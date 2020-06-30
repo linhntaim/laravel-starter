@@ -2,6 +2,11 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\CustomCampaignController;
+use App\ModelRepositories\CampaignEndpointRepository;
+use App\ModelRepositories\CampaignRepository;
+use App\Models\Campaign;
+use App\Models\CampaignEndpoint;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
 
@@ -30,8 +35,6 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
-
         parent::boot();
     }
 
@@ -42,11 +45,9 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function map()
     {
+        $this->mapFilesRoutes();
         $this->mapApiRoutes();
-
         $this->mapWebRoutes();
-
-        //
     }
 
     /**
@@ -59,8 +60,8 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapWebRoutes()
     {
         Route::middleware('web')
-            ->namespace($this->namespace)
-            ->group(base_path('routes/web.php'));
+             ->namespace($this->namespace)
+             ->group(base_path('routes/web.php'));
     }
 
     /**
@@ -76,5 +77,12 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware('api')
             ->namespace($this->namespace)
             ->group(base_path('routes/api.php'));
+    }
+
+    protected function mapFilesRoutes()
+    {
+        Route::prefix('files')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/files.php'));
     }
 }

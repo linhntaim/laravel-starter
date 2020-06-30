@@ -1,0 +1,13 @@
+<?php
+
+namespace App\Console\Commands;
+
+class TryCommand extends Command
+{
+    protected $signature = 'try';
+
+    protected function go()
+    {
+        // TODO: Write something to check if it works
+    }
+}
