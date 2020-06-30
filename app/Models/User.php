@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
+use App\ModelTraits\MemorizeTrait;
 use App\Notifications\ResetPasswordNotification;
 use App\Utils\ConfigHelper;
 use App\Utils\CryptoJs\AES;
 use App\Utils\LocalizationHelper;
 use App\Utils\DateTimeHelper;
-use App\Utils\MemorizeTrait;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
@@ -21,8 +21,6 @@ use Laravel\Passport\HasApiTokens;
  * @property int $id
  * @property string $display_name
  * @property string $email
- * @property OneTimeWatcher $oneTimeWatcher
- * @property MembershipWatcher $membershipWatcher
  */
 class User extends Authenticatable implements HasLocalePreference
 {
@@ -41,10 +39,7 @@ class User extends Authenticatable implements HasLocalePreference
      */
     protected $fillable = [
         'email',
-        'display_name',
         'password',
-        'url_avatar',
-        'created_at',
     ];
 
     /**
@@ -93,22 +88,6 @@ class User extends Authenticatable implements HasLocalePreference
     public function passwordReset()
     {
         return $this->hasOne(PasswordReset::class, 'email', 'email');
-    }
-
-    public function oneTimeWatcher()
-    {
-        return $this->hasOne(OneTimeWatcher::class, 'user_id', 'id');
-    }
-
-    public function membershipWatcher()
-    {
-        return $this->hasOne(MembershipWatcher::class, 'user_id', 'id');
-    }
-
-    public function companies()
-    {
-        return $this->belongsToMany(Company::class, 'watchers_companies', 'watcher_id', 'company_id')
-            ->withPivot('department_id');
     }
     #endregion
 
