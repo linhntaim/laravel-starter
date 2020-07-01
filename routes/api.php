@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +13,84 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group([
+    'namespace' => 'Api',
+], function () {
+    #region Common
+    Route::get('prerequisite', 'PrerequisiteController@index');
+
+    Route::post('device/current', 'DeviceController@currentStore');
+
+    Route::post('auth/login', 'LoginController@issueToken');
+    Route::post('auth/password', 'PasswordController@store');
+    Route::get('auth/password', 'PasswordController@show');
+
+    Route::get('managed-file/{id}', 'ManagedFileController@show')->name('managed_file.show');
+    #endregion
+
+    Route::group([
+        'middleware' => 'auth:api',
+    ], function () {
+        Route::post('auth/logout', 'LogoutController@logout');
+
+        Route::group([
+            'prefix' => 'account',
+            'namespace' => 'Account',
+        ], function () {
+            Route::get('/admin', 'AdminAccountController@index');
+        });
+    });
+
+    Route::group([
+        'namespace' => 'Home',
+    ], function () {
+        // TODO: Home API
+    });
+
+    Route::group([
+        'prefix' => 'admin',
+        'namespace' => 'Admin',
+        'middleware' => ['authenticated.passport.request', 'auth:api', 'authorized.admin'],
+    ], function () {
+        Route::group([
+            'prefix' => 'command',
+        ], function () {
+            Route::get('/', 'CommandController@index')
+                ->middleware('authorized.permissions:be-owner');
+            Route::post('/', 'CommandController@run')
+                ->middleware('authorized.permissions:be-owner');
+        });
+
+        Route::group([
+            'prefix' => 'system-log',
+        ], function () {
+            Route::get('/', 'SystemLogController@index')
+                ->middleware('authorized.permissions:be-owner');
+        });
+
+        Route::group([
+            'prefix' => 'app-option',
+        ], function () {
+            Route::post('/', 'AppOptionController@store');
+        });
+
+        Route::group([
+            'prefix' => 'data-export',
+        ], function () {
+            Route::get('{id}', 'DataExportController@show');
+        });
+
+        Route::group([
+            'prefix' => 'role',
+        ], function () {
+            Route::get('/', 'RoleController@index')
+                ->middleware('authorized.permissions:role-manage');
+            Route::post('/', 'RoleController@store')
+                ->middleware('authorized.permissions:role-manage');
+            Route::get('{id}', 'RoleController@show')
+                ->middleware('authorized.permissions:role-manage');
+            Route::post('{id}', 'RoleController@update')
+                ->middleware('authorized.permissions:role-manage');
+        });
+    });
 });

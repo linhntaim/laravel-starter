@@ -2,10 +2,9 @@
 
 namespace App\Vendors\Illuminate\Auth\Passwords;
 
+use Illuminate\Auth\Passwords\DatabaseTokenRepository as BaseDatabaseTokenRepository;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Support\Carbon;
-
-use Illuminate\Auth\Passwords\DatabaseTokenRepository as BaseDatabaseTokenRepository;
 
 class DatabaseTokenRepository extends BaseDatabaseTokenRepository
 {

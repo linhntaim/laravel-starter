@@ -3,7 +3,6 @@
 namespace App\ModelRepositories;
 
 use App\Models\AppOption;
-use App\Utils\Files\Filer\ImageFiler;
 
 class AppOptionRepository extends ModelRepository
 {
@@ -27,19 +26,5 @@ class AppOptionRepository extends ModelRepository
             }
             return true;
         });
-    }
-
-    public function saveAppLogo($imageFiler)
-    {
-        $imageFiler = (new ImageFiler($imageFiler))->store();
-        $imageThumbnail32Filer = $imageFiler->createThumbnail(32, 32);
-        $whiteImageFiler = $imageFiler->duplicate(false)->toWhite();
-        $whiteImageThumbnail32Filer = $whiteImageFiler->createThumbnail(32, 32);
-        return $this->save('app_logo', [
-            'original' => $imageFiler->getUrl(),
-            's32' => $imageThumbnail32Filer->getUrl(),
-            'white_original' => $whiteImageFiler->getUrl(),
-            'white_s32' => $whiteImageThumbnail32Filer->getUrl(),
-        ]);
     }
 }

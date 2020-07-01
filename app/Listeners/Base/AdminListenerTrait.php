@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Listeners\Base;
 
 use App\Utils\ClientApp\AdminTrait as AdminClientAppTrait;
 

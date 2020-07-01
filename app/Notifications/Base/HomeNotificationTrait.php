@@ -1,16 +1,18 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Notifications\Base;
 
 use App\Utils\ClientApp\HomeTrait as HomeClientAppTrait;
 
-trait HomeListenerTrait
+trait HomeNotificationTrait
 {
     use HomeClientAppTrait;
 
-    public function __construct()
+    public function __construct($fromUser = null)
     {
         $this->createClientApp();
+
+        parent::__construct($fromUser);
     }
 
     public function __destruct()

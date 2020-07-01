@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Notifications\Base;
 
 use App\Utils\ClientApp\AdminTrait as AdminClientAppTrait;
 

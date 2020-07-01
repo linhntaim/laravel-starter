@@ -48,7 +48,7 @@ class RoleController extends ApiController
 
     protected function storeExecute(Request $request)
     {
-        return $this->modelRepository->create(
+        return $this->modelRepository->createWithAttributes(
             [
                 'name' => $request->input('name'),
                 'display_name' => $request->input('display_name'),
@@ -76,7 +76,7 @@ class RoleController extends ApiController
     protected function updateExecute(Request $request)
     {
         $this->modelRepository->model();
-        return $this->modelRepository->update(
+        return $this->modelRepository->updateWithAttributes(
             [
                 'name' => $request->input('name'),
                 'display_name' => $request->input('display_name'),

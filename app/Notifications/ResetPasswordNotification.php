@@ -2,6 +2,8 @@
 
 namespace App\Notifications;
 
+use App\Notifications\Base\NowNotification;
+
 class ResetPasswordNotification extends NowNotification
 {
     protected $token;

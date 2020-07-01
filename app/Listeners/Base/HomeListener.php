@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Listeners\Base;
 
 class HomeListener extends Listener
 {

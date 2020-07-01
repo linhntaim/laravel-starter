@@ -8,11 +8,6 @@ use Illuminate\Support\Str;
 
 class PasswordBrokerManager extends BasePasswordBrokerManager
 {
-    public function __construct($app)
-    {
-        parent::__construct($app);
-    }
-
     protected function createTokenRepository(array $config)
     {
         $key = $this->app['config']['app.key'];
@@ -28,7 +23,8 @@ class PasswordBrokerManager extends BasePasswordBrokerManager
             $this->app['hash'],
             $config['table'],
             $key,
-            $config['expire']
+            $config['expire'],
+            $config['throttle'] ?? 0
         );
     }
 
@@ -46,21 +42,5 @@ class PasswordBrokerManager extends BasePasswordBrokerManager
     public function reset(array $credentials, Closure $callback)
     {
         return $this->__call(__FUNCTION__, [$credentials, $callback]);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function validator(Closure $callback)
-    {
-        return $this->__call(__FUNCTION__, [$callback]);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function validateNewPassword(array $credentials)
-    {
-        return $this->__call(__FUNCTION__, [$credentials]);
     }
 }

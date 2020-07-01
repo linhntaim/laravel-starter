@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Notifications\Base;
 
 class AdminNowNotification extends NowNotification
 {

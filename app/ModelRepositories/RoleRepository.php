@@ -50,7 +50,7 @@ class RoleRepository extends ModelRepository
      * @return Role
      * @throws Exception
      */
-    public function create(array $attributes, array $permissions = [])
+    public function createWithAttributes(array $attributes = [], array $permissions = [])
     {
         $this->createWithAttributes($attributes);
         return $this->catch(function () use ($permissions) {
@@ -68,13 +68,13 @@ class RoleRepository extends ModelRepository
      * @throws AppException
      * @throws Exception
      */
-    public function update(array $attributes, array $permissions = [])
+    public function updateWithAttributes(array $attributes = [], array $permissions = [])
     {
-        if (in_array($this->model->id, Role::PROTECTED)) {
+        if (in_array($this->getId(), Role::PROTECTED)) {
             throw new AppException('Cannot edit this role');
         }
 
-        $this->updateWithAttributes($attributes);
+        parent::updateWithAttributes($attributes);
         return $this->catch(function () use ($permissions) {
             if (count($permissions) > 0) {
                 $this->model->permissions()->sync($permissions);
@@ -96,5 +96,14 @@ class RoleRepository extends ModelRepository
             $this->queryByIds($ids)->noneProtected()->delete();
             return true;
         });
+    }
+
+    public function delete()
+    {
+        if (in_array($this->getId(), Role::PROTECTED)) {
+            throw new AppException('Cannot delete this role');
+        }
+
+        return parent::delete();
     }
 }

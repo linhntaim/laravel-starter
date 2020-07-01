@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Listeners\Base;
 
 class AdminNowListener extends NowListener
 {

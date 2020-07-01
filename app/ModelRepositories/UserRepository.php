@@ -2,8 +2,8 @@
 
 namespace App\ModelRepositories;
 
+use App\Exceptions\AppException;
 use App\Models\User;
-use App\Utils\ConfigHelper;
 use App\Utils\StringHelper;
 
 /**
@@ -16,6 +16,17 @@ class UserRepository extends ModelRepository
     public function modelClass()
     {
         return User::class;
+    }
+
+    protected function searchOn($query, array $search)
+    {
+        if (!empty($search['except_protected'])) {
+            $query->noneProtected();
+        }
+        if (!empty($search['email'])) {
+            $query->where('email', 'like', '%' . $search['email'] . '%');
+        }
+        return parent::searchOn($query, $search);
     }
 
     /**
@@ -40,21 +51,23 @@ class UserRepository extends ModelRepository
         });
     }
 
-    /**
-     * @param int $lengthLowercase
-     * @param int $lengthUppercase
-     * @param int $lengthNumber
-     * @return string
-     */
-    public static function generatePassword($lengthLowercase = 4, $lengthUppercase = 2, $lengthNumber = 2)
+    public function getByEmailWithTrashed($email, $strict = true)
     {
-        $lowercaseCharacter = 'abcdefghijklmnopqrstuvwxyz';
-        $uppercaseCharacter = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $numberCharacter = '0123456789';
-        $str1 = $lengthLowercase > 0 ? substr(str_shuffle($lowercaseCharacter), 0, $lengthLowercase) : '';
-        $str2 = $lengthUppercase > 0 ? substr(str_shuffle($uppercaseCharacter), 0, $lengthUppercase) : '';
-        $str3 = $lengthNumber > 0 ? substr(str_shuffle($numberCharacter), 0, $lengthNumber) : '';
-        return str_shuffle($str1 . $str2 . $str3);
+        return $strict ?
+            $this->query()->withTrashed()->where('email', $email)->firstOrFail()
+            : $this->query()->withTrashed()->where('email', $email)->first();
+    }
+
+    public function restoreTrashedEmail($email)
+    {
+        $user = $this->getByEmailWithTrashed($email, false);
+        if ($user && $user->trashed()) {
+            return $this->catch(function () use ($user) {
+                $user->restore();
+                return $user;
+            });
+        }
+        return $user;
     }
 
     /**
@@ -69,9 +82,6 @@ class UserRepository extends ModelRepository
         } else {
             unset($attributes['password']);
         }
-        if (empty($attributes['url_avatar'])) {
-            $attributes['url_avatar'] = ConfigHelper::defaultAvatarUrl();
-        }
         return parent::createWithAttributes($attributes);
     }
 
@@ -82,6 +92,10 @@ class UserRepository extends ModelRepository
      */
     public function updateWithAttributes(array $attributes = [])
     {
+        if (in_array($this->getId(), User::PROTECTED)) {
+            throw new AppException('Cannot edit this role');
+        }
+
         if (!empty($attributes['password'])) {
             $attributes['password'] = StringHelper::hash($attributes['password']);
         } else {
@@ -106,19 +120,12 @@ class UserRepository extends ModelRepository
         });
     }
 
-    public function getByEmailWithTrashed($email, $strict = true)
+    public function delete()
     {
-        return $strict ?
-            $this->query()->withTrashed()->where('email', $email)->firstOrFail()
-            : $this->query()->withTrashed()->where('email', $email)->first();
-    }
-
-    public function restoreTrashedEmail($email)
-    {
-        $user = $this->getByEmailWithTrashed($email, false);
-        if ($user && $user->trashed()) {
-            $user->restore();
+        if (in_array($this->getId(), User::PROTECTED)) {
+            throw new AppException('Cannot delete this user');
         }
-        return true;
+
+        return parent::delete();
     }
 }
