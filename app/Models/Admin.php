@@ -3,12 +3,19 @@
 namespace App\Models;
 
 use App\ModelTraits\MemorizeTrait;
+use App\Utils\ConfigHelper;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Admin
  * @package App\Models
+ * @property string $display_name
+ * @property string $roleName
+ * @property string $avatarUrl
+ * @property string[] $permissionNames
  * @property User $user
+ * @property Role $role
+ * @property ManagedFile $avatar
  */
 class Admin extends Model
 {
@@ -25,6 +32,8 @@ class Admin extends Model
     protected $fillable = [
         'user_id',
         'role_id',
+        'avatar_id',
+        'display_name',
     ];
 
     // region Get Attributes
@@ -63,6 +72,11 @@ class Admin extends Model
         }
         return $this->remind('permission_names');
     }
+
+    public function getAvatarUrlAttribute()
+    {
+        return empty($this->attributes['avatar_id']) ? ConfigHelper::defaultAvatarUrl() : $this->avatar->url;
+    }
     // endregion
 
     // region Relationships
@@ -74,6 +88,11 @@ class Admin extends Model
     public function role()
     {
         return $this->belongsTo(Role::class, 'role_id', 'id');
+    }
+
+    public function avatar()
+    {
+        return $this->belongsTo(ManagedFile::class, 'avatar_id', 'id');
     }
     // endregion
 

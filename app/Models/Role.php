@@ -4,6 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Role
+ * @package App\Models
+ * @property string $name
+ * @property string $display_name
+ * @property string $description
+ */
 class Role extends Model
 {
     const PROTECTED = [1, 2];

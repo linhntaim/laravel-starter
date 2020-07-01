@@ -6,31 +6,8 @@ use App\Utils\ConfigHelper;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 
-class SetupMigrationWithPassportCommand extends SetupMigrationCommand
+trait SetupMigrationWithPassportTrait
 {
-    protected $signature = 'setup:migration:passport {--u} {--dummy-data}';
-
-    protected function setup()
-    {
-        parent::setup();
-
-        $this->setupPassport();
-    }
-
-    protected function seed()
-    {
-        parent::seed();
-
-        $this->seedPassportData();
-    }
-
-    protected function uninstall()
-    {
-        parent::uninstall();
-
-        $this->uninstallPassport();
-    }
-
     private function setupPassport()
     {
         $this->warn('Passport...');
@@ -42,6 +19,7 @@ class SetupMigrationWithPassportCommand extends SetupMigrationCommand
 
     private function seedPassportData()
     {
+        $this->warn('Seeding passport...');
         $clientId = ConfigHelper::get('passport.password.client_id');
         $clientSecret = ConfigHelper::get('passport.password.client_secret');
 
@@ -53,6 +31,7 @@ class SetupMigrationWithPassportCommand extends SetupMigrationCommand
                 'secret' => $clientSecret,
             ]);
         $this->info(sprintf('The client ID %d was updated to %s', $clientId, $clientSecret));
+        $this->warn('Passport seeded!!!');
     }
 
     private function uninstallPassport()

@@ -19,8 +19,6 @@ class AccountTransformer extends ModelTransformer
         return [
             'id' => $user->id,
             'email' => $user->email,
-            'display_name' => $user->display_name,
-            'url_avatar' => $user->url_avatar,
 
             'localization' => [
                 '_ts' => $localizationHelper->getTimestamp(),

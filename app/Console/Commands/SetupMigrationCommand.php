@@ -4,15 +4,23 @@ namespace App\Console\Commands;
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Laravel\Passport\Passport;
 
 class SetupMigrationCommand extends Command
 {
+    use SetupMigrationWithPassportTrait;
+
     protected $signature = 'setup:migration {--u} {--dummy-data}';
 
-    protected $seeders = [];
+    protected $defaultSeeders = [
+        'DefaultSeeder',
+    ];
+
+    protected $hasPassport = false;
 
     protected function go()
     {
+        $this->hasPassport = class_exists('Laravel\\Passport\\Passport');
         $this->uninstall();
         if (!$this->option('u')) {
             $this->setup();
@@ -23,35 +31,47 @@ class SetupMigrationCommand extends Command
     protected function setup()
     {
         $this->setupMigration();
+
+        if ($this->hasPassport) {
+            $this->setupPassport();
+        }
     }
 
     protected function seed()
     {
         $this->seedDefaultData();
         $this->seedDummyData();
+
+        if ($this->hasPassport) {
+            $this->seedPassportData();
+        }
     }
 
     protected function uninstall()
     {
         $this->uninstallMigration();
+
+        if ($this->hasPassport) {
+            $this->uninstallPassport();
+        }
     }
 
     private function setupMigration()
     {
         $this->warn('Migrating...');
-        Artisan::call('migrate', [
-            '--seed' => true,
-        ], $this->output);
+        Artisan::call('migrate', [], $this->output);
         $this->warn('Migrated!!!');
     }
 
     private function seedDefaultData()
     {
-        foreach ($this->seeders as $seeder) {
+        $this->warn('Seeding default data...');
+        foreach ($this->defaultSeeders as $seeder) {
             Artisan::call('db:seed', [
                 '--class' => $seeder,
             ], $this->output);
         }
+        $this->warn('Seeded!!!');
     }
 
     private function seedDummyData()
