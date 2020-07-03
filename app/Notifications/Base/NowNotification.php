@@ -7,7 +7,7 @@ use App\ModelRepositories\UserRepository;
 use App\Models\Base\IUser;
 use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\DateTimer;
-use App\Utils\Facades\ClientSettings;
+use App\Utils\ClientSettings\Facade;
 use App\Utils\Mail\TemplateMailable;
 use App\Utils\Mail\TemplateNowMailable;
 use Illuminate\Database\Eloquent\Collection;
@@ -132,7 +132,7 @@ abstract class NowNotification extends BaseNotification
 
     protected function resolveData($via, IUser $notifiable, $dataCallback)
     {
-        return ClientSettings::temporaryFromUser($notifiable, function () use ($via, $notifiable, $dataCallback) {
+        return Facade::temporaryFromUser($notifiable, function () use ($via, $notifiable, $dataCallback) {
             return $dataCallback($notifiable);
         });
     }
@@ -150,7 +150,7 @@ abstract class NowNotification extends BaseNotification
             'id' => $this->id,
             'data' => $this->dataArray($notifiable),
             'created_at' => DateTimer::syncNow(),
-            'shown_created_at' => ClientSettings::dateTimer()->compound('shortDate', ' ', 'shortTime'),
+            'shown_created_at' => Facade::dateTimer()->compound('shortDate', ' ', 'shortTime'),
             'is_read' => false,
         ]));
     }

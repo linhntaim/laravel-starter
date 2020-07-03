@@ -5,7 +5,7 @@ namespace App\Utils\Mail;
 use App\Exceptions\AppException;
 use App\Utils\ClassTrait;
 use App\Utils\ConfigHelper;
-use App\Utils\Facades\ClientSettings;
+use App\Utils\ClientSettings\Facade;
 use Illuminate\Mail\Mailable;
 
 class TemplateNowMailable extends Mailable
@@ -76,7 +76,7 @@ class TemplateNowMailable extends Mailable
             $this->subject(
                 isset($this->templateParams[static::EMAIL_SUBJECT]) ?
                     $this->templateParams[static::EMAIL_SUBJECT]
-                    : $this->__transWithModule('default_subject', 'label', ['app_name' => ClientSettings::getAppName()])
+                    : $this->__transWithModule('default_subject', 'label', ['app_name' => Facade::getAppName()])
             );
 
             $this->view($this->getTemplatePath(), $this->templateParams);

@@ -5,18 +5,21 @@ namespace App\Utils;
 use App\Exceptions\UserException;
 use App\Http\Requests\Request;
 use App\Rules\Rule;
-use Illuminate\Contracts\Validation\Factory;
+use Illuminate\Support\Facades\Validator;
 
 trait ValidationTrait
 {
-    protected function getValidator()
+    /**
+     * @param array $inputs
+     * @param array $rules
+     * @param array $messages
+     * @param array $customAttributes
+     * @return bool
+     * @throws
+     */
+    protected function validatedData(array $inputs, array $rules, array $messages = [], array $customAttributes = [])
     {
-        return app(Factory::class);
-    }
-
-    protected function validatedInputs(array $inputs, array $rules, array $messages = [], array $customAttributes = [])
-    {
-        $validator = $this->getValidator()->make(
+        $validator = Validator::make(
             $inputs,
             $rules,
             array_merge($this->validatedMessages($rules), $messages),
@@ -28,9 +31,17 @@ trait ValidationTrait
         return true;
     }
 
+    /**
+     * @param Request $request
+     * @param array $rules
+     * @param array $messages
+     * @param array $customAttributes
+     * @return bool
+     * @throws
+     */
     protected function validated(Request $request, array $rules, array $messages = [], array $customAttributes = [])
     {
-        return $this->validatedInputs($request->all(), $rules, $messages, $customAttributes);
+        return $this->validatedData($request->all(), $rules, $messages, $customAttributes);
     }
 
     private function validatedMessages(array $rules)

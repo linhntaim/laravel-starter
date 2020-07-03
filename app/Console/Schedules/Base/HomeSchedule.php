@@ -2,7 +2,7 @@
 
 namespace App\Console\Schedules;
 
-use App\Utils\Traits\HomeSettingsHandleTrait;
+use App\Utils\ClientSettings\HomeSettingsHandleTrait;
 
 abstract class HomeSchedule extends Schedule
 {

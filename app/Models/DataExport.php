@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Utils\Facades\ClientSettings;
+use App\Utils\ClientSettings\Facade;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -30,7 +30,7 @@ class DataExport extends Model
 
     public function getSdStCreatedAtAttribute()
     {
-        return ClientSettings::dateTimer()->compound(
+        return Facade::dateTimer()->compound(
             'shortDate',
             ' ',
             'shortTime',

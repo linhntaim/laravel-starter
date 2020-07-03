@@ -2,7 +2,7 @@
 
 namespace App\Utils\ClientSettings;
 
-use App\Utils\Facades\ClientSettings;
+use App\Utils\ClientSettings\Facade;
 
 trait Capture
 {
@@ -12,7 +12,7 @@ trait Capture
 
     public function settingsCapture()
     {
-        $this->settings = ClientSettings::capture();
+        $this->settings = Facade::capture();
         $this->locale = $this->settings->getLocale();
         return $this;
     }
@@ -20,7 +20,7 @@ trait Capture
     public function settingsTemporary(callable $callback)
     {
         if (!empty($this->settings)) {
-            return ClientSettings::temporary($this->settings, $callback);
+            return Facade::temporary($this->settings, $callback);
         }
         return $callback();
     }

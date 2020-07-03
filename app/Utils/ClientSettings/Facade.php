@@ -1,12 +1,8 @@
 <?php
 
-namespace App\Utils\Facades;
+namespace App\Utils\ClientSettings;
 
-use App\Utils\ClientSettings\DateTimer;
-use App\Utils\ClientSettings\Manager;
-use App\Utils\ClientSettings\NumberFormatter;
-use App\Utils\ClientSettings\Settings;
-use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\Facade as BaseFacade;
 
 /**
  * Class ClientSettings
@@ -22,7 +18,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string getAppUrl()
  * @method static string getLocale()
  */
-class ClientSettings extends Facade
+class Facade extends BaseFacade
 {
     protected static function getFacadeAccessor()
     {

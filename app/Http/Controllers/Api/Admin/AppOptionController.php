@@ -55,7 +55,7 @@ class AppOptionController extends ModelApiController
             ];
         }
 
-        $this->validatedInputs($options, [
+        $this->validatedData($options, [
             '*.key' => 'required|max:255',
             '*.value' => 'required',
         ]);

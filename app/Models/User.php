@@ -8,7 +8,7 @@ use App\ModelTraits\MemorizeTrait;
 use App\ModelTraits\PassportTrait;
 use App\Notifications\ResetPasswordNotification;
 use App\Utils\ConfigHelper;
-use App\Utils\Facades\ClientSettings;
+use App\Utils\ClientSettings\Facade;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
@@ -53,7 +53,7 @@ class User extends Authenticatable implements HasLocalePreference, IUser
 
     public function getSdStCreatedAtAttribute()
     {
-        return ClientSettings::dateTimer()->compound(
+        return Facade::dateTimer()->compound(
             'shortDate',
             ' ',
             'shortTime',
@@ -63,7 +63,7 @@ class User extends Authenticatable implements HasLocalePreference, IUser
 
     public function getSdStUpdatedAtAttribute()
     {
-        return ClientSettings::dateTimer()->compound(
+        return Facade::dateTimer()->compound(
             'shortDate',
             ' ',
             'shortTime',
@@ -115,7 +115,7 @@ class User extends Authenticatable implements HasLocalePreference, IUser
 
     public function preferredSettings()
     {
-        return $this instanceof IUserHasSettings ? $this->getSettings() : ClientSettings::capture();
+        return $this instanceof IUserHasSettings ? $this->getSettings() : Facade::capture();
     }
 
     public function getPasswordResetExpiredAt()

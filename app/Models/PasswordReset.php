@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Utils\Facades\ClientSettings;
+use App\Utils\ClientSettings\Facade;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -22,7 +22,7 @@ class PasswordReset extends Model
 
     public function getSdStExpiredAtAttribute()
     {
-        $dateTimer = ClientSettings::dateTimer();
+        $dateTimer = Facade::dateTimer();
         return $dateTimer->compound(
             'shortDate',
             ' ',

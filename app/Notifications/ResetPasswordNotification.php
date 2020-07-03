@@ -4,7 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Base\IUser;
 use App\Notifications\Base\AdminNowNotification;
-use App\Utils\Facades\ClientSettings;
+use App\Utils\ClientSettings\Facade;
 
 class ResetPasswordNotification extends AdminNowNotification
 {
@@ -30,7 +30,7 @@ class ResetPasswordNotification extends AdminNowNotification
     protected function getMailSubject(IUser $notifiable)
     {
         return $this->__transWithCurrentModule('mail_subject', [
-            'app_name' => ClientSettings::getAppName(),
+            'app_name' => Facade::getAppName(),
         ]);
     }
 
@@ -45,7 +45,7 @@ class ResetPasswordNotification extends AdminNowNotification
     public function getAppResetPasswordUrl(IUser $notifiable)
     {
         return implode('/', [
-            ClientSettings::getAppUrl(),
+            Facade::getAppUrl(),
             trim($this->appResetPasswordPath, '/'),
             $this->token,
         ]);

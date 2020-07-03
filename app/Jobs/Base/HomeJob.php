@@ -2,7 +2,7 @@
 
 namespace App\Jobs\Base;
 
-use App\Utils\Traits\HomeSettingsHandleTrait;
+use App\Utils\ClientSettings\HomeSettingsHandleTrait;
 
 abstract class HomeJob extends Job
 {

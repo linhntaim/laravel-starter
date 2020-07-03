@@ -6,7 +6,7 @@ use App\Http\Requests\Request;
 use App\Utils\ClientSettings\Manager as ClientSettingsManager;
 use App\Utils\ConfigHelper;
 use App\Utils\ExtraActions\HookExtraAction;
-use App\Utils\Facades\ClientSettings;
+use App\Utils\ClientSettings\Facade;
 use App\Vendors\Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -52,6 +52,6 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        ClientSettings::autoFetch();
+        Facade::autoFetch();
     }
 }
