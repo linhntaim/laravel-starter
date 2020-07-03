@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Base\Command;
 use Illuminate\Foundation\Application;
 
 class AboutCommand extends Command

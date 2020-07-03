@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Utils\DateTimeHelper;
+use App\Utils\ClientSettings\DateTimer;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -30,7 +30,7 @@ class DataExport extends Model
 
     public function getSdStCreatedAtAttribute()
     {
-        return DateTimeHelper::getInstance()
+        return DateTimer::getInstance()
             ->compound(
                 'shortDate',
                 ' ',

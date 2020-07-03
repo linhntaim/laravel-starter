@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Base\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
-use Laravel\Passport\Passport;
 
 class SetupMigrationCommand extends Command
 {

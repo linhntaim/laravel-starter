@@ -2,19 +2,15 @@
 
 namespace App\Listeners\Base;
 
-use App\Utils\ClientApp\AdminTrait as AdminClientAppTrait;
+use App\Configuration;
+use App\Utils\Facades\ClientSettings;
 
 trait AdminListenerTrait
 {
-    use AdminClientAppTrait;
-
-    public function __construct()
+    public function handle($event)
     {
-        $this->createClientApp();
-    }
-
-    public function __destruct()
-    {
-        $this->destroyClientApp();
+        ClientSettings::temporaryFromClientType(Configuration::CLIENT_APP_ADMIN, function () use ($event) {
+            parent::handle($event);
+        });
     }
 }

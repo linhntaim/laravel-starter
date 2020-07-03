@@ -2,7 +2,7 @@
 
 namespace App\Listeners\Base;
 
-class AdminListener extends Listener
+abstract class AdminListener extends Listener
 {
     use AdminListenerTrait;
 }

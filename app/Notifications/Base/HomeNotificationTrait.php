@@ -2,21 +2,19 @@
 
 namespace App\Notifications\Base;
 
-use App\Utils\ClientApp\HomeTrait as HomeClientAppTrait;
+use App\Configuration;
+use App\ModelTraits\IUser;
+use App\Utils\Facades\ClientSettings;
 
 trait HomeNotificationTrait
 {
-    use HomeClientAppTrait;
-
-    public function __construct($fromUser = null)
+    protected function resolveData($via, IUser $notifiable, $dataCallback)
     {
-        $this->createClientApp();
-
-        parent::__construct($fromUser);
-    }
-
-    public function __destruct()
-    {
-        $this->destroyClientApp();
+        return ClientSettings::temporaryFromClientType(
+            Configuration::CLIENT_APP_HOME,
+            function () use ($via, $notifiable, $dataCallback) {
+                return parent::resolveData($via, $notifiable, $dataCallback);
+            }
+        );
     }
 }

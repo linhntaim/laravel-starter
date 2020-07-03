@@ -2,11 +2,6 @@
 
 namespace App\Providers;
 
-use App\Http\Controllers\CustomCampaignController;
-use App\ModelRepositories\CampaignEndpointRepository;
-use App\ModelRepositories\CampaignRepository;
-use App\Models\Campaign;
-use App\Models\CampaignEndpoint;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +23,13 @@ class RouteServiceProvider extends ServiceProvider
      */
     public const HOME = '/home';
 
+    public function __construct($app)
+    {
+        parent::__construct($app);
+
+        print_r(__CLASS__ . '::construct' . PHP_EOL);
+    }
+
     /**
      * Define your route model bindings, pattern filters, etc.
      *
@@ -36,6 +38,12 @@ class RouteServiceProvider extends ServiceProvider
     public function boot()
     {
         parent::boot();
+        print_r(__CLASS__ . '::boot' . PHP_EOL);
+    }
+
+    public function __destruct()
+    {
+        print_r(__CLASS__ . '::destruct' . PHP_EOL);
     }
 
     /**
@@ -60,8 +68,8 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapWebRoutes()
     {
         Route::middleware('web')
-             ->namespace($this->namespace)
-             ->group(base_path('routes/web.php'));
+            ->namespace($this->namespace)
+            ->group(base_path('routes/web.php'));
     }
 
     /**

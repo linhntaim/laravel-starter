@@ -15,7 +15,6 @@ use App\ModelTransformers\RoleTransformer;
 use App\ModelTransformers\ModelTransformTrait;
 use App\Utils\ConfigHelper;
 use App\Utils\Files\FileHelper;
-use App\Utils\TenantHelper;
 
 class PrerequisiteController extends ApiController
 {
@@ -57,12 +56,9 @@ class PrerequisiteController extends ApiController
                 'max_upload_file_size' => FileHelper::getInstance()->maxUploadFileSize(),
                 'variables' => ConfigHelper::get('variables'),
                 'app_options' => $this->modelSafe(
-                    array_merge(
-                        $this->modelTransform(
-                            AppOptionTransformer::class,
-                            (new AppOptionRepository())->getAll()->keyBy('key')
-                        ),
-                        TenantHelper::getInstance()->currentPublicOptions()
+                    $this->modelTransform(
+                        AppOptionTransformer::class,
+                        (new AppOptionRepository())->getAll()->keyBy('key')
                     )
                 ),
                 'gtm_code' => ConfigHelper::get('gtm_code'),

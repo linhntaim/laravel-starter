@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Http\Requests\Request;
+use App\Utils\ClientSettings\Manager as ClientSettingsManager;
 use App\Utils\ConfigHelper;
 use App\Utils\ExtraActions\HookExtraAction;
+use App\Utils\Facades\ClientSettings;
 use App\Vendors\Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -23,6 +25,9 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton('db.factory', function ($app) {
             return new ConnectionFactory($app);
+        });
+        $this->app->singleton(ClientSettingsManager::class, function () {
+            return new ClientSettingsManager();
         });
         $this->app->singleton(HookExtraAction::class, function () {
             return new HookExtraAction();
@@ -46,5 +51,7 @@ class AppServiceProvider extends ServiceProvider
         if (Str::startsWith(ConfigHelper::getAppUrl(), 'https://')) {
             URL::forceScheme('https');
         }
+
+        ClientSettings::autoFetch();
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Base\Command;
+
 class ClientLimitCommand extends Command
 {
     protected $signature = 'client:limit {--none} {--allow=} {--deny=} {--admin}';

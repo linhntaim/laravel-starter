@@ -4,8 +4,8 @@ namespace App\Utils\Files;
 
 use App\Exceptions\AppException;
 use App\Utils\ClassTrait;
-use App\Utils\DateTimeHelper;
-use App\Utils\NumberFormatHelper;
+use App\Utils\ClientSettings\DateTimer;
+use App\Utils\ClientSettings\NumberFormatter;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 
@@ -45,7 +45,7 @@ class FileHelper
 
     public function storePath()
     {
-        $now = DateTimeHelper::syncNowObject();
+        $now = DateTimer::syncNowObject();
         return $this->concatPath($this->filePath, static::STORE_FOLDER, $now->format('Y'), $now->format('m'), $now->format('d'), $now->format('H'));
     }
 
@@ -223,7 +223,7 @@ class FileHelper
             $typeIndex = 0;
         }
 
-        return NumberFormatHelper::getInstance()->formatNumber($fileSize) . ' ' . $this->fileSizeType[$typeIndex];
+        return NumberFormatter::getInstance()->formatNumber($fileSize) . ' ' . $this->fileSizeType[$typeIndex];
     }
 
     public function delete($target)

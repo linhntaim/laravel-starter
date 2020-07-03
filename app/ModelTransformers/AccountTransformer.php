@@ -2,7 +2,7 @@
 
 namespace App\ModelTransformers;
 
-use App\Utils\DateTimeHelper;
+use App\Utils\ClientSettings\DateTimer;
 use App\Utils\LocalizationHelper;
 
 class AccountTransformer extends ModelTransformer
@@ -14,7 +14,7 @@ class AccountTransformer extends ModelTransformer
         $user = $this->getModel();
 
         $localizationHelper = LocalizationHelper::getInstance();
-        $dateTimeHelper = DateTimeHelper::getInstance();
+        $dateTimeHelper = DateTimer::getInstance();
 
         return [
             'id' => $user->id,

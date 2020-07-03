@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Utils;
+namespace App\Utils\ClientSettings;
 
 use App\Exceptions\AppException;
+use App\Utils\ClassTrait;
 use Carbon\Carbon;
 use Carbon\CarbonTimeZone;
 use Exception;
 use Illuminate\Support\Str;
 
-abstract class BaseDateTimeHelper
+class DateTimer
 {
     use ClassTrait;
 
@@ -18,97 +19,43 @@ abstract class BaseDateTimeHelper
     const SHORT_TIME_FUNCTION = 'shortTime';
     const DATABASE_FORMAT_DATE = 'Y-m-d';
     const DATABASE_FORMAT_TIME = 'H:i:s';
-    const DATABASE_FORMAT = BaseDateTimeHelper::DATABASE_FORMAT_DATE . ' ' . BaseDateTimeHelper::DATABASE_FORMAT_TIME;
+    const DATABASE_FORMAT = DateTimer::DATABASE_FORMAT_DATE . ' ' . DateTimer::DATABASE_FORMAT_TIME;
     const DAY_TYPE_NONE = 0;
     const DAY_TYPE_START = -1;
     const DAY_TYPE_END = 1;
     const DAY_TYPE_NEXT_START = 2;
 
     /**
-     * @var static
-     */
-    protected static $instance;
-
-    /**
-     * @return static
-     */
-    public static function getInstance()
-    {
-        if (empty(static::$instance)) {
-            static::$instance = new static();
-        }
-        return static::$instance;
-    }
-
-    /**
      * @var Carbon
      */
     protected static $now;
 
-    /**
-     * @param bool $reset
-     * @return Carbon
-     * @throws Exception
-     */
-    public static function syncNowObject($reset = false)
-    {
-        if ($reset || empty(static::$now)) {
-            static::$now = new Carbon('now', new CarbonTimeZone('UTC'));
-        }
-        return clone static::$now;
-    }
-
-    /**
-     * @param string $format
-     * @param bool $reset
-     * @return string
-     * @throws Exception
-     */
-    public static function syncNowFormat($format, $reset = false)
-    {
-        return static::syncNowObject($reset)->format($format);
-    }
-
-    /**
-     * @param bool $reset
-     * @return string
-     * @throws Exception
-     */
-    public static function syncNow($reset = false)
-    {
-        return static::syncNowFormat(static::DATABASE_FORMAT, $reset);
-    }
-
-    private $locale;
-    private $locales;
-    private $transLongDate;
-    private $transShortDate;
-    private $transShortMonth;
-    private $transLongTime;
-    private $transShortTime;
+    protected $locale;
+    protected $locales;
+    protected $transLongDate;
+    protected $transShortDate;
+    protected $transShortMonth;
+    protected $transLongTime;
+    protected $transShortTime;
 
     /**
      * Seconds
      *
      * @var float|int
      */
-    private $dateTimeOffset;
+    protected $dateTimeOffset;
 
-    public function __construct(LocalizationHelper $localizationHelper = null)
+    public function __construct(Settings $settings)
     {
-        if ($localizationHelper == null) {
-            $localizationHelper = LocalizationHelper::getInstance();
-        }
+        $this->locale = $settings->getLocale();
 
-        $this->locale = $localizationHelper->getLocale();
+        $this->transLongDate = 'datetime.formats.long_date_' . $settings->getLongDateFormat();
+        $this->transShortDate = 'datetime.formats.short_date_' . $settings->getShortDateFormat();
+        $this->transShortMonth = 'datetime.formats.short_month_' . $settings->getShortDateFormat();
+        $this->transLongTime = 'datetime.formats.long_time_' . $settings->getLongTimeFormat();
+        $this->transShortTime = 'datetime.formats.short_time_' . $settings->getShortTimeFormat();
 
-        $this->transLongDate = 'datetime.formats.long_date_' . $localizationHelper->getLongDateFormat();
-        $this->transShortDate = 'datetime.formats.short_date_' . $localizationHelper->getShortDateFormat();
-        $this->transShortMonth = 'datetime.formats.short_month_' . $localizationHelper->getShortDateFormat();
-        $this->transLongTime = 'datetime.formats.long_time_' . $localizationHelper->getLongTimeFormat();
-        $this->transShortTime = 'datetime.formats.short_time_' . $localizationHelper->getShortTimeFormat();
-
-        $this->dateTimeOffset = $this->parseDateTimeOffsetByTimezone($localizationHelper->getTimezone());
+        $this->dateTimeOffset = $this->parseDateTimeOffsetByTimezone($settings->getTimezone());
     }
 
     public function getLocale()
@@ -124,7 +71,7 @@ abstract class BaseDateTimeHelper
     /**
      * @param $time
      * @return Carbon
-     * @throws \App\Exceptions\Exception
+     * @throws
      */
     protected function toCarbon($time)
     {
@@ -136,7 +83,9 @@ abstract class BaseDateTimeHelper
             }
         }
 
-        if ($time instanceof Carbon) return (clone $time)->setTimezone(new CarbonTimeZone('UTC'))->locale($this->locale);
+        if ($time instanceof Carbon) {
+            return (clone $time)->setTimezone(new CarbonTimeZone('UTC'))->locale($this->locale);
+        }
 
         throw new AppException(self::__transErrorWithModule('time_not_supported'));
     }
@@ -190,7 +139,7 @@ abstract class BaseDateTimeHelper
         return str_replace($this->locales['trans'], $this->locales['default'], $time);
     }
 
-    protected function applyStartType(Carbon $time, $start = BaseDateTimeHelper::DAY_TYPE_NONE)
+    protected function applyStartType(Carbon $time, $start = DateTimer::DAY_TYPE_NONE)
     {
         switch ($start) {
             case static::DAY_TYPE_NEXT_START:
@@ -212,26 +161,26 @@ abstract class BaseDateTimeHelper
      * @param Carbon|string $time
      * @param int $start
      * @return Carbon
-     * @throws \App\Exceptions\Exception
+     * @throws
      */
-    public function from($time, $start = BaseDateTimeHelper::DAY_TYPE_NONE)
+    public function from($time, $start = DateTimer::DAY_TYPE_NONE)
     {
         $time = $this->applyStartType($this->toCarbon($time), $start);
         $time->subSeconds($this->getDateTimeOffset());
         return $time;
     }
 
-    public function fromFormat($format, $time, $start = BaseDateTimeHelper::DAY_TYPE_NONE)
+    public function fromFormat($format, $time, $start = DateTimer::DAY_TYPE_NONE)
     {
         return $this->from(Carbon::createFromFormat($format, $this->standardizeTime($time)), $start);
     }
 
-    public function fromFormatToFormat($format, $time, $toFormat = null, $start = BaseDateTimeHelper::DAY_TYPE_NONE)
+    public function fromFormatToFormat($format, $time, $toFormat = null, $start = DateTimer::DAY_TYPE_NONE)
     {
         return $this->fromFormat($format, $time, $start)->format($toFormat ?: $format);
     }
 
-    public function fromFormatToDatabaseFormat($format, $time, $start = BaseDateTimeHelper::DAY_TYPE_NONE)
+    public function fromFormatToDatabaseFormat($format, $time, $start = DateTimer::DAY_TYPE_NONE)
     {
         return $this->fromFormatToFormat($format, $time, static::DATABASE_FORMAT, $start);
     }
@@ -243,16 +192,16 @@ abstract class BaseDateTimeHelper
      * @param Carbon|string $time
      * @param int $start
      * @return Carbon
-     * @throws \App\Exceptions\Exception
+     * @throws
      */
-    public function getObject($time = 'now', $start = BaseDateTimeHelper::DAY_TYPE_NONE)
+    public function getObject($time = 'now', $start = DateTimer::DAY_TYPE_NONE)
     {
         $time = $this->toCarbon($time);
         $time->addSeconds($this->getDateTimeOffset());
         return $this->applyStartType($time, $start);
     }
 
-    protected function getBags($time = 'now', $start = BaseDateTimeHelper::DAY_TYPE_NONE)
+    protected function getBags($time = 'now', $start = DateTimer::DAY_TYPE_NONE)
     {
         $time = $this->getObject($time, $start);
         return [
@@ -326,7 +275,7 @@ abstract class BaseDateTimeHelper
         return trans($this->transShortTime, $bags, $this->locale);
     }
 
-    public function compound($func1 = BaseDateTimeHelper::SHORT_DATE_FUNCTION, $separation = ' ', $func2 = BaseDateTimeHelper::SHORT_TIME_FUNCTION, $time = 'now')
+    public function compound($func1 = DateTimer::SHORT_DATE_FUNCTION, $separation = ' ', $func2 = DateTimer::SHORT_TIME_FUNCTION, $time = 'now')
     {
         $allowedFunctions = [static::LONG_DATE_FUNCTION, static::LONG_TIME_FUNCTION, static::SHORT_DATE_FUNCTION, static::SHORT_TIME_FUNCTION];
         if (!in_array($func1, $allowedFunctions) || !in_array($func2, $allowedFunctions)) {
@@ -405,9 +354,9 @@ abstract class BaseDateTimeHelper
      * @param Carbon|string $time
      * @param int $start
      * @return string
-     * @throws \App\Exceptions\Exception
+     * @throws
      */
-    public function format($format, $time, $start = BaseDateTimeHelper::DAY_TYPE_NONE)
+    public function format($format, $time, $start = DateTimer::DAY_TYPE_NONE)
     {
         return $this->getObject($time, $start)->format($format);
     }
@@ -593,5 +542,39 @@ abstract class BaseDateTimeHelper
     public static function getShortTimeFormatValues()
     {
         return range(0, 4);
+    }
+
+    /**
+     * @param bool $reset
+     * @return Carbon
+     * @throws
+     */
+    public static function syncNowObject($reset = false)
+    {
+        if ($reset || empty(static::$now)) {
+            static::$now = new Carbon('now', new CarbonTimeZone('UTC'));
+        }
+        return clone static::$now;
+    }
+
+    /**
+     * @param string $format
+     * @param bool $reset
+     * @return string
+     * @throws
+     */
+    public static function syncNowFormat($format, $reset = false)
+    {
+        return static::syncNowObject($reset)->format($format);
+    }
+
+    /**
+     * @param bool $reset
+     * @return string
+     * @throws
+     */
+    public static function syncNow($reset = false)
+    {
+        return static::syncNowFormat(static::DATABASE_FORMAT, $reset);
     }
 }

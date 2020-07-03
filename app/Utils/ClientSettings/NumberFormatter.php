@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Utils;
+namespace App\Utils\ClientSettings;
 
-abstract class BaseNumberFormatHelper
+class NumberFormatter
 {
     const DEFAULT_NUMBER_OF_DECIMAL_POINTS = 2;
 
@@ -10,57 +10,43 @@ abstract class BaseNumberFormatHelper
     /**
      * @var int
      */
-    public static $NUMBER_OF_DECIMAL_POINTS;
-
-    /**
-     * @var NumberFormatHelper
-     */
-    protected static $instance;
-
-    public static function getInstance()
-    {
-        if (empty(static::$instance)) {
-            static::$instance = new static();
-        }
-        return static::$instance;
-    }
-    #endregion
+    public $numberOfDecimalPoints;
 
     /**
      * @var string
      */
     private $type;
 
-    public function __construct(LocalizationHelper $localizationHelper = null)
+    public function __construct(Settings $settings = null)
     {
-        if ($localizationHelper == null) {
-            $localizationHelper = LocalizationHelper::getInstance();
-        }
-        $this->type = $localizationHelper->getNumberFormat();
+        $this->type = $settings->getNumberFormat();
         $this->modeNormal();
     }
 
     public function setType($value)
     {
         $this->type = $value;
+        return $this;
     }
 
     public function modeInt()
     {
-        $this->mode(0);
+        return $this->mode(0);
     }
 
     public function modeNormal()
     {
-        $this->mode(static::DEFAULT_NUMBER_OF_DECIMAL_POINTS);
+        return $this->mode(static::DEFAULT_NUMBER_OF_DECIMAL_POINTS);
     }
 
     /**
      * @param int $numberOfDecimalPoints
+     * @return NumberFormatter
      */
     public function mode($numberOfDecimalPoints)
     {
-        static::$NUMBER_OF_DECIMAL_POINTS = $numberOfDecimalPoints;
+        $this->numberOfDecimalPoints = $numberOfDecimalPoints;
+        return $this;
     }
 
     /**
@@ -86,16 +72,14 @@ abstract class BaseNumberFormatHelper
 
     public function formatInt($number)
     {
-        $this->modeInt();
-        $number = $this->format($number);
+        $number = $this->modeInt()->format($number);
         $this->modeNormal();
         return $number;
     }
 
-    public function formatNumber($number, $mode = BaseNumberFormatHelper::DEFAULT_NUMBER_OF_DECIMAL_POINTS)
+    public function formatNumber($number, $mode = NumberFormatter::DEFAULT_NUMBER_OF_DECIMAL_POINTS)
     {
-        $this->mode($mode);
-        $number = $this->format($number);
+        $number = $this->mode($mode)->format($number);
         $this->modeNormal();
         return $number;
     }
@@ -133,10 +117,9 @@ abstract class BaseNumberFormatHelper
                 return [',', '.'];
             case 'comma_space':
                 return [',', ' '];
-            case 'point_comma':
-                return ['.', ','];
             case 'point_space':
                 return ['.', ' '];
+            case 'point_comma':
             default:
                 return ['.', ','];
         }
@@ -149,10 +132,9 @@ abstract class BaseNumberFormatHelper
                 return ['\,', '\.'];
             case 'comma_space':
                 return ['\,', '[ ]'];
-            case 'point_comma':
-                return ['\.', '\,'];
             case 'point_space':
                 return ['\.', '[ ]'];
+            case 'point_comma':
             default:
                 return ['\.', '\,'];
         }
@@ -164,7 +146,7 @@ abstract class BaseNumberFormatHelper
      */
     public function formatPointComma($number)
     {
-        return number_format($number, static::$NUMBER_OF_DECIMAL_POINTS, '.', ',');
+        return number_format($number, $this->numberOfDecimalPoints, '.', ',');
     }
 
     /**
@@ -173,7 +155,7 @@ abstract class BaseNumberFormatHelper
      */
     public function formatPointSpace($number)
     {
-        return number_format($number, static::$NUMBER_OF_DECIMAL_POINTS, '.', ' ');
+        return number_format($number, $this->numberOfDecimalPoints, '.', ' ');
     }
 
     /**
@@ -191,7 +173,7 @@ abstract class BaseNumberFormatHelper
      */
     public function formatCommaPoint($number)
     {
-        return number_format($number, static::$NUMBER_OF_DECIMAL_POINTS, ',', '.');
+        return number_format($number, $this->numberOfDecimalPoints, ',', '.');
     }
 
     /**
@@ -200,7 +182,7 @@ abstract class BaseNumberFormatHelper
      */
     public function formatCommaSpace($number)
     {
-        return number_format($number, static::$NUMBER_OF_DECIMAL_POINTS, ',', ' ');
+        return number_format($number, $this->numberOfDecimalPoints, ',', ' ');
     }
 
     /**
@@ -210,35 +192,5 @@ abstract class BaseNumberFormatHelper
     public function fromFormatComma($formattedNumber)
     {
         return floatval(str_replace(',', '.', preg_replace('/[^\d\,]+/', '', $formattedNumber)));
-    }
-
-    public static function doFormat($number, $type)
-    {
-        switch ($type) {
-            case 'point_comma':
-                return static::getInstance()->formatPointComma($number);
-            case 'point_space':
-                return static::getInstance()->formatPointSpace($number);
-            case 'comma_point':
-                return static::getInstance()->formatCommaPoint($number);
-            case 'comma_space':
-                return static::getInstance()->formatCommaSpace($number);
-            default:
-                return static::getInstance()->format($number);
-        }
-    }
-
-    public static function doFromFormat($formattedNumber, $type)
-    {
-        switch ($type) {
-            case 'point_comma':
-            case 'point_space':
-                return static::getInstance()->fromFormatPoint($formattedNumber);
-            case 'comma_point':
-            case 'comma_space':
-                return static::getInstance()->fromFormatComma($formattedNumber);
-            default:
-                return static::getInstance()->fromFormat($formattedNumber);
-        }
     }
 }

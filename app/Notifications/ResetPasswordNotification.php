@@ -2,9 +2,10 @@
 
 namespace App\Notifications;
 
-use App\Notifications\Base\NowNotification;
+use App\Notifications\Base\AdminNowNotification;
+use App\Utils\Facades\ClientSettings;
 
-class ResetPasswordNotification extends NowNotification
+class ResetPasswordNotification extends AdminNowNotification
 {
     protected $token;
     protected $appResetPasswordPath;
@@ -27,8 +28,8 @@ class ResetPasswordNotification extends NowNotification
 
     protected function getMailSubject($notifiable)
     {
-        return $this->__transNotification('mail_subject', [
-            'app_name' => $this->getClientAppName(),
+        return $this->__transWithCurrentModule('mail_subject', [
+            'app_name' => ClientSettings::getAppName(),
         ]);
     }
 
@@ -43,9 +44,8 @@ class ResetPasswordNotification extends NowNotification
     public function getAppResetPasswordUrl($notifiable)
     {
         return implode('/', [
-            $this->clientAppUrl,
+            ClientSettings::getAppUrl(),
             trim($this->appResetPasswordPath, '/'),
-            // $notifiable->preferredEmail(),
             $this->token,
         ]);
     }

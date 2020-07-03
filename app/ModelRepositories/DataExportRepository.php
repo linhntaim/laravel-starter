@@ -41,7 +41,7 @@ class DataExportRepository extends ModelRepository
 
     public function createWithAttributesAndExport(array $attributes, Export $export)
     {
-        $attributes['name'] = $export->getUniqueName();
+        $attributes['name'] = $export->getName();
         $attributes['state'] = DataExport::STATE_EXPORTING;
         $attributes['payload'] = serialize($export);
         $this->createWithAttributes($attributes);

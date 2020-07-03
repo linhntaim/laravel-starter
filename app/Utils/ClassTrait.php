@@ -8,11 +8,15 @@ use Illuminate\Support\Str;
 
 trait ClassTrait
 {
-    protected static $transNamespace = '';
+    protected static $__transNamespace = '';
 
-    protected function setTransNamespace($transNamespace)
+    protected static $__friendlyClassBaseName;
+
+    protected static $__snakyClassBaseName;
+
+    protected static function setTransNamespace($transNamespace)
     {
-        static::$transNamespace = $transNamespace . '::';
+        static::$__transNamespace = $transNamespace . '::';
     }
 
     protected static function __class()
@@ -27,33 +31,45 @@ trait ClassTrait
 
     protected static function __snakyClassBaseName()
     {
-        return Str::snake(static::__classBaseName());
+        if (empty(static::$__snakyClassBaseName)) {
+            static::$__snakyClassBaseName = Str::snake(static::__classBaseName());
+        }
+        return static::$__snakyClassBaseName;
     }
 
     protected static function __friendlyClassBaseName()
     {
-        return Str::title(Str::snake(static::__classBaseName(), ' '));
+        if (empty(static::$__friendlyClassBaseName)) {
+            static::$__friendlyClassBaseName = Str::title(Str::snake(static::__classBaseName(), ' '));
+        }
+        return static::$__friendlyClassBaseName;
+    }
+
+    protected static function __transCurrentModule()
+    {
+        return null;
     }
 
     protected static function __trans($key = null, $replace = [], $locale = null)
     {
-        $key = sprintf('%s%s', static::$transNamespace, $key);
+        $key = sprintf('%s%s', static::$__transNamespace, $key);
         return trans(empty($key) ? null : $key, $replace, $locale);
     }
 
     protected static function __transChoice($key, $number, $replace = [], $locale = null)
     {
-        return trans_choice(sprintf('%s%s', static::$transNamespace, $key), $number, $replace, $locale);
+        $key = sprintf('%s%s', static::$__transNamespace, $key);
+        return trans_choice(empty($key) ? null : $key, $number, $replace, $locale);
     }
 
-    protected static function __hasTransWithModule($name, $module, $locale = null, $fallback = true)
+    protected static function __hasTransWithCurrentModule($name, $locale = null, $fallback = true)
     {
-        return Lang::has(static::__transPathWithModule($name, $module), $locale, $fallback);
+        return static::__hasTransWithSpecificModule($name, static::__transCurrentModule(), $locale, $fallback);
     }
 
-    protected static function __transWithModule($name, $module, $replace = [], $locale = null)
+    protected static function __transWithCurrentModule($name, $replace = [], $locale = null)
     {
-        return trans(static::__transPathWithModule($name, $module), $replace, $locale);
+        return static::__transWithSpecificModule($name, static::__transCurrentModule(), $replace, $locale);
     }
 
     protected static function __hasTransWithSpecificModule($name, $module, $locale = null, $fallback = true)
@@ -66,17 +82,9 @@ trait ClassTrait
         return trans(static::__transPathWithModule($name, $module, true), $replace, $locale);
     }
 
-    protected static function __transPathWithModule($name, $module, $specific = false)
+    protected static function __hasTransErrorWithModule($error, $locale = null, $fallback = true)
     {
-        if ($specific) {
-            return sprintf('%s%s.%s.%s', static::$transNamespace, $module, static::__snakyClassBaseName(), $name);
-        }
-
-        $classNames = explode('\\', str_replace(Configuration::ROOT_NAMESPACE . '\\', '', static::class));
-        foreach ($classNames as &$className) {
-            $className = Str::snake($className);
-        }
-        return sprintf('%s%s.%s.%s', static::$transNamespace, $module, implode('.', $classNames), $name);
+        return static::__hasTransWithModule($error, 'error', $locale, $fallback);
     }
 
     protected static function __transErrorWithModule($error, $replace = [], $locale = null)
@@ -84,14 +92,32 @@ trait ClassTrait
         return static::__transWithModule($error, 'error', $replace, $locale);
     }
 
-    protected static function __hasTransErrorWithModule($error, $locale = null, $fallback = true)
-    {
-        return static::__hasTransWithModule($error, 'error', $locale, $fallback);
-    }
-
     protected static function __transErrorPathWithModule($error)
     {
         return static::__transPathWithModule($error, 'error');
+    }
+
+    protected static function __hasTransWithModule($name, $module, $locale = null, $fallback = true)
+    {
+        return Lang::has(static::__transPathWithModule($name, $module), $locale, $fallback);
+    }
+
+    protected static function __transWithModule($name, $module, $replace = [], $locale = null)
+    {
+        return trans(static::__transPathWithModule($name, $module), $replace, $locale);
+    }
+
+    protected static function __transPathWithModule($name, $module, $specific = false)
+    {
+        if ($specific) {
+            return sprintf('%s%s.%s.%s', static::$__transNamespace, $module, static::__snakyClassBaseName(), $name);
+        }
+
+        $classNames = explode('\\', str_replace(Configuration::ROOT_NAMESPACE . '\\', '', static::class));
+        foreach ($classNames as &$className) {
+            $className = Str::snake($className);
+        }
+        return sprintf('%s%s.%s.%s', static::$__transNamespace, $module, implode('.', $classNames), $name);
     }
 
     protected static function __transError($error, $replace = [], $locale = null)
@@ -101,6 +127,6 @@ trait ClassTrait
 
     protected static function __transErrorPath($error)
     {
-        return sprintf('%s%s.%s', static::$transNamespace, 'error', $error);
+        return sprintf('%s%s.%s', static::$__transNamespace, 'error', $error);
     }
 }

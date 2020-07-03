@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Base\Command;
 use App\ModelRepositories\UserRepository;
 use App\Utils\PasswordGenerator;
 

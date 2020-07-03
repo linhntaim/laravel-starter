@@ -3,6 +3,7 @@
 namespace App\Utils;
 
 use App\Configuration;
+use App\Utils\Facades\ClientSettings;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class PaginationHelper
@@ -67,7 +68,7 @@ class PaginationHelper
                 'end' => $this->end,
             ],
             'total_items' => $this->totalItems,
-            'formatted_total_items' => NumberFormatHelper::getInstance()->formatInt($this->totalItems),
+            'formatted_total_items' => ClientSettings::numberFormatter()->formatInt($this->totalItems),
             'items_per_page' => $this->itemsPerPage,
         ];
     }

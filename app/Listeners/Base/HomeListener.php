@@ -2,7 +2,7 @@
 
 namespace App\Listeners\Base;
 
-class HomeListener extends Listener
+abstract class HomeListener extends Listener
 {
     use HomeListenerTrait;
 }

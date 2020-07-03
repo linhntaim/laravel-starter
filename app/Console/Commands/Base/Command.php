@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Base;
 
 use App\Utils\ClassTrait;
 use App\Utils\LogHelper;
@@ -12,46 +12,35 @@ abstract class Command extends BaseCommand
 
     protected $noInformation = false;
 
-    protected $friendlyName;
-
     protected function lineBreak()
     {
         $this->line('');
     }
 
-    public function getFriendlyName()
-    {
-        if (empty($this->friendlyName)) {
-            $this->friendlyName = $this->__friendlyClassBaseName();
-        }
-        return $this->friendlyName;
-    }
-
     protected function before()
     {
-        $this->lineBreak();
-        $this->info(sprintf('START %s...', strtoupper($this->getFriendlyName())));
-        $this->lineBreak();
+        if (!$this->noInformation) {
+            $this->lineBreak();
+            $this->info(sprintf('START %s...', strtoupper($this->__friendlyClassBaseName())));
+            $this->lineBreak();
+        }
     }
 
     public function handle()
     {
         LogHelper::info(sprintf('%s executing...', static::class));
-
-        if ($this->noInformation) {
-            $this->catchGo();
-        } else {
-            $this->before();
-            $this->catchGo();
-            $this->after();
+        try {
+            $this->go();
+        } catch (\Exception $exception) {
+            $this->handleException($exception);
         }
-
         LogHelper::info(sprintf('%s executed!', static::class));
     }
 
     protected function handleException(\Exception $exception)
     {
         LogHelper::error($exception);
+
         $this->error('EXCEPTION:');
         $this->warn('- Message: ' . $exception->getMessage());
         $this->warn('- File: ' . $exception->getFile());
@@ -60,20 +49,13 @@ abstract class Command extends BaseCommand
         $this->warn($exception->getTraceAsString());
     }
 
-    protected function catchGo()
-    {
-        try {
-            $this->go();
-        } catch (\Exception $exception) {
-            $this->handleException($exception);
-        }
-    }
-
     protected abstract function go();
 
     protected function after()
     {
-        $this->lineBreak();
-        $this->info(sprintf('END %s!!!', strtoupper($this->getFriendlyName())));
+        if (!$this->noInformation) {
+            $this->lineBreak();
+            $this->info(sprintf('END %s!!!', strtoupper($this->__friendlyClassBaseName())));
+        }
     }
 }

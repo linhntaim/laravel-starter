@@ -2,24 +2,21 @@
 
 namespace App\Listeners\Base;
 
-use App\Utils\AppOptionHelper;
 use App\Utils\ClassTrait;
 
 abstract class NowListener
 {
     use ClassTrait;
 
-    protected static function __transListener($name, $replace = [], $locale = null)
+    protected static function __transCurrentModule()
     {
-        return static::__transWithSpecificModule($name, 'listener', $replace, $locale);
+        return 'listener';
     }
 
-    protected static function __transWithAppInfoListener($name, $replace = [], $locale = null)
+    public function handle($event)
     {
-        $appOptions = AppOptionHelper::getInstance();
-        $replace = array_merge($replace, [
-            'company_short_name' => $appOptions->getBy('company_short_name'),
-        ]);
-        return static::__transWithSpecificModule($name, 'listener', $replace, $locale);
+        $this->go($event);
     }
+
+    protected abstract function go($event);
 }

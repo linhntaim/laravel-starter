@@ -4,20 +4,21 @@ namespace App\Notifications\Base;
 
 use App\Configuration;
 use App\ModelRepositories\UserRepository;
-use App\Models\User;
-use App\Utils\AppOptionHelper;
+use App\ModelTraits\IUser;
 use App\Utils\ClassTrait;
-use App\Utils\DateTimeHelper;
+use App\Utils\ClientSettings\Capture;
+use App\Utils\ClientSettings\DateTimer;
+use App\Utils\Facades\ClientSettings;
 use App\Utils\Mail\TemplateMailable;
+use App\Utils\Mail\TemplateNowMailable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification as BaseNotification;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Notification;
 
 abstract class NowNotification extends BaseNotification
 {
-    use SerializesModels, ClassTrait;
+    use ClassTrait, Capture;
 
     const VIA_DATABASE = 'database';
     const VIA_WEB = 'broadcast';
@@ -27,18 +28,9 @@ abstract class NowNotification extends BaseNotification
 
     const NAME = 'now_notification';
 
-    protected static function __transNotification($name, $replace = [], $locale = null)
+    protected static function __transCurrentModule()
     {
-        return static::__transWithSpecificModule($name, 'notification', $replace, $locale);
-    }
-
-    protected static function __transWithAppInfoNotification($name, $replace = [], $locale = null)
-    {
-        $appOptions = AppOptionHelper::getInstance();
-        $replace = array_merge($replace, [
-            'company_short_name' => $appOptions->getBy('company_short_name'),
-        ]);
-        return static::__transWithSpecificModule($name, 'notification', $replace, $locale);
+        return 'notification';
     }
 
     public $shouldStore;
@@ -47,16 +39,12 @@ abstract class NowNotification extends BaseNotification
     public $shouldIos;
     public $shouldAndroid;
 
-    protected $currentVia;
-
     /**
-     * @var User
+     * @var IUser
      */
-    public $fromUser;
+    public $notifier;
 
-    protected $prepared;
-
-    public function __construct($fromUser = null)
+    public function __construct(IUser $notifier = null)
     {
         $this->shouldWeb = false;
         $this->shouldStore = false;
@@ -64,20 +52,14 @@ abstract class NowNotification extends BaseNotification
         $this->shouldIos = false;
         $this->shouldAndroid = false;
 
-        $this->prepared = false;
-
-        $this->setFromUser($fromUser);
+        $this->setNotifier($notifier);
     }
 
-    public function __destruct()
+    public function setNotifier(IUser $notifier = null)
     {
-        $this->destroyClientApp();
-    }
-
-    public function setFromUser(User $user = null)
-    {
-        $this->fromUser = empty($user) ?
-            (new UserRepository())->getById(Configuration::USER_SYSTEM_ID) : $user;
+        $this->notifier = empty($notifier) ?
+            (new UserRepository())->getById(Configuration::USER_SYSTEM_ID)
+            : $notifier;
 
         return $this;
     }
@@ -118,7 +100,7 @@ abstract class NowNotification extends BaseNotification
             || $this->shouldIos || $this->shouldAndroid;
     }
 
-    public function via($notifiable)
+    public function via(IUser $notifiable)
     {
         $via = [];
         if ($this->shouldStore) {
@@ -139,72 +121,68 @@ abstract class NowNotification extends BaseNotification
         return $via;
     }
 
-    protected function beforeNotifying($notifiable)
+    public function beforeNotifying($via, IUser $notifiable)
     {
 
     }
 
-    protected function afterNotifying($notifiable)
+    public function afterNotifying($via, IUser $notifiable)
     {
 
     }
 
-    protected function notify($via, $notifiable, $dataCallback)
+    protected function resolveData($via, IUser $notifiable, $dataCallback)
     {
-        $this->currentVia = $via;
-
-        if (!$this->prepared) {
-            $this->beforeNotifying($notifiable);
-            $this->prepared = true;
-        }
-        $data = $dataCallback($notifiable);
-        $this->afterNotifying($notifiable);
-        return $data;
+        return $this->settingsTemporary(function () use ($via, $notifiable, $dataCallback) {
+            return ClientSettings::temporaryFromUser($notifiable, function () use ($via, $notifiable, $dataCallback) {
+                return $dataCallback($notifiable);
+            });
+        });
     }
 
-    public function toBroadcast($notifiable)
+    public function toBroadcast(IUser $notifiable)
     {
-        return $this->notify(static::VIA_WEB, $notifiable, function ($notifiable) {
+        return $this->resolveData(static::VIA_WEB, $notifiable, function (IUser $notifiable) {
             return $this->dataBroadcast($notifiable);
         });
     }
 
-    protected function dataBroadcast($notifiable)
+    protected function dataBroadcast(IUser $notifiable)
     {
-        $dateTimeHelper = DateTimeHelper::fromUser($notifiable);
         return (new BroadcastMessage([
             'id' => $this->id,
             'data' => $this->dataArray($notifiable),
-            'created_at' => DateTimeHelper::syncNow(),
-            'shown_created_at' => $dateTimeHelper->compound('shortDate', ' ', 'shortTime'),
+            'created_at' => DateTimer::syncNow(),
+            'shown_created_at' => ClientSettings::dateTimer()->compound('shortDate', ' ', 'shortTime'),
             'is_read' => false,
         ]));
     }
 
-    public function toDatabase($notifiable)
+    public function toDatabase(IUser $notifiable)
     {
-        return $this->notify(static::VIA_DATABASE, $notifiable, function ($notifiable) {
+        return $this->resolveData(static::VIA_DATABASE, $notifiable, function ($notifiable) {
             return $this->dataDatabase($notifiable);
         });
     }
 
-    protected function dataDatabase($notifiable)
+    protected function dataDatabase(IUser $notifiable)
     {
         return [
-            'sender_id' => $this->fromUser->id,
+            'sender_id' => $this->notifier->id,
         ];
     }
 
-    public function toMail($notifiable)
+    public function toMail(IUser $notifiable)
     {
-        return $this->notify(static::VIA_MAIL, $notifiable, function ($notifiable) {
+        return $this->resolveData(static::VIA_MAIL, $notifiable, function ($notifiable) {
             return $this->dataMail($notifiable);
         });
     }
 
-    protected function dataMail($notifiable)
+    protected function dataMail(IUser $notifiable)
     {
-        return new TemplateMailable(
+        $mailable = $this->getMailNow($notifiable) ? TemplateNowMailable::class : TemplateMailable::class;
+        return new ($mailable)(
             $this->getMailTemplate($notifiable),
             array_merge([
                 TemplateMailable::EMAIL_TO => $notifiable->preferredEmail(),
@@ -216,14 +194,14 @@ abstract class NowNotification extends BaseNotification
         );
     }
 
-    public function toIos($notifiable)
+    public function toIos(IUser $notifiable)
     {
-        return $this->notify(static::VIA_IOS, $notifiable, function ($notifiable) {
+        return $this->resolveData(static::VIA_IOS, $notifiable, function ($notifiable) {
             return $this->dataIos($notifiable);
         });
     }
 
-    protected function dataIos($notifiable)
+    protected function dataIos(IUser $notifiable)
     {
         return [
             'aps' => [
@@ -240,14 +218,14 @@ abstract class NowNotification extends BaseNotification
         ];
     }
 
-    public function toAndroid($notifiable)
+    public function toAndroid(IUser $notifiable)
     {
-        return $this->notify(static::VIA_ANDROID, $notifiable, function ($notifiable) {
+        return $this->resolveData(static::VIA_ANDROID, $notifiable, function ($notifiable) {
             return $this->dataAndroid($notifiable);
         });
     }
 
-    protected function dataAndroid($notifiable)
+    protected function dataAndroid(IUser $notifiable)
     {
         return [
             'notification' => [
@@ -261,48 +239,53 @@ abstract class NowNotification extends BaseNotification
         ];
     }
 
-    protected function dataArray($notifiable)
+    protected function dataArray(IUser $notifiable)
     {
         return [
             'name' => $this::NAME,
-            'image' => $this->fromUser->url_avatar,
+            'image' => $this->notifier->preferredAvatarUrl(),
             'content' => $this->getContent($notifiable, false),
             'html_content' => $this->getContent($notifiable),
             'action' => $this->getAction($notifiable),
         ];
     }
 
-    protected function getTitle($notifiable)
+    protected function getTitle(IUser $notifiable)
     {
         return null;
     }
 
-    protected function getContent($notifiable, $html = true)
+    protected function getContent(IUser $notifiable, $html = true)
     {
         return null;
     }
 
-    protected function getAction($notifiable)
+    protected function getAction(IUser $notifiable)
     {
         return null;
     }
 
-    protected function getMailTemplate($notifiable)
+    protected function getMailTemplate(IUser $notifiable)
     {
         return null;
     }
 
-    protected function getMailSubject($notifiable)
+    protected function getMailSubject(IUser $notifiable)
     {
         return null;
     }
 
-    protected function getMailParams($notifiable)
+    protected function getMailParams(IUser $notifiable)
     {
         return [];
     }
 
-    protected function getMailUseLocalizedTemplate($notifiable)
+    protected function getMailUseLocalizedTemplate(IUser $notifiable)
+    {
+        return true;
+    }
+
+    protected function getMailNow(IUser $notifiable)
     {
         return true;
     }

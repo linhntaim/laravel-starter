@@ -2,19 +2,15 @@
 
 namespace App\Listeners\Base;
 
-use App\Utils\ClientApp\HomeTrait as HomeClientAppTrait;
+use App\Configuration;
+use App\Utils\Facades\ClientSettings;
 
 trait HomeListenerTrait
 {
-    use HomeClientAppTrait;
-
-    public function __construct()
+    public function handle($event)
     {
-        $this->createClientApp();
-    }
-
-    public function __destruct()
-    {
-        $this->destroyClientApp();
+        ClientSettings::temporaryFromClientType(Configuration::CLIENT_APP_HOME, function () use ($event) {
+            parent::handle($event);
+        });
     }
 }

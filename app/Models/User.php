@@ -2,17 +2,16 @@
 
 namespace App\Models;
 
+use App\ModelTraits\IUser;
 use App\ModelTraits\MemorizeTrait;
+use App\ModelTraits\PassportTrait;
 use App\Notifications\ResetPasswordNotification;
-use App\Utils\ConfigHelper;
-use App\Utils\CryptoJs\AES;
 use App\Utils\LocalizationHelper;
-use App\Utils\DateTimeHelper;
+use App\Utils\ClientSettings\DateTimer;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\HasApiTokens;
 
 /**
@@ -21,10 +20,11 @@ use Laravel\Passport\HasApiTokens;
  * @property int $id
  * @property string $display_name
  * @property string $email
+ * @property PasswordReset $passwordReset
  */
-class User extends Authenticatable implements HasLocalePreference
+class User extends Authenticatable implements HasLocalePreference, IUser
 {
-    use HasApiTokens, Notifiable, MemorizeTrait, SoftDeletes;
+    use PassportTrait, HasApiTokens, Notifiable, MemorizeTrait, SoftDeletes;
 
     const PROTECTED = [1, 2];
 
@@ -53,7 +53,7 @@ class User extends Authenticatable implements HasLocalePreference
 
     public function getShortDateShortTimeCreatedAtAttribute()
     {
-        return DateTimeHelper::getInstance()
+        return DateTimer::getInstance()
             ->compound(
                 'shortDate',
                 ' ',
@@ -64,7 +64,7 @@ class User extends Authenticatable implements HasLocalePreference
 
     public function getShortDateShortTimeUpdatedAtAttribute()
     {
-        return DateTimeHelper::getInstance()
+        return DateTimer::getInstance()
             ->compound(
                 'shortDate',
                 ' ',
@@ -101,9 +101,8 @@ class User extends Authenticatable implements HasLocalePreference
     #region HasLocalePreference
     public function preferredLocale()
     {
-        return LocalizationHelper::getInstance()->getLocale();
+        return $this->preferredLocalization()->getLocale();
     }
-
     #endregion
 
     public function preferredEmail()
@@ -113,44 +112,16 @@ class User extends Authenticatable implements HasLocalePreference
 
     public function preferredName()
     {
-        return $this->display_name;
+        return null;
     }
 
-    #region Passport
-    public function findForPassport($username)
+    public function preferredAvatarUrl()
     {
-        if (request()->has('_e')) {
-            $username = AES::decrypt($username, ConfigHelper::getClockBlockKey());
-        }
-        $advanced = json_decode($username);
-        if ($advanced !== false) {
-            if (!empty($advanced->token) && !empty($advanced->id)) {
-                $sysToken = SysToken::where('type', SysToken::TYPE_LOGIN)
-                    ->where('token', $advanced->token)->first();
-                if (!empty($sysToken)) {
-                    $sysToken->delete();
-                    $user = User::where('id', $advanced->id)
-                        ->orWhere('email', $advanced->id)
-                        ->first();
-                    if ($user) $user->via = 'token';
-                    return $user;
-                }
-            }
-        }
-        return User::where('email', $username)->first();
+        return null;
     }
 
-    public function validateForPassportPasswordGrant($password)
+    public function preferredLocalization()
     {
-        if (request()->has('_e')) {
-            $password = AES::decrypt($password, ConfigHelper::getClockBlockKey());
-        }
-        $advanced = json_decode($password);
-        if ($advanced !== false) {
-            if (!empty($advanced->source) && !empty($this->via)
-                && $advanced->source == $this->via) return true;
-        }
-        return Hash::check($password, $this->password);
+        return LocalizationHelper::getInstance();
     }
-    #endregion
 }

@@ -2,6 +2,10 @@
 
 namespace App\Utils;
 
+use App\Configuration;
+use App\ModelRepositories\UserRepository;
+use App\ModelTraits\IUser;
+
 abstract class BaseLocalizationHelper
 {
     protected static $instance;
@@ -17,7 +21,6 @@ abstract class BaseLocalizationHelper
         return static::$instance;
     }
 
-    protected $fetched;
     protected $fromApp;
 
     public $_ts;
@@ -35,7 +38,6 @@ abstract class BaseLocalizationHelper
 
     public function __construct()
     {
-        $this->fetched = false;
         $this->fromApp = false;
 
         $this->_ts = 0;
@@ -51,6 +53,9 @@ abstract class BaseLocalizationHelper
         $this->shortTimeFormat = ConfigHelper::get('localization.short_time_format');
     }
 
+    /**
+     * @return static
+     */
     public function apply()
     {
         ConfigHelper::setCurrentLocale($this->getLocale());
@@ -93,7 +98,7 @@ abstract class BaseLocalizationHelper
 
     public function setTimezone($timezone)
     {
-        if (!is_null($timezone) && in_array($timezone, DateTimeHelper::getTimezoneValues())) {
+        if (!is_null($timezone) && in_array($timezone, DateTimer::getTimezoneValues())) {
             $this->timezone = $timezone;
         }
     }
@@ -129,7 +134,7 @@ abstract class BaseLocalizationHelper
 
     public function setFirstDayOfWeek($firstDayOfWeek)
     {
-        if (!is_null($firstDayOfWeek) && in_array($firstDayOfWeek, DateTimeHelper::getDaysOfWeekValues())) {
+        if (!is_null($firstDayOfWeek) && in_array($firstDayOfWeek, DateTimer::getDaysOfWeekValues())) {
             $this->firstDayOfWeek = $firstDayOfWeek;
         }
     }
@@ -141,7 +146,7 @@ abstract class BaseLocalizationHelper
 
     public function setLongDateFormat($longDateFormat)
     {
-        if (!is_null($longDateFormat) && in_array($longDateFormat, DateTimeHelper::getLongDateFormatValues())) {
+        if (!is_null($longDateFormat) && in_array($longDateFormat, DateTimer::getLongDateFormatValues())) {
             $this->longDateFormat = $longDateFormat;
         }
     }
@@ -153,7 +158,7 @@ abstract class BaseLocalizationHelper
 
     public function setShortDateFormat($shortDateFormat)
     {
-        if (!is_null($shortDateFormat) && in_array($shortDateFormat, DateTimeHelper::getShortDateFormatValues())) {
+        if (!is_null($shortDateFormat) && in_array($shortDateFormat, DateTimer::getShortDateFormatValues())) {
             $this->shortDateFormat = $shortDateFormat;
         }
     }
@@ -165,7 +170,7 @@ abstract class BaseLocalizationHelper
 
     public function setLongTimeFormat($longTimeFormat)
     {
-        if (!is_null($longTimeFormat) && in_array($longTimeFormat, DateTimeHelper::getLongTimeFormatValues())) {
+        if (!is_null($longTimeFormat) && in_array($longTimeFormat, DateTimer::getLongTimeFormatValues())) {
             $this->longTimeFormat = $longTimeFormat;
         }
     }
@@ -177,7 +182,7 @@ abstract class BaseLocalizationHelper
 
     public function setShortTimeFormat($shortTimeFormat)
     {
-        if (!is_null($shortTimeFormat) && DateTimeHelper::getShortTimeFormatValues()) {
+        if (!is_null($shortTimeFormat) && DateTimer::getShortTimeFormatValues()) {
             $this->shortTimeFormat = $shortTimeFormat;
         }
     }
@@ -187,23 +192,25 @@ abstract class BaseLocalizationHelper
         return $this->shortTimeFormat;
     }
 
-    public function autoFetch()
+    /**
+     * @param IUser|integer|null $user
+     * @return static
+     */
+    public function autoFetch($user = null)
     {
-        return $this->fetchFromRequestHeader()
-            ->apply();
+        $user = is_null($user) ? null : (new UserRepository())->model($user);
+        if (!is_null($user)) {
+            $this->fetchFromUser($user);
+        } elseif (app()->runningInConsole()) {
+            $this->fetchFromClient(Configuration::$currentClient);
+        } else {
+            $this->fetchFromRequestHeader();
+        }
+        return $this->apply();
     }
 
-    public function fetched()
+    public function fetchFromArray($localization)
     {
-        return $this->fetched;
-    }
-
-    public function fetchFromConfiguration($clientAppId)
-    {
-        if ($this->fetched) return $this;
-
-        $client = ConfigHelper::getClient($clientAppId);
-        $localization = $client['default_localization'];
         if (isset($localization['locale'])) $this->setLocale($localization['locale']);
         if (isset($localization['country'])) $this->setCountry($localization['country']);
         if (isset($localization['timezone'])) $this->setTimezone($localization['timezone']);
@@ -214,38 +221,37 @@ abstract class BaseLocalizationHelper
         if (isset($localization['short_date_format'])) $this->setShortDateFormat($localization['short_date_format']);
         if (isset($localization['long_time_format'])) $this->setLongTimeFormat($localization['long_time_format']);
         if (isset($localization['short_time_format'])) $this->setShortTimeFormat($localization['short_time_format']);
-
-        $this->fetched = true;
-
         return $this;
+    }
+
+    public function fetchFromClient($clientAppId)
+    {
+        if (empty($clientAppId)) return $this;
+
+        $client = ConfigHelper::getClient($clientAppId);
+        return $this->fetchFromArray($client['default_localization']);
     }
 
     public function fetchFromRequestHeader()
     {
-        if ($this->fetched) return $this;
-
         $request = request();
         if (!$request->headers->has('Localization')) return $this;
 
         $localization = json_decode($request->header('Localization'), true);
-        if (empty($localization)) return $this;
+        if ($localization === false) return $this;
 
         if (isset($localization['_from_app'])) $this->fromApp = true;
         if (isset($localization['_ts'])) $this->setTimestamp($localization['_ts']);
-        if (isset($localization['locale'])) $this->setLocale($localization['locale']);
-        if (isset($localization['country'])) $this->setCountry($localization['country']);
-        if (isset($localization['timezone'])) $this->setTimezone($localization['timezone']);
-        if (isset($localization['currency'])) $this->setCurrency($localization['currency']);
-        if (isset($localization['number_format'])) $this->setNumberFormat($localization['number_format']);
-        if (isset($localization['first_day_of_week'])) $this->setFirstDayOfWeek($localization['first_day_of_week']);
-        if (isset($localization['long_date_format'])) $this->setLongDateFormat($localization['long_date_format']);
-        if (isset($localization['short_date_format'])) $this->setShortDateFormat($localization['short_date_format']);
-        if (isset($localization['long_time_format'])) $this->setLongTimeFormat($localization['long_time_format']);
-        if (isset($localization['short_time_format'])) $this->setShortTimeFormat($localization['short_time_format']);
+        return $this->fetchFromArray($localization);
+    }
 
-        $this->fetched = true;
-
-        return $this;
+    /**
+     * @param IUser $user
+     * @return static
+     */
+    public function fetchFromUser($user)
+    {
+        return $this->fetchFromArray($user->preferredLocalization());
     }
 
     public function toArray()

@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use App\Events\MailTestingEvent;
 use App\Events\TestingEvent;
+use App\Listeners\OnMailTestingEvent;
+use App\Listeners\OnTestingEvent;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -14,7 +17,10 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen = [
         TestingEvent::class => [
-            SendEmailOfTesting::class,
+            OnTestingEvent::class,
+        ],
+        MailTestingEvent::class => [
+            OnMailTestingEvent::class,
         ],
     ];
 

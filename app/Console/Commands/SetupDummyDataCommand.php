@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Base\Command;
+
 class SetupDummyDataCommand extends Command
 {
     protected $signature = 'setup:dummy-data {--u}';

@@ -2,9 +2,13 @@
 
 namespace App\Models;
 
+use App\ModelTraits\IUser;
+use App\ModelTraits\IUserExtended;
 use App\ModelTraits\MemorizeTrait;
+use App\ModelTraits\ExtendedUserModel;
 use App\Utils\ConfigHelper;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 
 /**
  * Class Admin
@@ -17,17 +21,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property Role $role
  * @property ManagedFile $avatar
  */
-class Admin extends Model
+class Admin extends ExtendedUserModel implements IUserExtended, IUser
 {
-    use MemorizeTrait;
+    use Notifiable, MemorizeTrait;
 
     protected $table = 'admins';
-
-    protected $primaryKey = 'user_id';
-
-    public $incrementing = false;
-
-    public $timestamps = false;
 
     protected $fillable = [
         'user_id',
@@ -36,7 +34,7 @@ class Admin extends Model
         'display_name',
     ];
 
-    // region Get Attributes
+    #region Get Attributes
     public function getRoleAttribute()
     {
         if (!$this->memorized('role') || $this->remind('role')->id != $this->attributes['role_id']) {
@@ -77,14 +75,9 @@ class Admin extends Model
     {
         return empty($this->attributes['avatar_id']) ? ConfigHelper::defaultAvatarUrl() : $this->avatar->url;
     }
-    // endregion
+    #endregion
 
-    // region Relationships
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id', 'id');
-    }
-
+    #region Relationships
     public function role()
     {
         return $this->belongsTo(Role::class, 'role_id', 'id');
@@ -94,7 +87,18 @@ class Admin extends Model
     {
         return $this->belongsTo(ManagedFile::class, 'avatar_id', 'id');
     }
-    // endregion
+
+    #endregion
+
+    public function preferredName()
+    {
+        return $this->display_name;
+    }
+
+    public function preferredAvatarUrl()
+    {
+        return $this->avatarUrl;
+    }
 
     #region Functionality
     public function hasPermission($permissionName)

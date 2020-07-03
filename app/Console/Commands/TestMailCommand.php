@@ -2,11 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Base\Command;
 use App\Utils\Mail\MailHelper;
 
-class TestSendMailCommand extends Command
+class TestMailCommand extends Command
 {
-    protected $signature = 'test:send-mail';
+    protected $signature = 'test:mail';
 
     protected function go()
     {

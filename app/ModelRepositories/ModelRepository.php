@@ -7,7 +7,7 @@ use App\Exceptions\DatabaseException;
 use App\Exceptions\Exception;
 use App\Utils\AbortTrait;
 use App\Utils\ClassTrait;
-use App\Utils\DateTimeHelper;
+use App\Utils\ClientSettings\DateTimer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -316,7 +316,7 @@ abstract class ModelRepository
     protected function batchInsertAdd($attributes)
     {
         if ($this->model->timestamps) {
-            $now = DateTimeHelper::syncNow();
+            $now = DateTimer::syncNow();
             $attributes['created_at'] = $now;
             $attributes['updated_at'] = $now;
         }

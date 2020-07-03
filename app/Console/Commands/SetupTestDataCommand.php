@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Base\Command;
+
 class SetupTestDataCommand extends Command
 {
     protected $signature = 'setup:test-data {--u}';
