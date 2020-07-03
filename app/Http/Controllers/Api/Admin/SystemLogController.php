@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use Illuminate\Support\Facades\File;
 
-class SystemLogController extends ApiController
+class SystemLogController extends ModelApiController
 {
     public function index(Request $request)
     {

@@ -2,16 +2,18 @@
 
 namespace App\Models;
 
-use App\ModelTraits\IUser;
+use App\Models\Base\IUser;
+use App\Models\Base\IUserHasSettings;
 use App\ModelTraits\MemorizeTrait;
 use App\ModelTraits\PassportTrait;
 use App\Notifications\ResetPasswordNotification;
-use App\Utils\LocalizationHelper;
-use App\Utils\ClientSettings\DateTimer;
+use App\Utils\ConfigHelper;
+use App\Utils\Facades\ClientSettings;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Str;
 use Laravel\Passport\HasApiTokens;
 
 /**
@@ -29,8 +31,6 @@ class User extends Authenticatable implements HasLocalePreference, IUser
     const PROTECTED = [1, 2];
 
     protected $table = 'users';
-
-    protected $via = '';
 
     /**
      * The attributes that are mass assignable.
@@ -51,32 +51,24 @@ class User extends Authenticatable implements HasLocalePreference, IUser
         'password', 'remember_token',
     ];
 
-    public function getShortDateShortTimeCreatedAtAttribute()
+    public function getSdStCreatedAtAttribute()
     {
-        return DateTimer::getInstance()
-            ->compound(
-                'shortDate',
-                ' ',
-                'shortTime',
-                $this->attributes['created_at']
-            );
+        return ClientSettings::dateTimer()->compound(
+            'shortDate',
+            ' ',
+            'shortTime',
+            $this->attributes['created_at']
+        );
     }
 
-    public function getShortDateShortTimeUpdatedAtAttribute()
+    public function getSdStUpdatedAtAttribute()
     {
-        return DateTimer::getInstance()
-            ->compound(
-                'shortDate',
-                ' ',
-                'shortTime',
-                $this->attributes['updated_at']
-            );
-    }
-
-    public function getPasswordResetExpiredAtAttribute()
-    {
-        $passwordReset = $this->passwordReset;
-        return empty($passwordReset) ? null : $passwordReset->sdStExpiredAt;
+        return ClientSettings::dateTimer()->compound(
+            'shortDate',
+            ' ',
+            'shortTime',
+            $this->attributes['updated_at']
+        );
     }
 
     public function scopeNoneProtected($query)
@@ -101,8 +93,9 @@ class User extends Authenticatable implements HasLocalePreference, IUser
     #region HasLocalePreference
     public function preferredLocale()
     {
-        return $this->preferredLocalization()->getLocale();
+        return $this->preferredSettings()->getLocale();
     }
+
     #endregion
 
     public function preferredEmail()
@@ -112,16 +105,22 @@ class User extends Authenticatable implements HasLocalePreference, IUser
 
     public function preferredName()
     {
-        return null;
+        return Str::before($this->preferredEmail(), '@');
     }
 
     public function preferredAvatarUrl()
     {
-        return null;
+        return ConfigHelper::defaultAvatarUrl();
     }
 
-    public function preferredLocalization()
+    public function preferredSettings()
     {
-        return LocalizationHelper::getInstance();
+        return $this instanceof IUserHasSettings ? $this->getSettings() : ClientSettings::capture();
+    }
+
+    public function getPasswordResetExpiredAt()
+    {
+        $passwordReset = $this->passwordReset;
+        return empty($passwordReset) ? null : $passwordReset->sdStExpiredAt;
     }
 }

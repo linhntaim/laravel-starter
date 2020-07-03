@@ -2,16 +2,13 @@
 
 namespace App\Utils\Mail;
 
+use App\Utils\ClientSettings\Capture;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
 class TemplateMailable extends TemplateNowMailable implements ShouldQueue
 {
-    use Queueable, SerializesModels;
-
-    public function __construct($templateName, $templateParams = [], $useLocalizedTemplate = true, $locale = null)
-    {
-        parent::__construct($templateName, $templateParams, $useLocalizedTemplate, $locale);
-    }
+    use Queueable, InteractsWithQueue, SerializesModels, Capture;
 }

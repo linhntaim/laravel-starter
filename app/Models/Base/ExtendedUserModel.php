@@ -1,9 +1,8 @@
 <?php
 
-namespace App\ModelTraits;
+namespace App\Models\Base;
 
 use App\Models\User;
-use App\Utils\LocalizationHelper;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -11,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * @package App\ModelTraits
  * @property User $user
  */
-abstract class ExtendedUserModel extends Model
+abstract class ExtendedUserModel extends Model implements IUser
 {
     protected $primaryKey = 'user_id';
 
@@ -26,16 +25,16 @@ abstract class ExtendedUserModel extends Model
 
     public function preferredEmail()
     {
-        return $this->user->email;
+        return $this->user->preferredEmail();
     }
 
-    public function preferredLocalization()
+    public function preferredSettings()
     {
-        return $this->user->preferredLocalization();
+        return $this->user->preferredSettings();
     }
 
-    public function preferredLocale()
+    public function getPasswordResetExpiredAt()
     {
-        return $this->user->preferredLocale();
+        return $this->user->getPasswordResetExpiredAt();
     }
 }

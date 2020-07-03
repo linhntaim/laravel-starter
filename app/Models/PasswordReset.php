@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Utils\ClientSettings\DateTimer;
+use App\Utils\Facades\ClientSettings;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -22,12 +22,12 @@ class PasswordReset extends Model
 
     public function getSdStExpiredAtAttribute()
     {
-        $dateTimeHelper = DateTimer::getInstance();
-        return $dateTimeHelper->compound(
+        $dateTimer = ClientSettings::dateTimer();
+        return $dateTimer->compound(
             'shortDate',
             ' ',
             'shortTime',
-            $dateTimeHelper->getObject($this->attributes['created_at'])->addMinutes(config('auth.passwords.users.expire'))
+            $dateTimer->getObject($this->attributes['created_at'])->addMinutes(config('auth.passwords.users.expire'))
         );
     }
 

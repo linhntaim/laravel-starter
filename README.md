@@ -65,9 +65,3 @@ Go into `app\Console\Commands` and clone the file `TryCommand.php.example` to `T
 ```
 php artisan try
 ```
-
-### Reminds event of 3 hours before happening
-
-```
-php artisan remind_events
-```

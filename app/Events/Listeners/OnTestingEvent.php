@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Events\Listeners;
 
 use App\Events\TestingEvent;
-use App\Listeners\Base\NowListener;
+use App\Events\Listeners\Base\NowListener;
 use App\Utils\LogHelper;
 
 class OnTestingEvent extends NowListener

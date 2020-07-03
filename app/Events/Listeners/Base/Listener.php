@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Listeners\Base;
+namespace App\Events\Listeners\Base;
 
+use App\Events\Event;
 use App\Utils\LogHelper;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -12,11 +13,16 @@ abstract class Listener extends NowListener implements ShouldQueue
 {
     use Queueable, InteractsWithQueue, SerializesModels;
 
+    /**
+     * @param Event $event
+     */
     public function handle($event)
     {
         if (app()->runningInConsole()) {
             try {
-                parent::handle($event);
+                $event->settingsTemporary(function () use ($event) {
+                    parent::handle($event);
+                });
             } catch (\Exception $exception) {
                 LogHelper::error($exception);
             }

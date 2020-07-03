@@ -6,11 +6,14 @@ use App\Utils\Facades\ClientSettings;
 
 trait Capture
 {
+    public $locale;
+
     protected $settings;
 
     public function settingsCapture()
     {
         $this->settings = ClientSettings::capture();
+        $this->locale = $this->settings->getLocale();
         return $this;
     }
 

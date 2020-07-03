@@ -13,7 +13,9 @@ class Device
     {
         if ($request->headers->has('Device')) {
             $device = json_decode($request->headers->get('Device'));
-            CurrentDevice::set((new DeviceRepository())->getByProviderAndSecret($device->provider, $device->secret));
+            if ($device !== false) {
+                CurrentDevice::set((new DeviceRepository())->getByProviderAndSecret($device->provider, $device->secret));
+            }
         }
         return $next($request);
     }

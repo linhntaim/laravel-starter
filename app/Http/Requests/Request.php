@@ -25,11 +25,15 @@ class Request extends BaseRequest
 
     public function ajax()
     {
-        $accessControlRequestHeaders = explode(',', $this->headers->get('access-control-request-headers'));
-        $accessControlRequestHeaders = array_map(function ($item) {
-            return strtolower(trim($item));
-        }, $accessControlRequestHeaders);
-        return parent::ajax() || in_array('x-requested-with', $accessControlRequestHeaders);
+        return parent::ajax() || in_array(
+                'x-requested-with',
+                array_map(
+                    function ($item) {
+                        return strtolower(trim($item));
+                    },
+                    explode(',', $this->headers->get('access-control-request-headers'))
+                )
+            );
     }
 
     public function expectsJson()
@@ -37,7 +41,7 @@ class Request extends BaseRequest
         return parent::expectsJson() || $this->is('api/*');
     }
 
-    public static function normalizeQueryStringWithoutSort($qs)
+    public static function normalizeQueryStringWithoutSorting($qs)
     {
         if ('' == $qs) {
             return '';

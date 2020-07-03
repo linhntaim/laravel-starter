@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\ManagedFileRepository;
 use App\ModelTransformers\ManagedFileTransformer;
 
-class ManagedFileController extends ApiController
+class ManagedFileController extends ModelApiController
 {
     public function __construct()
     {

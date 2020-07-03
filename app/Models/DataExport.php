@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Utils\ClientSettings\DateTimer;
+use App\Utils\Facades\ClientSettings;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -30,13 +30,12 @@ class DataExport extends Model
 
     public function getSdStCreatedAtAttribute()
     {
-        return DateTimer::getInstance()
-            ->compound(
-                'shortDate',
-                ' ',
-                'shortTime',
-                $this->attributes['created_at']
-            );
+        return ClientSettings::dateTimer()->compound(
+            'shortDate',
+            ' ',
+            'shortTime',
+            $this->attributes['created_at']
+        );
     }
 
     public function creator()

@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\PasswordResetRepository;
 use App\Utils\StringHelper;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Password;
 
-class PasswordController extends ApiController
+class PasswordController extends ModelApiController
 {
     public function __construct()
     {

@@ -10,14 +10,9 @@ use App\Http\Requests\Request;
 use App\Utils\ConfigHelper;
 use App\Utils\Helper;
 use App\Utils\LogHelper;
-use App\Utils\PaginationHelper;
 use Closure;
 use Exception as BaseException;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Arr;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use Throwable;
 
@@ -101,15 +96,15 @@ trait ApiResponseTrait
         ]);
     }
 
-    protected function withThrottlingMiddleware()
+    protected function withInlineMiddleware()
     {
         $this->middleware(function (Request $request, Closure $next) {
-            $this->throttleMiddleware($request);
+            $this->inlineMiddleware($request);
             return $next($request);
         });
     }
 
-    protected function throttleMiddleware(Request $request = null)
+    protected function inlineMiddleware(Request $request = null)
     {
     }
 
@@ -125,7 +120,7 @@ trait ApiResponseTrait
             $payload,
             ConfigHelper::getApiResponseStatus($status),
             ConfigHelper::getApiResponseHeaders($headers),
-            JSON_UNESCAPED_UNICODE
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
         );
     }
 
@@ -156,39 +151,10 @@ trait ApiResponseTrait
         return $this->response(static::failPayload($data, $message), Configuration::HTTP_RESPONSE_STATUS_ERROR, $headers);
     }
 
-    protected function getRespondedModel($model)
+    protected function getRespondedDataWithKey($data, $key = null)
     {
-        if ($model instanceof LengthAwarePaginator) {
-            return [
-                'models' => $this->modelTransform($this->modelTransformerClass, $model),
-                'pagination' => PaginationHelper::parse($model),
-            ];
-        }
-        if ($model instanceof Collection) {
-            return [
-                'models' => $this->modelTransform($this->modelTransformerClass, $model),
-            ];
-        }
-        if ($model instanceof Model) {
-            return [
-                'model' => $this->modelTransform($this->modelTransformerClass, $model),
-            ];
-        }
-        return Arr::isAssoc($model) ? [
-            'model' => $model,
-        ] : [
-            'models' => $model,
+        return is_null($key) ? $data : [
+            $key => $data,
         ];
-    }
-
-    /**
-     * @param Model|Collection|LengthAwarePaginator|iterable $model
-     * @param array $extra
-     * @param array $headers
-     * @return JsonResponse
-     */
-    protected function responseModel($model, $extra = [], $headers = [])
-    {
-        return $this->responseSuccess(array_merge($this->getRespondedModel($model), $extra), $headers);
     }
 }

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use Illuminate\Support\Facades\Artisan;
 
-class CommandController extends ApiController
+class CommandController extends ModelApiController
 {
     public function index(Request $request)
     {
@@ -16,7 +16,7 @@ class CommandController extends ApiController
     public function run(Request $request)
     {
         Artisan::call($request->input('cmd'), $request->input('params', []));
-        return $this->responseSuccess([
+        return $this->responseModel([
             'output' => Artisan::output(),
         ]);
     }

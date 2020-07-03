@@ -3,7 +3,7 @@
 namespace App\Notifications\Base;
 
 use App\Configuration;
-use App\ModelTraits\IUser;
+use App\Models\Base\IUser;
 use App\Utils\Facades\ClientSettings;
 
 trait HomeNotificationTrait

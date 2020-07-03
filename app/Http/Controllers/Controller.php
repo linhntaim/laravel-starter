@@ -16,7 +16,7 @@ use Illuminate\Routing\Controller as BaseController;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-    use ClassTrait, AbortTrait, TransactionTrait, ModelTransformTrait, ValidationTrait;
+    use ClassTrait, AbortTrait, TransactionTrait, ModelTransformTrait, ValidationTrait, ItemsPerPageTrait;
 
     protected function responseFile($file, array $headers = [])
     {
@@ -34,9 +34,9 @@ class Controller extends BaseController
         return response()->download($file, $name, $headers);
     }
 
-    protected function noCache($response)
+    protected function responseNoCache($response)
     {
-        $response->headers->set('Cache-Control', 'no-cache, max-age=0, no-store, must-revalidate');
+        $response->headers->set('Cache-Control', 'no-cache, no-store');
         $response->headers->set('Pragma', 'no-cache');
         return $response;
     }

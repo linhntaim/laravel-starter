@@ -24,7 +24,7 @@ class Kernel extends HttpKernel
     protected $middleware = [
         // \App\Http\Middleware\TrustHosts::class,
         \App\Http\Middleware\TrustProxies::class,
-//        \Fruitcake\Cors\HandleCors::class,
+        // \Fruitcake\Cors\HandleCors::class,
         \App\Http\Middleware\CheckForMaintenanceMode::class,
         \App\Http\Middleware\CheckForClientLimitation::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
@@ -39,21 +39,20 @@ class Kernel extends HttpKernel
      */
     protected $middlewareGroups = [
         'web' => [
-//            \App\Http\Middleware\EncryptCookies::class,
-//            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-//            \Illuminate\Session\Middleware\StartSession::class,
+            // \App\Http\Middleware\EncryptCookies::class,
+            // \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            // \Illuminate\Session\Middleware\StartSession::class,
             // \Illuminate\Session\Middleware\AuthenticateSession::class,
-//            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-//            \App\Http\Middleware\VerifyCsrfToken::class,
-//            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            // \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            // \App\Http\Middleware\VerifyCsrfToken::class,
+            // \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
 
         'api' => [
-            ApiMiddleware::class,
             'throttle:' . Configuration::THROTTLE_REQUEST_MAX_ATTEMPTS . ',' . Configuration::THROTTLE_REQUEST_DECAY_MINUTES,
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
             OverrideAuthorizationHeader::class,
             Device::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
 
@@ -75,30 +74,34 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+
         'device' => Device::class,
-        'authorized.permissions' => AuthorizedWithPermissions::class,
-        'authorized.admin' => AuthorizedWithAdmin::class,
         'authenticated.passport.cookie' => AuthenticatedByPassportViaCookie::class,
         'authenticated.passport.request' => AuthenticatedByPassportViaRequest::class,
+        'authorized.permissions' => AuthorizedWithPermissions::class,
+        'authorized.admin' => AuthorizedWithAdmin::class,
     ];
 
     protected $middlewarePriority = [
-        ApiMiddleware::class,
-        OverrideAuthorizationHeader::class,
-        Device::class,
-
         \Illuminate\Session\Middleware\StartSession::class,
         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
         \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
         \Illuminate\Routing\Middleware\ThrottleRequests::class,
+
+        OverrideAuthorizationHeader::class,
+
         \Illuminate\Session\Middleware\AuthenticateSession::class,
-        \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        \Illuminate\Auth\Middleware\Authorize::class,
 
         AuthenticatedByPassportViaCookie::class,
         AuthenticatedByPassportViaRequest::class,
         \App\Http\Middleware\Authenticate::class,
+        Device::class,
+
+        \Illuminate\Routing\Middleware\SubstituteBindings::class,
+
         AuthorizedWithAdmin::class,
         AuthorizedWithPermissions::class,
+
+        \Illuminate\Auth\Middleware\Authorize::class,
     ];
 }

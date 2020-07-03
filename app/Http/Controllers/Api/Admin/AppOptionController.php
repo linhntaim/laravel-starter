@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\AppOptionRepository;
 use App\ModelTransformers\AppOptionTransformer;
 
-class AppOptionController extends ApiController
+class AppOptionController extends ModelApiController
 {
     public function __construct()
     {

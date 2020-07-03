@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Listeners\Base;
+namespace App\Events\Listeners\Base;
 
 use App\Configuration;
 use App\Utils\Facades\ClientSettings;

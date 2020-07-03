@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\DataExportRepository;
 use App\ModelTransformers\DataExportTransformer;
 
-class DataExportController extends ApiController
+class DataExportController extends ModelApiController
 {
     public function __construct()
     {

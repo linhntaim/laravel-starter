@@ -2,12 +2,9 @@
 
 namespace App\Models;
 
-use App\ModelTraits\IUser;
-use App\ModelTraits\IUserExtended;
+use App\Models\Base\ExtendedUserModel;
 use App\ModelTraits\MemorizeTrait;
-use App\ModelTraits\ExtendedUserModel;
 use App\Utils\ConfigHelper;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
 /**
@@ -21,7 +18,7 @@ use Illuminate\Notifications\Notifiable;
  * @property Role $role
  * @property ManagedFile $avatar
  */
-class Admin extends ExtendedUserModel implements IUserExtended, IUser
+class Admin extends ExtendedUserModel
 {
     use Notifiable, MemorizeTrait;
 

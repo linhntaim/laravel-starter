@@ -5,19 +5,22 @@ namespace App\Utils\Mail;
 use App\Exceptions\AppException;
 use App\Utils\ConfigHelper;
 use Exception;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Mail;
 
 class MailHelper
 {
-    public static function send(Mailable $mailable)
+    /**
+     * @param TemplateNowMailable $mailable
+     * @return bool
+     * @throws
+     */
+    public static function send(TemplateNowMailable $mailable)
     {
         if (ConfigHelper::get('emails.send_off')) return true;
 
         try {
-            if ($mailable instanceof ShouldQueue) {
-                Mail::queue($mailable);
+            if ($mailable instanceof TemplateMailable) {
+                Mail::queue($mailable->settingsCapture());
             } else {
                 Mail::send($mailable);
             }
@@ -27,14 +30,28 @@ class MailHelper
         }
     }
 
-    public static function sendWithTemplate($templatePath, $templateParams, $useLocalizedTemplate = true, $locale = null)
+    /**
+     * @param string $templatePath
+     * @param array $templateParams
+     * @param bool $templateLocalized
+     * @return bool
+     * @throws
+     */
+    public static function sendWithTemplate($templatePath, array $templateParams = [], $templateLocalized = true)
     {
-        return static::send(new TemplateMailable($templatePath, $templateParams, $useLocalizedTemplate, $locale));
+        return static::send(new TemplateMailable($templatePath, $templateParams, $templateLocalized));
     }
 
-    public static function sendNowWithTemplate($templatePath, $templateParams, $useLocalizedTemplate = true, $locale = null)
+    /**
+     * @param string $templatePath
+     * @param array $templateParams
+     * @param bool $templateLocalized
+     * @return bool
+     * @throws
+     */
+    public static function sendNowWithTemplate($templatePath, array $templateParams = [], $templateLocalized = true)
     {
-        return static::send(new TemplateNowMailable($templatePath, $templateParams, $useLocalizedTemplate, $locale));
+        return static::send(new TemplateNowMailable($templatePath, $templateParams, $templateLocalized));
     }
 
     public static function sendTestMail()

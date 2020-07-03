@@ -21,7 +21,7 @@ class LoginController extends AccessTokenController
     {
         parent::__construct($server, $tokens, $jwt);
 
-        $this->throttleMiddleware();
+        $this->inlineMiddleware();
     }
 
     public function issueToken(ServerRequestInterface $request)

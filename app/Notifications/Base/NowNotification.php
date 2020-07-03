@@ -4,9 +4,8 @@ namespace App\Notifications\Base;
 
 use App\Configuration;
 use App\ModelRepositories\UserRepository;
-use App\ModelTraits\IUser;
+use App\Models\Base\IUser;
 use App\Utils\ClassTrait;
-use App\Utils\ClientSettings\Capture;
 use App\Utils\ClientSettings\DateTimer;
 use App\Utils\Facades\ClientSettings;
 use App\Utils\Mail\TemplateMailable;
@@ -18,7 +17,7 @@ use Illuminate\Support\Facades\Notification;
 
 abstract class NowNotification extends BaseNotification
 {
-    use ClassTrait, Capture;
+    use ClassTrait;
 
     const VIA_DATABASE = 'database';
     const VIA_WEB = 'broadcast';
@@ -133,10 +132,8 @@ abstract class NowNotification extends BaseNotification
 
     protected function resolveData($via, IUser $notifiable, $dataCallback)
     {
-        return $this->settingsTemporary(function () use ($via, $notifiable, $dataCallback) {
-            return ClientSettings::temporaryFromUser($notifiable, function () use ($via, $notifiable, $dataCallback) {
-                return $dataCallback($notifiable);
-            });
+        return ClientSettings::temporaryFromUser($notifiable, function () use ($via, $notifiable, $dataCallback) {
+            return $dataCallback($notifiable);
         });
     }
 

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\RoleRepository;
 use App\ModelTransformers\RoleTransformer;
 use Illuminate\Validation\Rule;
 
-class RoleController extends ApiController
+class RoleController extends ModelApiController
 {
     public function __construct()
     {

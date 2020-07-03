@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Hash;
 
 trait PassportTrait
 {
+    protected $via = null;
+
     public function findForPassport($username)
     {
         if (request()->has('_e')) {

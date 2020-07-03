@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Models\Base\IUser;
 use App\Notifications\Base\AdminNowNotification;
 use App\Utils\Facades\ClientSettings;
 
@@ -10,9 +11,9 @@ class ResetPasswordNotification extends AdminNowNotification
     protected $token;
     protected $appResetPasswordPath;
 
-    public function __construct($token, $fromUser = null)
+    public function __construct($token, IUser $notifier = null)
     {
-        parent::__construct($fromUser);
+        parent::__construct($notifier);
 
         $this->token = $token;
 
@@ -21,27 +22,27 @@ class ResetPasswordNotification extends AdminNowNotification
         $this->shouldMail();
     }
 
-    protected function getMailTemplate($notifiable)
+    protected function getMailTemplate(IUser $notifiable)
     {
         return 'user_password_reset';
     }
 
-    protected function getMailSubject($notifiable)
+    protected function getMailSubject(IUser $notifiable)
     {
         return $this->__transWithCurrentModule('mail_subject', [
             'app_name' => ClientSettings::getAppName(),
         ]);
     }
 
-    protected function getMailParams($notifiable)
+    protected function getMailParams(IUser $notifiable)
     {
         return [
             'url_reset_password' => $this->getAppResetPasswordUrl($notifiable),
-            'expired_at' => $notifiable->passwordResetExpiredAt, // user model
+            'expired_at' => $notifiable->getPasswordResetExpiredAt(),
         ];
     }
 
-    public function getAppResetPasswordUrl($notifiable)
+    public function getAppResetPasswordUrl(IUser $notifiable)
     {
         return implode('/', [
             ClientSettings::getAppUrl(),

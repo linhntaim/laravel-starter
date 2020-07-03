@@ -3,7 +3,7 @@
 namespace App\Utils\ClientSettings;
 
 use App\Exceptions\AppException;
-use App\ModelTraits\IUserSettings;
+use App\Models\Base\IUserHasSettings;
 use App\Utils\ConfigHelper;
 use Illuminate\Support\Str;
 
@@ -60,7 +60,7 @@ class Manager
 
     public function fetchFromUser($user)
     {
-        if ($user instanceof IUserSettings) {
+        if ($user instanceof IUserHasSettings) {
             return $this->update($user->preferredSettings());
         }
         return $this;
@@ -73,7 +73,7 @@ class Manager
      */
     public function temporaryFromUser($user, callable $callback)
     {
-        if ($user instanceof IUserSettings) {
+        if ($user instanceof IUserHasSettings) {
             return $this->temporary($user->preferredSettings(), $callback);
         }
         return $this;

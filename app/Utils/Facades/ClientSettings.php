@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static Settings capture()
  * @method static string getAppName()
  * @method static string getAppUrl()
+ * @method static string getLocale()
  */
 class ClientSettings extends Facade
 {

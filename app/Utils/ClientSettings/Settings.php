@@ -4,9 +4,11 @@
 namespace App\Utils\ClientSettings;
 
 use App\Utils\ConfigHelper;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Str;
 
-class Settings
+class Settings implements ISettings, Arrayable, Jsonable
 {
     protected $appName;
     protected $appUrl;
@@ -228,5 +230,10 @@ class Settings
             $data[Str::snake($propertyName)] = $this->{$propertyName};
         }
         return $data;
+    }
+
+    public function toJson($options = 0)
+    {
+        return json_encode($this->toArray(), $options);
     }
 }

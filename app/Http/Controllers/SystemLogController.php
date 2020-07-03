@@ -16,8 +16,8 @@ class SystemLogController extends Controller
             return $this->abort404();
         }
         $filePath = storage_path('logs/' . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $logFileRelativePath));
-        if (Str::endsWith($filePath, '.log') || Str::endsWith($filePath, '.txt')) {
-            return response()->download($filePath);
+        if (Str::endsWith($filePath, ['.log', '.txt'])) {
+            return $this->responseDownload($filePath);
         }
         return $this->abort404();
     }

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\DeviceRepository;
 use App\Models\Device;
 use App\ModelTransformers\DeviceTransformer;
 
-class DeviceController extends ApiController
+class DeviceController extends ModelApiController
 {
     public function __construct()
     {
