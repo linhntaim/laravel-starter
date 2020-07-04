@@ -2,6 +2,7 @@
 
 namespace App\Rules;
 
+use App\Rules\Base\Rule;
 use Illuminate\Support\Facades\Hash;
 
 class CurrentPasswordRule extends Rule

@@ -2,7 +2,6 @@
 
 namespace App\ModelResources;
 
-use App\ModelResources\Base\ModelTransformTrait;
 use App\Models\Admin;
 
 /**
@@ -12,8 +11,6 @@ use App\Models\Admin;
  */
 class AdminAccountResource extends AdminResource
 {
-    use ModelTransformTrait;
-
     public function toCustomArray($request)
     {
         return [

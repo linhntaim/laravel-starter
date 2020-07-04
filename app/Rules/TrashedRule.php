@@ -2,6 +2,8 @@
 
 namespace App\Rules;
 
+use App\Rules\Base\Rule;
+
 class TrashedRule extends Rule
 {
     protected $modelClass;
