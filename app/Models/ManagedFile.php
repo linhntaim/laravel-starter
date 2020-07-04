@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Base\Model;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -35,8 +35,14 @@ class ManagedFile extends Model
         'inline',
     ];
 
-    protected $hidden = [
-        'inline',
+    protected $visible = [
+        'id',
+        'name',
+        'url',
+    ];
+
+    protected $appends = [
+        'url',
     ];
 
     public function getInLocalAttribute()

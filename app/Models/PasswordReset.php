@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Base\Model;
 use App\Utils\ClientSettings\Facade;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class PasswordReset

@@ -36,7 +36,7 @@ abstract class DependedRepository extends ModelRepository
             ]);
             $this->dependedWith = null;
         } else {
-            $query->with($this->dependedWith);
+            $query->with($this->depended);
         }
         if (!is_null($this->dependedWhere)) {
             $query->whereHas($this->depended, $this->dependedWhere);

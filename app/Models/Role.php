@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\ModelResources\RoleResource;
+use App\Models\Base\Model;
 
 /**
  * Class Role
  * @package App\Models
+ * @property int $id
  * @property string $name
  * @property string $display_name
  * @property string $description
+ * @property Permission[] permissions
  */
 class Role extends Model
 {
@@ -22,6 +25,15 @@ class Role extends Model
         'display_name',
         'description',
     ];
+
+    protected $visible = [
+        'id',
+        'name',
+        'display_name',
+        'description',
+    ];
+
+    protected $resourceClass = RoleResource::class;
 
     public function scopeNoneProtected($query)
     {

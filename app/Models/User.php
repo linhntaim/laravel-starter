@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Base\IResource;
 use App\Models\Base\IUser;
 use App\Models\Base\IUserHasSettings;
+use App\ModelTraits\OnlyAttributesToArrayTrait;
 use App\ModelTraits\MemorizeTrait;
 use App\ModelTraits\PassportTrait;
+use App\ModelTraits\ResourceTrait;
 use App\Notifications\ResetPasswordNotification;
 use App\Utils\ConfigHelper;
 use App\Utils\ClientSettings\Facade;
@@ -24,9 +27,9 @@ use Laravel\Passport\HasApiTokens;
  * @property string $email
  * @property PasswordReset $passwordReset
  */
-class User extends Authenticatable implements HasLocalePreference, IUser
+class User extends Authenticatable implements HasLocalePreference, IUser, IResource
 {
-    use PassportTrait, HasApiTokens, Notifiable, MemorizeTrait, SoftDeletes;
+    use OnlyAttributesToArrayTrait, PassportTrait, HasApiTokens, Notifiable, MemorizeTrait, ResourceTrait, SoftDeletes;
 
     const PROTECTED = [1, 2];
 
@@ -40,6 +43,11 @@ class User extends Authenticatable implements HasLocalePreference, IUser
     protected $fillable = [
         'email',
         'password',
+    ];
+
+    protected $visible = [
+        'id',
+        'email',
     ];
 
     /**

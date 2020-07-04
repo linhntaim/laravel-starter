@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\RoleRepository;
-use App\ModelTransformers\RoleTransformer;
 use Illuminate\Validation\Rule;
 
 class RoleController extends ModelApiController
@@ -15,7 +14,6 @@ class RoleController extends ModelApiController
         parent::__construct();
 
         $this->modelRepository = new RoleRepository();
-        $this->modelTransformerClass = RoleTransformer::class;
     }
 
     protected function search(Request $request)

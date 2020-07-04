@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Base\Model;
 use App\Utils\ClientSettings\Facade;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class DataExport
  * @package App\Models
- * @property string sdStCreatedAt
+ * @property int $id
  * @property int $state
+ * @property string sdStCreatedAt
  * @property ManagedFile $managedFile
  */
 class DataExport extends Model
@@ -28,6 +29,15 @@ class DataExport extends Model
         'payload',
     ];
 
+    protected $visible = [
+        'id',
+        'url',
+    ];
+
+    protected $appends = [
+        'url',
+    ];
+
     public function getSdStCreatedAtAttribute()
     {
         return Facade::dateTimer()->compound(
@@ -36,6 +46,11 @@ class DataExport extends Model
             'shortTime',
             $this->attributes['created_at']
         );
+    }
+
+    public function getUrlAttribute()
+    {
+        return url('api/admin/data-export', [$this->id]) . '?_download=1';
     }
 
     public function creator()

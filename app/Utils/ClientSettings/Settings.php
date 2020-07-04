@@ -226,7 +226,8 @@ class Settings implements ISettings, Arrayable, Jsonable
     public function toArray()
     {
         $data = [];
-        foreach (get_object_vars($this) as $propertyName) {
+        foreach (array_keys(get_class_vars(static::class)) as $propertyName) {
+            if ($propertyName == 'changes') continue;
             $data[Str::snake($propertyName)] = $this->{$propertyName};
         }
         return $data;

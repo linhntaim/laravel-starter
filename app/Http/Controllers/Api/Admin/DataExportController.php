@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\DataExportRepository;
-use App\ModelTransformers\DataExportTransformer;
 
 class DataExportController extends ModelApiController
 {
@@ -14,7 +13,6 @@ class DataExportController extends ModelApiController
         parent::__construct();
 
         $this->modelRepository = new DataExportRepository();
-        $this->modelTransformerClass = DataExportTransformer::class;
     }
 
     public function show(Request $request, $id)

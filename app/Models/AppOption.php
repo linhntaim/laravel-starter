@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Base\Model;
 
 /**
  * Class AppOption
@@ -20,15 +20,20 @@ class AppOption extends Model
     const YES = 1;
     const NO = 2;
 
-    protected $primaryKey = 'key';
-
     protected $table = 'app_options';
+
+    protected $primaryKey = 'key';
 
     public $incrementing = false;
 
     protected $fillable = [
         'key',
         'type',
+        'value',
+    ];
+
+    protected $visible = [
+        'key',
         'value',
     ];
 

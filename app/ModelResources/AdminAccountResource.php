@@ -2,25 +2,24 @@
 
 namespace App\ModelResources;
 
-use App\ModelResources\Base\ModelResource;
 use App\ModelResources\Base\ModelTransformTrait;
-use App\Models\Role;
+use App\Models\Admin;
 
 /**
  * Class RoleResource
  * @package App\ModelResources
- * @mixin Role
+ * @mixin Admin
  */
-class RoleResource extends ModelResource
+class AdminAccountResource extends AdminResource
 {
     use ModelTransformTrait;
 
     public function toCustomArray($request)
     {
         return [
-            $this->merge($this->toCurrentArray($request)),
+            $this->merge(parent::toCustomArray($request)),
             $this->merge([
-                'permissions' => $this->modelTransform($this->whenLoaded('permissions'), $request),
+                'settings' => $this->preferredSettings()->toArray(),
             ]),
         ];
     }

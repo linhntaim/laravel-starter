@@ -19,6 +19,11 @@ class RoleRepository extends ModelRepository
         return Role::class;
     }
 
+    public function query()
+    {
+        return parent::query()->with('permissions');
+    }
+
     protected function searchOn($query, array $search)
     {
         if (!empty($search['except_protected'])) {

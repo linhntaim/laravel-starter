@@ -2,8 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Base\Model;
 
+/**
+ * Class Permission
+ * @package App\Models
+ * @property int $id
+ * @property string $name
+ * @property string $display_name
+ * @property string $description
+ */
 class Permission extends Model
 {
     const PROTECTED = [1, 2];
@@ -11,6 +19,13 @@ class Permission extends Model
     protected $table = 'permissions';
 
     protected $fillable = [
+        'name',
+        'display_name',
+        'description',
+    ];
+
+    protected $visible = [
+        'id',
         'name',
         'display_name',
         'description',

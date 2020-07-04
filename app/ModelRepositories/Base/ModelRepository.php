@@ -29,7 +29,7 @@ abstract class ModelRepository
     protected $model;
 
     private $with;
-    private $withTrashed = true;
+    private $withTrashed = false;
     private $lock;
     private $strict;
     private $force = false;

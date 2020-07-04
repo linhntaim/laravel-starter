@@ -6,7 +6,6 @@ use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\DeviceRepository;
 use App\Models\Device;
-use App\ModelTransformers\DeviceTransformer;
 
 class DeviceController extends ModelApiController
 {
@@ -15,7 +14,6 @@ class DeviceController extends ModelApiController
         parent::__construct();
 
         $this->modelRepository = new DeviceRepository();
-        $this->modelTransformerClass = DeviceTransformer::class;
     }
 
     public function currentStore(Request $request)

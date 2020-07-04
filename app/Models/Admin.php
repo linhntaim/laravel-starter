@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\ModelResources\AdminResource;
 use App\Models\Base\ExtendedUserModel;
 use App\ModelTraits\MemorizeTrait;
 use App\Utils\ConfigHelper;
@@ -30,6 +31,22 @@ class Admin extends ExtendedUserModel
         'avatar_id',
         'display_name',
     ];
+
+    protected $visible = [
+        'user_id',
+        'display_name',
+        'role_name',
+        'permission_names',
+        'avatar_url',
+    ];
+
+    protected $appends = [
+        'role_name',
+        'permission_names',
+        'avatar_url',
+    ];
+
+    protected $resourceClass = AdminResource::class;
 
     #region Get Attributes
     public function getRoleAttribute()

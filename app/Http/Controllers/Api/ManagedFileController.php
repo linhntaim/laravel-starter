@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\ManagedFileRepository;
-use App\ModelTransformers\ManagedFileTransformer;
 
 class ManagedFileController extends ModelApiController
 {
@@ -14,7 +13,6 @@ class ManagedFileController extends ModelApiController
         parent::__construct();
 
         $this->modelRepository = new ManagedFileRepository();
-        $this->modelTransformerClass = ManagedFileTransformer::class;
     }
 
     public function show(Request $request, $id)

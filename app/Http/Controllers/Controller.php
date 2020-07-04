@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Request;
+use App\ModelResources\Base\ModelTransformTrait;
 use App\Models\ManagedFile;
-use App\ModelTransformers\ModelTransformTrait;
 use App\Utils\AbortTrait;
 use App\Utils\ClassTrait;
 use App\Utils\TransactionTrait;

@@ -26,6 +26,13 @@ Route::group([
     Route::get('auth/password', 'PasswordController@show');
 
     Route::get('managed-file/{id}', 'ManagedFileController@show')->name('managed_file.show');
+
+    Route::group([
+        'prefix' => 'role',
+        'namespace' => 'Admin',
+    ], function () {
+        Route::get('/', 'RoleController@index');
+    });
     #endregion
 
     Route::group([

@@ -3,7 +3,6 @@
 namespace App\Models\Base;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Trait UserExtendedTrait

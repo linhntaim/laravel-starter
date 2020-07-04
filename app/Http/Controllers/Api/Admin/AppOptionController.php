@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\AppOptionRepository;
-use App\ModelTransformers\AppOptionTransformer;
 
 class AppOptionController extends ModelApiController
 {
@@ -14,7 +13,6 @@ class AppOptionController extends ModelApiController
         parent::__construct();
 
         $this->modelRepository = new AppOptionRepository();
-        $this->modelTransformerClass = AppOptionTransformer::class;
     }
 
     protected function storeValidatedRules(Request $request)
@@ -62,11 +60,6 @@ class AppOptionController extends ModelApiController
 
         $this->transactionStart();
         $this->modelRepository->saveMany($options);
-        return $this->responseModel(
-            $this->modelTransform(
-                AppOptionTransformer::class,
-                (new AppOptionRepository())->getAll()->keyBy('key')
-            )
-        );
+        return $this->responseModel((new AppOptionRepository())->getAll()->keyBy('key'));
     }
 }

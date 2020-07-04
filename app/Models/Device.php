@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Base\Model;
 use App\ModelTraits\ArrayValuedAttributesTrait;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Device
@@ -26,5 +26,10 @@ class Device extends Model
         'meta',
         'meta_array_value',
         'meta_array_overridden_value',
+    ];
+
+    protected $visible = [
+        'provider',
+        'secret',
     ];
 }

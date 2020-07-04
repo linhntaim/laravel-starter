@@ -4,14 +4,14 @@ namespace App\ModelResources;
 
 use App\ModelResources\Base\ModelResource;
 use App\ModelResources\Base\ModelTransformTrait;
-use App\Models\Role;
+use App\Models\Admin;
 
 /**
  * Class RoleResource
  * @package App\ModelResources
- * @mixin Role
+ * @mixin Admin
  */
-class RoleResource extends ModelResource
+class AdminResource extends ModelResource
 {
     use ModelTransformTrait;
 
@@ -20,7 +20,7 @@ class RoleResource extends ModelResource
         return [
             $this->merge($this->toCurrentArray($request)),
             $this->merge([
-                'permissions' => $this->modelTransform($this->whenLoaded('permissions'), $request),
+                'user' => $this->modelTransform($this->whenLoaded('user'), $request),
             ]),
         ];
     }

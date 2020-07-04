@@ -4,11 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Request;
 use App\ModelRepositories\Base\ModelRepository;
-use App\Utils\PaginationHelper;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 
 class ModelApiController extends ApiController
@@ -17,11 +16,6 @@ class ModelApiController extends ApiController
      * @var ModelRepository|mixed
      */
     protected $modelRepository;
-
-    /**
-     * @var string
-     */
-    protected $modelTransformerClass;
 
     #region Index
     protected function search(Request $request)
@@ -138,28 +132,25 @@ class ModelApiController extends ApiController
         $this->modelRepository->deleteWithIds($ids);
         return $this->responseSuccess();
     }
-
     #endregion
 
+    /**
+     * @param Model|Collection|LengthAwarePaginator|array $model
+     * @return array
+     */
     protected function getRespondedModel($model)
     {
-        if ($model instanceof LengthAwarePaginator) {
-            return [
-                'models' => $this->modelTransform($this->modelTransformerClass, $model),
-                'pagination' => PaginationHelper::parse($model),
-            ];
+        if ($model instanceof Model || $model instanceof Collection || $model instanceof LengthAwarePaginator) {
+            $model = $this->modelTransform($model, null, true);
         }
-        if ($model instanceof Collection) {
-            return $this->getRespondedDataWithKey($this->modelTransform($this->modelTransformerClass, $model), 'models');
-        }
-        if ($model instanceof Model) {
-            return $this->getRespondedDataWithKey($this->modelTransform($this->modelTransformerClass, $model), 'model');
-        }
-        return $this->getRespondedDataWithKey($model, Arr::isAssoc($model) ? 'model' : 'models');
+        return is_null($model) ?
+            ['model' => null, 'models' => []] :
+            (isset($model['model']) || isset($model['models']) ?
+                $model : $this->getRespondedDataWithKey($model, Arr::isAssoc($model) ? 'model' : 'models'));
     }
 
     /**
-     * @param Model|Collection|LengthAwarePaginator|iterable $model
+     * @param Model|Collection|LengthAwarePaginator|array $model
      * @param array $extra
      * @param array $headers
      * @return JsonResponse

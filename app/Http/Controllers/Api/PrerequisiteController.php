@@ -9,17 +9,14 @@ use App\Http\Requests\Request;
 use App\ModelRepositories\AppOptionRepository;
 use App\ModelRepositories\PermissionRepository;
 use App\ModelRepositories\RoleRepository;
-use App\ModelResources\RoleResourceCollection;
-use App\ModelTransformers\AppOptionTransformer;
-use App\ModelTransformers\PermissionTransformer;
-use App\ModelTransformers\RoleTransformer;
-use App\ModelTransformers\ModelTransformTrait;
+use App\ModelResources\Base\ModelTransformTrait;
 use App\Utils\ConfigHelper;
 use App\Utils\Files\FileHelper;
+use App\Utils\GuardArrayTrait;
 
 class PrerequisiteController extends ApiController
 {
-    use ModelTransformTrait;
+    use ModelTransformTrait, GuardArrayTrait;
 
     private $dataset;
 
@@ -56,11 +53,8 @@ class PrerequisiteController extends ApiController
                 ],
                 'max_upload_file_size' => FileHelper::getInstance()->maxUploadFileSize(),
                 'variables' => ConfigHelper::get('variables'),
-                'app_options' => $this->modelSafe(
-                    $this->modelTransform(
-                        AppOptionTransformer::class,
-                        (new AppOptionRepository())->getAll()->keyBy('key')
-                    )
+                'app_options' => $this->guardEmptyAssocArray(
+                    $this->modelTransform((new AppOptionRepository())->getAll()->keyBy('key'))
                 ),
                 'gtm_code' => ConfigHelper::get('gtm_code'),
             ];
@@ -70,7 +64,9 @@ class PrerequisiteController extends ApiController
     private function roles(Request $request)
     {
         if ($request->has('roles')) {
-            $this->dataset['roles'] = new RoleResourceCollection((new RoleRepository())->getNoneProtected());
+            $this->dataset['roles'] = $this->modelTransform(
+                (new RoleRepository())->getNoneProtected()
+            );
         }
     }
 
@@ -78,7 +74,6 @@ class PrerequisiteController extends ApiController
     {
         if ($request->has('permissions')) {
             $this->dataset['permissions'] = $this->modelTransform(
-                PermissionTransformer::class,
                 (new PermissionRepository())->getNoneProtected()
             );
         }
