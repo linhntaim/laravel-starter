@@ -17,6 +17,12 @@ abstract class Command extends BaseCommand
         $this->line('');
     }
 
+    public function alert($string)
+    {
+        $this->lineBreak();
+        parent::alert($string);
+    }
+
     protected function before()
     {
         if (!$this->noInformation) {

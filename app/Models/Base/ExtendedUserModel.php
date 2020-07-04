@@ -28,6 +28,11 @@ abstract class ExtendedUserModel extends Model implements IUser
         return $this->user->preferredEmail();
     }
 
+    public function preferredLocale()
+    {
+        return $this->user->preferredLocale();
+    }
+
     public function preferredSettings()
     {
         return $this->user->preferredSettings();

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Request;
 use App\Models\ManagedFile;
 use App\ModelTransformers\ModelTransformTrait;
 use App\Utils\AbortTrait;
@@ -17,6 +18,19 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     use ClassTrait, AbortTrait, TransactionTrait, ModelTransformTrait, ValidationTrait, ItemsPerPageTrait;
+
+    /**
+     * @param Request $request
+     * @param array $rules
+     * @param array $messages
+     * @param array $customAttributes
+     * @return bool
+     * @throws
+     */
+    protected function validated(Request $request, array $rules, array $messages = [], array $customAttributes = [])
+    {
+        return $this->validatedData($request->all(), $rules, $messages, $customAttributes);
+    }
 
     protected function responseFile($file, array $headers = [])
     {

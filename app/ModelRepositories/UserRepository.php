@@ -3,6 +3,7 @@
 namespace App\ModelRepositories;
 
 use App\Exceptions\AppException;
+use App\ModelRepositories\Base\ModelRepository;
 use App\Models\User;
 use App\Utils\StringHelper;
 
@@ -10,6 +11,7 @@ use App\Utils\StringHelper;
  * Class UserRepository
  * @package App\ModelRepositories
  * @property User $model
+ * @method User first($query)
  */
 class UserRepository extends ModelRepository
 {
@@ -31,43 +33,14 @@ class UserRepository extends ModelRepository
 
     /**
      * @param string $email
-     * @param bool $strict
-     * @param null|bool $lock
      * @return User
      * @throws
      */
-    public function getByEmail($email, $strict = true, $lock = null)
+    public function getByEmail($email)
     {
-        return $this->catch(function () use ($email, $strict, $lock) {
-            return $strict ?
-                $this->query()
-                    ->where('email', $email)
-                    ->lock($lock)
-                    ->firstOrFail()
-                : $this->query()
-                    ->where('email', $email)
-                    ->lock($lock)
-                    ->first();
-        });
-    }
-
-    public function getByEmailWithTrashed($email, $strict = true)
-    {
-        return $strict ?
-            $this->query()->withTrashed()->where('email', $email)->firstOrFail()
-            : $this->query()->withTrashed()->where('email', $email)->first();
-    }
-
-    public function restoreTrashedEmail($email)
-    {
-        $user = $this->getByEmailWithTrashed($email, false);
-        if ($user && $user->trashed()) {
-            return $this->catch(function () use ($user) {
-                $user->restore();
-                return $user;
-            });
-        }
-        return $user;
+        return $this->first(
+            $this->query()->where('email', $email)
+        );
     }
 
     /**
@@ -110,14 +83,10 @@ class UserRepository extends ModelRepository
     /**
      * @param array $ids
      * @return bool
-     * @throws
      */
     public function deleteWithIds(array $ids)
     {
-        return $this->catch(function () use ($ids) {
-            $this->queryByIds($ids)->noneProtected()->delete();
-            return true;
-        });
+        return $this->queryDelete($this->queryByIds($ids)->noneProtected());
     }
 
     public function delete()
@@ -127,5 +96,14 @@ class UserRepository extends ModelRepository
         }
 
         return parent::delete();
+    }
+
+    public function restoreWithEmail($email)
+    {
+        $this->withTrashed()
+            ->notStrict()
+            ->pinModel()
+            ->getByEmail($email);
+        return $this->restore();
     }
 }

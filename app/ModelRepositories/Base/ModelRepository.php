@@ -1,6 +1,6 @@
 <?php
 
-namespace App\ModelRepositories;
+namespace App\ModelRepositories\Base;
 
 use App\Configuration;
 use App\Exceptions\DatabaseException;
@@ -28,7 +28,12 @@ abstract class ModelRepository
      */
     protected $model;
 
-    protected $with;
+    private $with;
+    private $withTrashed = true;
+    private $lock;
+    private $strict;
+    private $force = false;
+    private $pinned = false;
 
     /**
      * @var array|null
@@ -51,20 +56,73 @@ abstract class ModelRepository
         return call_user_func($this->modelClass . '::query');
     }
 
+    public function withTrashed()
+    {
+        $this->withTrashed = true;
+        return $this;
+    }
+
+    public function with($with)
+    {
+        $this->with = $with;
+        return $this;
+    }
+
+    public function lock($lock)
+    {
+        $this->lock = $lock;
+        return $this;
+    }
+
     /**
      * @return Builder
      */
     public function query()
     {
-        return $this->with ? $this->rawQuery()->with($this->with) : $this->rawQuery();
+        $query = $this->rawQuery();
+        if (!is_null($this->with)) {
+            $query->with($this->with);
+            $this->with = null;
+        }
+        if ($this->withTrashed) {
+            $query->withTrashed();
+            $this->withTrashed = false;
+        }
+        if (!is_null($this->lock)) {
+            $query->lock($this->lock);
+            $this->lock = null;
+        }
+        return $query;
     }
 
-    public function queryWith($with, $callback)
+    public function notStrict()
     {
-        $this->with = $with;
-        $r = $callback();
-        $this->with = null;
-        return $r;
+        $this->strict = false;
+        return $this;
+    }
+
+    public function pinModel()
+    {
+        $this->pinned = true;
+        return $this;
+    }
+
+    /**
+     * @param Builder $query
+     * @return Model
+     * @throws
+     */
+    public function first($query)
+    {
+        $model = $this->catch(function () use ($query) {
+            return $this->strict ? $query->firstOrFail() : $query->first();
+        });
+        $this->strict = false;
+        if ($this->pinned) {
+            $this->pinned = false;
+            $this->model = $model;
+        }
+        return $model;
     }
 
     /**
@@ -89,9 +147,15 @@ abstract class ModelRepository
         return $this->model;
     }
 
+    public function doesntHaveModel()
+    {
+        return empty($this->model);
+    }
+
     public function forgetModel()
     {
         $this->model = null;
+        return $this;
     }
 
     public function getIdKey()
@@ -123,19 +187,19 @@ abstract class ModelRepository
         }
     }
 
-    public function getById($id, $strict = true)
+    public function getById($id, callable $callback = null)
     {
-        return $this->catch(function () use ($id, $strict) {
-            $idKey = $this->getIdKey();
-            return $strict ?
-                $this->query()->where($idKey, $id)->firstOrFail()
-                : $this->query()->where($idKey, $id)->first();
+        if (empty($callback)) {
+            return $this->first($this->queryById($id));
+        }
+        return $this->catch(function () use ($id, $callback) {
+            return $callback($this->queryById($id));
         });
     }
 
-    public function queryByIds(array $ids)
+    public function queryById($id)
     {
-        return $this->query()->whereIn($this->getIdKey(), $ids);
+        return $this->query()->where($this->getIdKey(), $id);
     }
 
     /**
@@ -144,12 +208,17 @@ abstract class ModelRepository
      * @return Collection
      * @throws Exception
      */
-    public function getByIds(array $ids, $callback = null)
+    public function getByIds(array $ids, callable $callback = null)
     {
         return $this->catch(function () use ($ids, $callback) {
             return empty($callback) ? $this->queryByIds($ids)->get() : $callback($this->queryByIds($ids));
         });
 
+    }
+
+    public function queryByIds(array $ids)
+    {
+        return $this->query()->whereIn($this->getIdKey(), $ids);
     }
 
     /**
@@ -158,14 +227,10 @@ abstract class ModelRepository
      * @return Collection
      * @throws Exception
      */
-    public function getAll($sortBy = null, $sortOrder = null)
+    public function getAll($sortBy = null, $sortOrder = 'asc')
     {
         return $this->catch(function () use ($sortBy, $sortOrder) {
-            $query = $this->query();
-            if (!empty($sortBy)) {
-                $query->orderBy($sortBy, $sortOrder);
-            }
-            return $query->get();
+            return $this->search([], Configuration::FETCH_PAGING_NO, 0, $sortBy, $sortOrder);
         });
     }
 
@@ -188,7 +253,7 @@ abstract class ModelRepository
      * @return Collection|LengthAwarePaginator|Builder
      * @throws Exception
      */
-    public function search($search = [], $paging = Configuration::FETCH_PAGING_YES, $itemsPerPage = Configuration::DEFAULT_ITEMS_PER_PAGE, $sortBy = null, $sortOrder = null)
+    public function search(array $search = [], $paging = Configuration::FETCH_PAGING_YES, $itemsPerPage = Configuration::DEFAULT_ITEMS_PER_PAGE, $sortBy = null, $sortOrder = 'asc')
     {
         $query = $this->query();
 
@@ -199,17 +264,19 @@ abstract class ModelRepository
         if (!empty($sortBy)) {
             $query->orderBy($sortBy, $sortOrder);
         }
-        if ($paging == Configuration::FETCH_PAGING_NO) {
-            return $this->catch(function () use ($query) {
-                return $query->get();
-            });
-        } elseif ($paging == Configuration::FETCH_PAGING_YES) {
-            return $this->catch(function () use ($query, $itemsPerPage) {
-                return $query->paginate($itemsPerPage);
-            });
-        }
 
-        return $query;
+        switch ($paging) {
+            case Configuration::FETCH_PAGING_NO:
+                return $this->catch(function () use ($query) {
+                    return $query->get();
+                });
+            case Configuration::FETCH_PAGING_YES:
+                return $this->catch(function () use ($query, $itemsPerPage) {
+                    return $query->paginate($itemsPerPage);
+                });
+            default:
+                return $query;
+        }
     }
 
     /**
@@ -244,7 +311,7 @@ abstract class ModelRepository
      * @param array $attributes
      * @param array $values
      * @return Model|mixed
-     * @throws Exception
+     * @throws
      */
     public function updateOrCreateWithAttributes(array $attributes = [], array $values = [])
     {
@@ -256,29 +323,56 @@ abstract class ModelRepository
         });
     }
 
+    public function force()
+    {
+        $this->force = true;
+        return $this;
+    }
+
     /**
      * @param array $ids
      * @return bool
-     * @throws Exception
      */
     public function deleteWithIds(array $ids)
     {
-        return $this->catch(function () use ($ids) {
-            $this->queryByIds($ids)->delete();
+        return $this->queryDelete($this->queryByIds($ids));
+    }
+
+    /**
+     * @param Builder $query
+     * @return bool
+     * @throws
+     */
+    protected function queryDelete($query)
+    {
+        return $this->catch(function () use ($query) {
+            if ($this->force) {
+                $this->force = false;
+                $query->forceDelete();
+            } else {
+                $query->delete();
+            }
             return true;
         });
     }
 
     /**
      * @return bool
-     * @throws Exception
      */
     public function delete()
     {
-        return $this->catch(function () {
-            $this->model->delete();
-            return true;
-        });
+        return $this->queryDelete($this->model);
+    }
+
+    public function restore()
+    {
+        if ($this->model && $this->model->trashed()) {
+            return $this->catch(function () {
+                $this->model->restore();
+                return $this->model;
+            });
+        }
+        return $this->model;
     }
 
     public function batchInsertStart($batch = 1000, $ignored = false)

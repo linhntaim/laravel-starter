@@ -2,6 +2,7 @@
 
 namespace App\ModelRepositories;
 
+use App\ModelRepositories\Base\ModelRepository;
 use App\Models\ManagedFile;
 use App\Utils\ConfigHelper;
 use App\Utils\Files\Filer\Filer;
@@ -99,12 +100,11 @@ class ManagedFileRepository extends ModelRepository
 
     public function createInlineWithFiler(string $name, Filer $filer)
     {
-        $this->createWithAttributes([
+        return $this->createWithAttributes([
             'name' => $name,
             'size' => $filer->getSize(),
             'type' => $filer->getMimeType(),
             'inline' => $filer->getContent(),
         ]);
-        return $this->model;
     }
 }

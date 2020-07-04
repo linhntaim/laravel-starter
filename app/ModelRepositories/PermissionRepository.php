@@ -3,7 +3,7 @@
 namespace App\ModelRepositories;
 
 use App\Exceptions\AppException;
-use App\Exceptions\Exception;
+use App\ModelRepositories\Base\ModelRepository;
 use App\Models\Permission;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -16,7 +16,7 @@ class PermissionRepository extends ModelRepository
 
     /**
      * @return Collection
-     * @throws Exception
+     * @throws
      */
     public function getNoneProtected()
     {
@@ -36,14 +36,10 @@ class PermissionRepository extends ModelRepository
     /**
      * @param array $ids
      * @return bool
-     * @throws Exception
      */
     public function deleteWithIds(array $ids)
     {
-        return $this->catch(function () use ($ids) {
-            $this->queryByIds($ids)->noneProtected()->delete();
-            return true;
-        });
+        return $this->queryDelete($this->queryByIds($ids)->noneProtected());
     }
 
     public function delete()

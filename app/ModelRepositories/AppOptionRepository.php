@@ -2,6 +2,7 @@
 
 namespace App\ModelRepositories;
 
+use App\ModelRepositories\Base\ModelRepository;
 use App\Models\AppOption;
 
 class AppOptionRepository extends ModelRepository
@@ -13,18 +14,14 @@ class AppOptionRepository extends ModelRepository
 
     public function save($key, $value)
     {
-        return $this->catch(function () use ($key, $value) {
-            return $this->query()->updateOrCreate(['key' => $key], ['value' => $value]);
-        });
+        return $this->updateOrCreateWithAttributes(['key' => $key], ['value' => $value]);
     }
 
     public function saveMany($options)
     {
-        return $this->catch(function () use ($options) {
-            foreach ($options as $option) {
-                $this->query()->updateOrCreate(['key' => $option['key']], ['value' => $option['value']]);
-            }
-            return true;
-        });
+        foreach ($options as $option) {
+            $this->save($option['key'], $option['value']);
+        }
+        return true;
     }
 }

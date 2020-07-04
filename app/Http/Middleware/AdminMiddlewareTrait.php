@@ -11,7 +11,7 @@ trait AdminMiddlewareTrait
     {
         return $request->hasAdminViaMiddleware() ?
             $request->admin()
-            : $request->setAdminViaMiddleware((new AdminRepository())->getById($this->auth->user()->id, false))
+            : $request->setAdminViaMiddleware((new AdminRepository())->notStrict()->getById($this->auth->user()->id))
                 ->admin();
     }
 }

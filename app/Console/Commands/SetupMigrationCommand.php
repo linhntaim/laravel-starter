@@ -49,6 +49,8 @@ class SetupMigrationCommand extends Command
 
     protected function uninstall()
     {
+        $this->createDatabaseIfNotExists();
+
         $this->uninstallMigration();
 
         if ($this->hasPassport) {
@@ -56,10 +58,28 @@ class SetupMigrationCommand extends Command
         }
     }
 
+    protected function createDatabaseIfNotExists()
+    {
+        $databaseConnection = config('database.connections.' . config('database.default'));
+        switch ($databaseConnection['driver']) {
+            case 'mysql':
+            default:
+                $pdo = new \PDO(
+                    sprintf('mysql:host=%s;port:%d', $databaseConnection['host'], $databaseConnection['port']),
+                    $databaseConnection['username'],
+                    $databaseConnection['password']
+                );
+                $pdo->query(sprintf('CREATE DATABASE IF NOT EXISTS `%s`', $databaseConnection['database']));
+                break;
+        }
+    }
+
     private function setupMigration()
     {
         $this->warn('Migrating...');
-        Artisan::call('migrate', [], $this->output);
+        Artisan::call('migrate', [
+            '--force' => true,
+        ], $this->output);
         $this->warn('Migrated!!!');
     }
 
@@ -69,6 +89,7 @@ class SetupMigrationCommand extends Command
         foreach ($this->defaultSeeders as $seeder) {
             Artisan::call('db:seed', [
                 '--class' => $seeder,
+                '--force' => true,
             ], $this->output);
         }
         $this->warn('Seeded!!!');

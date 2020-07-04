@@ -90,7 +90,7 @@ class UpdatePasswordCommand extends Command
     private function updatePassword()
     {
         $userRepository = new UserRepository();
-        $user = $userRepository->getByEmail($this->getEmail(), false);
+        $user = $userRepository->notStrict()->getByEmail($this->getEmail());
         if (empty($user)) {
             $this->error('Email does not exist!');
         } else {

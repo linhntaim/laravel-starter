@@ -22,15 +22,14 @@ trait SetupMigrationWithPassportTrait
         $this->warn('Seeding passport...');
         $clientId = ConfigHelper::get('passport.password.client_id');
         $clientSecret = ConfigHelper::get('passport.password.client_secret');
-
-        if (empty($clientId) || empty($clientSecret)) return;
-
-        DB::table('oauth_clients')
-            ->where('id', $clientId)
-            ->update([
-                'secret' => $clientSecret,
-            ]);
-        $this->info(sprintf('The client ID %d was updated to %s', $clientId, $clientSecret));
+        if (!empty($clientId) && !empty($clientSecret)) {
+            DB::table('oauth_clients')
+                ->where('id', $clientId)
+                ->update([
+                    'secret' => $clientSecret,
+                ]);
+            $this->info(sprintf('The client ID %d was updated to %s', $clientId, $clientSecret));
+        }
         $this->warn('Passport seeded!!!');
     }
 

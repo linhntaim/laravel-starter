@@ -2,17 +2,23 @@
 
 namespace App\ModelRepositories;
 
+use App\ModelRepositories\Base\DependedRepository;
+use App\ModelRepositories\Base\ModelRepository;
 use App\Models\Admin;
-use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Class UserRepository
  * @package App\ModelRepositories
  * @property Admin $model
- * @method Admin getById($id, $strict = true)
+ * @method Admin getById($id, callable $callback = null)
  */
-class AdminRepository extends ModelRepository
+class AdminRepository extends DependedRepository
 {
+    public function __construct($id = null)
+    {
+        parent::__construct('user', $id);
+    }
+
     public function modelClass()
     {
         return Admin::class;
@@ -25,11 +31,11 @@ class AdminRepository extends ModelRepository
      */
     public function deleteWithIds(array $ids)
     {
-        return $this->catch(function () use ($ids) {
-            $this->queryByIds($ids)->whereHas('user', function (Builder $query) {
+        return $this->queryDelete(
+            $this->dependedWhere(function ($query) {
                 $query->noneProtected();
-            })->delete();
-            return true;
-        });
+            })
+                ->queryByIds($ids)
+        );
     }
 }

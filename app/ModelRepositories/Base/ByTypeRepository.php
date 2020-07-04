@@ -1,6 +1,6 @@
 <?php
 
-namespace App\ModelRepositories;
+namespace App\ModelRepositories\Base;
 
 abstract class ByTypeRepository extends ModelRepository
 {
@@ -15,7 +15,7 @@ abstract class ByTypeRepository extends ModelRepository
 
     public function query()
     {
-        return $this->rawQuery()->where('type', $this->type);
+        return parent::query()->where('type', $this->type);
     }
 
     public function batchInsert($attributes)

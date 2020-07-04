@@ -3,10 +3,14 @@
 namespace App\Utils;
 
 use App\Exceptions\UserException;
-use App\Http\Requests\Request;
 use App\Rules\Rule;
 use Illuminate\Support\Facades\Validator;
 
+/**
+ * Trait ValidationTrait
+ * @package App\Utils
+ * @mixin ClassTrait
+ */
 trait ValidationTrait
 {
     /**
@@ -31,19 +35,6 @@ trait ValidationTrait
         return true;
     }
 
-    /**
-     * @param Request $request
-     * @param array $rules
-     * @param array $messages
-     * @param array $customAttributes
-     * @return bool
-     * @throws
-     */
-    protected function validated(Request $request, array $rules, array $messages = [], array $customAttributes = [])
-    {
-        return $this->validatedData($request->all(), $rules, $messages, $customAttributes);
-    }
-
     private function validatedMessages(array $rules)
     {
         $messages = [];
@@ -62,13 +53,13 @@ trait ValidationTrait
                         $rule = $subRule;
                     }
 
-                    $ruleName = explode(':', $rule)[0];
+                    $ruleName = explode(':', $rule, 2)[0];
                     $errorName = $inputName . (empty($ruleName) ? '' : '.' . $ruleName);
-                    if ($this->__hasTransErrorWithModule($errorName)) {
+                    if (static::__hasTransErrorWithModule($errorName)) {
                         if ($subRule instanceof Rule) {
-                            $subRule->setTransPath($this->__transErrorPathWithModule($inputName));
+                            $subRule->setTransPath(static::__transErrorPathWithModule($inputName));
                         }
-                        $messages[$errorName] = $this->__transErrorWithModule($errorName);
+                        $messages[$errorName] = static::__transErrorWithModule($errorName);
                     }
                 }
             }

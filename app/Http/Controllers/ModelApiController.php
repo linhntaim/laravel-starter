@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Request;
-use App\ModelRepositories\ModelRepository;
+use App\ModelRepositories\Base\ModelRepository;
 use App\Utils\PaginationHelper;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;

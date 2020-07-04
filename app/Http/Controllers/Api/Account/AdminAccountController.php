@@ -20,7 +20,7 @@ class AdminAccountController extends ModelApiController
 
     public function index(Request $request)
     {
-        $model = $this->modelRepository->getById($request->user()->id, false);
+        $model = $this->modelRepository->notStrict()->getById($request->user()->id);
         if (empty($model)) {
             throw new AppException(static::__transErrorWithModule('not_found'));
         }

@@ -2,11 +2,16 @@
 
 namespace App\ModelRepositories;
 
-use App\Exceptions\Exception;
+use App\ModelRepositories\Base\ModelRepository;
 use App\Models\Device;
 use App\Utils\ClientHelper;
 use App\Utils\StringHelper;
 
+/**
+ * Class DeviceRepository
+ * @package App\ModelRepositories
+ * @method Device first($query)
+ */
 class DeviceRepository extends ModelRepository
 {
     public function modelClass()
@@ -18,23 +23,21 @@ class DeviceRepository extends ModelRepository
      * @param $provider
      * @param $secret
      * @return Device
-     * @throws Exception
      */
     public function getByProviderAndSecret($provider, $secret)
     {
-        return $this->catch(function () use ($provider, $secret) {
-            return $this->query()
+        return $this->first(
+            $this->query()
                 ->where('provider', $provider)
                 ->where('secret', $secret)
-                ->first();
-        });
+        );
     }
 
     /**
      * @param $provider
      * @param $secret
      * @return boolean
-     * @throws Exception
+     * @throws
      */
     public function hasProviderAndSecret($provider, $secret)
     {
@@ -63,7 +66,7 @@ class DeviceRepository extends ModelRepository
      * @param array|string|null $clientIps
      * @param int|null $userId
      * @return Device
-     * @throws Exception
+     * @throws
      */
     public function save($provider = Device::PROVIDER_BROWSER, $secret = null, $clientIps = null, $userId = null)
     {
@@ -73,10 +76,13 @@ class DeviceRepository extends ModelRepository
 
         $clientIps = empty($clientIps) ? null : json_encode((array)$clientIps);
 
-        $device = empty($secret) ? null : $this->getByProviderAndSecret($provider, $secret);
+        if (!empty($secret)) {
+            $this->notStrict()
+                ->pinModel()
+                ->getByProviderAndSecret($provider, $secret);
+        }
 
-        if (empty($device)) {
-            $this->trySecretWithProvider($provider);
+        if ($this->doesntHaveModel()) {
             return $this->createWithAttributes([
                 'user_id' => $userId,
                 'provider' => $provider,
@@ -89,7 +95,6 @@ class DeviceRepository extends ModelRepository
             ]);
         }
 
-        $this->model($device);
         return $this->updateWithAttributes([
             'user_id' => $userId,
             'client_ips' => $clientIps,

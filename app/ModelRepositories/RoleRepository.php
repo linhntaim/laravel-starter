@@ -3,10 +3,15 @@
 namespace App\ModelRepositories;
 
 use App\Exceptions\AppException;
-use App\Exceptions\Exception;
+use App\ModelRepositories\Base\ModelRepository;
 use App\Models\Role;
 use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * Class RoleRepository
+ * @package App\ModelRepositories
+ * @property Role $model
+ */
 class RoleRepository extends ModelRepository
 {
     public function modelClass()
@@ -35,7 +40,7 @@ class RoleRepository extends ModelRepository
 
     /**
      * @return Collection
-     * @throws Exception
+     * @throws
      */
     public function getNoneProtected()
     {
@@ -48,7 +53,7 @@ class RoleRepository extends ModelRepository
      * @param array $attributes
      * @param array $permissions
      * @return Role
-     * @throws Exception
+     * @throws
      */
     public function createWithAttributes(array $attributes = [], array $permissions = [])
     {
@@ -65,8 +70,7 @@ class RoleRepository extends ModelRepository
      * @param array $attributes
      * @param array $permissions
      * @return Role
-     * @throws AppException
-     * @throws Exception
+     * @throws
      */
     public function updateWithAttributes(array $attributes = [], array $permissions = [])
     {
@@ -88,14 +92,10 @@ class RoleRepository extends ModelRepository
     /**
      * @param array $ids
      * @return bool
-     * @throws Exception
      */
     public function deleteWithIds(array $ids)
     {
-        return $this->catch(function () use ($ids) {
-            $this->queryByIds($ids)->noneProtected()->delete();
-            return true;
-        });
+        return $this->queryDelete($this->queryByIds($ids)->noneProtected());
     }
 
     public function delete()

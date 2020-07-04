@@ -2,9 +2,9 @@
 
 namespace App\ModelRepositories;
 
-use App\Configuration;
 use App\Exports\Export;
 use App\Jobs\ExportJob;
+use App\ModelRepositories\Base\ModelRepository;
 use App\Models\DataExport;
 
 /**
@@ -19,24 +19,12 @@ class DataExportRepository extends ModelRepository
         return DataExport::class;
     }
 
-    public function search($search = [], $paging = Configuration::FETCH_PAGING_YES, $itemsPerPage = Configuration::DEFAULT_ITEMS_PER_PAGE, $sortBy = null, $sortOrder = null)
+    protected function searchOn($query, array $search)
     {
-        $query = $this->query();
-
         if (!empty($search['names'])) {
             $query->whereIn('name', $search['names']);
         }
-
-        if (!empty($sortBy)) {
-            $query->orderBy($sortBy, $sortOrder);
-        }
-        if ($paging == Configuration::FETCH_PAGING_NO) {
-            return $query->get();
-        } elseif ($paging == Configuration::FETCH_PAGING_YES) {
-            return $query->paginate($itemsPerPage);
-        }
-
-        return $query;
+        return parent::searchOn($query, $search);
     }
 
     public function createWithAttributesAndExport(array $attributes, Export $export)
