@@ -74,6 +74,16 @@ abstract class ModelRepository
         return $this;
     }
 
+    public function lockForUpdate()
+    {
+        return $this->lock(true);
+    }
+
+    public function sharedLock()
+    {
+        return $this->lock(false);
+    }
+
     /**
      * @return Builder
      */
