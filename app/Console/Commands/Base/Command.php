@@ -36,7 +36,9 @@ abstract class Command extends BaseCommand
     {
         LogHelper::info(sprintf('%s executing...', static::class));
         try {
+            $this->before();
             $this->go();
+            $this->after();
         } catch (\Exception $exception) {
             $this->handleException($exception);
         }

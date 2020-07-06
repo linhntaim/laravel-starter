@@ -11,6 +11,6 @@ class TestMailCommand extends Command
 
     protected function go()
     {
-        MailHelper::sendTestMail();
+        MailHelper::sendTestMailNow();
     }
 }

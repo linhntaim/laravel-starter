@@ -38,48 +38,46 @@ class TemplateNowMailable extends Mailable
 
     public function build()
     {
-        $this->settingsTemporary(function () {
-            if (isset($this->templateParams[static::EMAIL_FROM])) {
-                if (empty($this->templateParams[static::EMAIL_FROM])) {
-                    throw new AppException('From email has been not set');
-                }
-                if (isset($this->templateParams[static::EMAIL_FROM_NAME])) {
-                    $this->from($this->templateParams[static::EMAIL_FROM], $this->templateParams[static::EMAIL_FROM_NAME]);
-                } else {
-                    $this->from($this->templateParams[static::EMAIL_FROM]);
-                }
-            } else {
-                $noReplyMail = ConfigHelper::getNoReplyMail();
-                if (empty($noReplyMail['address'])) {
-                    throw new AppException('No-reply email has been not set');
-                }
-                $this->from($noReplyMail['address'], $noReplyMail['name']);
+        if (isset($this->templateParams[static::EMAIL_FROM])) {
+            if (empty($this->templateParams[static::EMAIL_FROM])) {
+                throw new AppException('From email has been not set');
             }
-
-            $emailTested = ConfigHelper::getTestedMail();
-            if ($emailTested['used']) {
-                if (empty($emailTested['address'])) {
-                    throw new AppException('Tested email has been not set');
-                }
-                $this->to($emailTested['address'], $emailTested['name']);
+            if (isset($this->templateParams[static::EMAIL_FROM_NAME])) {
+                $this->from($this->templateParams[static::EMAIL_FROM], $this->templateParams[static::EMAIL_FROM_NAME]);
             } else {
-                if (empty($this->templateParams[static::EMAIL_TO])) {
-                    throw new AppException('To email has been not set');
-                }
-                if (isset($this->templateParams[static::EMAIL_TO_NAME])) {
-                    $this->to($this->templateParams[static::EMAIL_TO], $this->templateParams[static::EMAIL_TO_NAME]);
-                } else {
-                    $this->to($this->templateParams[static::EMAIL_TO]);
-                }
+                $this->from($this->templateParams[static::EMAIL_FROM]);
             }
+        } else {
+            $noReplyMail = ConfigHelper::getNoReplyMail();
+            if (empty($noReplyMail['address'])) {
+                throw new AppException('No-reply email has been not set');
+            }
+            $this->from($noReplyMail['address'], $noReplyMail['name']);
+        }
 
-            $this->subject(
-                isset($this->templateParams[static::EMAIL_SUBJECT]) ?
-                    $this->templateParams[static::EMAIL_SUBJECT]
-                    : $this->__transWithModule('default_subject', 'label', ['app_name' => Facade::getAppName()])
-            );
+        $emailTested = ConfigHelper::getTestedMail();
+        if ($emailTested['used']) {
+            if (empty($emailTested['address'])) {
+                throw new AppException('Tested email has been not set');
+            }
+            $this->to($emailTested['address'], $emailTested['name']);
+        } else {
+            if (empty($this->templateParams[static::EMAIL_TO])) {
+                throw new AppException('To email has been not set');
+            }
+            if (isset($this->templateParams[static::EMAIL_TO_NAME])) {
+                $this->to($this->templateParams[static::EMAIL_TO], $this->templateParams[static::EMAIL_TO_NAME]);
+            } else {
+                $this->to($this->templateParams[static::EMAIL_TO]);
+            }
+        }
 
-            $this->view($this->getTemplatePath(), $this->templateParams);
-        });
+        $this->subject(
+            isset($this->templateParams[static::EMAIL_SUBJECT]) ?
+                $this->templateParams[static::EMAIL_SUBJECT]
+                : $this->__transWithModule('default_subject', 'label', ['app_name' => Facade::getAppName()])
+        );
+
+        $this->view($this->getTemplatePath(), $this->templateParams);
     }
 }
