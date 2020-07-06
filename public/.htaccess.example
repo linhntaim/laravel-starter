@@ -1,0 +1,63 @@
+# AuthType Basic
+# AuthName "Protected Area"
+# AuthUserFile /path/to/.htpasswd
+# Require valid-user
+
+AddDefaultCharset utf-8
+
+AddType application/json .json
+AddType font/woff .woff
+AddType font/woff2 .woff2
+AddType text/csv .csv
+AddType text/plain .txt
+
+<IfModule mod_headers.c>
+    Header add Access-Control-Allow-Origin "*"
+    Header add Access-Control-Allow-Headers "Accept, Application, Authorization, Content-Type, Device, Localization, Origin, Referer, User-Agent, X-Authorization, X-Requested-With"
+    Header add Access-Control-Allow-Methods "OPTIONS, GET, POST, PUT, DELETE"
+
+    Header add Strict-Transport-Security "max-age=86400; includeSubDomains"
+    Header add X-Content-Type-Options "nosniff"
+    Header add X-Download-Options "noopen"
+    Header add X-Frame-Options "sameorigin"
+    Header add X-XSS-Protection "1; mode=block"
+    Header add Content-Security-Policy "default-src 'self'"
+    Header add X-Content-Security-Policy "allow 'self'"
+    Header add X-WebKit-CSP "default-src 'self'"
+
+    Header unset Cache-Control
+    Header add Cache-Control "no-cache, no-store, private"
+    <FilesMatch ".(html|jpg|jpeg|png|gif|svg|ico|js|css|json|woff|woff2)$">
+        Header unset Cache-Control
+        Header set Cache-Control "max-age=84600, public"
+    </FilesMatch>
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    RewriteCond %{HTTP:X-Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:X-Authorization}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Handle Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^api index.php [L]
+
+    # Handle Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.html [L]
+</IfModule>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <!--
+    <configSections>
+        <section name="httpAuthModule" type="System.Configuration.NameValueFileSectionHandler" />
+    </configSections>
+	<httpAuthModule>
+		<add key="AuthMode" value="Basic" />
+		<add key="Realm" value="SecureZone" />
+		<add key="Credentials" value="hakuhodo_products_live:ProductsLive@0424" />
+		<add key="DigestNonceValidDuration" value="120" />
+	</httpAuthModule>
+	-->
+	<system.web>
+        <globalization
+            fileEncoding="utf-8"
+            responseEncoding="utf-8"
+        />
+    </system.web>
+	<system.webServer>
+        <!--
+        <modules>
+            <add type="HttpAuthModule.HttpAuthModule" name="HttpAuthModule" />
+        </modules>
+        -->
+		<urlCompression doDynamicCompression="true" doStaticCompression="true" dynamicCompressionBeforeCache="true" />
+		<staticContent>
+	        <remove fileExtension=".json" />
+	        <remove fileExtension=".woff" />
+            <remove fileExtension=".woff2" />
+            <remove fileExtension=".csv" />
+            <remove fileExtension=".txt" />
+            <mimeMap fileExtension=".json" mimeType="application/json" />
+            <mimeMap fileExtension=".woff" mimeType="application/x-font-woff" />
+            <mimeMap fileExtension=".woff2" mimeType="font/woff2" />
+            <mimeMap fileExtension=".csv" mimeType="text/csv" />
+            <mimeMap fileExtension=".txt" mimeType="text/plain" />
+        </staticContent>
+		<httpProtocol>
+			<customHeaders>
+				<add name="Access-Control-Allow-Origin" value="*" />
+				<add name="Access-Control-Allow-Headers" value="Accept, Application, Authorization, Content-Type, Device, Localization, Origin, Referer, User-Agent, X-Authorization, X-Requested-With" />
+				<add name="Access-Control-Allow-Methods" value="OPTIONS, GET, POST, PUT, DELETE" />
+
+				<add name="Strict-Transport-Security" value="max-age=86400; includeSubDomains" />
+                <add name="X-Content-Type-Options" value="nosniff" />
+                <add name="X-Download-Options" value="noopen" />
+                <add name="X-Frame-Options" value="sameorigin" />
+                <add name="X-XSS-Protection" value="1; mode=block" />
+                <add name="Content-Security-Policy" value="default-src 'self'" />
+                <add name="X-Content-Security-Policy" value="allow 'self'" />
+                <add name="X-WebKit-CSP" value="default-src 'self'" />
+
+                <remove name="Cache-Control" />
+                <add name="Cache-Control" value="no-cache, no-store, private" />
+			</customHeaders>
+		</httpProtocol>
+		<rewrite>
+            <outboundRules>
+                <rule name="cache_control_on_files">
+                    <match serverVariable="RESPONSE_Cache_Control" pattern=".*" />
+                    <conditions>
+                        <add input="{REQUEST_FILENAME}" pattern="\.(html|jpg|jpeg|png|gif|svg|ico|js|css|json|woff|woff2)$" />
+                    </conditions>
+                    <action type="Rewrite" value="max-age=84600, public"/>
+                </rule>
+            </outboundRules>
+			<rules>
+				<rule name="admin" stopProcessing="true">
+					<match url="^admin(.*)" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll">
+						<add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
+						<add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
+					</conditions>
+					<action type="Rewrite" url="admin/index.html" appendQueryString="true" />
+				</rule>
+				<rule name="api" stopProcessing="true">
+					<match url="^api(.*)" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll">
+						<add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
+						<add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
+					</conditions>
+					<action type="Rewrite" url="index.php" appendQueryString="true" />
+				</rule>
+				<rule name="index" stopProcessing="true">
+					<match url="^" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll">
+						<add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
+						<add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
+					</conditions>
+					<action type="Rewrite" url="index.html" appendQueryString="true" />
+				</rule>
+			</rules>
+		</rewrite>
+	</system.webServer>
+</configuration>
