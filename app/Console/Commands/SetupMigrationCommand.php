@@ -10,7 +10,7 @@ class SetupMigrationCommand extends Command
 {
     use SetupMigrationWithPassportTrait;
 
-    protected $signature = 'setup:migration {--u} {--dummy-data}';
+    protected $signature = 'setup:migration {--u} {--key} {--dummy-data}';
 
     protected $defaultSeeders = [
         'DefaultSeeder',
@@ -21,6 +21,11 @@ class SetupMigrationCommand extends Command
     protected function go()
     {
         $this->hasPassport = class_exists('Laravel\\Passport\\Passport');
+
+        if ($this->option('key')) {
+            Artisan::call('key:generate', [], $this->output);
+        }
+
         $this->uninstall();
         if (!$this->option('u')) {
             $this->setup();
