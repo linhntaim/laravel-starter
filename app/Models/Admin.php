@@ -4,9 +4,7 @@ namespace App\Models;
 
 use App\ModelResources\AdminResource;
 use App\Models\Base\ExtendedUserModel;
-use App\ModelTraits\MemorizeTrait;
 use App\Utils\ConfigHelper;
-use Illuminate\Notifications\Notifiable;
 
 /**
  * Class Admin
@@ -21,8 +19,6 @@ use Illuminate\Notifications\Notifiable;
  */
 class Admin extends ExtendedUserModel
 {
-    use Notifiable, MemorizeTrait;
-
     protected $table = 'admins';
 
     protected $fillable = [
