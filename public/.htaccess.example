@@ -21,9 +21,9 @@ AddType text/plain .txt
     Header add X-Download-Options "noopen"
     Header add X-Frame-Options "sameorigin"
     Header add X-XSS-Protection "1; mode=block"
-    Header add Content-Security-Policy "default-src 'self'"
-    Header add X-Content-Security-Policy "allow 'self'"
-    Header add X-WebKit-CSP "default-src 'self'"
+    Header add Content-Security-Policy "default-src 'self' 'unsafe-inline' 'unsafe-eval' fonts.googleapis.com fonts.gstatic.com"
+    Header add X-Content-Security-Policy "allow 'self' 'unsafe-inline' 'unsafe-eval' fonts.googleapis.com fonts.gstatic.com"
+    Header add X-WebKit-CSP "default-src 'self' 'unsafe-inline' 'unsafe-eval' fonts.googleapis.com fonts.gstatic.com"
 
     Header unset Cache-Control
     Header add Cache-Control "no-cache, no-store, private"
