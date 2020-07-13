@@ -13,7 +13,7 @@ AddType text/plain .txt
 
 <IfModule mod_headers.c>
     Header add Access-Control-Allow-Origin "*"
-    Header add Access-Control-Allow-Headers "Accept, Application, Authorization, Content-Type, Device, Localization, Origin, Referer, User-Agent, X-Authorization, X-Requested-With"
+    Header add Access-Control-Allow-Headers "Accept, Authorization, Content-Type, Device, Origin, Referer, User-Agent, X-Authorization, X-Settings, X-Requested-With"
     Header add Access-Control-Allow-Methods "OPTIONS, GET, POST, PUT, DELETE"
 
     Header add Strict-Transport-Security "max-age=86400; includeSubDomains"

@@ -43,8 +43,9 @@ class Manager
     public function fetchFromRequestHeaders()
     {
         $requestHeaders = request()->headers;
-        if ($requestHeaders->has('Client')
-            && ($settings = json_decode($requestHeaders->get('Client'), true)) !== false) {
+        $settingsHeader = ConfigHelper::get('headers.settings');
+        if (!empty($settingsHeader) && $requestHeaders->has($settingsHeader)
+            && ($settings = json_decode($requestHeaders->get($settingsHeader), true)) !== false) {
             return $this->update($settings);
         }
         return $this;

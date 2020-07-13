@@ -85,6 +85,10 @@ return [
             ],
         ],
     ],
+    'headers' => [
+        'settings' => env('HEADER_SETTINGS_NAME'),
+        'token_authorization' => env('HEADER_TOKEN_AUTHORIZATION_NAME'),
+    ],
 
     'localization' => [
         'country' => 'US',
