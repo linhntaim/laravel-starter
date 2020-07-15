@@ -50,7 +50,7 @@ class Kernel extends ConsoleKernel
                     ->withKernel($this)
                     ->handle();
             }
-        })->everyMinute();
+        })->everyMinute()->onOneServer();
     }
 
     /**
