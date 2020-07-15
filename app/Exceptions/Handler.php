@@ -74,14 +74,14 @@ class Handler extends ExceptionHandler
 
     protected function convertExceptionToArray(Throwable $e)
     {
-        return ApiController::failPayload(null, $e);
+        return ApiController::failPayload(null, $e, $this->isHttpException($e) ? $e->getStatusCode() : 500);
     }
 
     protected function unauthenticated($request, AuthenticationException $exception)
     {
         return $request->expectsJson()
             ? response()->json(
-                ApiController::failPayload(null, $exception),
+                ApiController::failPayload(null, $exception, 401),
                 ConfigHelper::getApiResponseStatus(401),
                 ConfigHelper::getApiResponseHeaders(),
                 JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
@@ -92,7 +92,7 @@ class Handler extends ExceptionHandler
     protected function invalidJson($request, ValidationException $exception)
     {
         return response()->json(
-            ApiController::failPayload(null, $exception),
+            ApiController::failPayload(null, $exception, $exception->status),
             ConfigHelper::getApiResponseStatus($exception->status),
             ConfigHelper::getApiResponseHeaders(),
             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE

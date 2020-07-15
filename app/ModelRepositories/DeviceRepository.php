@@ -70,10 +70,8 @@ class DeviceRepository extends ModelRepository
      */
     public function save($provider = Device::PROVIDER_BROWSER, $secret = null, $clientIps = null, $userId = null)
     {
-        if (empty($provider)) {
-            $provider = Device::PROVIDER_BROWSER;
-        }
-
+        $provider = empty($provider) ? Device::PROVIDER_BROWSER : htmlentities($provider);
+        $secret = empty($secret) ? null : htmlentities($secret);
         $clientIps = empty($clientIps) ? null : json_encode((array)$clientIps);
 
         if (!empty($secret)) {
