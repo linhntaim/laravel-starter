@@ -3,6 +3,8 @@
 namespace App\Models\Base;
 
 use App\Models\User;
+use App\ModelTraits\MemorizeTrait;
+use Illuminate\Notifications\Notifiable;
 
 /**
  * Trait UserExtendedTrait
@@ -11,6 +13,8 @@ use App\Models\User;
  */
 abstract class ExtendedUserModel extends Model implements IUser
 {
+    use Notifiable, MemorizeTrait;
+
     protected $primaryKey = 'user_id';
 
     public $incrementing = false;

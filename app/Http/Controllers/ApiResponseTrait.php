@@ -14,6 +14,7 @@ use Closure;
 use Exception as BaseException;
 use Illuminate\Http\JsonResponse;
 use League\OAuth2\Server\Exception\OAuthServerException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
 trait ApiResponseTrait
@@ -82,10 +83,11 @@ trait ApiResponseTrait
         ];
     }
 
-    public static function failPayload($data = null, $message = null)
+    public static function failPayload($data = null, $message = null, $code = Configuration::HTTP_RESPONSE_STATUS_ERROR)
     {
         return array_merge(static::payload($data, $message), [
             '_status' => false,
+            '_code' => $code,
         ]);
     }
 
@@ -93,6 +95,7 @@ trait ApiResponseTrait
     {
         return array_merge(static::payload($data, $message), [
             '_status' => true,
+            '_code' => Configuration::HTTP_RESPONSE_STATUS_OK,
         ]);
     }
 
@@ -148,7 +151,15 @@ trait ApiResponseTrait
         if ($message instanceof BaseException) {
             LogHelper::error($message);
         }
-        return $this->response(static::failPayload($data, $message), Configuration::HTTP_RESPONSE_STATUS_ERROR, $headers);
+        return $this->response(
+            static::failPayload(
+                $data,
+                $message,
+                $message instanceof HttpExceptionInterface ? $message->getStatusCode() : Configuration::HTTP_RESPONSE_STATUS_ERROR
+            ),
+            Configuration::HTTP_RESPONSE_STATUS_ERROR,
+            $headers
+        );
     }
 
     protected function getRespondedDataWithKey($data, $key = null)

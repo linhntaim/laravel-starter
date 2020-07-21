@@ -11,4 +11,11 @@ use Illuminate\Queue\SerializesModels;
 class TemplateMailable extends TemplateNowMailable implements ShouldQueue
 {
     use Queueable, InteractsWithQueue, SerializesModels, Capture;
+
+    public function build()
+    {
+        $this->settingsTemporary(function () {
+            parent::build();
+        });
+    }
 }

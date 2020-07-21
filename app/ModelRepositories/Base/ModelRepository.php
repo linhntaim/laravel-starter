@@ -32,6 +32,10 @@ abstract class ModelRepository
     private $withTrashed = false;
     private $lock;
     private $strict;
+    private $sorts = [];
+    private $sortsDefault = [];
+    private $sortsAllowed = [];
+    private $sortsAllowedDefault = [];
     private $force = false;
     private $pinned = false;
 
@@ -74,6 +78,36 @@ abstract class ModelRepository
         return $this;
     }
 
+    public function lockForUpdate()
+    {
+        return $this->lock(true);
+    }
+
+    public function sharedLock()
+    {
+        return $this->lock(false);
+    }
+
+    public function sorts($sorts = [])
+    {
+        $this->sorts = $sorts;
+        return $this;
+    }
+
+    public function sortsAllowed($sortsAllowed = [])
+    {
+        $this->sortsAllowed = $sortsAllowed;
+        return $this;
+    }
+
+    public function sort($sortBy = null, $sortOrder = 'asc')
+    {
+        if ($sortBy) {
+            $this->sorts[$sortBy] = $sortOrder;
+        }
+        return $this;
+    }
+
     /**
      * @return Builder
      */
@@ -87,6 +121,16 @@ abstract class ModelRepository
         if ($this->withTrashed) {
             $query->withTrashed();
             $this->withTrashed = false;
+        }
+        if (!empty($this->sorts)) {
+            $sortsAllowed = array_merge($this->sortsAllowed, $this->sortsAllowedDefault);
+            $noNeedToCheckSortsAllowed = empty($sortsAllowed);
+            foreach (array_merge($this->sorts, $this->sortsDefault) as $sortBy => $sortOrder) {
+                if ($noNeedToCheckSortsAllowed || in_array($sortBy, $sortsAllowed)) {
+                    $query->orderBy($sortBy, $sortOrder ? $sortOrder : 'asc');
+                }
+            }
+            $this->sorts()->sortsAllowed();
         }
         if (!is_null($this->lock)) {
             $query->lock($this->lock);
@@ -222,15 +266,13 @@ abstract class ModelRepository
     }
 
     /**
-     * @param string $sortBy
-     * @param string $sortOrder
      * @return Collection
      * @throws Exception
      */
-    public function getAll($sortBy = null, $sortOrder = 'asc')
+    public function getAll()
     {
-        return $this->catch(function () use ($sortBy, $sortOrder) {
-            return $this->search([], Configuration::FETCH_PAGING_NO, 0, $sortBy, $sortOrder);
+        return $this->catch(function () {
+            return $this->search([], Configuration::FETCH_PAGING_NO, 0);
         });
     }
 
@@ -248,21 +290,15 @@ abstract class ModelRepository
      * @param array $search
      * @param int $paging
      * @param int $itemsPerPage
-     * @param string|null $sortBy
-     * @param string|null $sortOrder
      * @return Collection|LengthAwarePaginator|Builder
      * @throws Exception
      */
-    public function search(array $search = [], $paging = Configuration::FETCH_PAGING_YES, $itemsPerPage = Configuration::DEFAULT_ITEMS_PER_PAGE, $sortBy = null, $sortOrder = 'asc')
+    public function search(array $search = [], $paging = Configuration::FETCH_PAGING_YES, $itemsPerPage = Configuration::DEFAULT_ITEMS_PER_PAGE)
     {
         $query = $this->query();
 
         if (!empty($search)) {
             $query = $this->searchOn($query, $search);
-        }
-
-        if (!empty($sortBy)) {
-            $query->orderBy($sortBy, $sortOrder);
         }
 
         switch ($paging) {

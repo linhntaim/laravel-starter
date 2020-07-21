@@ -19,7 +19,7 @@ class DeviceController extends ModelApiController
     public function currentStore(Request $request)
     {
         $this->validated($request, [
-            'provider' => 'nullable|sometimes|string',
+            'provider' => 'nullable|sometimes|string|max:255',
             'secret' => 'nullable|sometimes|string|max:255',
         ]);
 

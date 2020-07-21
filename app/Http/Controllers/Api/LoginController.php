@@ -46,7 +46,7 @@ class LoginController extends AccessTokenController
 
     protected function throwException(LeagueException $e)
     {
-        $e->setPayload(static::failPayload(null, $e));
+        $e->setPayload(static::failPayload(null, $e, 401));
         throw new OAuthServerException(
             $e,
             $this->convertResponse($e->generateHttpResponse(new Psr7Response))

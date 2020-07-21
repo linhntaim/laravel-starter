@@ -178,8 +178,8 @@ abstract class NowNotification extends BaseNotification
 
     protected function dataMail(IUser $notifiable)
     {
-        $mailable = $this->getMailNow($notifiable) ? TemplateNowMailable::class : TemplateMailable::class;
-        return new ($mailable)(
+        $mailable = $this->getMailNow($notifiable) ? $this->getNowMailable($notifiable) : $this->getMailable($notifiable);
+        return new $mailable(
             $this->getMailTemplate($notifiable),
             array_merge([
                 TemplateMailable::EMAIL_TO => $notifiable->preferredEmail(),
@@ -260,6 +260,16 @@ abstract class NowNotification extends BaseNotification
     protected function getAction(IUser $notifiable)
     {
         return null;
+    }
+
+    protected function getNowMailable(IUser $notifiable)
+    {
+        return TemplateNowMailable::class;
+    }
+
+    protected function getMailable(IUser $notifiable)
+    {
+        return TemplateMailable::class;
     }
 
     protected function getMailTemplate(IUser $notifiable)

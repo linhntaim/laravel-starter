@@ -6,8 +6,8 @@ use App\Configuration;
 
 trait ItemsPerPageTrait
 {
-    protected $sortBy;
-    protected $sortOrder;
+    protected $sortBy = null;
+    protected $sortOrder = 'asc';
 
     protected function paging()
     {
@@ -33,6 +33,10 @@ trait ItemsPerPageTrait
 
     protected function sortOrder()
     {
-        return request()->input('sort_order', $this->sortOrder);
+        $sortOrder = strtolower(request()->input('sort_order', $this->sortOrder));
+        if (!in_array($sortOrder, ['asc', 'desc'])) {
+            $sortOrder = 'asc';
+        }
+        return $sortOrder;
     }
 }

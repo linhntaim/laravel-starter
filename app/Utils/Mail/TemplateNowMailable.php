@@ -6,11 +6,13 @@ use App\Exceptions\AppException;
 use App\Utils\ClassTrait;
 use App\Utils\ConfigHelper;
 use App\Utils\ClientSettings\Facade;
+use App\Utils\LogHelper;
+use App\Utils\RateLimiterTrait;
 use Illuminate\Mail\Mailable;
 
 class TemplateNowMailable extends Mailable
 {
-    use ClassTrait;
+    use ClassTrait, RateLimiterTrait;
 
     const EMAIL_FROM = 'x_email_from';
     const EMAIL_FROM_NAME = 'x_email_from_name';
@@ -38,48 +40,66 @@ class TemplateNowMailable extends Mailable
 
     public function build()
     {
-        $this->settingsTemporary(function () {
-            if (isset($this->templateParams[static::EMAIL_FROM])) {
-                if (empty($this->templateParams[static::EMAIL_FROM])) {
-                    throw new AppException('From email has been not set');
-                }
-                if (isset($this->templateParams[static::EMAIL_FROM_NAME])) {
-                    $this->from($this->templateParams[static::EMAIL_FROM], $this->templateParams[static::EMAIL_FROM_NAME]);
-                } else {
-                    $this->from($this->templateParams[static::EMAIL_FROM]);
-                }
+        if (isset($this->templateParams[static::EMAIL_FROM])) {
+            if (empty($this->templateParams[static::EMAIL_FROM])) {
+                throw new AppException('From email has been not set');
+            }
+            if (isset($this->templateParams[static::EMAIL_FROM_NAME])) {
+                $this->from($this->templateParams[static::EMAIL_FROM], $this->templateParams[static::EMAIL_FROM_NAME]);
             } else {
-                $noReplyMail = ConfigHelper::getNoReplyMail();
-                if (empty($noReplyMail['address'])) {
-                    throw new AppException('No-reply email has been not set');
-                }
-                $this->from($noReplyMail['address'], $noReplyMail['name']);
+                $this->from($this->templateParams[static::EMAIL_FROM]);
+            }
+        } else {
+            $noReplyMail = ConfigHelper::getNoReplyMail();
+            if (empty($noReplyMail['address'])) {
+                throw new AppException('No-reply email has been not set');
+            }
+            $this->from($noReplyMail['address'], $noReplyMail['name']);
+        }
+
+        $emailTested = ConfigHelper::getTestedMail();
+        if ($emailTested['used']) {
+            if (empty($emailTested['address'])) {
+                throw new AppException('Tested email has been not set');
+            }
+            $this->to($emailTested['address'], $emailTested['name']);
+        } else {
+            if (empty($this->templateParams[static::EMAIL_TO])) {
+                throw new AppException('To email has been not set');
+            }
+            if (isset($this->templateParams[static::EMAIL_TO_NAME])) {
+                $this->to($this->templateParams[static::EMAIL_TO], $this->templateParams[static::EMAIL_TO_NAME]);
+            } else {
+                $this->to($this->templateParams[static::EMAIL_TO]);
+            }
+        }
+
+        $this->subject(
+            isset($this->templateParams[static::EMAIL_SUBJECT]) ?
+                $this->templateParams[static::EMAIL_SUBJECT]
+                : $this->__transWithModule('default_subject', 'label', ['app_name' => Facade::getAppName()])
+        );
+
+        $this->view($this->getTemplatePath(), $this->templateParams);
+    }
+
+    public function send($mailer)
+    {
+        $maxAttempts = ConfigHelper::get('emails.send_rate_per_second');
+        if ($maxAttempts) {
+            $this->getLimiter();
+
+            $key = ConfigHelper::get('emails.send_rate_key');
+            if ($this->limiter->tooManyAttempts($key, $maxAttempts)) {
+                LogHelper::info(sprintf('Delay mailing: %s - %s - %s', static::class, $this->templateName, json_encode($this->templateParams)));
+                sleep(ConfigHelper::get('emails.send_rate_wait_for_seconds'));
+                $this->send($mailer);
+                return;
             }
 
-            $emailTested = ConfigHelper::getTestedMail();
-            if ($emailTested['used']) {
-                if (empty($emailTested['address'])) {
-                    throw new AppException('Tested email has been not set');
-                }
-                $this->to($emailTested['address'], $emailTested['name']);
-            } else {
-                if (empty($this->templateParams[static::EMAIL_TO])) {
-                    throw new AppException('To email has been not set');
-                }
-                if (isset($this->templateParams[static::EMAIL_TO_NAME])) {
-                    $this->to($this->templateParams[static::EMAIL_TO], $this->templateParams[static::EMAIL_TO_NAME]);
-                } else {
-                    $this->to($this->templateParams[static::EMAIL_TO]);
-                }
-            }
+            $this->limiter->hit($key, 1);
+        }
 
-            $this->subject(
-                isset($this->templateParams[static::EMAIL_SUBJECT]) ?
-                    $this->templateParams[static::EMAIL_SUBJECT]
-                    : $this->__transWithModule('default_subject', 'label', ['app_name' => Facade::getAppName()])
-            );
-
-            $this->view($this->getTemplatePath(), $this->templateParams);
-        });
+        parent::send($mailer);
     }
 }

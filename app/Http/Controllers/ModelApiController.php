@@ -25,13 +25,12 @@ class ModelApiController extends ApiController
 
     public function index(Request $request)
     {
-        $models = $this->modelRepository->search(
-            $this->search($request),
-            $this->paging(),
-            $this->itemsPerPage(),
-            $this->sortBy(),
-            $this->sortOrder()
-        );
+        $models = $this->modelRepository->sort($this->sortBy(), $this->sortOrder())
+            ->search(
+                $this->search($request),
+                $this->paging(),
+                $this->itemsPerPage()
+            );
         return $this->responseModel($models);
     }
     #endregion

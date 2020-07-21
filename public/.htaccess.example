@@ -13,7 +13,7 @@ AddType text/plain .txt
 
 <IfModule mod_headers.c>
     Header add Access-Control-Allow-Origin "*"
-    Header add Access-Control-Allow-Headers "Accept, Application, Authorization, Content-Type, Device, Localization, Origin, Referer, User-Agent, X-Authorization, X-Requested-With"
+    Header add Access-Control-Allow-Headers "Accept, Authorization, Content-Type, Device, Origin, Referer, User-Agent, X-Authorization, X-Settings, X-Requested-With"
     Header add Access-Control-Allow-Methods "OPTIONS, GET, POST, PUT, DELETE"
 
     Header add Strict-Transport-Security "max-age=86400; includeSubDomains"
@@ -21,9 +21,9 @@ AddType text/plain .txt
     Header add X-Download-Options "noopen"
     Header add X-Frame-Options "sameorigin"
     Header add X-XSS-Protection "1; mode=block"
-    Header add Content-Security-Policy "default-src 'self'"
-    Header add X-Content-Security-Policy "allow 'self'"
-    Header add X-WebKit-CSP "default-src 'self'"
+    Header add Content-Security-Policy "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com"
+    Header add X-Content-Security-Policy "allow 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com"
+    Header add X-WebKit-CSP "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com"
 
     Header unset Cache-Control
     Header add Cache-Control "no-cache, no-store, private"

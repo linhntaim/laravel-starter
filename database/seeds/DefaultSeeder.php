@@ -8,8 +8,11 @@ use App\Utils\StringHelper;
 
 class DefaultSeeder extends Seeder
 {
+    protected $systemEmail = 'system@dsquare.com.vn';
     protected $systemPassword = ')^KM$bB-W7:Z@8eG';
+    protected $superAdminEmail = 'superadmin@dsquare.com.vn';
     protected $superAdminPassword = '3sQUJ8yXc@m#3bx3';
+    protected $administratorEmail = 'admin@dsquare.com.vn';
     protected $administratorPassword = 'NNA*Tb3x';
 
     public function run()
@@ -45,21 +48,23 @@ class DefaultSeeder extends Seeder
 
         Admin::query()->create([
             'user_id' => User::query()->create([
-                'email' => 'system@dsquare.com.vn',
+                'email' => $this->systemEmail,
                 'password' => StringHelper::hash($this->systemPassword),
             ])->id,
             'role_id' => $systemRole->id,
             'display_name' => 'System',
         ]);
+        $this->output()->writeln(sprintf('System: %s / %s', $this->systemEmail, $this->systemPassword));
 
         Admin::query()->create([
             'user_id' => User::query()->create([
-                'email' => 'superadmin@dsquare.com.vn',
+                'email' => $this->superAdminEmail,
                 'password' => StringHelper::hash($this->superAdminPassword),
             ])->id,
             'role_id' => $superAdminRole->id,
             'display_name' => 'Super Administrator',
         ]);
+        $this->output()->writeln(sprintf('Super admin: %s / %s', $this->superAdminEmail, $this->superAdminPassword));
 
         // Normal administrative users
         $manageRoles = Permission::query()->create([
@@ -85,11 +90,12 @@ class DefaultSeeder extends Seeder
 
         Admin::query()->create([
             'user_id' => User::query()->create([
-                'email' => 'admin@dsquare.com.vn',
+                'email' => $this->administratorEmail,
                 'password' => StringHelper::hash($this->administratorPassword),
             ])->id,
             'role_id' => $adminRole->id,
             'display_name' => 'Administrator',
         ]);
+        $this->output()->writeln(sprintf('Admin: %s / %s', $this->administratorEmail, $this->administratorPassword));
     }
 }
