@@ -36,16 +36,23 @@ Launch Docker:
 ```cmd
 cd SOURCE_DIR\.docker
 .\docker-up.bat
+
+# Notice: Database will be kept. If need to get new database:
+.\docker-up.bat --db-refesh
 ```
 
 - Linux
 
 ```bash
 cd SOURCE_DIR/.docker
+
 bash docker-up.sh
+
+# Notice: Database will be kept. If need to get new database:
+bash docker-up.sh --db-refesh
 ```
 
-Finally, launch browser and access `http://localhost`. If it shows 404 Not Found Page then it's OK.
+Finally, launch browser and access `http://localhost`. If it shows an Welcome Page then it's OK.
 
 ## Stop
 
