@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Schedules;
+namespace App\Console\Schedules\Base;
 
 use App\Utils\ClientSettings\HomeSettingsHandleTrait;
 
