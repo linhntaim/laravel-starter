@@ -20,6 +20,9 @@ return [
     ],
     'emails' => [
         'send_off' => (bool)env('MAIL_SEND_OFF', false),
+        'send_rate_key' => env('MAIL_SEND_RATE_KEY', 'mailing'),
+        'send_rate_per_second' => (int)env('MAIL_SEND_RATE_PER_SECOND', 0),
+        'send_rate_wait_for_seconds' => (int)env('MAIL_SEND_RATE_WAIT_FOR_SECONDS', 1),
         'no_reply' => [
             'name' => env('MAIL_NO_REPLY_FROM_NAME'),
             'address' => env('MAIL_NO_REPLY_FROM_ADDRESS'),

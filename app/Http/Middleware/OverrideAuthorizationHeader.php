@@ -2,9 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Requests\Request;
 use App\Utils\ConfigHelper;
 use Closure;
-use App\Http\Requests\Request;
 
 class OverrideAuthorizationHeader
 {
