@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  php:
+    image: linhntatdsquare/uempnv:latest
+    restart: unless-stopped
+    tty: true
+    volumes:
+      - ../:/dsquare/base
+      - mysql:/var/lib/mysql
+    environment:
+      VUE_APP_ENV: production
+    command: bash /dsquare/base/.docker/docker.boot.all.sh
+    ports:
+      - "80:80"
+      - "3306:3306"
+
+volumes:
+  mysql:
