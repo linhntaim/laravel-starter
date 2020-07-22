@@ -88,6 +88,12 @@ Route::group([
         });
 
         Route::group([
+            'prefix' => 'managed-file',
+        ], function () {
+            Route::post('ck-editor-simple-upload', 'ManagedFileController@storeCkEditorSimpleUpload');
+        });
+
+        Route::group([
             'prefix' => 'role',
         ], function () {
             Route::get('/', 'RoleController@index')
