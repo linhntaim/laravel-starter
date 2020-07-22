@@ -26,6 +26,11 @@ class ManagedFileRepository extends ModelRepository
         return $this->createWithFile($uploadedFile->getClientOriginalName(), $uploadedFile);
     }
 
+    /**
+     * @param UploadedFile $uploadedFile
+     * @return ManagedFile
+     * @throws
+     */
     public function createWithUploadedImage(UploadedFile $uploadedFile)
     {
         $imageFiler = (new ImageFiler($uploadedFile))->store();
