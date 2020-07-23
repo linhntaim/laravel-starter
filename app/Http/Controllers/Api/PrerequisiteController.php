@@ -12,7 +12,7 @@ use App\ModelRepositories\RoleRepository;
 use App\ModelResources\Base\ModelTransformTrait;
 use App\Utils\ConfigHelper;
 use App\Utils\GuardArrayTrait;
-use App\Utils\ManagedFiles\Helper;
+use App\Utils\HandledFiles\Helper;
 
 class PrerequisiteController extends ApiController
 {

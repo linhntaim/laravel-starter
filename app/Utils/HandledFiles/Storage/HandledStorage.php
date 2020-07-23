@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Utils\ManagedFiles\Storage;
+namespace App\Utils\HandledFiles\Storage;
 
 use App\Exceptions\AppException;
-use App\Utils\ManagedFiles\File;
-use App\Utils\ManagedFiles\Helper;
+use App\Utils\HandledFiles\File;
+use App\Utils\HandledFiles\Helper;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\UploadedFile;
@@ -37,6 +37,7 @@ abstract class HandledStorage extends Storage
 
     /**
      * @param FilesystemAdapter|null $disk
+     * @return HandledStorage
      * @throws AppException
      */
     public function setDisk($disk = null)
@@ -51,6 +52,36 @@ abstract class HandledStorage extends Storage
             throw new AppException('Disk was not allowed');
         }
         $this->disk = $disk;
+
+        return $this;
+    }
+
+    /**
+     * @param string $relativePath
+     * @return HandledStorage
+     */
+    public function setRelativePath($relativePath)
+    {
+        $this->relativePath = $relativePath;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRelativePath()
+    {
+        return $this->relativePath;
+    }
+
+    public function getFilename()
+    {
+        return pathinfo($this->relativePath, PATHINFO_FILENAME);
+    }
+
+    public function getBasename()
+    {
+        return basename($this->relativePath);
     }
 
     public function from($file, $toDirectory = '', $keepOriginalName = true)
@@ -83,6 +114,16 @@ abstract class HandledStorage extends Storage
     public function getMime()
     {
         return $this->disk->getMimetype($this->relativePath);
+    }
+
+    public function getUrl()
+    {
+        return $this->disk->url($this->relativePath);
+    }
+
+    public function getContent()
+    {
+        return $this->disk->get($this->relativePath);
     }
 
     public function delete()

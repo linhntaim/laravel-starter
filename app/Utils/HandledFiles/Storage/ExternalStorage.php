@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Utils\ManagedFiles\Storage;
+namespace App\Utils\HandledFiles\Storage;
 
-class ExternalStorage extends Storage
+class ExternalStorage extends Storage implements IUrlStorage
 {
     const NAME = 'external';
 
@@ -14,6 +14,11 @@ class ExternalStorage extends Storage
     }
 
     public function getData()
+    {
+        return $this->url;
+    }
+
+    public function getUrl()
     {
         return $this->url;
     }

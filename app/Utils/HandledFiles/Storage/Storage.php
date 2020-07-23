@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils\ManagedFiles\Storage;
+namespace App\Utils\HandledFiles\Storage;
 
 abstract class Storage
 {

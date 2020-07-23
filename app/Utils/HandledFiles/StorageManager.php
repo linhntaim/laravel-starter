@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Utils\ManagedFiles;
+namespace App\Utils\HandledFiles;
 
-use App\Utils\ManagedFiles\Storage\HandledStorage;
-use App\Utils\ManagedFiles\Storage\Storage;
+use App\Utils\HandledFiles\Storage\HandledStorage;
+use App\Utils\HandledFiles\Storage\Storage;
 
 abstract class StorageManager
 {
@@ -25,7 +25,7 @@ abstract class StorageManager
      */
     public function origin()
     {
-        return $this->stored() && !empty($this->origin) ? $this->storage[$this->origin]['storage'] : null;
+        return $this->stored() && !is_null($this->origin) ? $this->storage[$this->origin]['storage'] : null;
     }
 
     public function originSize()
@@ -47,6 +47,7 @@ abstract class StorageManager
     public function removeOrigin()
     {
         $this->storage->splice($this->origin, 1);
+        $this->origin = null;
         return $this;
     }
 

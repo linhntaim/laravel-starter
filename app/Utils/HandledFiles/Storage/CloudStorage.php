@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Utils\ManagedFiles\Storage;
+namespace App\Utils\HandledFiles\Storage;
 
 use Illuminate\Support\Facades\Storage;
 
-class CloudStorage extends HandledStorage
+class CloudStorage extends HandledStorage implements IUrlStorage
 {
     protected $cloud;
 
