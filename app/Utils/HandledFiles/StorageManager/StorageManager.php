@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils\HandledFiles;
+namespace App\Utils\HandledFiles\StorageManager;
 
 use App\Utils\HandledFiles\Storage\HandledStorage;
 use App\Utils\HandledFiles\Storage\Storage;
@@ -18,6 +18,14 @@ abstract class StorageManager
     public function stored()
     {
         return $this->storage->count() > 0;
+    }
+
+    public function each(callable $callback)
+    {
+        foreach ($this->storage as $storage) {
+            $callback($storage['name'], $storage['storage']);
+        }
+        return $this;
     }
 
     /**

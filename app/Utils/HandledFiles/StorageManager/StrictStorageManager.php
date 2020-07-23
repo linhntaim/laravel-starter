@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils\HandledFiles;
+namespace App\Utils\HandledFiles\StorageManager;
 
 use App\Exceptions\AppException;
 use App\Utils\HandledFiles\Storage\Storage;

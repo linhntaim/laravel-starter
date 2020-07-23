@@ -6,7 +6,7 @@ use App\Models\Base\Model;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Class DataExport
+ * Class ManagedFile
  * @package App\Models
  * @property int $id
  * @property string $name

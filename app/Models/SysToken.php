@@ -5,6 +5,10 @@ namespace App\Models;
 use App\Models\Base\Model;
 use Illuminate\Support\Str;
 
+/**
+ * Class SysToken
+ * @package App\Models
+ */
 class SysToken extends Model
 {
     const TYPE_LOGIN = 1;

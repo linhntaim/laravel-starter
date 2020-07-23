@@ -74,6 +74,14 @@ abstract class HandledStorage extends Storage implements IFileStorage
         return $this->relativePath;
     }
 
+    /**
+     * @return string
+     */
+    public function getRelativeDirectory()
+    {
+        return dirname($this->relativePath);
+    }
+
     public function getFilename()
     {
         return pathinfo($this->relativePath, PATHINFO_FILENAME);
