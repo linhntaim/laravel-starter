@@ -10,7 +10,7 @@ use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage as StorageFacade;
 
-abstract class HandledStorage extends Storage
+abstract class HandledStorage extends Storage implements IFileStorage
 {
     /**
      * @var FilesystemAdapter
@@ -116,14 +116,14 @@ abstract class HandledStorage extends Storage
         return $this->disk->getMimetype($this->relativePath);
     }
 
-    public function getUrl()
-    {
-        return $this->disk->url($this->relativePath);
-    }
-
     public function getContent()
     {
         return $this->disk->get($this->relativePath);
+    }
+
+    public function getUrl()
+    {
+        return $this->disk->url($this->relativePath);
     }
 
     public function delete()
