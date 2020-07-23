@@ -2,6 +2,7 @@
 
 namespace App\Utils\ManagedFiles;
 
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 
 class Helper
@@ -24,8 +25,23 @@ class Helper
         return trim($path, '\\/');
     }
 
+    public static function nameWithExtension($name = null, $extension = null)
+    {
+        return ($name ? $name : static::randomName()) . ($extension ? '.' . $extension : '');
+    }
+
     public static function randomName()
     {
         return Str::random(40);
+    }
+
+    /**
+     * Returns the maximum size of an uploaded file as configured in php.ini.
+     *
+     * @return int The maximum size of an uploaded file in bytes
+     */
+    public static function maxUploadFileSize()
+    {
+        return UploadedFile::getMaxFilesize();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Utils\ManagedFiles;
 
+use App\Utils\ManagedFiles\Storage\HandledStorage;
 use App\Utils\ManagedFiles\Storage\Storage;
 
 abstract class StorageManager
@@ -24,7 +25,23 @@ abstract class StorageManager
      */
     public function origin()
     {
-        return $this->storage[$this->origin]['storage'];
+        return $this->stored() && !empty($this->origin) ? $this->storage[$this->origin]['storage'] : null;
+    }
+
+    public function originSize()
+    {
+        if (($origin = $this->origin()) && $origin instanceof HandledStorage) {
+            return $origin->getSize();
+        }
+        return -1;
+    }
+
+    public function originMime()
+    {
+        if (($origin = $this->origin()) && $origin instanceof HandledStorage) {
+            return $origin->getMime();
+        }
+        return -1;
     }
 
     public function removeOrigin()

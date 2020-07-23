@@ -3,8 +3,11 @@
 namespace App\Utils\ManagedFiles;
 
 use App\Exceptions\AppException;
+use App\Utils\ManagedFiles\Storage\CloudStorage;
 use App\Utils\ManagedFiles\Storage\ExternalStorage;
+use App\Utils\ManagedFiles\Storage\HandledStorage;
 use App\Utils\ManagedFiles\Storage\LocalStorage;
+use App\Utils\ManagedFiles\Storage\PrivateStorage;
 use App\Utils\ManagedFiles\Storage\PublicStorage;
 use Illuminate\Http\UploadedFile;
 
@@ -16,12 +19,25 @@ class Filer
     protected $storageManager;
 
     protected $name;
-    protected $type;
-    protected $size;
 
     public function __construct()
     {
         $this->storageManager = new StrictStorageManager();
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function getSize()
+    {
+        return $this->storageManager->originSize();
+    }
+
+    public function getMime()
+    {
+        return $this->storageManager->originMime();
     }
 
     /**
@@ -43,55 +59,126 @@ class Filer
     {
         $this->checkIfCanInitializeFromAnySource();
 
-        $storage = new ExternalStorage($url);
-        $this->name = $storage->getFilename();
-        $this->storageManager->add($storage, true);
+        $this->name = basename($url);
+        $this->storageManager->add(new ExternalStorage($url), true);
 
         return $this;
     }
 
-    public function fromUploaded(UploadedFile $uploadedFile)
+    /**
+     * @param UploadedFile $uploadedFile
+     * @param string $toDirectory
+     * @param bool $keepOriginalName
+     * @return Filer
+     * @throws AppException
+     */
+    public function fromUploaded(UploadedFile $uploadedFile, $toDirectory = 'upload', $keepOriginalName = true)
+    {
+        return $this->fromExisted($uploadedFile, $toDirectory, $keepOriginalName);
+    }
+
+    /**
+     * @param $file
+     * @param string $toDirectory
+     * @param bool $keepOriginalName
+     * @return Filer
+     * @throws AppException
+     */
+    public function fromExisted($file, $toDirectory = '', $keepOriginalName = true)
     {
         $this->checkIfCanInitializeFromAnySource();
 
-        $storage = (new LocalStorage())->fromUploaded($uploadedFile);
-        $this->name = $uploadedFile->getClientOriginalName();
-        $this->storageManager->add($storage, true);
+        if ($file instanceof UploadedFile) {
+            $originalName = $file->getClientOriginalName();
+        } elseif ($file instanceof File) {
+            $originalName = $file->getBasename();
+        } else {
+            $originalName = basename($file);
+        }
+        $this->name = $originalName;
+        $this->storageManager->add((new PrivateStorage())->from($file, $toDirectory, $keepOriginalName), true);
 
         return $this;
     }
 
-    public function moveToPublic()
+    /**
+     * @param string $name
+     * @param string $extension
+     * @param string $toDirectory
+     * @return Filer
+     * @throws AppException
+     */
+    public function fromCreating($name, $extension, $toDirectory = '')
     {
-        $originStore = $this->storageManager->origin();
-        if ($originStore instanceof LocalStorage) {
-            if (!$this->storageManager->exists(PublicStorage::NAME)) {
-                $storage = new PublicStorage();
-                $storage->fromPath($originStore->getRealPath());
+        $this->checkIfCanInitializeFromAnySource();
 
-                $originStore->remove();
-                $this->storageManager->removeOrigin()
-                    ->add($storage, true);
-            }
-        }
+        $this->name = Helper::nameWithExtension($name, $extension);
+        $this->storageManager->add((new PrivateStorage())->create($extension, $toDirectory), true);
 
         return $this;
     }
 
-    public function moveToLocal()
+    protected function moveToStorage(HandledStorage $toStorage, callable $conditionCallback = null, $toDirectory = '', $keepOriginalName = true, $markOriginal = false)
     {
-        $originStore = $this->storageManager->origin();
-        if ($originStore instanceof PublicStorage) {
-            if (!$this->storageManager->exists(LocalStorage::NAME)) {
-                $storage = new LocalStorage();
-                $storage->fromPath($originStore->getRealPath());
-
-                $originStore->remove();
-                $this->storageManager->removeOrigin()
-                    ->add($storage, true);
+        $originStorage = $this->storageManager->origin();
+        if (is_null($conditionCallback) || $conditionCallback($originStorage)) {
+            if (!$this->storageManager->exists($toStorage->getName())) {
+                $toStorage->from($originStorage->getRealPath(), $toDirectory, $keepOriginalName);
+                if ($markOriginal) {
+                    $originStorage->delete();
+                    $this->storageManager->removeOrigin();
+                }
+                $this->storageManager->add($toStorage, $markOriginal);
             }
         }
-
         return $this;
+    }
+
+    public function moveToPublic($toDirectory = '', $keepOriginalName = true, $markOriginal = false)
+    {
+        return $this->moveToStorage(
+            new PublicStorage(),
+            function ($originStorage) {
+                return $originStorage instanceof PrivateStorage;
+            },
+            $toDirectory, $keepOriginalName, $markOriginal
+        );
+    }
+
+    public function cloneToPublic($toDirectory = '', $keepOriginalName = true)
+    {
+        return $this->moveToPublic($toDirectory, $keepOriginalName, false);
+    }
+
+    public function moveToPrivate($toDirectory = '', $keepOriginalName = true, $markOriginal = false)
+    {
+        return $this->moveToStorage(
+            new PublicStorage(),
+            function ($originStorage) {
+                return $originStorage instanceof PublicStorage;
+            },
+            $toDirectory, $keepOriginalName, $markOriginal
+        );
+    }
+
+    public function cloneToPrivate($toDirectory = '', $keepOriginalName = true)
+    {
+        return $this->moveToPrivate($toDirectory, $keepOriginalName, false);
+    }
+
+    public function moveToCloud($toDirectory = '', $keepOriginalName = true, $markOriginal = false)
+    {
+        return $this->moveToStorage(
+            new CloudStorage(),
+            function ($originStorage) {
+                return $originStorage instanceof LocalStorage;
+            },
+            $toDirectory, $keepOriginalName, $markOriginal
+        );
+    }
+
+    public function cloneToCloud($toDirectory = '', $keepOriginalName = true)
+    {
+        return $this->moveToCloud($toDirectory, $keepOriginalName, false);
     }
 }

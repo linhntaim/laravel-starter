@@ -11,8 +11,8 @@ use App\ModelRepositories\PermissionRepository;
 use App\ModelRepositories\RoleRepository;
 use App\ModelResources\Base\ModelTransformTrait;
 use App\Utils\ConfigHelper;
-use App\Utils\Files\FileHelper;
 use App\Utils\GuardArrayTrait;
+use App\Utils\ManagedFiles\Helper;
 
 class PrerequisiteController extends ApiController
 {
@@ -51,7 +51,7 @@ class PrerequisiteController extends ApiController
                     'max_attempts' => Configuration::THROTTLE_REQUEST_MAX_ATTEMPTS,
                     'decay_minutes' => Configuration::THROTTLE_REQUEST_DECAY_MINUTES,
                 ],
-                'max_upload_file_size' => FileHelper::getInstance()->maxUploadFileSize(),
+                'max_upload_file_size' => Helper::maxUploadFileSize(),
                 'variables' => ConfigHelper::get('variables'),
                 'app_options' => $this->guardEmptyAssocArray(
                     $this->modelTransform((new AppOptionRepository())->getAll()->keyBy('key'))

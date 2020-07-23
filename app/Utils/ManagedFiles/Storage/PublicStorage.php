@@ -2,9 +2,7 @@
 
 namespace App\Utils\ManagedFiles\Storage;
 
-class PublicStorage extends HandledStorage implements ILocalStorage
+class PublicStorage extends LocalStorage
 {
-    use LocalStorageTrait;
-
     const NAME = 'public';
 }

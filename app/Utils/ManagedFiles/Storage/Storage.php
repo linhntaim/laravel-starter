@@ -11,7 +11,5 @@ abstract class Storage
         return static::NAME;
     }
 
-    public abstract function getFilename();
-
     public abstract function getData();
 }

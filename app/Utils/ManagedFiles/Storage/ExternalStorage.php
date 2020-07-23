@@ -13,11 +13,6 @@ class ExternalStorage extends Storage
         $this->url = $url;
     }
 
-    public function getFilename()
-    {
-        return pathinfo($this->url, PATHINFO_FILENAME);
-    }
-
     public function getData()
     {
         return $this->url;
