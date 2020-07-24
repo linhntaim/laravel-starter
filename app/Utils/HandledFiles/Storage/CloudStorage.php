@@ -2,6 +2,8 @@
 
 namespace App\Utils\HandledFiles\Storage;
 
+use App\Exceptions\AppException;
+use App\Utils\ConfigHelper;
 use Illuminate\Support\Facades\Storage;
 
 class CloudStorage extends HandledStorage implements IUrlStorage
@@ -10,6 +12,10 @@ class CloudStorage extends HandledStorage implements IUrlStorage
 
     public function __construct($disk = null)
     {
+        if (!ConfigHelper::get('managed_file.cloud_enabled')) {
+            throw new AppException('Cloud was not enabled');
+        }
+
         parent::__construct($disk);
 
         $this->cloud = config('filesystems.cloud');

@@ -4,6 +4,7 @@ namespace App\Utils\HandledFiles\Filer;
 
 use App\Exceptions\AppException;
 use App\Utils\ClassTrait;
+use App\Utils\ConfigHelper;
 use App\Utils\HandledFiles\File;
 use App\Utils\HandledFiles\Helper;
 use App\Utils\HandledFiles\Storage\CloudStorage;
@@ -21,8 +22,6 @@ use Illuminate\Support\Str;
 class Filer
 {
     use ClassTrait, ResourceFilerTrait, WriteFilerTrait, ReadFilerTrait;
-
-    const DEFAULT_UPLOAD_TO_DIRECTORY = 'upload';
 
     const MODE_READ = 'r';
     const MODE_READ_WRITE = 'r+';
@@ -94,7 +93,7 @@ class Filer
         $this->checkIfCanInitializeFromAnySource();
 
         $this->name = basename($url);
-        $this->storageManager->add(new ExternalStorage($url), true);
+        $this->storageManager->add((new ExternalStorage())->fromUrl($url), true);
 
         return $this;
     }
@@ -129,13 +128,10 @@ class Filer
 
         if ($file instanceof UploadedFile) {
             $originalName = $file->getClientOriginalName();
-            $toDirectory = is_null($toDirectory) ? static::DEFAULT_UPLOAD_TO_DIRECTORY : $toDirectory;
+        } elseif ($file instanceof File) {
+            $originalName = $file->getBasename();
         } else {
-            if ($file instanceof File) {
-                $originalName = $file->getBasename();
-            } else {
-                $originalName = basename($file);
-            }
+            $originalName = basename($file);
         }
         $this->name = $originalName;
 
@@ -164,10 +160,8 @@ class Filer
             }
         }
 
-        if (!($file instanceof UploadedFile)) {
-            $toDirectory = is_null($toDirectory) ?
-                $this->getDefaultToDirectory() : $toDirectory;
-        }
+        $toDirectory = is_null($toDirectory) ?
+            $this->getDefaultToDirectory() : $toDirectory;
         $this->storageManager->add((new PrivateStorage())->from($file, is_null($toDirectory) ? '' : $toDirectory, $keepOriginalName), true);
 
         return $this;
@@ -248,13 +242,16 @@ class Filer
 
     public function moveToCloud($toDirectory = null, $keepOriginalName = true, $markOriginal = true)
     {
-        return $this->moveToHandledStorage(
-            new CloudStorage(),
-            function ($originStorage) {
-                return $originStorage instanceof LocalStorage;
-            },
-            $toDirectory, $keepOriginalName, $markOriginal
-        );
+        if (ConfigHelper::get('managed_file.cloud_enabled')) {
+            return $this->moveToHandledStorage(
+                new CloudStorage(),
+                function ($originStorage) {
+                    return $originStorage instanceof LocalStorage;
+                },
+                $toDirectory, $keepOriginalName, $markOriginal
+            );
+        }
+        return $this;
     }
 
     public function cloneToCloud($toDirectory = null, $keepOriginalName = true)

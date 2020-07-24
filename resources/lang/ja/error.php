@@ -46,6 +46,35 @@ return [
         'controllers' => [
             'api' => [
                 'account' => [
+                    'admin_account_controller' => [
+                        'current_password' => [
+                            'required' => '現在のパスワードフィールドが必要です',
+                            'current_password_as_password' => 'パスワードは正しくありません。',
+                        ],
+                        'display_name' => [
+                            'max' => 'The display name may not be greater than 255 characters',
+                            'required' => '表示名フィールドは必須です',
+                        ],
+                        'email' => [
+                            'email' => 'The email must be a valid email address',
+                            'max' => 'The email may not be greater than 255 characters',
+                            'not_trashed' => 'The email has already been trashed',
+                            'required' => 'The email field is required',
+                            'unique_not_trashed' => 'The email has already been taken or trashed',
+                            'unique' => 'The email has already been taken',
+                        ],
+                        'image' => [
+                            'dimensions' => '画像のサイズが無効です（最小値は512px * 512pxです)',
+                            'image' => '画像は画像でなければなりません',
+                            'required' => '画像フィールドは必須です',
+                        ],
+                        'password' => [
+                            'confirmed' => 'パスワードが一致しません',
+                            'confirmed_new' => '入力した新しいパスワードと確認用のパスワードが一致しません。',
+                            'min' => 'パスワードは少なくとも8文字でなければなりません',
+                            'required' => '表示名フィールドは必須です',
+                        ],
+                    ],
                 ],
                 'admin' => [
                 ],

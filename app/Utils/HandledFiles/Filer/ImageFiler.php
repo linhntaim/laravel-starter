@@ -8,6 +8,11 @@ use Illuminate\Http\UploadedFile;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManagerStatic;
 
+/**
+ * Class ImageFiler
+ * @package App\Utils\HandledFiles\Filer
+ * @method ImageFiler fromUploaded(UploadedFile $uploadedFile, $toDirectory = null, $keepOriginalName = true)
+ */
 class ImageFiler extends Filer
 {
     /**
@@ -26,7 +31,7 @@ class ImageFiler extends Filer
         return $this->imagePrepare();
     }
 
-    public function fromCreating($name, $extension, $toDirectory = '')
+    public function fromCreating($name = null, $extension = null, $toDirectory = '')
     {
         throw new AppException('Not supported');
     }
@@ -37,8 +42,7 @@ class ImageFiler extends Filer
      */
     public function imagePrepare()
     {
-        $storage = $this->getOriginStorage();
-        if ($storage instanceof LocalStorage) {
+        if (($storage = $this->getOriginStorage()) && $storage instanceof LocalStorage) {
             try {
                 $this->image = ImageManagerStatic::make($storage->getRealPath());
             } catch (\Exception $exception) {
@@ -111,5 +115,6 @@ class ImageFiler extends Filer
         if ($this->image) {
             $this->image->save(null, $quality);
         }
+        return $this;
     }
 }

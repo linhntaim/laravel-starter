@@ -11,6 +11,29 @@ class Helper
 {
     use ClassTrait;
 
+    public static function changeToUrl($path)
+    {
+        return str_replace('\\', '/', $path);
+    }
+
+    public static function changeToPath($path)
+    {
+        return str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
+    }
+
+    public static function concatUrl()
+    {
+        $urls = [];
+        foreach (func_get_args() as $arg) {
+            if (is_array($arg)) {
+                array_push($urls, static::concatUrl(...$arg));
+            } else {
+                $urls[] = $arg;
+            }
+        }
+        return implode('/', $urls);
+    }
+
     public static function concatPath()
     {
         $paths = [];

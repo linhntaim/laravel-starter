@@ -11,5 +11,11 @@ abstract class Storage
         return static::NAME;
     }
 
+    /**
+     * @param $data
+     * @return Storage|IUrlStorage
+     */
+    public abstract function setData($data);
+
     public abstract function getData();
 }

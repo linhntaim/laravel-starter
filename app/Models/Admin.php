@@ -19,6 +19,8 @@ use App\Utils\ConfigHelper;
  */
 class Admin extends ExtendedUserModel
 {
+    const MAX_AVATAR_SIZE = 512;
+
     protected $table = 'admins';
 
     protected $fillable = [

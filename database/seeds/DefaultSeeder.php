@@ -13,7 +13,7 @@ class DefaultSeeder extends Seeder
     protected $superAdminEmail = 'superadmin@dsquare.com.vn';
     protected $superAdminPassword = '3sQUJ8yXc@m#3bx3';
     protected $administratorEmail = 'admin@dsquare.com.vn';
-    protected $administratorPassword = 'NNA*Tb3x';
+    protected $administratorPassword = 'Gbu@190708';
 
     public function run()
     {

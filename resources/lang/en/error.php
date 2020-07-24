@@ -46,6 +46,35 @@ return [
         'controllers' => [
             'api' => [
                 'account' => [
+                    'admin_account_controller' => [
+                        'current_password' => [
+                            'required' => 'The current password field is required',
+                            'current_password_as_password' => 'The password is incorrect',
+                        ],
+                        'display_name' => [
+                            'max' => 'The display name may not be greater than 255 characters',
+                            'required' => 'The display name field is required',
+                        ],
+                        'email' => [
+                            'email' => 'The email must be a valid email address',
+                            'max' => 'The email may not be greater than 255 characters',
+                            'not_trashed' => 'The email has already been trashed',
+                            'required' => 'The email field is required',
+                            'unique_not_trashed' => 'The email has already been taken or trashed',
+                            'unique' => 'The email has already been taken',
+                        ],
+                        'image' => [
+                            'dimensions' => 'The image has invalid dimensions (the minimum is 512px * 512px)',
+                            'image' => 'The image must be an image',
+                            'required' => 'The image field is required',
+                        ],
+                        'password' => [
+                            'confirmed' => 'The password confirmation does not match',
+                            'confirmed_new' => 'The password confirmation does not match',
+                            'min' => 'The password must be at least 8 characters',
+                            'required' => 'The display name field is required',
+                        ],
+                    ],
                 ],
                 'admin' => [
                 ],

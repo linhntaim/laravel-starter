@@ -29,8 +29,8 @@ abstract class StorageManager
 
     public function each(callable $callback)
     {
-        foreach ($this->storage as $storage) {
-            $callback($storage['name'], $storage['storage']);
+        foreach ($this->storage as $index => $storage) {
+            $callback($storage['name'], $storage['storage'], $index == $this->origin);
         }
         return $this;
     }

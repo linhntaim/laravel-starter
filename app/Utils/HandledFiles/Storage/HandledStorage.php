@@ -10,7 +10,7 @@ use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage as StorageFacade;
 
-abstract class HandledStorage extends Storage implements IFileStorage
+abstract class HandledStorage extends Storage implements IFileStorage, IResponseStorage
 {
     /**
      * @var FilesystemAdapter
@@ -102,10 +102,20 @@ abstract class HandledStorage extends Storage implements IFileStorage
             } else {
                 $originalName = basename($file);
             }
-            $this->relativePath = $this->disk->putFileAs(Helper::noWrappedSlashes($toDirectory), $file, $originalName, 'public');
+            $this->relativePath = Helper::changeToPath($this->disk->putFileAs(Helper::noWrappedSlashes($toDirectory), $file, $originalName, 'public'));
         } else {
-            $this->relativePath = $this->disk->putFile(Helper::noWrappedSlashes($toDirectory), $file, 'public');
+            $this->relativePath = Helper::changeToPath($this->disk->putFile(Helper::noWrappedSlashes($toDirectory), $file, 'public'));
         }
+        return $this;
+    }
+
+    /**
+     * @param $data
+     * @return IUrlStorage|Storage|HandledStorage
+     */
+    public function setData($data)
+    {
+        $this->relativePath = $data;
         return $this;
     }
 
@@ -131,7 +141,7 @@ abstract class HandledStorage extends Storage implements IFileStorage
 
     public function getUrl()
     {
-        return $this->disk->url($this->relativePath);
+        return Helper::changeToUrl(urldecode($this->disk->url($this->relativePath)));
     }
 
     public function write($contents)
@@ -153,5 +163,15 @@ abstract class HandledStorage extends Storage implements IFileStorage
     {
         $this->disk->delete($this->relativePath);
         return $this;
+    }
+
+    public function responseFile($mime, $headers = [])
+    {
+        return $this->disk->response($this->relativePath, null, $headers);
+    }
+
+    public function responseDownload($name, $mime, $headers = [])
+    {
+        return $this->disk->download($this->relativePath, $name, $headers);
     }
 }

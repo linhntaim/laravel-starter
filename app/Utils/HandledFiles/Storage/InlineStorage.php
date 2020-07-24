@@ -6,7 +6,7 @@ namespace App\Utils\HandledFiles\Storage;
 use App\Utils\HandledFiles\File;
 use Illuminate\Http\UploadedFile;
 
-class InlineStorage extends Storage implements IFileStorage, IUrlStorage
+class InlineStorage extends Storage implements IFileStorage, IUrlStorage, IResponseStorage
 {
     const NAME = 'inline';
 
@@ -35,6 +35,16 @@ class InlineStorage extends Storage implements IFileStorage, IUrlStorage
         return $this;
     }
 
+    /**
+     * @param $data
+     * @return IUrlStorage|Storage|InlineStorage
+     */
+    public function setData($data)
+    {
+        $this->inline = $data;
+        return $this;
+    }
+
     public function getData()
     {
         return $this->inline;
@@ -58,5 +68,23 @@ class InlineStorage extends Storage implements IFileStorage, IUrlStorage
     public function getUrl()
     {
         return sprintf('data:%s;base64,%s', $this->getMime(), $this->inline);
+    }
+
+    public function responseFile($mime, $headers = [])
+    {
+        return response()->streamDownload(function () {
+            echo $this->getContent();
+        }, null, array_merge([
+            'Content-Type' => $mime,
+        ], $headers), 'inline');
+    }
+
+    public function responseDownload($name, $mime, $headers = [])
+    {
+        return response()->streamDownload(function () {
+            echo $this->getContent();
+        }, $name, array_merge([
+            'Content-Type' => $mime,
+        ]));
     }
 }

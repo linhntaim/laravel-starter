@@ -4,6 +4,7 @@ namespace App\ModelRepositories;
 
 use App\ModelRepositories\Base\ModelRepository;
 use App\Models\HandledFile;
+use App\Models\HandledFileStore;
 use App\Utils\ConfigHelper;
 use App\Utils\HandledFiles\Filer\Filer;
 use App\Utils\HandledFiles\Filer\ImageFiler;
@@ -54,8 +55,9 @@ class HandledFileRepository extends ModelRepository
             'size' => $filer->getSize(),
         ]);
 
-        $filer->eachStorage(function ($name, Storage $storage) {
+        $filer->eachStorage(function ($name, Storage $storage, $origin) {
             $this->model->handledFileStores()->create([
+                'origin' => $origin ? HandledFileStore::ORIGIN_YES : HandledFileStore::ORIGIN_NO,
                 'store' => $name,
                 'data' => $storage->getData(),
             ]);

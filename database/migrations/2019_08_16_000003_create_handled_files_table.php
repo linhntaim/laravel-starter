@@ -32,6 +32,7 @@ class CreateHandledFilesTable extends Migration
 
             $table->increments('id');
             $table->integer('handled_file_id')->unsigned();
+            $table->tinyInteger('origin')->default(2);
             $table->string('store');
             $table->longText('data');
 

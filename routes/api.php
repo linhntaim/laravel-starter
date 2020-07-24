@@ -26,6 +26,7 @@ Route::group([
     Route::get('auth/password', 'PasswordController@show');
 
     Route::get('managed-file/{id}', 'ManagedFileController@show')->name('managed_file.show');
+    Route::get('handled-file/{id}', 'HandledFileController@show')->name('handled_file.show');
 
     Route::group([
         'prefix' => 'role',
@@ -45,6 +46,7 @@ Route::group([
             'namespace' => 'Account',
         ], function () {
             Route::get('/admin', 'AdminAccountController@index');
+            Route::post('/admin', 'AdminAccountController@store');
         });
     });
 
