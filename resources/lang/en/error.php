@@ -100,6 +100,13 @@ return [
                 'directory_not_writable' => 'Directory is not writable',
             ],
         ],
+        'handled_files' => [
+            'filer' => [
+                'csv_filer' => [
+                    'read_line' => 'Error at line :line',
+                ],
+            ],
+        ],
         'regex' => [
             'regex_parser' => [
                 'unexpected_token' => 'The regular expression pattern is not valid',

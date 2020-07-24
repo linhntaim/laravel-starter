@@ -41,7 +41,7 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
     {
         if (is_array($message)) {
             $this->messages = $message;
-            $message = array_values($this->messages)[0][0];
+            $message = array_values($this->messages)[0];
         } elseif (!empty($message)) {
             $message = $this->formatMessage($message);
             $this->messages = [$message];

@@ -95,7 +95,7 @@ class Admin extends ExtendedUserModel
 
     public function avatar()
     {
-        return $this->belongsTo(ManagedFile::class, 'avatar_id', 'id');
+        return $this->belongsTo(HandledFile::class, 'avatar_id', 'id');
     }
 
     #endregion

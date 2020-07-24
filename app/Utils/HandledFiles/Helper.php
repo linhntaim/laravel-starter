@@ -2,11 +2,15 @@
 
 namespace App\Utils\HandledFiles;
 
+use App\Exceptions\AppException;
+use App\Utils\ClassTrait;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 
 class Helper
 {
+    use ClassTrait;
+
     public static function concatPath()
     {
         $paths = [];
@@ -33,6 +37,20 @@ class Helper
     public static function randomName()
     {
         return Str::random(40);
+    }
+
+    public static function makeDirectory($directory)
+    {
+        if (!is_dir($directory)) {
+            if (false === @mkdir($directory, 0777, true)) {
+                throw new AppException(static::__transErrorWithModule('directory_not_found') . ' (' . $directory . ')');
+            }
+        }
+        if (!is_writable($directory)) {
+            throw new AppException(static::__transErrorWithModule('directory_not_writable') . ' (' . $directory . ')');
+        }
+
+        return $directory;
     }
 
     /**

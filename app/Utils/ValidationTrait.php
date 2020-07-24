@@ -3,7 +3,7 @@
 namespace App\Utils;
 
 use App\Exceptions\UserException;
-use App\Rules\Rule;
+use App\Rules\Base\Rule;
 use Illuminate\Support\Facades\Validator;
 
 /**
@@ -14,17 +14,17 @@ use Illuminate\Support\Facades\Validator;
 trait ValidationTrait
 {
     /**
-     * @param array $inputs
+     * @param array $data
      * @param array $rules
      * @param array $messages
      * @param array $customAttributes
      * @return bool
      * @throws
      */
-    protected function validatedData(array $inputs, array $rules, array $messages = [], array $customAttributes = [])
+    protected function validatedData(array $data, array $rules, array $messages = [], array $customAttributes = [])
     {
         $validator = Validator::make(
-            $inputs,
+            $data,
             $rules,
             array_merge($this->validatedMessages($rules), $messages),
             $customAttributes

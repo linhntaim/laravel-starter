@@ -18,13 +18,13 @@ class CreateDataExportsTable extends Migration
             $table->rowFormat = 'DYNAMIC';
 
             $table->increments('id');
-            $table->integer('managed_file_id')->unsigned()->nullable();
+            $table->integer('file_id')->unsigned()->nullable();
             $table->tinyInteger('state');
             $table->string('name');
             $table->longText('payload')->nullable();
             $table->timestamps();
 
-            $table->foreign('managed_file_id')->references('id')->on('managed_files')
+            $table->foreign('file_id')->references('id')->on('handled_files')
                 ->onUpdate('cascade')->onDelete('set null');
 
             $table->index('name');

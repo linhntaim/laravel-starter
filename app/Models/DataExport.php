@@ -25,7 +25,7 @@ class DataExport extends Model
         'created_by',
         'state',
         'name',
-        'managed_file_id',
+        'file_id',
         'payload',
     ];
 
@@ -60,6 +60,6 @@ class DataExport extends Model
 
     public function managedFile()
     {
-        return $this->hasOne(ManagedFile::class, 'id', 'managed_file_id');
+        return $this->hasOne(HandledFile::class, 'id', 'file_id');
     }
 }

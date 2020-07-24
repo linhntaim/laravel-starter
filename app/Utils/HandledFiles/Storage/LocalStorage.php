@@ -11,6 +11,8 @@ use App\Utils\HandledFiles\Helper;
  */
 abstract class LocalStorage extends HandledStorage
 {
+    const NAME = 'local';
+
     protected $rootDirectory;
 
     public function __construct($disk = null)
@@ -36,7 +38,9 @@ abstract class LocalStorage extends HandledStorage
             Helper::noWrappedSlashes($toDirectory),
             Helper::nameWithExtension(null, $extension)
         );
-        if (($resource = fopen($this->getRealPath(), 'w')) !== false) {
+        $realPath = $this->getRealPath();
+        Helper::makeDirectory(dirname($realPath));
+        if (($resource = fopen($realPath, 'w')) !== false) {
             fclose($resource);
         }
         return $this;

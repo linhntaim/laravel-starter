@@ -24,6 +24,8 @@ class HandledFileStore extends Model
         'handled_file_id',
     ];
 
+    public $timestamps = false;
+
     public function handledFile()
     {
         return $this->belongsTo(HandledFile::class, 'handled_file_id', 'id');

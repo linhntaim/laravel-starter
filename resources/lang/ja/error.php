@@ -100,6 +100,13 @@ return [
                 'directory_not_writable' => 'ディレクトリは書き込み不可',
             ],
         ],
+        'handled_files' => [
+            'filer' => [
+                'csv_filer' => [
+                    'read_line' => ':line行目に入力データに誤りがあります。',
+                ],
+            ],
+        ],
         'regex' => [
             'regex_parser' => [
                 'unexpected_token' => '正規表現パターンが無効です',

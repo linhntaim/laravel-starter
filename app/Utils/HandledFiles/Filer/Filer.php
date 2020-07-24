@@ -3,6 +3,7 @@
 namespace App\Utils\HandledFiles\Filer;
 
 use App\Exceptions\AppException;
+use App\Utils\ClassTrait;
 use App\Utils\HandledFiles\File;
 use App\Utils\HandledFiles\Helper;
 use App\Utils\HandledFiles\Storage\CloudStorage;
@@ -19,7 +20,16 @@ use Illuminate\Support\Str;
 
 class Filer
 {
+    use ClassTrait, ResourceFilerTrait, WriteFilerTrait, ReadFilerTrait;
+
     const DEFAULT_UPLOAD_TO_DIRECTORY = 'upload';
+
+    const MODE_READ = 'r';
+    const MODE_READ_WRITE = 'r+';
+    const MODE_WRITE_FRESH = 'w';
+    const MODE_WRITE_APPEND = 'a';
+    const MODE_READ_WRITE_FRESH = 'w+';
+    const MODE_READ_WRITE_APPEND = 'a+';
 
     /**
      * @var StorageManager
@@ -57,6 +67,11 @@ class Filer
     public function getOriginStorage()
     {
         return $this->storageManager->origin();
+    }
+
+    public function handled()
+    {
+        return ($originStorage = $this->getOriginStorage()) && $originStorage instanceof HandledStorage ? $originStorage : null;
     }
 
     /**
@@ -116,8 +131,6 @@ class Filer
             $originalName = $file->getClientOriginalName();
             $toDirectory = is_null($toDirectory) ? static::DEFAULT_UPLOAD_TO_DIRECTORY : $toDirectory;
         } else {
-            $toDirectory = is_null($toDirectory) ?
-                $this->getDefaultToDirectory() : $toDirectory;
             if ($file instanceof File) {
                 $originalName = $file->getBasename();
             } else {
@@ -151,6 +164,10 @@ class Filer
             }
         }
 
+        if (!($file instanceof UploadedFile)) {
+            $toDirectory = is_null($toDirectory) ?
+                $this->getDefaultToDirectory() : $toDirectory;
+        }
         $this->storageManager->add((new PrivateStorage())->from($file, is_null($toDirectory) ? '' : $toDirectory, $keepOriginalName), true);
 
         return $this;
@@ -163,7 +180,7 @@ class Filer
      * @return Filer
      * @throws AppException
      */
-    public function fromCreating($name, $extension, $toDirectory = null)
+    public function fromCreating($name = null, $extension = null, $toDirectory = null)
     {
         $this->checkIfCanInitializeFromAnySource();
 
@@ -182,8 +199,8 @@ class Filer
 
     protected function moveToHandledStorage(HandledStorage $toStorage, callable $conditionCallback = null, $toDirectory = null, $keepOriginalName = true, $markOriginal = true)
     {
-        if (($originStorage = $this->storageManager->origin())) {
-            if ($originStorage instanceof HandledStorage && (is_null($conditionCallback) || $conditionCallback($originStorage))) {
+        if (($originStorage = $this->handled())) {
+            if (is_null($conditionCallback) || $conditionCallback($originStorage)) {
                 if (!$this->storageManager->exists($toStorage->getName())) {
                     $toStorage->from($originStorage->getRealPath(), is_null($toDirectory) ? $originStorage->getRelativeDirectory() : $toDirectory, $keepOriginalName);
                     if ($markOriginal) {
@@ -247,19 +264,32 @@ class Filer
 
     public function moveToInline($markOriginal = true)
     {
-        if (($originStorage = $this->storageManager->origin())) {
-            if ($originStorage instanceof HandledStorage) {
-                $toStorage = new InlineStorage();
-                if (!$this->storageManager->exists($toStorage->getName())) {
-                    $toStorage->fromContent($originStorage->getContent());
-                    if ($markOriginal) {
-                        $originStorage->delete();
-                        $this->storageManager->removeOrigin();
-                    }
-                    $this->storageManager->add($toStorage, $markOriginal);
+        if (($originStorage = $this->handled())) {
+            $toStorage = new InlineStorage();
+            if (!$this->storageManager->exists($toStorage->getName())) {
+                $toStorage->fromContent($originStorage->getContent());
+                if ($markOriginal) {
+                    $originStorage->delete();
+                    $this->storageManager->removeOrigin();
                 }
+                $this->storageManager->add($toStorage, $markOriginal);
             }
         }
         return $this;
+    }
+
+    public function delete()
+    {
+        if (($originStorage = $this->handled())) {
+            $originStorage->delete();
+            $this->storageManager->clear();
+            $this->name = null;
+        }
+        return $this;
+    }
+
+    public function __destruct()
+    {
+        $this->fClose();
     }
 }

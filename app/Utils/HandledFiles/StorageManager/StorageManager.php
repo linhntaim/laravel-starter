@@ -15,6 +15,13 @@ abstract class StorageManager
         $this->storage = collect([]);
     }
 
+    public function clear()
+    {
+        while ($this->storage->offsetExists(0)) {
+            $this->storage->pop();
+        }
+    }
+
     public function stored()
     {
         return $this->storage->count() > 0;
@@ -33,7 +40,7 @@ abstract class StorageManager
      */
     public function origin()
     {
-        return $this->stored() && !is_null($this->origin) ? $this->storage[$this->origin]['storage'] : null;
+        return $this->stored() && !is_null($this->origin) ? $this->storage->offsetGet($this->origin)['storage'] : null;
     }
 
     public function originSize()

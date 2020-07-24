@@ -134,6 +134,21 @@ abstract class HandledStorage extends Storage implements IFileStorage
         return $this->disk->url($this->relativePath);
     }
 
+    public function write($contents)
+    {
+        $this->disk->put($this->relativePath, $contents);
+    }
+
+    public function append($contents, $separator = PHP_EOL)
+    {
+        $this->disk->append($this->relativePath, $contents, $separator);
+    }
+
+    public function prepend($contents, $separator = PHP_EOL)
+    {
+        $this->disk->prepend($this->relativePath, $contents, $separator);
+    }
+
     public function delete()
     {
         $this->disk->delete($this->relativePath);

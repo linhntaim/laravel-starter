@@ -26,7 +26,7 @@ class CreateAdminsTable extends Migration
                 ->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('role_id')->references('id')->on('roles')
                 ->onUpdate('cascade')->onDelete('set null');
-            $table->foreign('avatar_id')->references('id')->on('managed_files')
+            $table->foreign('avatar_id')->references('id')->on('handled_files')
                 ->onUpdate('cascade')->onDelete('cascade');
 
             $table->primary('user_id');

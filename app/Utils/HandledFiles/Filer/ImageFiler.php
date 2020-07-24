@@ -15,6 +15,22 @@ class ImageFiler extends Filer
      */
     protected $image;
 
+    public function fromExternal($url)
+    {
+        throw new AppException('Not supported');
+    }
+
+    public function fromExisted($file, $toDirectory = null, $keepOriginalName = true)
+    {
+        parent::fromExisted($file, $toDirectory, $keepOriginalName);
+        return $this->imagePrepare();
+    }
+
+    public function fromCreating($name, $extension, $toDirectory = '')
+    {
+        throw new AppException('Not supported');
+    }
+
     /**
      * @return ImageFiler
      * @throws
@@ -30,22 +46,6 @@ class ImageFiler extends Filer
             }
         }
         return $this;
-    }
-
-    public function fromExternal($url)
-    {
-        throw new AppException('Not supported');
-    }
-
-    public function fromExisted($file, $toDirectory = null, $keepOriginalName = true)
-    {
-        parent::fromExisted($file, $toDirectory, $keepOriginalName);
-        return $this->imagePrepare();
-    }
-
-    public function fromCreating($name, $extension, $toDirectory = '')
-    {
-        throw new AppException('Not supported');
     }
 
     /**

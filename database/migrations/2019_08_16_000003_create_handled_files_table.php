@@ -31,7 +31,7 @@ class CreateHandledFilesTable extends Migration
             $table->rowFormat = 'DYNAMIC';
 
             $table->increments('id');
-            $table->string('handled_file_id')->nullable();
+            $table->integer('handled_file_id')->unsigned();
             $table->string('store');
             $table->longText('data');
 
