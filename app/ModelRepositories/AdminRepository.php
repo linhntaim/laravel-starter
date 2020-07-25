@@ -30,7 +30,6 @@ class AdminRepository extends DependedRepository
             'avatar_id' => (new HandledFileRepository())->createWithFiler(
                 (new ImageFiler())
                     ->fromUploaded($imageFile, null, false)
-                    ->imageResize(Admin::MAX_AVATAR_SIZE, Admin::MAX_AVATAR_SIZE)
                     ->imageSave()
                     ->moveToPublic()
             )->id,

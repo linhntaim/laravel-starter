@@ -8,6 +8,7 @@ use App\ModelRepositories\AdminRepository;
 use App\Exceptions\AppException;
 use App\ModelRepositories\UserRepository;
 use App\ModelResources\AdminAccountResource;
+use App\Models\Admin;
 use App\Rules\CurrentPasswordRule;
 use Illuminate\Validation\Rule;
 
@@ -54,7 +55,11 @@ class AdminAccountController extends ModelApiController
     private function updateAvatar(Request $request)
     {
         $this->validated($request, [
-            'image' => 'required|image|dimensions:min_width=512,min_height=512',
+            'image' => [
+                'required',
+                'image',
+                sprintf('dimensions:min_width=%d,min_height=%d', Admin::MAX_AVATAR_SIZE, Admin::MAX_AVATAR_SIZE),
+            ],
         ]);
 
         return $this->responseModel(

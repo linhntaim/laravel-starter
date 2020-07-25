@@ -45,14 +45,4 @@ abstract class LocalStorage extends HandledStorage
         }
         return $this;
     }
-
-    public function move($toDirectory = '')
-    {
-        if (!is_null($toDirectory)) {
-            $relativePath = Helper::concatPath(Helper::noWrappedSlashes($toDirectory), $this->getBasename());
-            $this->disk->move($this->relativePath, $relativePath);
-            $this->relativePath = $relativePath;
-        }
-        return $this;
-    }
 }

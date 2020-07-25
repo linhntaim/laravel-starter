@@ -24,11 +24,8 @@ class Filer
     use ClassTrait, ResourceFilerTrait, WriteFilerTrait, ReadFilerTrait;
 
     const MODE_READ = 'r';
-    const MODE_READ_WRITE = 'r+';
-    const MODE_WRITE_FRESH = 'w';
+    const MODE_WRITE = 'w';
     const MODE_WRITE_APPEND = 'a';
-    const MODE_READ_WRITE_FRESH = 'w+';
-    const MODE_READ_WRITE_APPEND = 'a+';
 
     /**
      * @var StorageManager
@@ -170,11 +167,11 @@ class Filer
     /**
      * @param string $name
      * @param string $extension
-     * @param string $toDirectory
+     * @param bool|string|null $toDirectory
      * @return Filer
      * @throws AppException
      */
-    public function fromCreating($name = null, $extension = null, $toDirectory = null)
+    public function fromCreating($name = null, $extension = null, $toDirectory = false)
     {
         $this->checkIfCanInitializeFromAnySource();
 
@@ -182,12 +179,33 @@ class Filer
         $this->storageManager->add(
             (new PrivateStorage())->create(
                 $extension,
-                is_null($toDirectory) ?
-                    $this->getDefaultToDirectory() : $toDirectory
+                $this->parseToDirectory($toDirectory, '')
             ),
             true
         );
 
+        return $this;
+    }
+
+    protected function parseToDirectory($toDirectory, $default = null)
+    {
+        return is_string($toDirectory) ? $toDirectory :
+            ($toDirectory === false ? $this->getDefaultToDirectory() : $default);
+    }
+
+    public function moveTo($toDirectory = null, $keepOriginalName = true)
+    {
+        if (($originStorage = $this->handled()) && $originStorage instanceof HandledStorage) {
+            $originStorage->move($this->parseToDirectory($toDirectory), $keepOriginalName);
+        }
+        return $this;
+    }
+
+    public function copyTo($toDirectory = null, $keepOriginalName = true)
+    {
+        if (($originStorage = $this->handled()) && $originStorage instanceof HandledStorage) {
+            $originStorage->copy($this->parseToDirectory($toDirectory), $keepOriginalName);
+        }
         return $this;
     }
 
@@ -196,7 +214,11 @@ class Filer
         if (($originStorage = $this->handled())) {
             if (is_null($conditionCallback) || $conditionCallback($originStorage)) {
                 if (!$this->storageManager->exists($toStorage->getName())) {
-                    $toStorage->from($originStorage->getRealPath(), is_null($toDirectory) ? $originStorage->getRelativeDirectory() : $toDirectory, $keepOriginalName);
+                    $toStorage->from(
+                        $originStorage->getRealPath(),
+                        $this->parseToDirectory($toDirectory),
+                        $keepOriginalName
+                    );
                     if ($markOriginal) {
                         $originStorage->delete();
                         $this->storageManager->removeOrigin();

@@ -11,7 +11,7 @@ trait WriteFilerTrait
      */
     public function fStartWriting()
     {
-        return $this->fOpen(Filer::MODE_WRITE_FRESH);
+        return $this->fOpen(Filer::MODE_WRITE);
     }
 
     /**
