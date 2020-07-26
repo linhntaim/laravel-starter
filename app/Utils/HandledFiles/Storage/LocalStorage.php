@@ -19,7 +19,7 @@ abstract class LocalStorage extends HandledStorage
     {
         parent::__construct($disk);
 
-        $this->rootDirectory = $this->config['root'];
+        $this->rootDirectory = rtrim(Helper::changeToPath($this->config['root']), '/\\');
     }
 
     public function getRootPath()

@@ -2,6 +2,7 @@
 
 namespace App\Utils\HandledFiles\Filer;
 
+use App\Exceptions\AppException;
 use App\Utils\HandledFiles\Storage\LocalStorage;
 
 trait ResourceFilerTrait
@@ -56,16 +57,21 @@ trait ResourceFilerTrait
     /**
      * @param string $mode
      * @return Filer|mixed
+     * @throws
      */
     public function fOpen($mode = Filer::MODE_WRITE)
     {
-        if (($originStorage = $this->fHandled()) && is_null($this->fResource)) {
+        if (($originStorage = $this->fHandled()) && !is_resource($this->fResource)) {
             $this->fResource = fopen($originStorage->getRealPath(), implode('', [
                 $mode,
                 $this->fReadAndWriteEnabled ? '+' : '',
                 $this->fBinaryEnabled ? 'b' : '',
                 $this->fTextModeTranslationEnabled ? 't' : '',
             ]));
+
+            if ($this->fResource === false) {
+                throw new AppException('Could not open file');
+            }
         }
         return $this;
     }

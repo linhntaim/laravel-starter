@@ -41,7 +41,7 @@ trait ReadFilerTrait
     }
 
     /**
-     * @return ReadFilerTrait
+     * @return ReadFilerTrait|Filer
      */
     public function fStartReading()
     {
@@ -53,7 +53,7 @@ trait ReadFilerTrait
     }
 
     /**
-     * @return ReadFilerTrait
+     * @return ReadFilerTrait|Filer
      */
     public function fEndReading()
     {
@@ -63,11 +63,22 @@ trait ReadFilerTrait
         return $this;
     }
 
+    /**
+     * @return bool
+     */
+    public function fEndReadingIfEof()
+    {
+        if (feof($this->fResource)) {
+            $this->fEndReading();
+            return true;
+        }
+        return false;
+    }
+
     public function fRead()
     {
         if (is_resource($this->fResource)) {
-            if (feof($this->fResource)) {
-                $this->fEndReading();
+            if ($this->fEndReadingIfEof()) {
                 return false;
             }
             return $this->fBeforeReading()
@@ -82,7 +93,7 @@ trait ReadFilerTrait
     }
 
     /**
-     * @return ReadFilerTrait
+     * @return ReadFilerTrait|Filer
      */
     protected function fBeforeReading()
     {
@@ -95,6 +106,7 @@ trait ReadFilerTrait
 
     protected function fAfterReading($read)
     {
+        $this->fEndReadingIfEof();
         return $read;
     }
 

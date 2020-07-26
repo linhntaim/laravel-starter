@@ -14,6 +14,7 @@ use App\Utils\HandledFiles\Storage\InlineStorage;
 use App\Utils\HandledFiles\Storage\LocalStorage;
 use App\Utils\HandledFiles\Storage\PrivateStorage;
 use App\Utils\HandledFiles\Storage\PublicStorage;
+use App\Utils\HandledFiles\Storage\Storage;
 use App\Utils\HandledFiles\StorageManager\StorageManager;
 use App\Utils\HandledFiles\StorageManager\StrictStorageManager;
 use Illuminate\Http\UploadedFile;
@@ -100,16 +101,21 @@ class Filer
         return Helper::concatPath(date('Y'), date('m'), date('d'), date('H'));
     }
 
+    protected function parseToDirectory($toDirectory, $default = null)
+    {
+        return is_string($toDirectory) ? $toDirectory :
+            ($toDirectory === false ? $this->getDefaultToDirectory() : $default);
+    }
+
     /**
      * @param UploadedFile $uploadedFile
      * @param string $toDirectory
-     * @param bool $keepOriginalName
      * @return Filer
      * @throws AppException
      */
-    public function fromUploaded(UploadedFile $uploadedFile, $toDirectory = null, $keepOriginalName = true)
+    public function fromExistedBlob(UploadedFile $uploadedFile, $toDirectory = null)
     {
-        return $this->fromExisted($uploadedFile, $toDirectory, $keepOriginalName);
+        return $this->fromExisted($uploadedFile, $toDirectory, false);
     }
 
     /**
@@ -157,10 +163,7 @@ class Filer
             }
         }
 
-        $toDirectory = is_null($toDirectory) ?
-            $this->getDefaultToDirectory() : $toDirectory;
-        $this->storageManager->add((new PrivateStorage())->from($file, is_null($toDirectory) ? '' : $toDirectory, $keepOriginalName), true);
-
+        $this->storageManager->add((new PrivateStorage())->from($file, $this->parseToDirectory($toDirectory, ''), $keepOriginalName), true);
         return $this;
     }
 
@@ -187,24 +190,30 @@ class Filer
         return $this;
     }
 
-    protected function parseToDirectory($toDirectory, $default = null)
+    public function makeOriginalStorage(Storage $storage = null)
     {
-        return is_string($toDirectory) ? $toDirectory :
-            ($toDirectory === false ? $this->getDefaultToDirectory() : $default);
+        $this->checkIfCanInitializeFromAnySource();
+
+        $this->storageManager->add(
+            $storage ? $storage : new PrivateStorage(),
+            true
+        );
+
+        return $this;
     }
 
-    public function moveTo($toDirectory = null, $keepOriginalName = true)
+    public function moveTo($toDirectory = null, $keepOriginalName = true, $override = true, callable $overrideCallback = null)
     {
         if (($originStorage = $this->handled()) && $originStorage instanceof HandledStorage) {
-            $originStorage->move($this->parseToDirectory($toDirectory), $keepOriginalName);
+            $originStorage->move($this->parseToDirectory($toDirectory, ''), $keepOriginalName, $override, $overrideCallback);
         }
         return $this;
     }
 
-    public function copyTo($toDirectory = null, $keepOriginalName = true)
+    public function copyTo($toDirectory = null, $keepOriginalName = true, $override = true, callable $overrideCallback = null)
     {
         if (($originStorage = $this->handled()) && $originStorage instanceof HandledStorage) {
-            $originStorage->copy($this->parseToDirectory($toDirectory), $keepOriginalName);
+            $originStorage->copy($this->parseToDirectory($toDirectory, ''), $keepOriginalName, $override, $overrideCallback);
         }
         return $this;
     }
@@ -216,7 +225,7 @@ class Filer
                 if (!$this->storageManager->exists($toStorage->getName())) {
                     $toStorage->from(
                         $originStorage->getRealPath(),
-                        $this->parseToDirectory($toDirectory),
+                        $this->parseToDirectory($toDirectory, $originStorage->getRelativeDirectory()),
                         $keepOriginalName
                     );
                     if ($markOriginal) {

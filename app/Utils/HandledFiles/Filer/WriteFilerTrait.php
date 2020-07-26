@@ -23,25 +23,26 @@ trait WriteFilerTrait
     }
 
     /**
-     * @param $contents
-     * @param null $length
+     * @param array|mixed $contents
+     * @param int|null $length
      * @return WriteFilerTrait
      */
     public function fWrite($contents, $length = null)
     {
         return $this->fWriting($contents, function ($contents) use ($length) {
-            fwrite($this->fResource, $contents, $length);
+            $length ? fwrite($this->fResource, $contents, $length)
+                : fwrite($this->fResource, $contents);
         });
     }
 
     /**
-     * @param $contents
+     * @param array|mixed $contents
      * @param callable $callback
      * @return WriteFilerTrait
      */
     protected function fWriting($contents, callable $callback)
     {
-        if (!is_null($this->fResource)) {
+        if (is_resource($this->fResource)) {
             $contents = $this->fBeforeWriting($contents);
             foreach ((array)$contents as $content) {
                 $callback($content);

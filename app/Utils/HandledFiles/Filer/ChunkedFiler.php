@@ -2,11 +2,13 @@
 
 namespace App\Utils\HandledFiles\Filer;
 
+use App\Exceptions\AppException;
 use App\Utils\HandledFiles\File;
 use App\Utils\HandledFiles\Helper;
 use App\Utils\HandledFiles\Storage\PrivateStorage;
 use App\Utils\StringHelper;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 
 /**
  * Class ChunkedFiler
@@ -28,7 +30,7 @@ class ChunkedFiler extends Filer
     protected $chunkIndex;
 
     /**
-     * @var Filer
+     * @var ChunkedFiler
      */
     protected $joinedFiler;
 
@@ -43,19 +45,81 @@ class ChunkedFiler extends Filer
     public function fromChunk($chunksId, $chunksTotal, $chunkFile, $chunkIndex = 0)
     {
         $this->chunksId = $chunksId;
-        $this->chunksTotal = $chunksTotal;
         $this->chunksRelativeDirectory = static::generateChunksRelativeDirectory($chunksId);
+        $this->chunksTotal = $chunksTotal;
         $this->chunksJoined = false;
 
         $this->chunkIndex = $chunkIndex;
-        $this->fromExisted($chunkFile, $this->chunksRelativeDirectory);
-        $this->chunksExtension = $this->isFirstChunk() ?
-            $this->getOriginStorage()->getExtension()
-            : (new ChunkedFiler())->fromExisted(Helper::concatPath(
-                $this->getOriginStorage()->getRootPath(),
-                $this->getChunkFileRelativePathByIndex()
-            ))->getOriginStorage()->getExtension();
-        return $this->moveTo($this->chunksRelativeDirectory, $this->getChunkFileBaseNameByIndex($this->chunkIndex));
+        $this->fromExisted($chunkFile, false, false);
+        if ($this->isFirstChunk()) {
+            $this->chunksExtension = $this->getOriginStorage()->getExtension();
+        } else {
+            $firstChunkFileBaseName = $this->getOriginStorage()->first(function ($file) {
+                return Str::startsWith(Helper::changeToPath($file), Helper::concatPath(
+                    $this->chunksRelativeDirectory,
+                    $this->getChunkFileNameByIndex()
+                ));
+            }, $this->chunksRelativeDirectory);
+            if (empty($firstChunkFileBaseName)) {
+                $this->removeChunkDirectory();
+                throw new AppException('Chunks were failed');
+            }
+            $this->chunksExtension = pathinfo($firstChunkFileBaseName, PATHINFO_EXTENSION);
+        }
+        $this->moveTo($this->chunksRelativeDirectory, [
+            'name' => $this->getChunkFileNameByIndex($this->chunkIndex),
+            'extension' => $this->chunksExtension,
+        ]);
+        return $this;
+    }
+
+    public function fromChunksId($chunksId)
+    {
+        $this->chunksId = $chunksId;
+        $this->chunksRelativeDirectory = static::generateChunksRelativeDirectory($chunksId);
+        if (!$this->getOriginStorage()->exists($this->chunksRelativeDirectory)) {
+            throw new AppException(sprintf('Chunks ID [%s] were not existed', $this->chunksRelativeDirectory));
+        }
+        $chunkFiles = $this->getOriginStorage()->find(function ($file) {
+            return Str::startsWith(Helper::changeToPath($file), Helper::concatPath(
+                $this->chunksRelativeDirectory,
+                $this->getChunkFileNameByIndex('')
+            ));
+        }, $this->chunksRelativeDirectory);
+        $this->chunksTotal = $chunkFiles->count();
+        if ($this->chunksTotal <= 0) {
+            throw new AppException('Chunks were not existed');
+        }
+        $this->chunksJoined = false;
+        $this->chunksExtension = pathinfo($chunkFiles->first(), PATHINFO_EXTENSION);
+        return $this;
+    }
+
+    public function fromChunksIdCompleted($chunksId)
+    {
+        $this->makeOriginalStorage();
+        $this->chunksId = $chunksId;
+        $this->chunksRelativeDirectory = static::generateChunksRelativeDirectory($chunksId);
+        $originStorage = $this->getOriginStorage();
+        if (!$originStorage->exists($this->chunksRelativeDirectory)) {
+            throw new AppException(sprintf('Chunks ID [%s] were not existed', $this->chunksRelativeDirectory));
+        }
+        $chunkFile = $originStorage->first(function ($file) {
+            return Str::startsWith(Helper::changeToPath($file), Helper::concatPath(
+                    $this->chunksRelativeDirectory,
+                    static::CHUNK_FILE_NAME . '.'
+                )) || Helper::changeToPath($file) == Helper::concatPath(
+                    $this->chunksRelativeDirectory,
+                    static::CHUNK_FILE_NAME
+                );
+        }, $this->chunksRelativeDirectory);
+        if (empty($chunkFile)) {
+            throw new AppException('Chunk was not existed');
+        }
+        $originStorage->setRelativePath(Helper::changeToPath($chunkFile));
+        $this->moveTo(false, false);
+        $this->removeChunkDirectory();
+        return $this;
     }
 
     public function getChunksId()
@@ -75,7 +139,7 @@ class ChunkedFiler extends Filer
 
     protected function getChunkFileNameByIndex($chunkIndex = 0)
     {
-        return sprintf('%s.%s', static::CHUNK_FILE_NAME, $chunkIndex);
+        return sprintf('%s_%s', static::CHUNK_FILE_NAME, $chunkIndex);
     }
 
     protected function getChunkFileBaseNameByIndex($chunkIndex = 0)
@@ -93,14 +157,19 @@ class ChunkedFiler extends Filer
         return Helper::concatPath($this->chunksRelativeDirectory, $this->getChunkFileBaseNameByIndex($chunkIndex));
     }
 
+    protected function getChunkFileRelativePath()
+    {
+        return Helper::concatPath($this->chunksRelativeDirectory, $this->getChunkFileBaseName());
+    }
+
     protected function startJoining()
     {
-        $this->joinedFiler = (new Filer())
+        $this->joinedFiler = (new ChunkedFiler())
             ->fromExisted(Helper::concatPath(
                 $this->getOriginStorage()->getRootPath(),
                 $this->getChunkFileRelativePathByIndex()
             ))
-            ->copyTo(null, $this->getChunkFileBaseName());
+            ->copyTo($this->chunksRelativeDirectory, static::CHUNK_FILE_NAME);
         return $this;
     }
 
@@ -110,35 +179,23 @@ class ChunkedFiler extends Filer
             $this->joinedFiler->fEnableBinaryHandling()
                 ->fStartAppending();
             foreach (range(1, $this->chunksTotal - 1) as $chunkIndex) {
-                $chunkedFiler = (new Filer())
+                $chunkedFiler = (new ChunkedFiler())
                     ->fromExisted(Helper::concatPath(
                         $this->getOriginStorage()->getRootPath(),
-                        $this->getChunkFileRelativePathByIndex()
+                        $this->getChunkFileRelativePathByIndex($chunkIndex)
                     ))
                     ->fEnableBinaryHandling()
                     ->fStartReading();
                 $this->joinedFiler->fWrite($chunkedFiler->fRead());
-                $chunkedFiler->fEndReading();
             }
             $this->joinedFiler->fEndWriting();
         }
         return $this;
     }
 
-    protected function completeJoining()
-    {
-        return $this->publishJoinedFile()->removeChunkDirectory();
-    }
-
-    protected function publishJoinedFile()
-    {
-        $this->joinedFiler->moveToPublic(false, false);
-        return $this;
-    }
-
     protected function removeChunkDirectory()
     {
-        $this->getOriginStorage()->deleteRelativeDirectory();
+        $this->getOriginStorage()->deleteRelativeDirectory($this->chunksRelativeDirectory);
         return $this;
     }
 
@@ -154,7 +211,7 @@ class ChunkedFiler extends Filer
     public function join()
     {
         if ($this->canJoin()) {
-            $this->startJoining()->tryJoining()->completeJoining();
+            $this->startJoining()->tryJoining();
             $this->chunksJoined = true;
         }
 
@@ -170,9 +227,11 @@ class ChunkedFiler extends Filer
     {
         $chunksId = StringHelper::uuid();
         $chunksRelativeDirectory = static::generateChunksRelativeDirectory($chunksId);
-        if ((new PrivateStorage())->exists($chunksRelativeDirectory)) { // prevent duplicate
+        $privateStorage = new PrivateStorage();
+        if ($privateStorage->exists($chunksRelativeDirectory)) { // prevent duplicate
             return static::generateChunksId();
         }
+        $privateStorage->makeDirectory($chunksRelativeDirectory);
         return $chunksId;
     }
 }

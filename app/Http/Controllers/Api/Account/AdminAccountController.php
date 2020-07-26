@@ -39,6 +39,9 @@ class AdminAccountController extends ModelApiController
         if ($request->has('_avatar')) {
             return $this->updateAvatar($request);
         }
+        if ($request->has('_avatar_by_handled_file')) {
+            return $this->updateAvatarByHandledFile($request);
+        }
         if ($request->has('_information')) {
             return $this->updateInformation($request);
         }
@@ -64,6 +67,22 @@ class AdminAccountController extends ModelApiController
 
         return $this->responseModel(
             $this->modelRepository->updateAvatar($request->file('image'))
+        );
+    }
+
+    private function updateAvatarByHandledFile(Request $request)
+    {
+        $this->validated($request, [
+            'file_id' => [
+                'required',
+                'exists:handled_files,id',
+            ],
+        ]);
+
+        return $this->responseModel(
+            $this->modelRepository->updateWithAttributes([
+                'avatar_id' => $request->input('file_id'),
+            ])
         );
     }
 

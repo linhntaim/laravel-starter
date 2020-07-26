@@ -28,7 +28,7 @@ class HandledFileRepository extends ModelRepository
         return $this->createWithFiler((new Filer())->fromExisted($uploadedFile, null, false));
     }
 
-    public function createWithUploadedImage(UploadedFile $uploadedFile)
+    public function createWithUploadedImageCasually(UploadedFile $uploadedFile)
     {
         $imageFiler = (new ImageFiler())->fromExisted($uploadedFile, null, false);
         $imageMaxWidth = ConfigHelper::get('image.upload.max_width');

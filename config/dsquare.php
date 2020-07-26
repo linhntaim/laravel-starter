@@ -116,9 +116,9 @@ return [
         'VND' => ['symbol' => '₫'],
     ],
 
-    'locales' => [
-        'en', 'ja',
-    ],
+    'locales' => array_filter(explode(',', env('APP_LOCALE_SUPPORTED', 'en,ja')), function ($locale) {
+        return !empty($locale);
+    }),
 
     'countries' => [
         'AF' => ['calling_code' => '93'],

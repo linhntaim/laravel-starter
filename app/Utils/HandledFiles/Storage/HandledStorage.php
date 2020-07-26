@@ -177,48 +177,68 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
     /**
      * @param string $toDirectory
      * @param bool|string|array $keepOriginalName
-     * @return $this
+     * @param bool $override
+     * @param callable $overrideCallback
+     * @return HandledStorage
+     * @throws
      */
-    public function move($toDirectory = '', $keepOriginalName = true)
+    public function move($toDirectory = '', $keepOriginalName = true, $override = true, callable $overrideCallback = null)
     {
         return $this->fromTo(function ($storage, $from, $to) {
             $this->disk->move($from, $to);
-        });
+        }, $toDirectory, $keepOriginalName, $override, $overrideCallback);
     }
 
     /**
      * @param string $toDirectory
      * @param bool|string|array $keepOriginalName
-     * @return $this
+     * @param bool $override
+     * @param callable $overrideCallback
+     * @return HandledStorage
+     * @throws
      */
-    public function copy($toDirectory = '', $keepOriginalName = true)
+    public function copy($toDirectory = '', $keepOriginalName = true, $override = true, callable $overrideCallback = null)
     {
         return $this->fromTo(function ($storage, $from, $to) {
             $this->disk->copy($from, $to);
-        });
+        }, $toDirectory, $keepOriginalName, $override, $overrideCallback);
     }
 
     /**
      * @param callable $callback
      * @param string $toDirectory
      * @param bool|string|array $keepOriginalName
-     * @return $this
+     * @param bool $override
+     * @param callable $overrideCallback
+     * @return HandledStorage
+     * @throws
      */
-    public function fromTo(callable $callback, $toDirectory = '', $keepOriginalName = true)
+    public function fromTo(callable $callback, $toDirectory = '', $keepOriginalName = true, $override = true, callable $overrideCallback = null)
     {
         if (!is_null($toDirectory) || $keepOriginalName !== true) {
             $toDirectory = is_null($toDirectory) ? $this->getRelativeDirectory() : Helper::noWrappedSlashes($toDirectory);
             if ($keepOriginalName === true) {
                 $toFilename = $this->getBasename();
             } else {
-                $toFilename = Helper::nameWithExtension(
-                    is_array($keepOriginalName) ?
-                        (isset($keepOriginalName['name']) ? $keepOriginalName['name'] : null)
-                        : (is_string($keepOriginalName) ? $keepOriginalName : null),
-                    $this->getExtension()
-                );
+                $toFilename = is_array($keepOriginalName) ?
+                    Helper::nameWithExtension(
+                        isset($keepOriginalName['name']) ? $keepOriginalName['name'] : null,
+                        isset($keepOriginalName['extension']) ? $keepOriginalName['extension'] : $this->getExtension()
+                    )
+                    : Helper::nameWithExtension(
+                        is_string($keepOriginalName) ? $keepOriginalName : null,
+                        $this->getExtension()
+                    );
             }
             $relativePath = Helper::concatPath($toDirectory, $toFilename);
+            if ($this->exists($relativePath)) {
+                if ($override) {
+                    (new static())->setRelativePath($relativePath)->delete();
+                } else {
+                    if ($overrideCallback) $overrideCallback();
+                    throw new AppException('Overriding file was not allowed');
+                }
+            }
             $callback($this, $this->relativePath, $relativePath);
             $this->relativePath = $relativePath;
         }
@@ -240,15 +260,31 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
         return $this;
     }
 
-    public function deleteRelativeDirectory()
+    public function deleteRelativeDirectory($relativeDirectory = null)
     {
-        $this->disk->deleteDirectory($this->getRelativeDirectory());
+        $this->disk->deleteDirectory($relativeDirectory ? $relativeDirectory : $this->getRelativeDirectory());
         return $this;
     }
 
     public function exists($relativePath)
     {
         return $this->disk->exists($relativePath);
+    }
+
+    public function makeDirectory($relativeDirectory)
+    {
+        $this->disk->makeDirectory($relativeDirectory);
+        return $this;
+    }
+
+    public function first(callable $conditionCallback, $inRelativeDirectory = '', $all = false)
+    {
+        return $this->find($conditionCallback, $inRelativeDirectory, $all)->first();
+    }
+
+    public function find(callable $conditionCallback, $inRelativeDirectory = '', $all = false)
+    {
+        return collect($this->disk->files($inRelativeDirectory, $all))->filter($conditionCallback);
     }
 
     public function responseFile($mime, $headers = [])
