@@ -43,6 +43,26 @@ class HandledFile extends Model
         'url',
     ];
 
+    public function getOriginStorageAttribute()
+    {
+        $handledFileStore = $this->handledFileStores()->where('origin', HandledFileStore::ORIGIN_YES)->first();
+        if ($handledFileStore->store === PublicStorage::NAME) {
+            $originStorage = (new PublicStorage())->setData($handledFileStore->data);
+        } elseif ($handledFileStore->store === PrivateStorage::NAME) {
+            $originStorage = (new PrivateStorage())->setData($handledFileStore->data);
+        } elseif ($handledFileStore->store === InlineStorage::NAME) {
+            $originStorage = (new InlineStorage())->setData($handledFileStore->data);
+        } elseif ($handledFileStore->store === ExternalStorage::NAME) {
+            $originStorage = (new ExternalStorage())->setData($handledFileStore->data);
+        } else {
+            $originStorage = ConfigHelper::get('managed_file.cloud_enabled') ? new CloudStorage() : null;
+            if ($originStorage && $handledFileStore->store === $originStorage->getName()) {
+                $originStorage = $originStorage->setData($handledFileStore->data);
+            }
+        }
+        return $originStorage;
+    }
+
     public function getUrlAttribute()
     {
         return $this->tryStorage(
