@@ -15,5 +15,5 @@ yarn-error.log
 .idea
 .tests
 .DS_Store
-.env.backup*
 .rnd
+*.backup*
