@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Base\Model;
+use App\ModelTraits\ArrayValuedAttributesTrait;
 use App\Utils\ConfigHelper;
 use App\Utils\HandledFiles\Storage\CloudStorage;
 use App\Utils\HandledFiles\Storage\ExternalStorage;
@@ -21,11 +22,15 @@ use Illuminate\Database\Eloquent\Collection;
  * @property int $id
  * @property string $name
  * @property string $mime
+ * @property bool $ready
+ * @property array $options_array_value
  * @property Collection $handledFileStores
  * @property Storage $originStorage
  */
 class HandledFile extends Model
 {
+    use ArrayValuedAttributesTrait;
+
     const HANDLING_YES = 1;
     const HANDLING_NO = 2;
 
@@ -35,6 +40,8 @@ class HandledFile extends Model
         'name',
         'mime',
         'size',
+        'options',
+        'options_array_value',
         'handling',
     ];
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Api\HandledFileController as BaseHandledFileController;
 use App\Http\Requests\Request;
+use App\Jobs\VideoJob;
 use App\Utils\HandledFiles\Filer\ChunkedFiler;
 
 class HandledFileController extends BaseHandledFileController
@@ -36,12 +37,15 @@ class HandledFileController extends BaseHandledFileController
             'chunks_id' => 'required',
         ]);
 
-        $filer = (new ChunkedFiler())->fromChunksIdCompleted($request->input('chunks_id'));
-        if ($request->has('public')) {
-            $filer->moveToPublic();
-        }
-
-        return $this->responseModel($this->modelRepository->createWithFiler($filer));
+        return $this->responseModel(
+            $this->modelRepository->createWithFiler(
+                (new ChunkedFiler())->fromChunksIdCompleted($request->input('chunks_id')),
+                [
+                    'public' => $request->input('public') == 1,
+                    'has_post_processed' => $request->input('has_post_processed') == 1,
+                ]
+            )
+        );
     }
 
     private function storeChunk(Request $request)
@@ -78,5 +82,23 @@ class HandledFileController extends BaseHandledFileController
         return response()->json([
             'url' => $handledFile->url,
         ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        if ($request->has('_handle')) {
+            return $this->handle($request, $id);
+        }
+        return parent::update($request, $id);
+    }
+
+    public function handle(Request $request, $id)
+    {
+        $this->modelRepository->model($id);
+        return $this->responseModel(
+            $this->modelRepository->handlePostProcessed(function ($model) {
+                // TODO: Handle something
+            })
+        );
     }
 }
