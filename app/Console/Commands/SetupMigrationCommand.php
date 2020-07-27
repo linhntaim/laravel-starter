@@ -26,6 +26,8 @@ class SetupMigrationCommand extends Command
             Artisan::call('key:generate', [], $this->output);
         }
 
+        Artisan::call('storage:link', [], $this->output);
+
         $this->uninstall();
         if (!$this->option('u')) {
             $this->setup();

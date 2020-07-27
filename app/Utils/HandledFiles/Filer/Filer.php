@@ -81,6 +81,17 @@ class Filer
         }
     }
 
+    protected function getDefaultToDirectory()
+    {
+        return Helper::concatPath(date('Y'), date('m'), date('d'), date('H'));
+    }
+
+    protected function parseToDirectory($toDirectory, $default = null)
+    {
+        return is_string($toDirectory) ? $toDirectory :
+            ($toDirectory === false ? $this->getDefaultToDirectory() : $default);
+    }
+
     /**
      * @param string $url
      * @return Filer
@@ -96,20 +107,9 @@ class Filer
         return $this;
     }
 
-    protected function getDefaultToDirectory()
-    {
-        return Helper::concatPath(date('Y'), date('m'), date('d'), date('H'));
-    }
-
-    protected function parseToDirectory($toDirectory, $default = null)
-    {
-        return is_string($toDirectory) ? $toDirectory :
-            ($toDirectory === false ? $this->getDefaultToDirectory() : $default);
-    }
-
     /**
      * @param UploadedFile $uploadedFile
-     * @param string $toDirectory
+     * @param bool|string|null $toDirectory
      * @return Filer
      * @throws AppException
      */
@@ -120,8 +120,8 @@ class Filer
 
     /**
      * @param UploadedFile|File|string $file
-     * @param string $toDirectory
-     * @param bool $keepOriginalName
+     * @param bool|string|null $toDirectory
+     * @param bool|string|array $keepOriginalName
      * @return Filer
      * @throws AppException
      */
@@ -250,7 +250,7 @@ class Filer
         );
     }
 
-    public function cloneToPublic($toDirectory = null, $keepOriginalName = true)
+    public function copyToPublic($toDirectory = null, $keepOriginalName = true)
     {
         return $this->moveToPublic($toDirectory, $keepOriginalName, false);
     }
@@ -266,7 +266,7 @@ class Filer
         );
     }
 
-    public function cloneToPrivate($toDirectory = null, $keepOriginalName = true)
+    public function copyToPrivate($toDirectory = null, $keepOriginalName = true)
     {
         return $this->moveToPrivate($toDirectory, $keepOriginalName, false);
     }
@@ -285,7 +285,7 @@ class Filer
         return $this;
     }
 
-    public function cloneToCloud($toDirectory = null, $keepOriginalName = true)
+    public function copyToCloud($toDirectory = null, $keepOriginalName = true)
     {
         return $this->moveToCloud($toDirectory, $keepOriginalName, false);
     }

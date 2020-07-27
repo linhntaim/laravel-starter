@@ -29,7 +29,7 @@ class AdminRepository extends DependedRepository
         return $this->updateWithAttributes([
             'avatar_id' => (new HandledFileRepository())->createWithFiler(
                 (new ImageFiler())
-                    ->fromExisted($imageFile, null, false)
+                    ->fromExisted($imageFile, false, false)
                     ->moveToPublic()
             )->id,
         ]);
