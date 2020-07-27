@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Collection;
  * @property string $name
  * @property string $mime
  * @property Collection $handledFileStores
+ * @property Storage $originStorage
  */
 class HandledFile extends Model
 {

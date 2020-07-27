@@ -93,18 +93,27 @@ class Filer
     }
 
     /**
+     * @param Storage $storage
+     * @return $this
+     * @throws AppException
+     */
+    public function fromStorage(Storage $storage)
+    {
+        $this->checkIfCanInitializeFromAnySource();
+
+        $this->storageManager->add($storage, true);
+        return $this;
+    }
+
+    /**
      * @param string $url
      * @return Filer
      * @throws AppException
      */
     public function fromExternal($url)
     {
-        $this->checkIfCanInitializeFromAnySource();
-
         $this->name = basename($url);
-        $this->storageManager->add((new ExternalStorage())->fromUrl($url), true);
-
-        return $this;
+        return $this->fromStorage((new ExternalStorage())->fromUrl($url));;
     }
 
     /**
@@ -127,8 +136,6 @@ class Filer
      */
     public function fromExisted($file, $toDirectory = null, $keepOriginalName = true)
     {
-        $this->checkIfCanInitializeFromAnySource();
-
         if ($file instanceof UploadedFile) {
             $originalName = $file->getClientOriginalName();
         } elseif ($file instanceof File) {
@@ -150,7 +157,7 @@ class Filer
             $try = function (LocalStorage $storage) use ($filePath, $toDirectory) {
                 $rootPath = $storage->getRootPath();
                 if (($relativePath = Helper::noWrappedSlashes(Str::after($filePath, $rootPath))) != $filePath) {
-                    $this->storageManager->add($storage->setRelativePath($relativePath)->move($toDirectory), true);
+                    $this->fromStorage($storage->setRelativePath($relativePath)->move($toDirectory));
                     return true;
                 }
                 return false;
@@ -163,8 +170,7 @@ class Filer
             }
         }
 
-        $this->storageManager->add((new PrivateStorage())->from($file, $this->parseToDirectory($toDirectory, ''), $keepOriginalName), true);
-        return $this;
+        return $this->fromStorage((new PrivateStorage())->from($file, $this->parseToDirectory($toDirectory, ''), $keepOriginalName));
     }
 
     /**
@@ -176,30 +182,16 @@ class Filer
      */
     public function fromCreating($name = null, $extension = null, $toDirectory = false)
     {
-        $this->checkIfCanInitializeFromAnySource();
-
         $this->name = Helper::nameWithExtension($name, $extension);
-        $this->storageManager->add(
-            (new PrivateStorage())->create(
-                $extension,
-                $this->parseToDirectory($toDirectory, '')
-            ),
-            true
-        );
-
-        return $this;
+        return $this->fromStorage((new PrivateStorage())->create(
+            $extension,
+            $this->parseToDirectory($toDirectory, '')
+        ));
     }
 
     public function makeOriginalStorage(Storage $storage = null)
     {
-        $this->checkIfCanInitializeFromAnySource();
-
-        $this->storageManager->add(
-            $storage ? $storage : new PrivateStorage(),
-            true
-        );
-
-        return $this;
+        return $this->fromStorage($storage ? $storage : new PrivateStorage());
     }
 
     public function moveTo($toDirectory = null, $keepOriginalName = true, $override = true, callable $overrideCallback = null)

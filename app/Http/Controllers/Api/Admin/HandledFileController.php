@@ -74,9 +74,9 @@ class HandledFileController extends BaseHandledFileController
             'upload' => 'required|image',
         ]);
 
-        $metaImage = $this->modelRepository->createWithUploadedImageCasually($request->file('upload'));
+        $handledFile = $this->modelRepository->createWithUploadedImageCasually($request->file('upload'));
         return response()->json([
-            'url' => $metaImage->url,
+            'url' => $handledFile->url,
         ]);
     }
 }
