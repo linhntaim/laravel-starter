@@ -21,6 +21,7 @@ class CreateHandledFilesTable extends Migration
             $table->string('name')->nullable();
             $table->string('mime')->nullable();
             $table->string('size')->default('0');
+            $table->tinyInteger('handling')->default(1); // handled
             $table->timestamps();
 
             $table->index('created_at');

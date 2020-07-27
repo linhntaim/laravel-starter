@@ -25,12 +25,16 @@ use Illuminate\Database\Eloquent\Collection;
  */
 class HandledFile extends Model
 {
+    const HANDLING_YES = 1;
+    const HANDLING_NO = 2;
+
     protected $table = 'handled_files';
 
     protected $fillable = [
         'name',
         'mime',
         'size',
+        'handling',
     ];
 
     protected $visible = [
@@ -42,6 +46,11 @@ class HandledFile extends Model
     protected $appends = [
         'url',
     ];
+
+    public function getReadyAttribute()
+    {
+        return $this->attributes['handling'] = static::HANDLING_YES;
+    }
 
     public function getOriginStorageAttribute()
     {
@@ -65,6 +74,9 @@ class HandledFile extends Model
 
     public function getUrlAttribute()
     {
+        if (!$this->getReadyAttribute()) {
+            return null;
+        }
         return $this->tryStorage(
             function (Storage $storage, HandledFileStore $store) {
                 if ($storage instanceof InlineStorage) {
