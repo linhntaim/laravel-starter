@@ -156,7 +156,7 @@ class Filer
         if (isset($filePath)) {
             $try = function (LocalStorage $storage) use ($filePath, $toDirectory) {
                 $rootPath = $storage->getRootPath();
-                if (($relativePath = Helper::noWrappedSlashes(Str::after($filePath, $rootPath))) != $filePath) {
+                if (($relativePath = Helper::noWrappedSlashes(Str::after($filePath, $rootPath))) != Helper::noWrappedSlashes($filePath)) {
                     $this->fromStorage($storage->setRelativePath($relativePath)->move($toDirectory));
                     return true;
                 }
