@@ -61,7 +61,7 @@ class HandledFile extends Model
 
     public function getReadyAttribute()
     {
-        return $this->attributes['handling'] = static::HANDLING_NO;
+        return $this->attributes['handling'] == static::HANDLING_NO;
     }
 
     public function getOriginStorageAttribute()

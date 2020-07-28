@@ -99,6 +99,9 @@ class HandledFileRepository extends ModelRepository
         if (empty($attributes['title'])) {
             unset($attributes['title']);
         }
+        if (empty($attributes['name'])) {
+            unset($attributes['name']);
+        }
         return parent::updateWithAttributes($attributes);
     }
 

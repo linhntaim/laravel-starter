@@ -88,6 +88,7 @@ class HandledFileController extends BaseHandledFileController
     {
         return [
             'title' => 'nullable|sometimes|max:255',
+            'name' => 'nullable|sometimes|max:255',
         ];
     }
 
@@ -95,6 +96,7 @@ class HandledFileController extends BaseHandledFileController
     {
         return $this->modelRepository->updateWithAttributes([
             'title' => $request->input('title'),
+            'name' => $request->input('name'),
         ]);
     }
 
