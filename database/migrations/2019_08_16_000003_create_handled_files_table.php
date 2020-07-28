@@ -18,6 +18,7 @@ class CreateHandledFilesTable extends Migration
             $table->rowFormat = 'DYNAMIC';
 
             $table->increments('id');
+            $table->string('title')->nullable();
             $table->string('name')->nullable();
             $table->string('mime')->nullable();
             $table->string('size')->default('0');

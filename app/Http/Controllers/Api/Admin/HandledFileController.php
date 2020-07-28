@@ -84,6 +84,20 @@ class HandledFileController extends BaseHandledFileController
         ]);
     }
 
+    protected function updateValidatedRules(Request $request)
+    {
+        return [
+            'title' => 'nullable|sometimes|max:255',
+        ];
+    }
+
+    protected function updateExecute(Request $request)
+    {
+        return $this->modelRepository->updateWithAttributes([
+            'title' => $request->input('title'),
+        ]);
+    }
+
     public function update(Request $request, $id)
     {
         if ($request->has('_handle')) {

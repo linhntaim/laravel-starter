@@ -37,6 +37,7 @@ class HandledFile extends Model
     protected $table = 'handled_files';
 
     protected $fillable = [
+        'title',
         'name',
         'mime',
         'size',
@@ -47,17 +48,20 @@ class HandledFile extends Model
 
     protected $visible = [
         'id',
+        'title',
         'name',
         'url',
+        'ready',
     ];
 
     protected $appends = [
         'url',
+        'ready',
     ];
 
     public function getReadyAttribute()
     {
-        return $this->attributes['handling'] = static::HANDLING_YES;
+        return $this->attributes['handling'] = static::HANDLING_NO;
     }
 
     public function getOriginStorageAttribute()

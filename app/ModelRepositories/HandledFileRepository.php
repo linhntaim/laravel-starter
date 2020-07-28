@@ -68,6 +68,14 @@ class HandledFileRepository extends ModelRepository
         }
 
         $this->createWithAttributes([
+            'title' => (function ($name) {
+                $names = explode('.', $name);
+                if (count($names) > 1) {
+                    array_pop($names);
+                    return implode('.', $names);
+                }
+                return $name;
+            })($filer->getName()),
             'name' => $filer->getName(),
             'mime' => $filer->getMime(),
             'size' => $filer->getSize(),
@@ -84,6 +92,14 @@ class HandledFileRepository extends ModelRepository
         });
 
         return $this->model;
+    }
+
+    public function updateWithAttributes(array $attributes = [])
+    {
+        if (empty($attributes['title'])) {
+            unset($attributes['title']);
+        }
+        return parent::updateWithAttributes($attributes);
     }
 
     public function handledWithFiler(Filer $filer)
