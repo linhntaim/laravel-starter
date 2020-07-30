@@ -256,7 +256,12 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
 
     public function delete()
     {
-        $this->disk->delete($this->relativePath);
+        return $this->deleteRelativePath();
+    }
+
+    public function deleteRelativePath($relativePath = null)
+    {
+        $this->disk->delete($relativePath ? $relativePath : $this->relativePath);
         return $this;
     }
 
