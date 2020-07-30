@@ -24,6 +24,12 @@ class AdminRepository extends DependedRepository
         return Admin::class;
     }
 
+    public function createWithAttributes(array $attributes = [], array $userAttributes = [], array $userSocialAttribute = [])
+    {
+        $attributes['user_id'] = (new UserRepository())->createWithAttributes($userAttributes, $userSocialAttribute)->id;
+        return parent::createWithAttributes($attributes);
+    }
+
     public function updateAvatar($imageFile)
     {
         return $this->updateWithAttributes([

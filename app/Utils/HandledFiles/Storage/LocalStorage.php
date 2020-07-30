@@ -6,7 +6,7 @@ use App\Utils\HandledFiles\Helper;
 
 /**
  * Class LocalStorage
- * @package App\Utils\ManagedFiles\Storage
+ * @package App\Utils\HandledFiles\Storage
  * @method LocalStorage setRelativePath($relativePath)
  */
 abstract class LocalStorage extends HandledStorage

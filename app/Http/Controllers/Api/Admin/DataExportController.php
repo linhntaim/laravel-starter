@@ -27,6 +27,6 @@ class DataExportController extends ModelApiController
     {
         $export = $this->modelRepository->model($id);
 
-        return $this->responseDownload($export->managedFile);
+        return $this->responseDownload($export->file);
     }
 }

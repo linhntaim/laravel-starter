@@ -32,6 +32,9 @@ return [
             'address' => env('MAIL_TESTED_TO_ADDRESS'),
         ],
     ],
+    'social_login' => [
+        'enabled' => (bool)env('SOCIAL_LOGIN_ENABLED', false),
+    ],
     'api_response_ok' => (bool)env('API_RESPONSE_OK', false),
     'api_response_headers' => [
         'Content-Type' => 'application/json; charset=utf-8',

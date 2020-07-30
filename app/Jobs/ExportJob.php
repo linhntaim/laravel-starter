@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Exports\Export;
+use App\Exports\Base\Export;
 use App\Jobs\Base\Job;
 use App\ModelRepositories\DataExportRepository;
 use App\Models\DataExport;
@@ -14,6 +14,9 @@ class ExportJob extends Job
      */
     public $dataExport;
 
+    /**
+     * @var Export
+     */
     public $export;
 
     public function __construct(DataExport $dataExport, Export $export)
@@ -24,9 +27,9 @@ class ExportJob extends Job
 
     public function go()
     {
-        $managedFile = $this->export->export();
+        $handledFile = $this->export->export();
         (new DataExportRepository($this->dataExport))->updateWithAttributes([
-            'managed_file_id' => $managedFile->id,
+            'managed_file_id' => $handledFile->id,
             'state' => DataExport::STATE_EXPORTED,
         ]);
     }

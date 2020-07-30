@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\ModelResources\AdminResource;
 use App\Models\Base\ExtendedUserModel;
-use App\Utils\ConfigHelper;
 
 /**
  * Class Admin
@@ -15,7 +14,7 @@ use App\Utils\ConfigHelper;
  * @property string[] $permissionNames
  * @property User $user
  * @property Role $role
- * @property ManagedFile $avatar
+ * @property HandledFile $avatar
  */
 class Admin extends ExtendedUserModel
 {

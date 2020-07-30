@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Request;
 use App\ModelResources\Base\ModelTransformTrait;
-use App\Models\ManagedFile;
+use App\Models\HandledFile;
 use App\Utils\AbortTrait;
 use App\Utils\ClassTrait;
 use App\Utils\TransactionTrait;
@@ -34,7 +34,7 @@ class Controller extends BaseController
 
     protected function responseFile($file, array $headers = [])
     {
-        if ($file instanceof ManagedFile) {
+        if ($file instanceof HandledFile) {
             return $file->responseFile($headers);
         }
         return response()->file($file, $headers);
@@ -42,7 +42,7 @@ class Controller extends BaseController
 
     protected function responseDownload($file, $name = null, array $headers = [])
     {
-        if ($file instanceof ManagedFile) {
+        if ($file instanceof HandledFile) {
             return $file->responseDownload($name, $headers);
         }
         return response()->download($file, $name, $headers);

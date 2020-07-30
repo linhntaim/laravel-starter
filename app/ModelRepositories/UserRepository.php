@@ -5,6 +5,7 @@ namespace App\ModelRepositories;
 use App\Exceptions\AppException;
 use App\ModelRepositories\Base\ModelRepository;
 use App\Models\User;
+use App\Utils\ConfigHelper;
 use App\Utils\StringHelper;
 
 /**
@@ -45,17 +46,22 @@ class UserRepository extends ModelRepository
 
     /**
      * @param array $attributes
+     * @param array $socialAttributes
      * @return User
      * @throws
      */
-    public function createWithAttributes(array $attributes = [])
+    public function createWithAttributes(array $attributes = [], $socialAttributes = [])
     {
         if (!empty($attributes['password'])) {
             $attributes['password'] = StringHelper::hash($attributes['password']);
         } else {
             unset($attributes['password']);
         }
-        return parent::createWithAttributes($attributes);
+        parent::createWithAttributes($attributes);
+        if (ConfigHelper::isSocialLoginEnabled()) {
+            $this->model->socials()->create($socialAttributes);
+        }
+        return $this->model;
     }
 
     /**

@@ -11,7 +11,7 @@ use App\Utils\ClientSettings\Facade;
  * @property int $id
  * @property int $state
  * @property string sdStCreatedAt
- * @property ManagedFile $managedFile
+ * @property HandledFile $file
  */
 class DataExport extends Model
 {
@@ -58,7 +58,7 @@ class DataExport extends Model
         return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
-    public function managedFile()
+    public function file()
     {
         return $this->hasOne(HandledFile::class, 'id', 'file_id');
     }

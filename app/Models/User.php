@@ -10,7 +10,6 @@ use App\ModelTraits\MemorizeTrait;
 use App\ModelTraits\PassportTrait;
 use App\ModelTraits\ResourceTrait;
 use App\Notifications\ResetPasswordNotification;
-use App\Utils\ConfigHelper;
 use App\Utils\ClientSettings\Facade;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -88,6 +87,12 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
     public function passwordReset()
     {
         return $this->hasOne(PasswordReset::class, 'email', 'email');
+    }
+
+
+    public function socials()
+    {
+        return $this->hasMany(UserSocial::class, 'user_id', 'id');
     }
     #endregion
 

@@ -19,6 +19,16 @@ trait PassportTrait
         }
         $advanced = json_decode($username);
         if ($advanced !== false) {
+            if (ConfigHelper::isSocialLoginEnabled()) {
+                if (!empty($advanced->provider) && !empty($advanced->provider_id)) {
+                    $user = User::whereHas('socials', function ($query) use ($advanced) {
+                        $query->where('provider', $advanced->provider)
+                            ->where('provider_id', $advanced->provider_id);
+                    })->first();
+                    if ($user) $user->via = 'social';
+                    return $user;
+                }
+            }
             if (!empty($advanced->token) && !empty($advanced->id)) {
                 $sysToken = SysToken::where('type', SysToken::TYPE_LOGIN)
                     ->where('token', $advanced->token)->first();
