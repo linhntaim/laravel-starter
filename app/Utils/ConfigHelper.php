@@ -105,11 +105,6 @@ class ConfigHelper
         return static::get('number_formats');
     }
 
-    public static function defaultAvatarUrl()
-    {
-        return static::get('app.default_avatar_url');
-    }
-
     public static function getClockBlock($secondRange = Configuration::CLOCK_BLOCK_RANGE)
     {
         return floor(time() / $secondRange);

@@ -118,7 +118,7 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
 
     public function preferredAvatarUrl()
     {
-        return ConfigHelper::defaultAvatarUrl();
+        return null;
     }
 
     public function preferredSettings()

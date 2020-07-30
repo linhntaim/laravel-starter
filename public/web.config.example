@@ -7,7 +7,7 @@
 	<httpAuthModule>
 		<add key="AuthMode" value="Basic" />
 		<add key="Realm" value="SecureZone" />
-		<add key="Credentials" value="hakuhodo_products_live:ProductsLive@0424" />
+		<add key="Credentials" value="hakuhodo_base:Gbu@190708" />
 		<add key="DigestNonceValidDuration" value="120" />
 	</httpAuthModule>
 	-->
@@ -41,20 +41,22 @@
 		<httpProtocol>
 			<customHeaders>
 				<add name="Access-Control-Allow-Origin" value="*" />
-				<add name="Access-Control-Allow-Headers" value="Accept, Application, Authorization, Content-Type, Device, Localization, Origin, Referer, User-Agent, X-Authorization, X-Requested-With" />
+				<add name="Access-Control-Allow-Headers" value="Accept, Authorization, Content-Type, Device, Origin, Referer, User-Agent, X-Authorization, X-Settings, X-Requested-With" />
 				<add name="Access-Control-Allow-Methods" value="OPTIONS, GET, POST, PUT, DELETE" />
+				<add name="Access-Control-Max-Age" value="86400" />
 
 				<add name="Strict-Transport-Security" value="max-age=86400; includeSubDomains" />
                 <add name="X-Content-Type-Options" value="nosniff" />
                 <add name="X-Download-Options" value="noopen" />
                 <add name="X-Frame-Options" value="sameorigin" />
                 <add name="X-XSS-Protection" value="1; mode=block" />
-                <add name="Content-Security-Policy" value="default-src 'self'" />
-                <add name="X-Content-Security-Policy" value="allow 'self'" />
-                <add name="X-WebKit-CSP" value="default-src 'self'" />
+                <add name="Content-Security-Policy" value="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com" />
+                <add name="X-Content-Security-Policy" value="allow 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com" />
+                <add name="X-WebKit-CSP" value="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com" />
 
                 <remove name="Cache-Control" />
                 <add name="Cache-Control" value="no-cache, no-store, private" />
+                <add name="Pragma" value="no-cache" />
 			</customHeaders>
 		</httpProtocol>
 		<rewrite>

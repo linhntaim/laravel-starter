@@ -25,9 +25,10 @@ cp /dsquare/base/.docker/.env.api /dsquare/base/.env
 ### Require permissions for Laravel app
 chmod -R 777 /dsquare/base/bootstrap/cache
 chmod -R 777 /dsquare/base/storage
-chmod -R 777 /dsquare/base/public/files
 ### Make sure Laravel schedule is ready to run
 echo "* * * * * php /dsquare/base/artisan schedule:run >> /dev/null 2>&1" >> /etc/crontab
+### Create symlink of public storage
+php /dsquare/base/artisan storage:link
 # sendmail
 ### Start service
 service sendmail start

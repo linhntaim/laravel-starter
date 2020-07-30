@@ -16,6 +16,7 @@ AddType video/mp4 .mp4
     Header add Access-Control-Allow-Origin "*"
     Header add Access-Control-Allow-Headers "Accept, Authorization, Content-Type, Device, Origin, Referer, User-Agent, X-Authorization, X-Settings, X-Requested-With"
     Header add Access-Control-Allow-Methods "OPTIONS, GET, POST, PUT, DELETE"
+    Header add Access-Control-Max-Age 86400
 
     Header add Strict-Transport-Security "max-age=86400; includeSubDomains"
     Header add X-Content-Type-Options "nosniff"
@@ -28,6 +29,7 @@ AddType video/mp4 .mp4
 
     Header unset Cache-Control
     Header add Cache-Control "no-cache, no-store, private"
+    Header add Pragma "no-cache"
     <FilesMatch ".(html|jpg|jpeg|png|gif|svg|ico|js|css|json|woff|woff2)$">
         Header unset Cache-Control
         Header set Cache-Control "max-age=84600, public"

@@ -3,7 +3,6 @@
 return [
     'app' => [
         'version' => env('APP_VERSION', '1.0.0'),
-        'default_avatar_url' => env('APP_DEFAULT_AVATAR_URL', ''),
         'cookie' => [
             'names' => [
                 'default' => env('APP_COOKIE_DEFAULT_NAME', ''),

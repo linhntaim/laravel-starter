@@ -85,7 +85,7 @@ class Admin extends ExtendedUserModel
 
     public function getAvatarUrlAttribute()
     {
-        return empty($this->attributes['avatar_id']) ? ConfigHelper::defaultAvatarUrl() : $this->avatar->url;
+        return empty($this->attributes['avatar_id']) ? null : $this->avatar->url;
     }
     #endregion
 
