@@ -30,11 +30,13 @@
             <remove fileExtension=".woff2" />
             <remove fileExtension=".csv" />
             <remove fileExtension=".txt" />
+            <remove fileExtension=".mp4" />
             <mimeMap fileExtension=".json" mimeType="application/json" />
             <mimeMap fileExtension=".woff" mimeType="application/x-font-woff" />
             <mimeMap fileExtension=".woff2" mimeType="font/woff2" />
             <mimeMap fileExtension=".csv" mimeType="text/csv" />
             <mimeMap fileExtension=".txt" mimeType="text/plain" />
+            <mimeMap fileExtension=".mp4" mimeType="video/mp4" />
         </staticContent>
 		<httpProtocol>
 			<customHeaders>
