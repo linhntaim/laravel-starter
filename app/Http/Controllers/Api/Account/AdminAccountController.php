@@ -10,6 +10,7 @@ use App\ModelRepositories\UserRepository;
 use App\ModelResources\AdminAccountResource;
 use App\Models\Admin;
 use App\Rules\CurrentPasswordRule;
+use App\Utils\ConfigHelper;
 use Illuminate\Validation\Rule;
 
 class AdminAccountController extends ModelApiController
@@ -99,43 +100,52 @@ class AdminAccountController extends ModelApiController
         );
     }
 
-    private function updatePassword(Request $request)
-    {
-        $this->validated($request, [
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'current_password' => ['required', new CurrentPasswordRule()],
-        ], [
-            'password.confirmed' => $this->__transErrorWithModule('password.confirmed_new'),
-        ]);
-
-        return $this->responseModel(
-            (new UserRepository($request->user()->id))->updateWithAttributes([
-                'password' => $request->input('password'),
-            ])
-        );
-    }
-
     private function updateEmail(Request $request)
     {
         $currentUser = $request->user();
 
-        $this->validated($request, [
+        $rules = [
             'email' => [
                 'required',
                 'email',
                 'max:255',
                 Rule::unique('users', 'email')->ignore($currentUser->id)->whereNull('deleted_at'),
             ],
-            'current_password' => [
+        ];
+        if (!ConfigHelper::isSocialLoginEnabled() || $currentUser->hasPassword) {
+            $rules['current_password'] = [
                 'required',
                 (new CurrentPasswordRule())
                     ->overrideMessage($this->__transErrorWithModule('current_password.current_password_as_password')),
-            ],
-        ]);
+            ];
+        }
 
-        return $this->responseSuccess(
+        $this->validated($request, $rules);
+
+        return $this->responseModel(
             (new UserRepository($request->user()->id))->updateWithAttributes([
                 'email' => $request->input('email'),
+            ])
+        );
+    }
+
+    private function updatePassword(Request $request)
+    {
+        $currentUser = $request->user();
+
+        $rules = [
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ];
+        if (!ConfigHelper::isSocialLoginEnabled() || $currentUser->hasPassword) {
+            $rules['current_password'] = ['required', new CurrentPasswordRule()];
+        }
+        $this->validated($request, $rules, [
+            'password.confirmed' => $this->__transErrorWithModule('password.confirmed_new'),
+        ]);
+
+        return $this->responseModel(
+            (new UserRepository($currentUser->id))->updateWithAttributes([
+                'password' => $request->input('password'),
             ])
         );
     }

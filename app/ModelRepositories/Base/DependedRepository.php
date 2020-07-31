@@ -2,47 +2,91 @@
 
 namespace App\ModelRepositories\Base;
 
+use Closure;
+
 abstract class DependedRepository extends ModelRepository
 {
+    /**
+     * @var string|array
+     */
     protected $depended;
+
+    /**
+     * @var callable|Closure|array
+     */
     protected $dependedWhere;
+
+    /**
+     * @var callable|Closure|array
+     */
     protected $dependedWith;
 
     public function __construct($depended, $id = null)
     {
         $this->depended = $depended;
+        if (is_array($this->depended)) {
+            $this->dependedWith = [];
+            $this->dependedWhere = [];
+        }
 
         parent::__construct($id);
     }
 
-    public function dependedWith(callable $callback)
+    public function dependedWith(callable $callback, $depended = null)
     {
-        $this->dependedWith = $callback;
+        if (is_array($this->dependedWith) && !is_null($depended)) {
+            $this->dependedWith[$depended] = $callback;
+        } else {
+            $this->dependedWith = $callback;
+        }
         return $this;
     }
 
-    public function dependedWhere(callable $callback)
+    public function dependedWhere(callable $callback, $depended = null)
     {
-        $this->dependedWhere = $callback;
+        if (is_array($this->dependedWhere) && !is_null($depended)) {
+            $this->dependedWhere[$depended] = $callback;
+        } else {
+            $this->dependedWhere = $callback;
+        }
         return $this;
     }
 
     public function query()
     {
         $query = parent::query();
-        if (!is_null($this->dependedWith)) {
-            $query->with([
-                $this->depended => $this->dependedWith,
-            ]);
-            $this->dependedWith = null;
+        if (is_array($this->depended)) {
+            foreach ($this->depended as $depended) {
+                if (isset($this->dependedWith[$depended])) {
+                    $query->with([
+                        $depended => $this->dependedWith[$depended],
+                    ]);
+                } else {
+                    $query->with($depended);
+                }
+                if (isset($this->dependedWhere[$depended])) {
+                    $query->whereHas($depended, $this->dependedWhere[$depended]);
+                } else {
+                    $query->whereHas($depended);
+                }
+            }
+            $this->dependedWith = [];
+            $this->dependedWhere = [];
         } else {
-            $query->with($this->depended);
-        }
-        if (!is_null($this->dependedWhere)) {
-            $query->whereHas($this->depended, $this->dependedWhere);
-            $this->dependedWhere = null;
-        } else {
-            $query->whereHas($this->depended);
+            if (!is_null($this->dependedWith)) {
+                $query->with([
+                    $this->depended => $this->dependedWith,
+                ]);
+                $this->dependedWith = null;
+            } else {
+                $query->with($this->depended);
+            }
+            if (!is_null($this->dependedWhere)) {
+                $query->whereHas($this->depended, $this->dependedWhere);
+                $this->dependedWhere = null;
+            } else {
+                $query->whereHas($this->depended);
+            }
         }
         return $query;
     }

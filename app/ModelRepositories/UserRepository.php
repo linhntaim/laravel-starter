@@ -50,7 +50,7 @@ class UserRepository extends ModelRepository
      * @return User
      * @throws
      */
-    public function createWithAttributes(array $attributes = [], $socialAttributes = [])
+    public function createWithAttributes(array $attributes = [], array $socialAttributes = [])
     {
         if (!empty($attributes['password'])) {
             $attributes['password'] = StringHelper::hash($attributes['password']);
@@ -58,7 +58,7 @@ class UserRepository extends ModelRepository
             unset($attributes['password']);
         }
         parent::createWithAttributes($attributes);
-        if (ConfigHelper::isSocialLoginEnabled()) {
+        if (ConfigHelper::isSocialLoginEnabled() && !empty($socialAttributes)) {
             $this->model->socials()->create($socialAttributes);
         }
         return $this->model;

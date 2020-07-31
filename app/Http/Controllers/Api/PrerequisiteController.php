@@ -57,6 +57,9 @@ class PrerequisiteController extends ApiController
                     $this->modelTransform((new AppOptionRepository())->getAll()->keyBy('key'))
                 ),
                 'gtm_code' => ConfigHelper::get('gtm_code'),
+                'social_login' => [
+                    'enabled' => ConfigHelper::isSocialLoginEnabled(),
+                ],
             ];
         }
     }

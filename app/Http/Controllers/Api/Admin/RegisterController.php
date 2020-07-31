@@ -38,7 +38,7 @@ class RegisterController extends ModelApiController
 
         return $this->responseModel(
             $this->setModelResourceClass(AdminAccountResource::class)->modelTransform(
-                $this->modelRepository->createWithAttributes([
+                $this->modelRepository->createWithAttributesFromSocial([
                     'display_name' => $request->input('display_name'),
                 ], [
                     'email' => $request->input('email'),

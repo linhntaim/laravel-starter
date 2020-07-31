@@ -17,8 +17,7 @@ trait PassportTrait
         if (request()->has('_e')) {
             $username = AES::decrypt($username, ConfigHelper::getClockBlockKey());
         }
-        $advanced = json_decode($username);
-        if ($advanced !== false) {
+        if ($advanced = json_decode($username)) {
             if (ConfigHelper::isSocialLoginEnabled()) {
                 if (!empty($advanced->provider) && !empty($advanced->provider_id)) {
                     $user = User::whereHas('socials', function ($query) use ($advanced) {

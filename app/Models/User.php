@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\ModelResources\UserResource;
 use App\Models\Base\IResource;
 use App\Models\Base\IUser;
 use App\Models\Base\IUserHasSettings;
@@ -24,6 +25,7 @@ use Laravel\Passport\HasApiTokens;
  * @property int $id
  * @property string $display_name
  * @property string $email
+ * @property bool $hasPassword
  * @property PasswordReset $passwordReset
  */
 class User extends Authenticatable implements HasLocalePreference, IUser, IResource
@@ -47,6 +49,11 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
     protected $visible = [
         'id',
         'email',
+        'has_password',
+    ];
+
+    protected $appends = [
+        'has_password',
     ];
 
     /**
@@ -57,6 +64,16 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function getResourceClass()
+    {
+        return UserResource::class;
+    }
+
+    public function getHasPasswordAttribute()
+    {
+        return !empty($this->attributes['password']);
+    }
 
     public function getSdStCreatedAtAttribute()
     {
