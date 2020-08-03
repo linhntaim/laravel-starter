@@ -46,7 +46,7 @@ class HandledFileController extends ModelApiController
     {
         return $this->modelRepository->createWithFiler(
             (new ImageFiler())
-                ->fromExisted($request->file('test'), false, false)
+                ->fromExisted($request->file('file'), false, false)
                 ->moveToCloud()
         );
     }
