@@ -13,13 +13,6 @@ class UpdateByInTables extends Migration
      */
     public function up()
     {
-        Schema::table('managed_files', function (Blueprint $table) {
-            $table->integer('created_by')->after('id')->unsigned()->nullable();
-
-            $table->foreign('created_by')->references('id')->on('users')
-                ->onUpdate('cascade')->onDelete('cascade');
-        });
-
         Schema::table('data_exports', function (Blueprint $table) {
             $table->integer('created_by')->after('id')->unsigned()->nullable();
 
@@ -35,11 +28,6 @@ class UpdateByInTables extends Migration
      */
     public function down()
     {
-        Schema::table('managed_files', function (Blueprint $table) {
-            $table->dropForeign('managed_files_created_by_foreign');
-            $table->dropColumn('created_by');
-        });
-
         Schema::table('data_exports', function (Blueprint $table) {
             $table->dropForeign('data_exports_created_by_foreign');
             $table->dropColumn('created_by');

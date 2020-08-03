@@ -29,7 +29,7 @@ class ExportJob extends Job
     {
         $handledFile = $this->export->export();
         (new DataExportRepository($this->dataExport))->updateWithAttributes([
-            'managed_file_id' => $handledFile->id,
+            'file_id' => $handledFile->id,
             'state' => DataExport::STATE_EXPORTED,
         ]);
     }
