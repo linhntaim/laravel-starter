@@ -53,8 +53,8 @@ class HandledFileRepository extends ModelRepository
     {
         if (isset($options['public']) && $options['public']) {
             $filer->moveToPublic();
-            if (ConfigHelper::get('managed_file.cloud_enabled')) {
-                $filer->moveToCloud(null, true, ConfigHelper::get('managed_file.cloud_only'));
+            if (ConfigHelper::get('handled_file.cloud_enabled')) {
+                $filer->moveToCloud(null, true, ConfigHelper::get('handled_file.cloud_only'));
             }
         }
         return $filer;

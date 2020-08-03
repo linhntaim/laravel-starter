@@ -76,7 +76,7 @@ class HandledFile extends Model
         } elseif ($handledFileStore->store === ExternalStorage::NAME) {
             $originStorage = (new ExternalStorage())->setData($handledFileStore->data);
         } else {
-            $originStorage = ConfigHelper::get('managed_file.cloud_enabled') ? new CloudStorage() : null;
+            $originStorage = ConfigHelper::get('handled_file.cloud_enabled') ? new CloudStorage() : null;
             if ($originStorage && $handledFileStore->store === $originStorage->getName()) {
                 $originStorage = $originStorage->setData($handledFileStore->data);
             }
@@ -159,7 +159,7 @@ class HandledFile extends Model
         $storagePriorities = [
             new ExternalStorage(),
             new InlineStorage(),
-            ConfigHelper::get('managed_file.cloud_enabled') ?
+            ConfigHelper::get('handled_file.cloud_enabled') ?
                 new CloudStorage() : null,
             new PublicStorage(),
             new PrivateStorage(),

@@ -40,9 +40,9 @@ return [
         'Content-Type' => 'application/json; charset=utf-8',
     ],
     'force_common_exception' => (bool)env('FORCE_COMMON_EXCEPTION', false),
-    'managed_file' => [
-        'cloud_enabled' => (bool)env('MANAGED_FILE_CLOUD_ENABLED', false),
-        'cloud_only' => (bool)env('MANAGED_FILE_CLOUD_ONLY', false),
+    'handled_file' => [
+        'cloud_enabled' => (bool)env('HANDLED_FILE_CLOUD_ENABLED', false),
+        'cloud_only' => (bool)env('HANDLED_FILE_CLOUD_ONLY', false),
     ],
     'image' => [
         'upload' => [
