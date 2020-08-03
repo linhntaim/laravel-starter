@@ -26,6 +26,7 @@ Route::group([
     Route::get('auth/password', 'PasswordController@show');
 
     Route::get('handled-file/{id}', 'HandledFileController@show')->name('handled_file.show');
+    Route::post('handled-file', 'HandledFileController@store')->name('handled_file.store');
 
     Route::group([
         'prefix' => 'role',
