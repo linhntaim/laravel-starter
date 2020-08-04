@@ -1,7 +1,12 @@
 # AuthType Basic
 # AuthName "Protected Area"
 # AuthUserFile /path/to/.htpasswd
-# Require valid-user
+# <RequireAny>
+#    Require ip 113.161.68.31
+#    Require ip 113.161.68.89
+#    Require expr %{REQUEST_URI} =~ m#^.+\.(jpg|jpeg|png|gif|svg)$#
+#    Require valid-user
+# </RequireAny>
 
 AddDefaultCharset utf-8
 
@@ -30,7 +35,7 @@ AddType video/mp4 .mp4
     Header unset Cache-Control
     Header add Cache-Control "no-cache, no-store, private"
     Header add Pragma "no-cache"
-    <FilesMatch ".(html|jpg|jpeg|png|gif|svg|ico|js|css|json|woff|woff2)$">
+    <FilesMatch ".(html|jpg|jpeg|png|gif|svg|ico|css|js|json|woff|woff2|mp4)$">
         Header unset Cache-Control
         Header set Cache-Control "max-age=84600, public"
     </FilesMatch>

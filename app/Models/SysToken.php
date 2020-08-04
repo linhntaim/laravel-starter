@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 /**
  * Class SysToken
  * @package App\Models
+ * @property string $token
  */
 class SysToken extends Model
 {

@@ -32,7 +32,13 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
 {
     use OnlyAttributesToArrayTrait, PassportTrait, HasApiTokens, Notifiable, MemorizeTrait, ResourceTrait, SoftDeletes;
 
-    const PROTECTED = [1, 2];
+    const USER_SYSTEM_ID = 1;
+    const USER_SUPER_ADMINISTRATOR_ID = 2;
+
+    const PROTECTED = [
+        User::USER_SYSTEM_ID,
+        User::USER_SUPER_ADMINISTRATOR_ID,
+    ];
 
     protected $table = 'users';
 

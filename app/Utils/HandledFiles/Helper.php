@@ -34,6 +34,16 @@ class Helper
         return implode('/', $urls);
     }
 
+    public static function hasBackPath($path)
+    {
+        return Str::startsWith('..\\', $path)
+            || Str::contains('\\..\\', $path)
+            || Str::endsWith('\\..', $path)
+            || Str::startsWith('../', $path)
+            || Str::contains('/../', $path)
+            || Str::endsWith('/..', $path);
+    }
+
     public static function concatPath()
     {
         $paths = [];
