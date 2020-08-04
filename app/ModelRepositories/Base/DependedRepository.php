@@ -3,6 +3,7 @@
 namespace App\ModelRepositories\Base;
 
 use Closure;
+use Illuminate\Support\Str;
 
 abstract class DependedRepository extends ModelRepository
 {
@@ -67,7 +68,9 @@ abstract class DependedRepository extends ModelRepository
                 if (isset($this->dependedWhere[$depended])) {
                     $query->whereHas($depended, $this->dependedWhere[$depended]);
                 } else {
-                    $query->whereHas($depended);
+                    if (!Str::contains($depended, '.')) {
+                        $query->whereHas($depended);
+                    }
                 }
             }
             $this->dependedWith = [];

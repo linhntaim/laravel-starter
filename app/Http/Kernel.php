@@ -2,16 +2,14 @@
 
 namespace App\Http;
 
+use App\Configuration;
 use App\Http\Middleware\AuthenticatedByPassportViaCookie;
 use App\Http\Middleware\AuthenticatedByPassportViaRequest;
 use App\Http\Middleware\AuthorizedWithAdmin;
 use App\Http\Middleware\AuthorizedWithPermissions;
 use App\Http\Middleware\Device;
 use App\Http\Middleware\OverrideAuthorizationHeader;
-use App\Utils\ConfigHelper;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
-use Illuminate\Routing\Router;
 
 class Kernel extends HttpKernel
 {
@@ -50,6 +48,7 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
+            'throttle:' . Configuration::THROTTLE_REQUEST_MAX_ATTEMPTS . ',' . Configuration::THROTTLE_REQUEST_DECAY_MINUTES,
             OverrideAuthorizationHeader::class,
             Device::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
@@ -104,18 +103,4 @@ class Kernel extends HttpKernel
 
         \Illuminate\Auth\Middleware\Authorize::class,
     ];
-
-    public function __construct(Application $app, Router $router)
-    {
-        array_unshift(
-            $this->middlewareGroups['api'],
-            sprintf(
-                'throttle:%d,%d',
-                ConfigHelper::get('api_throttle_request.max_attempts'),
-                ConfigHelper::get('api_throttle_request.decay_minutes')
-            )
-        );
-
-        parent::__construct($app, $router);
-    }
 }
