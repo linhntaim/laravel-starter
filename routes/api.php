@@ -66,19 +66,21 @@ Route::group([
             'middleware' => ['authenticated.passport.request', 'auth:api', 'authorized.admin'],
         ], function () {
             Route::group([
-                'prefix' => 'command',
+                'middleware' => 'authorized.permissions:be-super-admin',
             ], function () {
-                Route::get('/', 'CommandController@index')
-                    ->middleware('authorized.permissions:be-owner');
-                Route::post('/', 'CommandController@run')
-                    ->middleware('authorized.permissions:be-owner');
-            });
+                Route::group([
+                    'prefix' => 'command',
+                ], function () {
+                    Route::get('/', 'CommandController@index');
+                    Route::post('/', 'CommandController@run');
+                });
 
-            Route::group([
-                'prefix' => 'system-log',
-            ], function () {
-                Route::get('/', 'SystemLogController@index')
-                    ->middleware('authorized.permissions:be-owner');
+                Route::group([
+                    'prefix' => 'system-log',
+                ], function () {
+                    Route::get('/', 'SystemLogController@index');
+                    Route::get('{id}', 'SystemLogController@show')->name('admin.system_log.show');
+                });
             });
 
             Route::group([

@@ -11,14 +11,11 @@ class Device
 {
     public function handle(Request $request, Closure $next)
     {
-        if ($request->headers->has('Device')) {
-            $device = json_decode($request->headers->get('Device'));
-            if ($device) {
-                CurrentDevice::set(
-                    (new DeviceRepository())->notStrict()
-                        ->getByProviderAndSecret($device->provider, $device->secret)
-                );
-            }
+        if ($request->headers->has('Device') && ($device = json_decode($request->headers->get('Device')))) {
+            CurrentDevice::set(
+                (new DeviceRepository())->notStrict()
+                    ->getByProviderAndSecret($device->provider, $device->secret)
+            );
         }
         return $next($request);
     }

@@ -3,29 +3,27 @@
 namespace App\Console\Commands;
 
 use App\Console\Commands\Base\Command;
+use App\Utils\Framework\ClientLimiter;
 
 class ClientLimitCommand extends Command
 {
-    protected $signature = 'client:limit {--none} {--allow=} {--deny=} {--admin}';
+    protected $signature = 'client:limit {--u} {--allow=} {--deny=} {--admin}';
 
     protected function go()
     {
-        $file = storage_path('framework/limit');
+        $clientLimiter = new ClientLimiter();
 
-        if ($this->option('none')) {
-            if (file_exists($file)) {
-                unlink($file);
-            }
+        if ($this->option('u')) {
+            $clientLimiter->remove();
         } else {
             $allowed = $this->option('allow');
             $denied = $this->option('deny');
             $admin = $this->option('admin');
 
-            file_put_contents($file, json_encode([
-                'allowed' => empty($allowed) ? [] : $allowed,
-                'denied' => empty($denied) ? [] : $denied,
-                'admin' => $admin ? true : false,
-            ]));
+            $clientLimiter->setAllowed(empty($allowed) ? [] : $allowed)
+                ->setDenied(empty($denied) ? [] : $denied)
+                ->setAdmin($admin ? true : false)
+                ->save();
         }
     }
 }

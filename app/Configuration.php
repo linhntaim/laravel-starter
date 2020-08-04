@@ -16,24 +16,17 @@ class Configuration
         'y?M3x_=tB5S!Dn!^yvKPEPdHs5$7!t^@rvUM2Yd%2gKbS$D&BVw5+LWzLCUJB+S?',
         'R^dANH-e^*?h6UK@uCR_a?dSX%aj7L%!^mM=#xzFY9E*=x3aF9uaLwvHBj4VHCVH',
     ];
-    const CLOCK_BLOCK_RANGE = 30; // 30 minutes
+    const CLOCK_BLOCK_RANGE = 30; // minutes
 
     const HTTP_RESPONSE_STATUS_OK = 200;
     const HTTP_RESPONSE_STATUS_ERROR = 500;
 
-    const DEFAULT_PAGINATION_ITEMS = 5;
     const DEFAULT_ITEMS_PER_PAGE = 10;
     const ALLOWED_ITEMS_PER_PAGE = [10, 20, 50, 100];
-
-    const THROTTLE_REQUEST_MAX_ATTEMPTS = 60000;
-    const THROTTLE_REQUEST_DECAY_MINUTES = 1;
 
     const FETCH_QUERY = 0;
     const FETCH_PAGING_YES = 1;
     const FETCH_PAGING_NO = 2;
-
-    const USER_SYSTEM_ID = 1;
-    const USER_SUPER_ADMINISTRATOR_ID = 2;
 
     const REGEX_HOSTNAME = '/^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$/';
     const REGEX_IP = '/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/';
@@ -41,6 +34,4 @@ class Configuration
 
     const CLIENT_APP_HOME = 'home';
     const CLIENT_APP_ADMIN = 'admin';
-
-    public static $currentClient = null;
 }

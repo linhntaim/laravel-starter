@@ -5,6 +5,7 @@ namespace App\Notifications\Base;
 use App\Configuration;
 use App\ModelRepositories\UserRepository;
 use App\Models\Base\IUser;
+use App\Models\User;
 use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\DateTimer;
 use App\Utils\ClientSettings\Facade;
@@ -57,7 +58,7 @@ abstract class NowNotification extends BaseNotification
     public function setNotifier(IUser $notifier = null)
     {
         $this->notifier = empty($notifier) ?
-            (new UserRepository())->getById(Configuration::USER_SYSTEM_ID)
+            (new UserRepository())->getById(User::USER_SYSTEM_ID)
             : $notifier;
 
         return $this;

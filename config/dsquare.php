@@ -11,6 +11,10 @@ return [
         ],
     ],
     'public_path' => env('PUBLIC_PATH'),
+    'api_throttle_request' => [
+        'max_attempts' => (int)env('API_THROTTLE_REQUEST_MAX_ATTEMPTS', 60),
+        'decay_minutes' => (int)env('API_THROTTLE_REQUEST_DECAY_MINUTES', 1),
+    ],
     'passport' => [
         'password' => [
             'client_id' => env('PASSPORT_PASSWORD_CLIENT_ID'),
