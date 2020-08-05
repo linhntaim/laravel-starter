@@ -38,6 +38,7 @@ class HandledFileRepository extends ModelRepository
             $imageFiler->imageResize($imageMaxWidth ? $imageMaxWidth : null, $imageMaxHeight ? $imageMaxHeight : null)
                 ->imageSave();
         }
+        $imageFiler->moveToPublic();
         if (ConfigHelper::get('image.upload.inline')) {
             $imageFiler->moveToInline();
         }
