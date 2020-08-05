@@ -21,30 +21,36 @@ Route::group([
 
     Route::post('device/current', 'DeviceController@currentStore');
 
-    Route::post('auth/login', 'LoginController@issueToken');
-
     Route::get('handled-file/{id}', 'HandledFileController@show')->name('handled_file.show');
-    Route::post('handled-file', 'HandledFileController@store')->name('handled_file.store');
+    #endregion
 
     Route::group([
-        'prefix' => 'role',
-        'namespace' => 'Admin',
+        'prefix' => 'auth',
+        'namespace' => 'Auth',
     ], function () {
-        Route::get('/', 'RoleController@index');
+        Route::post('login', 'LoginController@issueToken');
     });
-    #endregion
 
     Route::group([
         'middleware' => 'auth:api',
     ], function () {
-        Route::post('auth/logout', 'LogoutController@logout');
+        Route::group([
+            'prefix' => 'auth',
+            'namespace' => 'Auth',
+        ], function () {
+            Route::post('logout', 'LogoutController@logout');
+        });
 
         Route::group([
             'prefix' => 'account',
             'namespace' => 'Account',
         ], function () {
-            Route::get('/admin', 'AdminAccountController@index');
-            Route::post('/admin', 'AdminAccountController@store');
+            Route::group([
+                'prefix' => 'admin',
+            ], function () {
+                Route::get('/', 'AdminAccountController@index');
+                Route::post('/', 'AdminAccountController@store');
+            });
         });
     });
 
@@ -58,6 +64,7 @@ Route::group([
         'prefix' => 'admin',
         'namespace' => 'Admin',
     ], function () {
+        // Anonymous
         Route::group([
             'prefix' => 'auth',
             'namespace' => 'Auth',
@@ -67,6 +74,7 @@ Route::group([
             Route::get('password', 'PasswordController@index');
         });
 
+        // Authenticated
         Route::group([
             'middleware' => ['authenticated.passport.request', 'auth:api', 'authorized.admin'],
         ], function () {

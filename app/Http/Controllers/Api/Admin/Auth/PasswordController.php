@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\Admin\Auth;
 
-use App\Http\Controllers\Api\PasswordController as BasePasswordController;
+use App\Http\Controllers\PasswordController as BasePasswordController;
 use App\Http\Requests\Request;
 use App\Models\Admin;
 use App\Utils\ConfigHelper;
