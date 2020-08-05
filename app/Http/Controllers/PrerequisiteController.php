@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Configuration;
 use App\Http\Requests\Request;
 use App\ModelRepositories\AppOptionRepository;
 use App\ModelRepositories\PermissionRepository;
@@ -50,8 +51,8 @@ class PrerequisiteController extends ApiController
                 'url' => url('/'),
                 'ips' => $request->ips(),
                 'throttle_request' => [
-                    'max_attempts' => ConfigHelper::get('api_throttle_request.max_attempts'),
-                    'decay_minutes' => ConfigHelper::get('api_throttle_request.decay_minutes'),
+                    'max_attempts' => Configuration::THROTTLE_REQUEST_MAX_ATTEMPTS,
+                    'decay_minutes' => Configuration::THROTTLE_REQUEST_DECAY_MINUTES,
                 ],
                 'max_upload_file_size' => Helper::maxUploadFileSize(),
                 'variables' => ConfigHelper::get('variables'),
@@ -62,6 +63,7 @@ class PrerequisiteController extends ApiController
                 'social_login' => [
                     'enabled' => ConfigHelper::isSocialLoginEnabled(),
                 ],
+                'forgot_password_enabled' => ConfigHelper::get('forgot_password_enabled'),
             ];
         }
     }

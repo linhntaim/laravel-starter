@@ -134,7 +134,7 @@ class AdminAccountController extends ModelApiController
         $currentUser = $request->user();
 
         $rules = [
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'string', sprintf('min:%d', Admin::MIN_PASSWORD_LENGTH), 'confirmed'],
         ];
         if (!ConfigHelper::isSocialLoginEnabled() || $currentUser->hasPassword) {
             $rules['current_password'] = ['required', new CurrentPasswordRule()];

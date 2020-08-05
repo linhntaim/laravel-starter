@@ -6,7 +6,7 @@ use App\Models\Base\IUser;
 use App\Notifications\Base\AdminNowNotification;
 use App\Utils\ClientSettings\Facade;
 
-class ResetPasswordNotification extends AdminNowNotification
+class AdminResetPasswordNotification extends AdminNowNotification
 {
     protected $token;
     protected $appResetPasswordPath;
@@ -24,12 +24,12 @@ class ResetPasswordNotification extends AdminNowNotification
 
     protected function getMailTemplate(IUser $notifiable)
     {
-        return 'user_password_reset';
+        return 'admin_password_reset';
     }
 
     protected function getMailSubject(IUser $notifiable)
     {
-        return $this->__transWithCurrentModule('mail_subject', [
+        return $this->__transMailWithModule('mail_subject', [
             'app_name' => Facade::getAppName(),
         ]);
     }

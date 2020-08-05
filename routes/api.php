@@ -22,8 +22,6 @@ Route::group([
     Route::post('device/current', 'DeviceController@currentStore');
 
     Route::post('auth/login', 'LoginController@issueToken');
-    Route::post('auth/password', 'PasswordController@store');
-    Route::get('auth/password', 'PasswordController@show');
 
     Route::get('handled-file/{id}', 'HandledFileController@show')->name('handled_file.show');
     Route::post('handled-file', 'HandledFileController@store')->name('handled_file.store');
@@ -60,7 +58,14 @@ Route::group([
         'prefix' => 'admin',
         'namespace' => 'Admin',
     ], function () {
-        Route::post('register', 'RegisterController@store');
+        Route::group([
+            'prefix' => 'auth',
+            'namespace' => 'Auth',
+        ], function () {
+            Route::post('register', 'RegisterController@store');
+            Route::post('password', 'PasswordController@store');
+            Route::get('password', 'PasswordController@index');
+        });
 
         Route::group([
             'middleware' => ['authenticated.passport.request', 'auth:api', 'authorized.admin'],
@@ -79,7 +84,9 @@ Route::group([
                     'prefix' => 'system-log',
                 ], function () {
                     Route::get('/', 'SystemLogController@index');
-                    Route::get('{id}', 'SystemLogController@show')->name('admin.system_log.show');
+                    Route::get('{id}', 'SystemLogController@show')
+                        ->where('id', '.+')
+                        ->name('admin.system_log.show');
                 });
             });
 

@@ -20,7 +20,7 @@ class MailHelper
 
         try {
             if ($mailable instanceof TemplateMailable) {
-                Mail::queue($mailable->settingsCapture());
+                Mail::queue($mailable);
             } else {
                 Mail::send($mailable);
             }

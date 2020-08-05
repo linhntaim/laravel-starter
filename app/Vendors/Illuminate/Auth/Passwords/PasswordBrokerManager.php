@@ -28,6 +28,18 @@ class PasswordBrokerManager extends BasePasswordBrokerManager
         );
     }
 
+    protected function resolve($name)
+    {
+        if ($name == 'admins') {
+            $config = $this->getConfig($this->getDefaultDriver());
+            return new AdminPasswordBroker(
+                $this->createTokenRepository($config),
+                $this->app['auth']->createUserProvider($config['provider'] ?? null)
+            );
+        }
+        return parent::resolve($name);
+    }
+
     /**
      * @inheritDoc
      */

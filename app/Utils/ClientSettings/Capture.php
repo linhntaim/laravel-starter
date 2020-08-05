@@ -2,8 +2,6 @@
 
 namespace App\Utils\ClientSettings;
 
-use App\Utils\ClientSettings\Facade;
-
 trait Capture
 {
     public $locale;

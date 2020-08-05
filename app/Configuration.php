@@ -21,12 +21,19 @@ class Configuration
     const HTTP_RESPONSE_STATUS_OK = 200;
     const HTTP_RESPONSE_STATUS_ERROR = 500;
 
+    const REQUEST_PARAM_TOKEN_TYPE = '_x_token_type';
+    const REQUEST_PARAM_ACCESS_TOKEN = '_x_access_token';
+    const REQUEST_PARAM_AUTHORIZATION = '_x_authorization';
+
     const DEFAULT_ITEMS_PER_PAGE = 10;
     const ALLOWED_ITEMS_PER_PAGE = [10, 20, 50, 100];
 
     const FETCH_QUERY = 0;
     const FETCH_PAGING_YES = 1;
     const FETCH_PAGING_NO = 2;
+
+    const THROTTLE_REQUEST_MAX_ATTEMPTS = 60000;
+    const THROTTLE_REQUEST_DECAY_MINUTES = 1;
 
     const REGEX_HOSTNAME = '/^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$/';
     const REGEX_IP = '/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/';
