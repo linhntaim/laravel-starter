@@ -39,6 +39,9 @@ return [
     'social_login' => [
         'enabled' => (bool)env('SOCIAL_LOGIN_ENABLED', false),
     ],
+    'forgot_password_enabled' => [
+        'admin' => (bool)env('ADMIN_FORGOT_PASSWORD_ENABLED', false),
+    ],
     'api_response_ok' => (bool)env('API_RESPONSE_OK', false),
     'api_response_headers' => [
         'Content-Type' => 'application/json; charset=utf-8',

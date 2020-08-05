@@ -63,6 +63,7 @@ class PrerequisiteController extends ApiController
                 'social_login' => [
                     'enabled' => ConfigHelper::isSocialLoginEnabled(),
                 ],
+                'forgot_password_enabled' => ConfigHelper::get('forgot_password_enabled'),
             ];
         }
     }
