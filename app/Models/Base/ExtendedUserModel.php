@@ -4,6 +4,7 @@ namespace App\Models\Base;
 
 use App\Models\User;
 use App\ModelTraits\MemorizeTrait;
+use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Notifications\Notifiable;
 
 /**
@@ -13,7 +14,7 @@ use Illuminate\Notifications\Notifiable;
  */
 abstract class ExtendedUserModel extends Model implements IUser
 {
-    use Notifiable, MemorizeTrait;
+    use Notifiable, CanResetPassword, MemorizeTrait;
 
     protected $primaryKey = 'user_id';
 
@@ -24,6 +25,11 @@ abstract class ExtendedUserModel extends Model implements IUser
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function getEmailForPasswordReset()
+    {
+        return $this->preferredEmail();
     }
 
     public function preferredEmail()

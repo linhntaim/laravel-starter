@@ -63,7 +63,7 @@ Route::group([
         ], function () {
             Route::post('register', 'RegisterController@store');
             Route::post('password', 'PasswordController@store');
-            Route::get('password', 'PasswordController@show');
+            Route::get('password', 'PasswordController@index');
         });
 
         Route::group([

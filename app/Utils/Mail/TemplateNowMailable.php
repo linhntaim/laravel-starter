@@ -4,6 +4,7 @@ namespace App\Utils\Mail;
 
 use App\Exceptions\AppException;
 use App\Utils\ClassTrait;
+use App\Utils\ClientSettings\Capture;
 use App\Utils\ConfigHelper;
 use App\Utils\ClientSettings\Facade;
 use App\Utils\LogHelper;
@@ -12,7 +13,7 @@ use Illuminate\Mail\Mailable;
 
 class TemplateNowMailable extends Mailable
 {
-    use ClassTrait, RateLimiterTrait;
+    use ClassTrait, RateLimiterTrait, Capture;
 
     const EMAIL_FROM = 'x_email_from';
     const EMAIL_FROM_NAME = 'x_email_from_name';
@@ -31,6 +32,8 @@ class TemplateNowMailable extends Mailable
         $this->templateName = $templateName;
         $this->templateParams = $templateParams;
         $this->templateLocalized = $templateLocalized;
+
+        $this->settingsCapture();
     }
 
     protected function getTemplatePath()

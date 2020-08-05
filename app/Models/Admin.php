@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\ModelResources\AdminResource;
 use App\Models\Base\ExtendedUserModel;
+use App\Notifications\AdminResetPasswordNotification;
 
 /**
  * Class Admin
@@ -19,6 +20,7 @@ use App\Models\Base\ExtendedUserModel;
 class Admin extends ExtendedUserModel
 {
     const MAX_AVATAR_SIZE = 512;
+    const MIN_PASSWORD_LENGTH = 8;
 
     protected $table = 'admins';
 
@@ -98,8 +100,12 @@ class Admin extends ExtendedUserModel
     {
         return $this->belongsTo(HandledFile::class, 'avatar_id', 'id');
     }
-
     #endregion
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new AdminResetPasswordNotification($token));
+    }
 
     public function preferredName()
     {

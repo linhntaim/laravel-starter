@@ -18,6 +18,11 @@ class PasswordController extends ModelApiController
         $this->modelRepository = new PasswordResetRepository();
     }
 
+    protected function broker()
+    {
+        return Password::broker();
+    }
+
     public function index(Request $request)
     {
         if ($request->has('_reset')) {
@@ -36,7 +41,7 @@ class PasswordController extends ModelApiController
         $email = $this->modelRepository->getEmailByToken($request->input('token'));
         if (empty($email)) return $this->abort404();
 
-        $passwordBroker = Password::broker();
+        $passwordBroker = $this->broker();
 
         $user = $passwordBroker->getUser([
             'email' => $email,
@@ -71,7 +76,7 @@ class PasswordController extends ModelApiController
             'email' => 'required|email',
         ]);
 
-        $response = Password::broker()->sendResetLink([
+        $response = $this->broker()->sendResetLink([
             'email' => $request->input('email'),
         ]);
 
@@ -80,19 +85,23 @@ class PasswordController extends ModelApiController
             : $this->responseFail(trans($response));
     }
 
-    private function reset(Request $request)
+    protected function resetValidatedRules()
     {
-        $this->validated($request, [
+        return [
             'token' => 'required',
             'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
-        ]);
+            'password' => 'required|string|min:8|confirmed',
+        ];
+    }
 
-        $response = Password::broker()->reset(
+    private function reset(Request $request)
+    {
+        $this->validated($request, $this->resetValidatedRules());
+
+        $response = $this->broker()->reset(
             [
                 'email' => $request->input('email'),
                 'password' => $request->input('password'),
-                'password_confirmation' => $request->input('password_confirmation'),
                 'token' => $request->input('token'),
             ],
             function ($user, $password) {

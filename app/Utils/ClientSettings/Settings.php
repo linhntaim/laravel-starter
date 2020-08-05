@@ -199,7 +199,7 @@ class Settings implements ISettings, Arrayable, Jsonable
 
     public function mergeFromOtherSettings(Settings $settings)
     {
-        foreach (get_class_vars(static::class) as $propertyName) {
+        foreach (array_keys(get_class_vars(static::class)) as $propertyName) {
             if (!is_null($settings->{$propertyName})) {
                 $this->{$propertyName} = $settings->{$propertyName};
             }
