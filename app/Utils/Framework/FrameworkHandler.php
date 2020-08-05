@@ -40,7 +40,7 @@ abstract class FrameworkHandler implements Arrayable, Jsonable
         if ($this->exists()) {
             $content = json_decode(file_get_contents($this->file), true);
             if (!is_null($content)) {
-                $this->fromContent();
+                $this->fromContent($content);
                 return $this;
             }
         }

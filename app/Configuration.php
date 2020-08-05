@@ -21,6 +21,10 @@ class Configuration
     const HTTP_RESPONSE_STATUS_OK = 200;
     const HTTP_RESPONSE_STATUS_ERROR = 500;
 
+    const REQUEST_PARAM_TOKEN_TYPE = '_x_token_type';
+    const REQUEST_PARAM_ACCESS_TOKEN = '_x_access_token';
+    const REQUEST_PARAM_AUTHORIZATION = '_x_authorization';
+
     const DEFAULT_ITEMS_PER_PAGE = 10;
     const ALLOWED_ITEMS_PER_PAGE = [10, 20, 50, 100];
 

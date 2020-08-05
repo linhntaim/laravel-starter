@@ -78,7 +78,9 @@ Route::group([
                     'prefix' => 'system-log',
                 ], function () {
                     Route::get('/', 'SystemLogController@index');
-                    Route::get('{id}', 'SystemLogController@show')->name('admin.system_log.show');
+                    Route::get('{id}', 'SystemLogController@show')
+                        ->where('id', '.+')
+                        ->name('admin.system_log.show');
                 });
             });
 

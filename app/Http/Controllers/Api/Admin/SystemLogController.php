@@ -16,6 +16,8 @@ class SystemLogController extends ModelApiController
     public function __construct()
     {
         parent::__construct();
+
+        $this->logPath = storage_path('logs');
     }
 
     public function index(Request $request)
