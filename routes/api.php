@@ -130,6 +130,8 @@ Route::group([
                 Route::post('{id}', 'RoleController@update')
                     ->middleware('authorized.permissions:role-manage');
             });
+
+            // TODO: Expand Admin API
         });
     });
 });
