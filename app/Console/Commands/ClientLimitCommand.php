@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Console\Commands\Base\Command;
+use App\Utils\ConfigHelper;
 use App\Utils\Framework\ClientLimiter;
 
 class ClientLimitCommand extends Command
@@ -19,10 +20,12 @@ class ClientLimitCommand extends Command
             $allowed = $this->option('allow');
             $denied = $this->option('deny');
             $admin = $this->option('admin');
+            $timeOut = ConfigHelper::get('client_limit.time_out');
 
             $clientLimiter->setAllowed(empty($allowed) ? [] : $allowed)
                 ->setDenied(empty($denied) ? [] : $denied)
                 ->setAdmin($admin ? true : false)
+                ->setTimeOut(intval($timeOut) > 0 ? $timeOut : null)
                 ->save();
         }
     }
