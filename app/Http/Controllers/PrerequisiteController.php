@@ -13,6 +13,7 @@ use App\Utils\ConfigHelper;
 use App\Utils\Framework\ServerMaintainer;
 use App\Utils\GuardArrayTrait;
 use App\Utils\HandledFiles\Helper;
+use App\Utils\SocialLogin;
 
 class PrerequisiteController extends ApiController
 {
@@ -44,6 +45,7 @@ class PrerequisiteController extends ApiController
     private function server(Request $request)
     {
         if ($request->has('server')) {
+            $socialLogin = SocialLogin::getInstance();
             $this->dataset['server'] = [
                 'c' => time(),
                 'm' => ($serverMaintainer = (new ServerMaintainer())->retrieve()) ? $serverMaintainer->toArray() : null,
@@ -56,12 +58,16 @@ class PrerequisiteController extends ApiController
                 ],
                 'max_upload_file_size' => Helper::maxUploadFileSize(),
                 'variables' => ConfigHelper::get('variables'),
-                'app_options' => $this->guardEmptyAssocArray(
+                'app_options' => $this->guardEmptyArray(
                     $this->modelTransform((new AppOptionRepository())->getAll()->keyBy('key'))
                 ),
                 'gtm_code' => ConfigHelper::get('gtm_code'),
                 'social_login' => [
-                    'enabled' => ConfigHelper::isSocialLoginEnabled(),
+                    'enabled' => $socialLogin->enabled(),
+                    'email_domain' => [
+                        'allowed' => $this->guardEmptyArray($socialLogin->allowedEmailDomains()),
+                        'denied' => $this->guardEmptyArray($socialLogin->deniedEmailDomains()),
+                    ],
                 ],
                 'forgot_password_enabled' => ConfigHelper::get('forgot_password_enabled'),
             ];

@@ -4,7 +4,7 @@ namespace App\ModelResources;
 
 use App\ModelResources\Base\ModelResource;
 use App\ModelResources\Base\ModelTransformTrait;
-use App\Utils\ConfigHelper;
+use App\Utils\SocialLogin;
 
 class UserResource extends ModelResource
 {
@@ -14,7 +14,7 @@ class UserResource extends ModelResource
     {
         return [
             $this->merge($this->toCurrentArray($request)),
-            ConfigHelper::isSocialLoginEnabled() ? $this->merge([
+            SocialLogin::getInstance()->enabled() ? $this->merge([
                 'socials' => $this->modelTransform($this->whenLoaded('socials'), $request),
             ]) : null,
         ];

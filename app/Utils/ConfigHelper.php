@@ -122,12 +122,4 @@ class ConfigHelper
     {
         return empty($name) ? static::get('clients') : static::get('clients.' . $name);
     }
-
-    public static function isSocialLoginEnabled()
-    {
-        if (is_null(static::$socialLoginEnabled)) {
-            static::$socialLoginEnabled = static::get('social_login.enabled');
-        }
-        return static::$socialLoginEnabled;
-    }
 }

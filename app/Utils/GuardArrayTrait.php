@@ -14,7 +14,7 @@ trait GuardArrayTrait
         return $array;
     }
 
-    protected function guardEmptyAssocArray($array)
+    protected function guardEmptyArray($array)
     {
         return empty($array) ? null : $array;
     }

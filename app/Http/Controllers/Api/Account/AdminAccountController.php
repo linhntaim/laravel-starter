@@ -10,7 +10,7 @@ use App\ModelRepositories\UserRepository;
 use App\ModelResources\AdminAccountResource;
 use App\Models\Admin;
 use App\Rules\CurrentPasswordRule;
-use App\Utils\ConfigHelper;
+use App\Utils\SocialLogin;
 use Illuminate\Validation\Rule;
 
 class AdminAccountController extends ModelApiController
@@ -112,7 +112,7 @@ class AdminAccountController extends ModelApiController
                 Rule::unique('users', 'email')->ignore($currentUser->id)->whereNull('deleted_at'),
             ],
         ];
-        if (!ConfigHelper::isSocialLoginEnabled() || $currentUser->hasPassword) {
+        if (!SocialLogin::getInstance()->enabled() || $currentUser->hasPassword) {
             $rules['current_password'] = [
                 'required',
                 (new CurrentPasswordRule())
@@ -136,7 +136,7 @@ class AdminAccountController extends ModelApiController
         $rules = [
             'password' => ['required', 'string', sprintf('min:%d', Admin::MIN_PASSWORD_LENGTH), 'confirmed'],
         ];
-        if (!ConfigHelper::isSocialLoginEnabled() || $currentUser->hasPassword) {
+        if (!SocialLogin::getInstance()->enabled() || $currentUser->hasPassword) {
             $rules['current_password'] = ['required', new CurrentPasswordRule()];
         }
         $this->validated($request, $rules, [

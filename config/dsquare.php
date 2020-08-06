@@ -34,6 +34,14 @@ return [
     ],
     'social_login' => [
         'enabled' => (bool)env('SOCIAL_LOGIN_ENABLED', false),
+        'email_domain' => [
+            'allowed' => array_filter(explode(',', env('SOCIAL_LOGIN_EMAIL_DOMAIN_ALLOWED', '')), function ($domain) {
+                return !empty($domain);
+            }),
+            'denied' => array_filter(explode(',', env('SOCIAL_LOGIN_EMAIL_DOMAIN_DENIED', '')), function ($domain) {
+                return !empty($domain);
+            }),
+        ],
     ],
     'forgot_password_enabled' => [
         'admin' => (bool)env('ADMIN_FORGOT_PASSWORD_ENABLED', false),

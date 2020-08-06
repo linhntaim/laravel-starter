@@ -6,7 +6,7 @@ use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\AdminRepository;
 use App\ModelResources\AdminAccountResource;
-use App\Utils\ConfigHelper;
+use App\Utils\SocialLogin;
 
 class RegisterController extends ModelApiController
 {
@@ -19,7 +19,7 @@ class RegisterController extends ModelApiController
 
     public function store(Request $request)
     {
-        if (ConfigHelper::isSocialLoginEnabled()) {
+        if (SocialLogin::getInstance()->enabled()) {
             if ($request->has('_social')) {
                 return $this->storeSocial($request);
             }
