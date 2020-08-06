@@ -1,6 +1,6 @@
 <?php
 
-use App\Utils\ConfigHelper;
+use App\Utils\SocialLogin;
 use App\Vendors\Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Migrations\Migration;
@@ -19,7 +19,7 @@ class CreateUsersTable extends Migration
             $table->rowFormat = 'DYNAMIC';
 
             $table->increments('id');
-            if (ConfigHelper::isSocialLoginEnabled()) {
+            if (SocialLogin::getInstance()->enabled()) {
                 $table->string('email')->nullable();
             } else {
                 $table->string('email');

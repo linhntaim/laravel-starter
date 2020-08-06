@@ -4,8 +4,8 @@ namespace App\ModelRepositories;
 
 use App\ModelRepositories\Base\DependedRepository;
 use App\Models\Admin;
-use App\Utils\ConfigHelper;
 use App\Utils\HandledFiles\Filer\ImageFiler;
+use App\Utils\SocialLogin;
 
 /**
  * Class UserRepository
@@ -17,7 +17,7 @@ class AdminRepository extends DependedRepository
 {
     public function __construct($id = null)
     {
-        parent::__construct(ConfigHelper::isSocialLoginEnabled() ? ['user', 'user.socials'] : 'user', $id);
+        parent::__construct(SocialLogin::getInstance()->enabled() ? ['user', 'user.socials'] : 'user', $id);
     }
 
     public function modelClass()
@@ -80,7 +80,7 @@ class AdminRepository extends DependedRepository
         return $this->queryDelete(
             $this->dependedWhere(function ($query) {
                 $query->noneProtected();
-            }, ConfigHelper::isSocialLoginEnabled() ? 'user' : null)
+            }, SocialLogin::getInstance()->enabled() ? 'user' : null)
                 ->queryByIds($ids)
         );
     }

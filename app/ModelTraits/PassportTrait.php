@@ -6,6 +6,7 @@ use App\Models\SysToken;
 use App\Models\User;
 use App\Utils\ConfigHelper;
 use App\Utils\CryptoJs\AES;
+use App\Utils\SocialLogin;
 use Illuminate\Support\Facades\Hash;
 
 trait PassportTrait
@@ -18,13 +19,19 @@ trait PassportTrait
             $username = AES::decrypt($username, ConfigHelper::getClockBlockKey());
         }
         if ($advanced = json_decode($username)) {
-            if (ConfigHelper::isSocialLoginEnabled()) {
+            $socialLogin = SocialLogin::getInstance();
+            if ($socialLogin->enabled()) {
                 if (!empty($advanced->provider) && !empty($advanced->provider_id)) {
                     $user = User::whereHas('socials', function ($query) use ($advanced) {
                         $query->where('provider', $advanced->provider)
                             ->where('provider_id', $advanced->provider_id);
                     })->first();
-                    if ($user) $user->via = 'social';
+                    if ($user) {
+                        if ($user->email && !$socialLogin->checkEmailDomain($user->email)) {
+                            return null;
+                        }
+                        $user->via = 'social';
+                    }
                     return $user;
                 }
             }

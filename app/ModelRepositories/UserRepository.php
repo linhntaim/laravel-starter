@@ -6,6 +6,7 @@ use App\Exceptions\AppException;
 use App\ModelRepositories\Base\ModelRepository;
 use App\Models\User;
 use App\Utils\ConfigHelper;
+use App\Utils\SocialLogin;
 use App\Utils\StringHelper;
 
 /**
@@ -52,13 +53,18 @@ class UserRepository extends ModelRepository
      */
     public function createWithAttributes(array $attributes = [], array $socialAttributes = [])
     {
+        $socialLogin = SocialLogin::getInstance();
+        if (!empty($socialAttributes) && isset($attributes['email'])
+            && !$socialLogin->checkEmailDomain($attributes['email'])) {
+            throw new AppException(static::__transErrorWithModule('email.not_allowed'));
+        }
         if (!empty($attributes['password'])) {
             $attributes['password'] = StringHelper::hash($attributes['password']);
         } else {
             unset($attributes['password']);
         }
         parent::createWithAttributes($attributes);
-        if (ConfigHelper::isSocialLoginEnabled() && !empty($socialAttributes)) {
+        if ($socialLogin->enabled() && !empty($socialAttributes)) {
             $this->model->socials()->create($socialAttributes);
         }
         return $this->model;

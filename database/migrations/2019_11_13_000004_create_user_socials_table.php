@@ -1,6 +1,6 @@
 <?php
 
-use App\Utils\ConfigHelper;
+use App\Utils\SocialLogin;
 use App\Vendors\Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Migrations\Migration;
@@ -14,7 +14,7 @@ class CreateUserSocialsTable extends Migration
      */
     public function up()
     {
-        if (ConfigHelper::isSocialLoginEnabled()) {
+        if (SocialLogin::getInstance()->enabled()) {
             Schema::create('user_socials', function (Blueprint $table) {
                 $table->engine = 'InnoDB';
                 $table->rowFormat = 'DYNAMIC';
