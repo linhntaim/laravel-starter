@@ -51,7 +51,7 @@ class ClientLimiter extends FrameworkHandler
 
     protected function fromContent($content)
     {
-        $now =  (clone DateTimer::syncNowObject())->format('Y-m-d H:i');
+        $now = (clone DateTimer::syncNowObject())->format('Y-m-d H:i');
 
         $this->setAllowed(isset($content['allowed']) ? $content['allowed'] : [])
             ->setDenied(isset($content['denied']) ? $content['denied'] : [])
@@ -62,13 +62,7 @@ class ClientLimiter extends FrameworkHandler
     public function canAccess(Request $request, $excepts = [])
     {
         if ($this->expired) {
-            $clientLimit = AppOptionHelper::getInstance()->getBy('client_limit');
-            $timeOut = ConfigHelper::get('client_limit.time_out');
-            $this->setAllowed($clientLimit['allowed'])
-                ->setDenied($clientLimit['denied'])
-                ->setAdmin($clientLimit['admin'])
-                ->setTimeOut(intval($timeOut) > 0 ? $timeOut : null)
-                ->saveFile();
+            $this->updateFileExpired();
         }
 
         return ($this->admin && !$request->is('api/admin/*'))
@@ -102,12 +96,12 @@ class ClientLimiter extends FrameworkHandler
 
     public function toArray()
     {
-        return [
-            'allowed' => $this->allowed,
-            'denied' => $this->denied,
-            'admin' => $this->admin,
-            'timeOut' => $this->timeOut
-        ];
+        return array_merge(
+            $this->valueForKeyClientLimit(),
+            [
+                'timeOut' => $this->timeOut
+            ]
+        );
     }
 
     public function valueForKeyClientLimit()
@@ -121,7 +115,7 @@ class ClientLimiter extends FrameworkHandler
 
     public function save()
     {
-        (new AppOptionRepository())->save('client_limit',$this->valueForKeyClientLimit());
+        (new AppOptionRepository())->save('client_limit', $this->valueForKeyClientLimit());
 
         return $this->saveFile();
     }
@@ -129,5 +123,51 @@ class ClientLimiter extends FrameworkHandler
     public function saveFile()
     {
         return parent::save();
+    }
+
+    public function isNotExists()
+    {
+        $this->createFile();
+
+        return $this->retrieve();
+    }
+
+    public function createFile()
+    {
+        return $this->resetFile();
+    }
+
+    public function updateFileExpired()
+    {
+        return $this->updateFile();
+    }
+
+    public function updateFile()
+    {
+        $clientLimit = AppOptionHelper::getInstance()->getBy('client_limit');
+
+        if (count($clientLimit) > 0) {
+            $timeOut = ConfigHelper::get('client_limit.time_out');
+            $this->setAllowed($clientLimit['allowed'])
+                ->setDenied($clientLimit['denied'])
+                ->setAdmin($clientLimit['admin'])
+                ->setTimeOut(intval($timeOut) > 0 ? $timeOut : null)
+                ->saveFile();
+        } else {
+            $this->resetFile();
+        }
+
+        return $this;
+    }
+
+    public function resetFile()
+    {
+        $this->setAllowed()
+            ->setDenied()
+            ->setAdmin()
+            ->setTimeOut()
+            ->save();
+
+        return $this;
     }
 }

@@ -35,6 +35,11 @@ abstract class FrameworkHandler implements Arrayable, Jsonable
         return is_file($this->file);
     }
 
+    public function isNotExists()
+    {
+        return null;
+    }
+
     public function retrieve()
     {
         if ($this->exists()) {
@@ -44,7 +49,8 @@ abstract class FrameworkHandler implements Arrayable, Jsonable
                 return $this;
             }
         }
-        return null;
+
+        return $this->isNotExists();
     }
 
     protected abstract function fromContent($content);
