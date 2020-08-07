@@ -4,14 +4,16 @@ use App\Models\Admin;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use App\Utils\Helper;
+use App\Utils\PasswordGenerator;
 use App\Utils\StringHelper;
 
 class DefaultSeeder extends Seeder
 {
     protected $systemEmail = 'system@dsquare.com.vn';
-    protected $systemPassword = ')^KM$bB-W7:Z@8eG';
+    protected $systemPassword = 'Gbu@190708';
     protected $superAdminEmail = 'superadmin@dsquare.com.vn';
-    protected $superAdminPassword = '3sQUJ8yXc@m#3bx3';
+    protected $superAdminPassword = 'Gbu@190708';
     protected $administratorEmail = 'admin@dsquare.com.vn';
     protected $administratorPassword = 'Gbu@190708';
 
@@ -49,7 +51,7 @@ class DefaultSeeder extends Seeder
         Admin::query()->create([
             'user_id' => User::query()->create([
                 'email' => $this->systemEmail,
-                'password' => StringHelper::hash($this->systemPassword),
+                'password' => StringHelper::hash(Helper::runInProductionMode() ? PasswordGenerator::random() : $this->systemPassword),
             ])->id,
             'role_id' => $systemRole->id,
             'display_name' => 'System',
@@ -59,7 +61,7 @@ class DefaultSeeder extends Seeder
         Admin::query()->create([
             'user_id' => User::query()->create([
                 'email' => $this->superAdminEmail,
-                'password' => StringHelper::hash($this->superAdminPassword),
+                'password' => StringHelper::hash(Helper::runInProductionMode() ? PasswordGenerator::random() : $this->superAdminPassword),
             ])->id,
             'role_id' => $superAdminRole->id,
             'display_name' => 'Super Administrator',

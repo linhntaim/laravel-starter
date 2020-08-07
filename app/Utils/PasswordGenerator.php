@@ -20,7 +20,7 @@ class PasswordGenerator
     public function excludeSimilarCharacter($isExclude = true)
     {
         if ($isExclude == true) {
-            // Exclude: e.g. i, l, 1, L, o, 0, O 
+            // Exclude: e.g. i, l, 1, L, o, 0, O
             $this->lowercaseCharacter = 'abcdefghjkmnpqrstuvwxyz';
             $this->uppercaseCharacter = 'ABCDEFGHJKMNPQRSTUVWXYZ';
             $this->numberCharacter = '23456789';
@@ -85,5 +85,19 @@ class PasswordGenerator
 
 
         return str_shuffle($str1 . $str2 . $str3 . $str4);
+    }
+
+    public static function random()
+    {
+        return (new PasswordGenerator())->excludeSimilarCharacter(true)
+            ->includeUpperCases(true)
+            ->setUpperCaseLength(3)
+            ->includeLowerCases(true)
+            ->setLowerCaseLength(3)
+            ->includeNumbers(true)
+            ->setNumberLength(3)
+            ->includeSymbols(true)
+            ->setSymbolLength(3)
+            ->generate();
     }
 }
