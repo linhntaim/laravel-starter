@@ -63,6 +63,7 @@ return [
         ],
     ],
     'variables' => json_decode(env('VARIABLES'), true),
+    'client_limit_timeout' => (int)env('CLIENT_LIMIT_TIMEOUT'),
     'clients' => [
         'admin' => [
             'name' => env('CLIENT_ADMIN_NAME'),

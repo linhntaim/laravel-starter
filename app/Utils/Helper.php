@@ -37,6 +37,11 @@ class Helper
         return sprintf('%s.%s', static::table($table, $connection), $column);
     }
 
+    public static function runInProductionMode()
+    {
+        return config('spp.env') == 'production';
+    }
+
     public static function runningInWindowsOS()
     {
         return version_compare(PHP_VERSION, '7.2.0', '>=') ?

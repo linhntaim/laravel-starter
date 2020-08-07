@@ -16,6 +16,7 @@ class ServerMaintainer extends FrameworkHandler
     protected function fromContent($content)
     {
         $this->data = $content;
+        return true;
     }
 
     public function toArray()
