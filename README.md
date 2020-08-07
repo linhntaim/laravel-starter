@@ -1,4 +1,4 @@
-# Product's Live
+# Laravel Starter
 
 ## Commands
 
@@ -11,10 +11,10 @@ php artisan about
 ### Limit the client to access
 
 ```
-php artisan client:limit {--none} {--allow=} {--deny=} {--admin}
+php artisan client:limit {--u} {--allow=} {--deny=} {--admin}
 ```
 
-- `--none`: Remove all limitation.
+- `--u`: Remove all limitation.
 - `--allow`: List of IPs, separated by comma. Only these IPs can access.
 - `--deny`: List of IPs, separated by comma. Only these IPs cannot access.
 - `--admin`: Limit with admin site only.
@@ -22,11 +22,12 @@ php artisan client:limit {--none} {--allow=} {--deny=} {--admin}
 ### Setup migration
 
 ```
-php artisan setup:migration {--u} {--dummy-data}
+php artisan setup:migration {--u} {--key} {--dummy-data}
 ```
 
 - `--u`: Remove all tables and some files to run the application.
-- `--dummy-data`: Enable to generate test data.
+- `--key`: Enable to generate application key.
+- `--dummy-data`: Enable to generate dummy data.
 
 ### Setup dummy data
 
@@ -55,8 +56,8 @@ php artisan test:send-mail
 php artisan update:password {email} {--password=}
 
 ```
-- `email`: User's email need to update password
-- `--password=`Input your options to generate new password
+- `email`: User's email need for updating password
+- `--password`: The password needs to update. Leave empty for auto-generating random password.
 
 ### Try something
 
