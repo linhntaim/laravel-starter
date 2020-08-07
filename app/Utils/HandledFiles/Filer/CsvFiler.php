@@ -10,6 +10,7 @@ class CsvFiler extends Filer
     protected $fReadMatchedHeaders = [];
     protected $fReadExtraHeaders = [];
     protected $fReadSkipHeader = true;
+    protected $fHasTrimBomCharacters = false;
 
     public function fStartReading()
     {
@@ -94,7 +95,11 @@ class CsvFiler extends Filer
         }
 
         array_walk($read, function (&$item) {
-            $item = StringHelper::toUtf8(trim($item, " \t\n\r\0\x0B" . chr(0xEF) . chr(0xBB) . chr(0xBF)));
+            if (!$this->fHasTrimBomCharacters) {
+                $item = ltrim($item, chr(0xEF) . chr(0xBB) . chr(0xBF));
+                $this->fHasTrimBomCharacters = true;
+            }
+            $item = StringHelper::toUtf8($item);
         });
         return $this->fReadMatchesHeaders($read);
     }
