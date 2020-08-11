@@ -17,9 +17,14 @@ abstract class FrameworkHandler implements Arrayable, Jsonable
         $this->setFile();
     }
 
+    public function getName()
+    {
+        return static::NAME;
+    }
+
     public function setFile()
     {
-        $this->file = storage_path('framework' . DIRECTORY_SEPARATOR . static::NAME);
+        $this->file = storage_path('framework' . DIRECTORY_SEPARATOR . $this->getName());
     }
 
     public function remove()

@@ -39,7 +39,7 @@ class Helper
 
     public static function runInProductionMode()
     {
-        return config('spp.env') == 'production';
+        return config('app.env') == 'production';
     }
 
     public static function runningInWindowsOS()
