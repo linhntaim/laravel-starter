@@ -8,7 +8,7 @@ use App\Utils\StringHelper;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Password;
 
-class PasswordController extends ModelApiController
+abstract class PasswordController extends ModelApiController
 {
     public function __construct()
     {

@@ -15,7 +15,7 @@ use App\Utils\GuardArrayTrait;
 use App\Utils\HandledFiles\Helper;
 use App\Utils\SocialLogin;
 
-class PrerequisiteController extends ApiController
+abstract class PrerequisiteController extends ApiController
 {
     use ModelTransformTrait, GuardArrayTrait;
 
