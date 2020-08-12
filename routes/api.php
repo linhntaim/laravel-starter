@@ -29,6 +29,7 @@ Route::group([
         'namespace' => 'Auth',
     ], function () {
         Route::post('login', 'LoginController@issueToken');
+        Route::post('register', 'RegisterController@store');
     });
 
     Route::group([

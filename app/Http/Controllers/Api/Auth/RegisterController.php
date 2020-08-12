@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Api\Admin\Auth;
+namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\RegisterController as BaseRegisterController;
 use App\Http\Requests\Request;
-use App\ModelRepositories\AdminRepository;
-use App\ModelResources\AdminAccountResource;
+use App\ModelRepositories\UserRepository;
+use App\ModelResources\UserAccountResource;
 
 class RegisterController extends BaseRegisterController
 {
@@ -13,23 +13,20 @@ class RegisterController extends BaseRegisterController
     {
         parent::__construct();
 
-        $this->modelRepository = new AdminRepository();
+        $this->modelRepository = new UserRepository();
     }
 
     public function storeSocial(Request $request)
     {
         $this->validated($request, [
             'email' => 'nullable|sometimes|max:255',
-            'display_name' => 'nullable|sometimes|max:255',
             'provider' => 'required|max:255',
             'provider_id' => 'required|max:255',
         ]);
 
         return $this->responseModel(
-            $this->setModelResourceClass(AdminAccountResource::class)->modelTransform(
-                $this->modelRepository->createWithAttributesFromSocial([
-                    'display_name' => $request->input('display_name'),
-                ], [
+            $this->setModelResourceClass(UserAccountResource::class)->modelTransform(
+                $this->modelRepository->createWithAttributes([
                     'email' => $request->input('email'),
                 ], [
                     'provider' => $request->input('provider'),

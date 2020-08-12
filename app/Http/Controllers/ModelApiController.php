@@ -10,7 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 
-class ModelApiController extends ApiController
+abstract class ModelApiController extends ApiController
 {
     /**
      * @var ModelRepository|mixed
