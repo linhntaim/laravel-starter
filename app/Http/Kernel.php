@@ -4,6 +4,7 @@ namespace App\Http;
 
 use App\Configuration;
 use App\Http\Middleware\AuthenticatedByPassportViaCookie;
+use App\Http\Middleware\AuthenticatedByPassportViaHeader;
 use App\Http\Middleware\AuthenticatedByPassportViaRequest;
 use App\Http\Middleware\AuthorizedWithAdmin;
 use App\Http\Middleware\AuthorizedWithPermissions;
@@ -76,6 +77,7 @@ class Kernel extends HttpKernel
 
         'device' => Device::class,
         'authenticated.passport.cookie' => AuthenticatedByPassportViaCookie::class,
+        'authenticated.passport.header' => AuthenticatedByPassportViaHeader::class,
         'authenticated.passport.request' => AuthenticatedByPassportViaRequest::class,
         'authorized.permissions' => AuthorizedWithPermissions::class,
         'authorized.admin' => AuthorizedWithAdmin::class,

@@ -19,7 +19,7 @@ abstract class PrerequisiteController extends ApiController
 {
     use ModelTransformTrait, GuardArrayTrait;
 
-    private $dataset;
+    protected $dataset;
 
     public function __construct()
     {
@@ -42,7 +42,7 @@ abstract class PrerequisiteController extends ApiController
         $this->locales($request);
     }
 
-    private function server(Request $request)
+    protected function server(Request $request)
     {
         if ($request->has('server')) {
             $socialLogin = SocialLogin::getInstance();
@@ -74,7 +74,7 @@ abstract class PrerequisiteController extends ApiController
         }
     }
 
-    private function roles(Request $request)
+    protected function roles(Request $request)
     {
         if ($request->has('roles')) {
             $this->dataset['roles'] = $this->modelTransform(
@@ -83,7 +83,7 @@ abstract class PrerequisiteController extends ApiController
         }
     }
 
-    private function permissions(Request $request)
+    protected function permissions(Request $request)
     {
         if ($request->has('permissions')) {
             $this->dataset['permissions'] = $this->modelTransform(
@@ -92,7 +92,7 @@ abstract class PrerequisiteController extends ApiController
         }
     }
 
-    private function locales(Request $request)
+    protected function locales(Request $request)
     {
         if ($request->has('locales')) {
             $locales = [];

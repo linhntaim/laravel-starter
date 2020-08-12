@@ -13,14 +13,15 @@ class AuthenticatedByPassportViaCookie
 
     public function handle(Request $request, Closure $next)
     {
-        $defaultCookieName = ConfigHelper::get('app.cookie.names.default');
-        if (!auth()->check() && $request->hasCookie($defaultCookieName)) {
-            $token = json_decode(AES::decrypt($request->cookie($defaultCookieName), ConfigHelper::get('app.cookie.secret')));
-            if ($token !== false && isset($token->access_token) && isset($token->token_type) && isset($token->refresh_token) && isset($token->token_end_time)) {
-                $this->authenticate($request, $token->token_type . ' ' . $token->access_token);
+        if (!auth()->check()) {
+            $defaultCookieName = ConfigHelper::get('app.cookie.names.default');
+            if (!auth()->check() && $request->hasCookie($defaultCookieName)) {
+                $token = json_decode(AES::decrypt($request->cookie($defaultCookieName), ConfigHelper::get('app.cookie.secret')));
+                if ($token !== false && isset($token->access_token) && isset($token->token_type) && isset($token->refresh_token) && isset($token->token_end_time)) {
+                    $this->authenticate($request, $token->token_type . ' ' . $token->access_token);
+                }
             }
         }
-
         return $next($request);
     }
 }
