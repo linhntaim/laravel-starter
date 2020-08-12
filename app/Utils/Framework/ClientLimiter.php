@@ -6,7 +6,7 @@ use App\Http\Requests\Request;
 use App\ModelRepositories\AppOptionRepository;
 use App\Utils\ClientSettings\DateTimer;
 use App\Utils\ConfigHelper;
-use Symfony\Component\HttpFoundation\IpUtils;
+use App\Utils\Helper;
 use App\Utils\AppOptionHelper;
 
 class ClientLimiter extends FrameworkHandler
@@ -78,17 +78,9 @@ class ClientLimiter extends FrameworkHandler
     public function canAccess(Request $request, $excepts = [])
     {
         return ($this->admin && !$request->is('api/admin/*'))
-            || ((empty($this->allowed) || $this->matchedIps($request->ips(), $this->allowed))
-                && (empty($this->denied) || !$this->matchedIps($request->ips(), $this->denied)))
+            || ((empty($this->allowed) || Helper::matchedIps($request->ips(), $this->allowed))
+                && (empty($this->denied) || !Helper::matchedIps($request->ips(), $this->denied)))
             || $this->except($request, $excepts);
-    }
-
-    protected function matchedIps($matchingIps, $matchedIps)
-    {
-        foreach ($matchingIps as $matchingIp) {
-            if (IpUtils::checkIp($matchingIp, $matchedIps)) return true;
-        }
-        return false;
     }
 
     protected function except(Request $request, $excepts)

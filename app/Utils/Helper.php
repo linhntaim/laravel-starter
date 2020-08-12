@@ -3,7 +3,7 @@
 namespace App\Utils;
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\IpUtils;
 
 class Helper
 {
@@ -56,5 +56,13 @@ class Helper
     public static function isInteger($input)
     {
         return preg_match('/^[+-]?\d+$/', $input) === 1;
+    }
+
+    public static function matchedIps($matchingIps, $matchedIps)
+    {
+        foreach ($matchingIps as $matchingIp) {
+            if (IpUtils::checkIp($matchingIp, $matchedIps)) return true;
+        }
+        return false;
     }
 }
