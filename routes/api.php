@@ -46,6 +46,8 @@ Route::group([
             'prefix' => 'account',
             'namespace' => 'Account',
         ], function () {
+            Route::get('/', 'AccountController@index');
+
             Route::group([
                 'prefix' => 'admin',
             ], function () {
