@@ -5,7 +5,6 @@ namespace App\ModelRepositories;
 use App\Exceptions\AppException;
 use App\ModelRepositories\Base\ModelRepository;
 use App\Models\User;
-use App\Utils\ConfigHelper;
 use App\Utils\SocialLogin;
 use App\Utils\StringHelper;
 
@@ -47,14 +46,37 @@ class UserRepository extends ModelRepository
 
     /**
      * @param array $attributes
-     * @param array $socialAttributes
+     * @param array $userSocialAttributes
      * @return User
      * @throws
      */
-    public function createWithAttributes(array $attributes = [], array $socialAttributes = [])
+    public function createWithAttributesFromSocial(array $attributes = [], array $userSocialAttributes = [])
+    {
+        $userSocialRepository = new UserSocialRepository();
+        if (!empty($attributes['email']) && ($user = $this->notStrict()->getByEmail($attributes['email']))) {
+            $this->model = $user;
+            $userSocialAttributes['user_id'] = $this->model->id;
+            $userSocialRepository->updateOrCreateWithAttributes($userSocialAttributes);
+            $this->updateWithAttributes($attributes);
+        } elseif ($userSocial = $userSocialRepository->notStrict()->getByProvider($userSocialAttributes['provider'], $userSocialAttributes['provider_id'])) {
+            $this->model = $userSocial->user;
+            $this->updateWithAttributes($attributes);
+        } else {
+            $this->createWithAttributes($attributes, $userSocialAttributes);
+        }
+        return $this->model;
+    }
+
+    /**
+     * @param array $attributes
+     * @param array $userSocialAttributes
+     * @return User
+     * @throws
+     */
+    public function createWithAttributes(array $attributes = [], array $userSocialAttributes = [])
     {
         $socialLogin = SocialLogin::getInstance();
-        if (!empty($socialAttributes) && isset($attributes['email'])
+        if (!empty($userSocialAttributes) && isset($attributes['email'])
             && !$socialLogin->checkEmailDomain($attributes['email'])) {
             throw new AppException(static::__transErrorWithModule('email.not_allowed'));
         }
@@ -64,8 +86,8 @@ class UserRepository extends ModelRepository
             unset($attributes['password']);
         }
         parent::createWithAttributes($attributes);
-        if ($socialLogin->enabled() && !empty($socialAttributes)) {
-            $this->model->socials()->create($socialAttributes);
+        if ($socialLogin->enabled() && !empty($userSocialAttributes)) {
+            $this->model->socials()->create($userSocialAttributes);
         }
         return $this->model;
     }

@@ -26,7 +26,7 @@ class RegisterController extends BaseRegisterController
 
         return $this->responseModel(
             $this->setModelResourceClass(UserAccountResource::class)->modelTransform(
-                $this->modelRepository->createWithAttributes([
+                $this->modelRepository->createWithAttributesFromSocial([
                     'email' => $request->input('email'),
                 ], [
                     'provider' => $request->input('provider'),
