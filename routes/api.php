@@ -50,6 +50,7 @@ Route::group([
 
             Route::group([
                 'prefix' => 'admin',
+                'middleware' => 'admin',
             ], function () {
                 Route::get('/', 'AdminAccountController@index');
                 Route::post('/', 'AdminAccountController@store');
@@ -66,6 +67,7 @@ Route::group([
     Route::group([
         'prefix' => 'admin',
         'namespace' => 'Admin',
+        'middleware' => 'admin',
     ], function () {
         // Anonymous
         Route::group([

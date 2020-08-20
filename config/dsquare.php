@@ -102,6 +102,9 @@ return [
             ],
         ],
     ],
+    'admin' => [
+        'disabled' => (bool)env('ADMIN_DISABLED', false),
+    ],
     'headers' => [
         'settings' => env('HEADER_SETTINGS_NAME'),
         'token_authorization' => env('HEADER_TOKEN_AUTHORIZATION_NAME'),
