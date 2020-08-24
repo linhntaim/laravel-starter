@@ -96,10 +96,6 @@ return [
                 'long_time_format' => 0,
                 'short_time_format' => 0,
             ],
-            'paths' => [
-                'membership_event_watching_path' => 'm/watch',
-                'one_time_event_watching_path' => 'o/watch',
-            ],
         ],
     ],
     'admin' => [
