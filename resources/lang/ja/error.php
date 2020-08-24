@@ -32,14 +32,6 @@ return [
             'level_failed' => 'ユーザーアクションに問題が発生しました',
             'level' => ':message',
         ],
-        'one_time_event_registered_exception' => [
-            'level_failed' => 'ユーザーアクションに問題が発生しました',
-            'level' => ':message',
-        ],
-        'event_watcher_registered_exception' => [
-            'level_failed' => 'Something went wrong with user action',
-            'level' => ':message',
-        ],
     ],
 
     'http' => [
@@ -102,33 +94,6 @@ return [
     ],
 
     'utils' => [
-        'files' => [
-            'filer' => [
-                'filer' => [
-                    'file_not_found' => 'ファイルが見つかりません',
-                ],
-            ],
-            'file_reader' => [
-                'csv_reader' => [
-                    'read_line' => ':line行目に入力データに誤りがあります。',
-                ],
-            ],
-            'file_writer' => [
-                'zip_archive_handler' => [
-                    'cannot_opened' => 'zipファイルを開けません',
-                ],
-                'zip_handler' => [
-                    'opened' => 'Zipファイルが開かれました',
-                    'not_opened' => 'Zipファイルが開かれていません',
-                    'not_found' => 'zipファイルは見つかりませんでした',
-                ],
-            ],
-            'file_helper' => [
-                'directory_not_found' => 'ディレクトリが見つかりません',
-                'directory_not_allowed' => 'ディレクトリへのアクセスは許可されていません',
-                'directory_not_writable' => 'ディレクトリは書き込み不可',
-            ],
-        ],
         'handled_files' => [
             'filer' => [
                 'csv_filer' => [
