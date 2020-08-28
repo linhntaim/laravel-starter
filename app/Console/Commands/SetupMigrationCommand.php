@@ -74,7 +74,8 @@ class SetupMigrationCommand extends Command
                 $pdo = new \PDO(
                     sprintf('mysql:host=%s;port:%d', $databaseConnection['host'], $databaseConnection['port']),
                     $databaseConnection['username'],
-                    $databaseConnection['password']
+                    $databaseConnection['password'],
+                    $databaseConnection['options']
                 );
                 $pdo->query(sprintf('CREATE DATABASE IF NOT EXISTS `%s`', $databaseConnection['database']));
                 break;
