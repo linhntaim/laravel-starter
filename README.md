@@ -66,3 +66,39 @@ Go into `app\Console\Commands` and clone the file `TryCommand.php.example` to `T
 ```
 php artisan try
 ```
+
+## Configuration
+
+### Azure Blob Storage Supported
+
+Add this package [matthewbdaly/laravel-azure-storage](https://github.com/matthewbdaly/laravel-azure-storage):
+
+```
+composer require matthewbdaly/laravel-azure-storage
+```
+
+There's configuration in `filesystems.php`:
+
+```php
+'disks' => [
+    ...
+    'azure' => [
+        'driver'    => 'azure',
+        'name'      => env('AZURE_STORAGE_NAME'),
+        'key'       => env('AZURE_STORAGE_KEY'),
+        'container' => env('AZURE_STORAGE_CONTAINER'),
+        'url'       => env('AZURE_STORAGE_URL'),
+        'prefix'    => null,
+    ],
+    ...
+]
+```
+
+So, you can apply some value for them in `.env` file:
+
+```
+AZURE_STORAGE_NAME=
+AZURE_STORAGE_KEY=
+AZURE_STORAGE_CONTAINER=
+...
+```
