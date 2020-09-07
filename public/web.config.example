@@ -25,6 +25,14 @@
             <add type="HttpAuthModule.HttpAuthModule" name="HttpAuthModule" />
         </modules>
         -->
+        <handlers>
+            <add name="SSINC-html"
+                 path="*.html"
+                 verb="*"
+                 modules="ServerSideIncludeModule"
+                 resourceType="File"
+                 requireAccess="Script" />
+        </handlers>
 		<urlCompression doDynamicCompression="true" doStaticCompression="true" dynamicCompressionBeforeCache="true" />
 		<staticContent>
 	        <remove fileExtension=".json" />
