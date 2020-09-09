@@ -20,7 +20,9 @@ class CreateAdminsTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->integer('role_id')->unsigned()->nullable();
             $table->integer('avatar_id')->unsigned()->nullable();
-            $table->string('display_name');
+            $table->string('display_name')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('user_id')->references('id')->on('users')
                 ->onUpdate('cascade')->onDelete('cascade');
@@ -30,6 +32,8 @@ class CreateAdminsTable extends Migration
                 ->onUpdate('cascade')->onDelete('cascade');
 
             $table->primary('user_id');
+            $table->index('created_at');
+            $table->index('deleted_at');
         });
     }
 
