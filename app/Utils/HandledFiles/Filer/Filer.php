@@ -265,7 +265,7 @@ class Filer
 
     public function moveToCloud($toDirectory = null, $keepOriginalName = true, $markOriginal = true)
     {
-        if (ConfigHelper::get('handled_file.cloud_enabled')) {
+        if (ConfigHelper::get('handled_file.cloud.enabled')) {
             return $this->moveToHandledStorage(
                 new CloudStorage(),
                 function ($originStorage) {

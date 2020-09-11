@@ -3,12 +3,6 @@
 return [
     'app' => [
         'version' => env('APP_VERSION', '1.0.0'),
-        'cookie' => [
-            'names' => [
-                'default' => env('APP_COOKIE_DEFAULT_NAME', ''),
-            ],
-            'secret' => env('APP_COOKIE_SECRET', ''),
-        ],
     ],
     'public_path' => env('PUBLIC_PATH'),
     'passport' => [
@@ -52,14 +46,14 @@ return [
     ],
     'force_common_exception' => (bool)env('FORCE_COMMON_EXCEPTION', false),
     'handled_file' => [
-        'cloud_enabled' => (bool)env('HANDLED_FILE_CLOUD_ENABLED', false),
-        'cloud_only' => (bool)env('HANDLED_FILE_CLOUD_ONLY', false),
-    ],
-    'image' => [
-        'upload' => [
-            'max_width' => (int)env('IMAGE_UPLOAD_MAX_WIDTH'),
-            'max_height' => (int)env('IMAGE_UPLOAD_MAX_HEIGHT'),
-            'inline' => (bool)env('IMAGE_UPLOAD_INLINE'),
+        'cloud' => [
+            'enabled' => (bool)env('HANDLED_FILE_CLOUD_ENABLED', false),
+            'only' => (bool)env('HANDLED_FILE_CLOUD_ONLY', false),
+        ],
+        'image' => [
+            'max_width' => (int)env('HANDLED_FILE_IMAGE_MAX_WIDTH'),
+            'max_height' => (int)env('HANDLED_FILE_IMAGE_MAX_HEIGHT'),
+            'inline' => (bool)env('HANDLED_FILE_IMAGE_INLINE'),
         ],
     ],
     'variables' => json_decode(env('VARIABLES'), true),
@@ -68,6 +62,12 @@ return [
         'admin' => [
             'name' => env('CLIENT_ADMIN_NAME'),
             'url' => env('CLIENT_ADMIN_URL'),
+            'cookie' => [
+                'names' => [
+                    'default' => env('CLIENT_ADMIN_COOKIE_DEFAULT_NAME', ''),
+                ],
+                'secret' => env('CLIENT_ADMIN_COOKIE_SECRET', ''),
+            ],
             'default_localization' => [
                 'locale' => 'ja',
                 'country' => 'JP',

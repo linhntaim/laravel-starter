@@ -30,16 +30,6 @@ class ConfigHelper
         config()->set(static::NAME . '.' . $key, $value);
     }
 
-    public static function getAppName()
-    {
-        return static::get('app.name');
-    }
-
-    public static function getAppUrl()
-    {
-        return static::get('app.url');
-    }
-
     public static function getAppVersion()
     {
         return static::get('app.version');

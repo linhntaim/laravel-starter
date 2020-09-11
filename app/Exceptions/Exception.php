@@ -39,6 +39,8 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
 
     public function __construct($message = null, $code = 0, Throwable $previous = null)
     {
+        $withoutMessage = empty($message);
+
         if (is_array($message)) {
             $this->messages = $message;
             $message = array_values($this->messages)[0];
@@ -58,7 +60,7 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
             }
         }
 
-        if (!config('app.debug') && ConfigHelper::get('force_common_exception')) {
+        if (!config('app.debug') && ConfigHelper::get('force_common_exception') && $withoutMessage) {
             $this->message = trans('error.exceptions.default_exception.level_failed');
             $this->messages = [$this->message];
         }

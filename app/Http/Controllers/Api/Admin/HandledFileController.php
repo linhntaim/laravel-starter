@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Api\HandledFileController as BaseHandledFileController;
 use App\Http\Requests\Request;
-use App\Jobs\VideoJob;
 use App\Utils\HandledFiles\Filer\ChunkedFiler;
 
 class HandledFileController extends BaseHandledFileController
@@ -78,7 +77,7 @@ class HandledFileController extends BaseHandledFileController
             'upload' => 'required|image',
         ]);
 
-        $handledFile = $this->modelRepository->createWithUploadedImageCasually($request->file('upload'));
+        $handledFile = $this->modelRepository->createWithUploadedImageFile($request->file('upload'));
         return response()->json([
             'url' => $handledFile->url,
         ]);

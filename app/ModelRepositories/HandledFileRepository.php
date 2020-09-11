@@ -29,20 +29,9 @@ class HandledFileRepository extends ModelRepository
         return $this->createWithFiler((new Filer())->fromExisted($uploadedFile, null, false));
     }
 
-    public function createWithUploadedImageCasually(UploadedFile $uploadedFile)
+    public function createWithUploadedImageFile(UploadedFile $uploadedFile)
     {
-        $imageFiler = (new ImageFiler())->fromExisted($uploadedFile, null, false);
-        $imageMaxWidth = ConfigHelper::get('image.upload.max_width');
-        $imageMaxHeight = ConfigHelper::get('image.upload.max_height');
-        if ($imageMaxWidth || $imageMaxHeight) {
-            $imageFiler->imageResize($imageMaxWidth ? $imageMaxWidth : null, $imageMaxHeight ? $imageMaxHeight : null)
-                ->imageSave();
-        }
-        $imageFiler->moveToPublic();
-        if (ConfigHelper::get('image.upload.inline')) {
-            $imageFiler->moveToInline();
-        }
-        return $this->createWithFiler($imageFiler);
+        return $this->createWithImageFiler((new ImageFiler())->fromExisted($uploadedFile, null, false));
     }
 
     /**
@@ -54,11 +43,30 @@ class HandledFileRepository extends ModelRepository
     {
         if (isset($options['public']) && $options['public']) {
             $filer->moveToPublic();
-            if (ConfigHelper::get('handled_file.cloud_enabled')) {
-                $filer->moveToCloud(null, true, ConfigHelper::get('handled_file.cloud_only'));
+            if (ConfigHelper::get('handled_file.cloud.enabled')) {
+                $filer->moveToCloud(null, true, ConfigHelper::get('handled_file.cloud.only'));
             }
         }
         return $filer;
+    }
+
+    public function createWithImageFiler(ImageFiler $imageFiler, $options = [], $imageMaxWidth = null, $imageMaxHeight = null)
+    {
+        if (empty($imageMaxWidth)) {
+            $imageMaxWidth = ConfigHelper::get('handled_file.image.max_width');
+        }
+        if (empty($imageMaxHeight)) {
+            $imageMaxHeight = ConfigHelper::get('handled_file.image.max_height');
+        }
+        if ($imageMaxWidth || $imageMaxHeight) {
+            $imageFiler->imageResize($imageMaxWidth ? $imageMaxWidth : null, $imageMaxHeight ? $imageMaxHeight : null)
+                ->imageSave();
+        }
+        $imageFiler->moveToPublic();
+        if (ConfigHelper::get('handled_file.image.inline')) {
+            $imageFiler->moveToInline();
+        }
+        return $this->createWithFiler($imageFiler, $options);
     }
 
     public function createWithFiler(Filer $filer, $options = [])

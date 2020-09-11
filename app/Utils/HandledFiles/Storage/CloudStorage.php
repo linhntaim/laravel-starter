@@ -12,7 +12,7 @@ class CloudStorage extends HandledStorage implements IUrlStorage
 
     public function __construct($disk = null)
     {
-        if (!ConfigHelper::get('handled_file.cloud_enabled')) {
+        if (!ConfigHelper::get('handled_file.cloud.enabled')) {
             throw new AppException('Cloud was not enabled');
         }
 
