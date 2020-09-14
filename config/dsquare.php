@@ -103,6 +103,7 @@ return [
     ],
     'headers' => [
         'settings' => env('HEADER_SETTINGS_NAME'),
+        'device' => env('HEADER_DEVICE_NAME'),
         'token_authorization' => env('HEADER_TOKEN_AUTHORIZATION_NAME'),
     ],
 

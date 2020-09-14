@@ -357,6 +357,10 @@ Set the name of some request headers.
 
 Localization settings will be passed form client to the application via default `X-Settings` header.
 
+##### HEADER_DEVICE_NAME
+
+Device identification will be passed form client to the application via default `X-Device` header.
+
 ##### HEADER_TOKEN_AUTHORIZATION_NAME
 
 Default value is empty.
