@@ -7,7 +7,7 @@
 	<httpAuthModule>
 		<add key="AuthMode" value="Basic" />
 		<add key="Realm" value="SecureZone" />
-		<add key="Credentials" value="hakuhodo_base:Gbu@190708" />
+		<add key="Credentials" value="hakuhodo_base:Base@190708" />
 		<add key="DigestNonceValidDuration" value="120" />
 		<add key="IgnoreIPAddresses" value="113.161.68.31;113.161.68.89"/>
 		<add key="IgnorePathRegex" value="^.+\.(jpg|jpeg|png|gif|svg|ico)$"/>
@@ -40,7 +40,6 @@
                  resourceType="File"
                  requireAccess="Script" />
         </handlers>
-		<urlCompression doDynamicCompression="true" doStaticCompression="true" dynamicCompressionBeforeCache="true" />
 		<staticContent>
 	        <remove fileExtension=".json" />
 	        <remove fileExtension=".woff" />
