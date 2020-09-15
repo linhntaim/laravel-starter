@@ -225,6 +225,23 @@ MAIL_TESTED_TO_NAME=
 
 ** **Note**: Always use methods of `App\Utils\Mail\MailHelper` class to send any email.
 
+#### TRUSTED_PROXIES
+
+When deploying to hosting service, the value should be set to `*` (or specific proxy IPs separated by comma).
+
+#### PUBLIC_PATH
+
+If you want not to use default `public` folder of Laravel (i.e `wwwroot`), change the value here.
+
+#### PASSPORT_PASSWORD_*
+
+Setup for migration with Passport.
+
+```
+PASSPORT_PASSWORD_CLIENT_ID=2
+PASSPORT_PASSWORD_CLIENT_SECRET=<secret>
+```
+
 #### SOCIAL_LOGIN_*
 
 - **`SOCIAL_LOGIN_ENABLED`**: 
@@ -366,7 +383,7 @@ Device identification will be passed form client to the application via default 
 
 Default value is empty.
 
-If the name of authorization header sent from client is different from `Authorization`, please set it as value here.
+If the name of authorization header sent from client is different from `Authorization`, please set it as value here (i.e. `X-Authorization`).
 
 #### AZURE_*
 
