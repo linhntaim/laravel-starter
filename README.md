@@ -35,7 +35,7 @@ php artisan setup:migration {--u} {--key} {--dummy-data}
 php artisan setup:dummy-data {--u}
 ```
 
-- `--u`: Truncate all data from tables related to events.
+- `--u`: Remove all dummy data.
 
 ### Setup data for testing
 
@@ -43,7 +43,7 @@ php artisan setup:dummy-data {--u}
 php artisan setup:test-data {--u}
 ```
 
-- `--u`: Truncate all data from tables related to events.
+- `--u`: Remove all test data.
 
 ### Test to send mail
 
@@ -56,12 +56,12 @@ php artisan test:send-mail
 php artisan update:password {email} {--password=}
 
 ```
-- `email`: User's email need for updating password
+- `email`: User's email needs to update password.
 - `--password`: The password needs to update. Leave empty for auto-generating random password.
 
 ### Try something
 
-Go into `app\Console\Commands` and clone the file `TryCommand.php.example` to `TryCommand.php`. Then change some codes in it and run:
+Go into `app\Console\Commands` and clone the file `TryCommand.php.example` to `TryCommand.php`. Then change some codes in it (find `TODO` block) and run:
 
 ```
 php artisan try
@@ -73,7 +73,7 @@ php artisan try
 
 #### APP_ENV
 
-Determine environment to run.
+Determine the environment to run.
 
 Available values: 
 
@@ -82,7 +82,7 @@ Available values:
 
 #### APP_KEY
 
-Use for encryption.
+Used for encryption.
 
 Value is set by running this command:
 
@@ -90,7 +90,7 @@ Value is set by running this command:
 php artisan key:generate
 ```
 
-Or by running setup migration command:
+Or by running the `setup:migration` command:
 
 ```
 php artisan setup:migration --key
@@ -98,7 +98,7 @@ php artisan setup:migration --key
 
 #### APP_DEBUG
 
-Enable code for debugging.
+Enable for debugging.
 
 Available values:
 
@@ -119,7 +119,7 @@ Value is string. Should be valid with this regular expression: `^[a-z][a-z0-9_]*
 
 #### APP_URL
 
-URL of the application. Application will get this URL as root URL when running in console.
+URL of the application. The application will get this URL as the root URL when running in console.
 
 #### APP_VERSION
 
@@ -129,21 +129,21 @@ Value should be valid with this regular expression: `^\d+\.\d+\.\d+$`.
 
 #### APP_LOCALE_SUPPORTED
 
-Locales that application supports.
+Locales that the application supports.
 
 Value is locales in ISO 639-1 format separated by comma.
 
 #### LOG_CHANNEL
 
-How application write logs.
+How the application writes logs.
 
-Default value is `daily` which tell application to write one log file per day.
+Default value is `daily` which tells the application to write one log file per day.
 
 #### DB_*
 
-Setup default database connection.
+Setup the default database connection.
 
-For multi-bytes character stored in Unicode format, the database connection should use `utf8mb4` for encoding:
+For multi-bytes characters stored in Unicode format, the database connection should use `utf8mb4` for encoding:
 
 ```
 DB_CHARSET=utf8mb4
@@ -152,7 +152,7 @@ DB_COLLATION=utf8mb4_unicode_ci
 
 #### MYSQL_ATTR_SSL_CA
 
-For default database connection by MySQL, if it is necessary to connect database server via SSL, place the absolute path to SSL certificate file here as the value.
+For the default database connection by MySQL, if it is necessary to connect database server via SSL, place the absolute path to SSL certificate file here as the value.
 
 For example, if this application is deployed to Azure App Service, the setting should be:
 
@@ -164,7 +164,7 @@ MYSQL_ATTR_SSL_CA="D:\\home\\site\\wwwroot\\storage\\BaltimoreCyberTrustRoot.crt
 MYSQL_ATTR_SSL_CA="/home/site/wwwroot/storage/BaltimoreCyberTrustRoot.crt.pem"
 ```
 
-- `BaltimoreCyberTrustRoot.crt.pem`: The SSL certificate file to connect `Azure Database for MySQL server` \([reference](https://docs.microsoft.com/en-us/azure/mysql/howto-configure-ssl)\), which is already included in `storage` folder.
+- `BaltimoreCyberTrustRoot.crt.pem`: The SSL certificate file which is used for connecting to the `Azure Database for MySQL server` \([reference](https://docs.microsoft.com/en-us/azure/mysql/howto-configure-ssl)\), which is already included in `storage` folder.
 
 #### CACHE_DRIVER
 
@@ -173,8 +173,8 @@ For caching.
 Default value is `file` and cache will be stored in local files.
 
 If the application is deployed on multi-instance infrastructure, value should be set to `database`.
-When value is set to `database`, a table named `sys_cache` will be automatically created when running migration.
-(See `database/migrations/2018_08_15_000000_create_cache_table.php` file) and cache will be stored in this table.
+When value is set to `database`, a table named `sys_cache` will be automatically created when running migration
+(see `database/migrations/2018_08_15_000000_create_cache_table.php` file) and cache will be stored in this table.
 
 #### QUEUE_CONNECTION
 
@@ -183,8 +183,8 @@ For running queued jobs.
 Default value is `sync` and queued jobs will be executed immediately when running code.
 
 If you want to queue the jobs, value could be set to `database`.
-When value is set to `database`, a table named `sys_jobs` will be automatically created when running migration.
-(See `database/migrations/2018_08_16_000000_create_failed_jobs_table.php` file) and queued jobs will be stored in this table then wait for executing.
+When value is set to `database`, a table named `sys_jobs` will be automatically created when running migration 
+(see `database/migrations/2018_08_16_000000_create_failed_jobs_table.php` file) and queued jobs will be stored in this table then wait for executing.
 
 #### MAIL_*
 
@@ -285,6 +285,7 @@ If there are extra unallocated configurations, put them as value of this setting
 For example:
 
 - Has this setting:
+
 ```
 VARIABLES={"sample":"Value of sample"}
 ```
