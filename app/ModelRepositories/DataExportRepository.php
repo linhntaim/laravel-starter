@@ -2,7 +2,7 @@
 
 namespace App\ModelRepositories;
 
-use App\Exports\Export;
+use App\Exports\Base\Export;
 use App\Jobs\ExportJob;
 use App\ModelRepositories\Base\ModelRepository;
 use App\Models\DataExport;
