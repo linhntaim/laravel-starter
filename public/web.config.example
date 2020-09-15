@@ -87,7 +87,7 @@
                 </rule>
             </outboundRules>
 			<rules>
-				<rule name="admin" stopProcessing="true">
+				<rule name="Admin" stopProcessing="true">
 					<match url="^admin(.*)" ignoreCase="false" />
 					<conditions logicalGrouping="MatchAll">
 						<add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
@@ -95,7 +95,7 @@
 					</conditions>
 					<action type="Rewrite" url="admin/index.html" appendQueryString="true" />
 				</rule>
-				<rule name="api" stopProcessing="true">
+				<rule name="API" stopProcessing="true">
 					<match url="^api(.*)" ignoreCase="false" />
 					<conditions logicalGrouping="MatchAll">
 						<add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
@@ -103,7 +103,7 @@
 					</conditions>
 					<action type="Rewrite" url="index.php" appendQueryString="true" />
 				</rule>
-				<rule name="index" stopProcessing="true">
+				<rule name="Home" stopProcessing="true">
 					<match url="^" ignoreCase="false" />
 					<conditions logicalGrouping="MatchAll">
 						<add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
@@ -111,6 +111,16 @@
 					</conditions>
 					<action type="Rewrite" url="index.html" appendQueryString="true" />
 				</rule>
+				<!--
+				<rule name="Front" stopProcessing="true">
+					<match url="^" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll">
+						<add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
+						<add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
+					</conditions>
+					<action type="Rewrite" url="index.php" appendQueryString="true" />
+				</rule>
+				-->
 			</rules>
 		</rewrite>
 	</system.webServer>
