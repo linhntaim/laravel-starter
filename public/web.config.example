@@ -10,7 +10,7 @@
 		<add key="Credentials" value="hakuhodo_base:Gbu@190708" />
 		<add key="DigestNonceValidDuration" value="120" />
 		<add key="IgnoreIPAddresses" value="113.161.68.31;113.161.68.89"/>
-		<add key="IgnorePathRegex" value="^.+\.(jpg|jpeg|png|gif|svg)$"/>
+		<add key="IgnorePathRegex" value="^.+\.(jpg|jpeg|png|gif|svg|ico)$"/>
 	</httpAuthModule>
 	-->
 	<system.web>
@@ -25,6 +25,13 @@
             <add type="HttpAuthModule.HttpAuthModule" name="HttpAuthModule" />
         </modules>
         -->
+        <defaultDocument enabled="true">
+            <files>
+                <add value="index.htm" />
+                <add value="index.html" />
+                <add value="index.php" />
+            </files>
+        </defaultDocument>
         <handlers>
             <add name="SSINC-html"
                  path="*.html"
