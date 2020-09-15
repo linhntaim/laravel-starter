@@ -4,9 +4,11 @@
 # <RequireAny>
 #    Require ip 113.161.68.31
 #    Require ip 113.161.68.89
-#    Require expr %{REQUEST_URI} =~ m#^.+\.(jpg|jpeg|png|gif|svg)$#
+#    Require expr %{REQUEST_URI} =~ m#^.+\.(jpg|jpeg|png|gif|svg|ico)$#
 #    Require valid-user
 # </RequireAny>
+
+DirectoryIndex index.htm index.html index.php
 
 AddDefaultCharset utf-8
 
