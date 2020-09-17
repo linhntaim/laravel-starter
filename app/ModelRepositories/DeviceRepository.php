@@ -64,14 +64,13 @@ class DeviceRepository extends ModelRepository
      * @param string $provider
      * @param string|null $secret
      * @param array|string|null $clientIps
-     * @param int|null $userId
      * @return Device
      * @throws
      */
-    public function save($provider = Device::PROVIDER_BROWSER, $secret = null, $clientIps = null, $userId = null)
+    public function save($provider = Device::PROVIDER_BROWSER, $secret = null, $clientIps = null)
     {
-        $provider = empty($provider) ? Device::PROVIDER_BROWSER : htmlentities($provider);
-        $secret = empty($secret) ? null : htmlentities($secret);
+        $provider = empty($provider) ? Device::PROVIDER_BROWSER : $provider;
+        $secret = empty($secret) ? null : $secret;
         $clientIps = empty($clientIps) ? null : json_encode((array)$clientIps);
 
         if (!empty($secret)) {
@@ -80,21 +79,15 @@ class DeviceRepository extends ModelRepository
                 ->getByProviderAndSecret($provider, $secret);
         }
 
-        if ($this->doesntHaveModel()) {
-            return $this->createWithAttributes([
-                'user_id' => $userId,
-                'provider' => $provider,
-                'secret' => empty($secret) ? $this->trySecretWithProvider($provider) : $secret,
-                'client_ips' => $clientIps,
-                'client_agent' => ClientHelper::userAgent(),
-                'meta_array_value' => [
-                    'client_info' => ClientHelper::information(),
-                ],
-            ]);
-        }
-
-        return $this->updateWithAttributes([
-            'user_id' => $userId,
+        return $this->doesntHaveModel() ? $this->createWithAttributes([
+            'provider' => $provider,
+            'secret' => empty($secret) ? $this->trySecretWithProvider($provider) : $secret,
+            'client_ips' => $clientIps,
+            'client_agent' => ClientHelper::userAgent(),
+            'meta_array_value' => [
+                'client_info' => ClientHelper::information(),
+            ],
+        ]) : $this->updateWithAttributes([
             'client_ips' => $clientIps,
             'client_agent' => ClientHelper::userAgent(),
             'meta_array_value' => [

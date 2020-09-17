@@ -23,12 +23,12 @@ class DeviceController extends ModelApiController
             'secret' => 'nullable|sometimes|string|max:255|regex:/^[a-zA-Z0-9-]+$/',
         ]);
 
-        $currentUser = $request->user();
-        return $this->responseModel($this->modelRepository->save(
-            $request->input('provider', Device::PROVIDER_BROWSER),
-            $request->input('secret', ''),
-            $request->getClientIps(),
-            empty($currentUser) ? null : $currentUser->id
-        ));
+        return $this->responseModel(
+            $this->modelRepository->save(
+                $request->input('provider', Device::PROVIDER_BROWSER),
+                $request->input('secret', ''),
+                $request->getClientIps()
+            )
+        );
     }
 }
