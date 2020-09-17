@@ -22,16 +22,42 @@ class SetupMigrationCommand extends Command
     {
         $this->hasPassport = class_exists('Laravel\\Passport\\Passport');
 
-        if ($this->option('key')) {
-            Artisan::call('key:generate', [], $this->output);
-        }
-
-        Artisan::call('storage:link', [], $this->output);
+        $this->setAppKey();
+        $this->setStorageLink();
 
         $this->uninstall();
         if (!$this->option('u')) {
             $this->setup();
             $this->seed();
+        }
+    }
+
+    protected function setAppKey()
+    {
+        if ($this->option('key')) {
+            Artisan::call('key:generate', [], $this->output);
+        }
+    }
+
+    protected function setStorageLink()
+    {
+        Artisan::call('storage:link', [], $this->output);
+
+        $linkedStoragePath = public_path('storage');
+        if (!file_exists($linkedStoragePath)) {
+            if (false === @mkdir($linkedStoragePath, 0777)) {
+                $this->error('Cannot create storage link');
+            } else {
+                if (config('filesystems.disks.public.root') != $linkedStoragePath) {
+                    $this->error('You should configure the root of `public` disk in `config/filesystems.php` to `public_path(\'storage\')`');
+                }
+            }
+        } else {
+            if (!is_link($linkedStoragePath)) {
+                if (config('filesystems.disks.public.root') != $linkedStoragePath) {
+                    $this->error('You should configure the root of `public` disk in `config/filesystems.php` to `public_path(\'storage\')`');
+                }
+            }
         }
     }
 
@@ -88,7 +114,7 @@ class SetupMigrationCommand extends Command
         Artisan::call('migrate', [
             '--force' => true,
         ], $this->output);
-        $this->warn('Migrated!!!');
+        $this->info('Migrated!!!');
     }
 
     private function seedDefaultData()
@@ -100,7 +126,7 @@ class SetupMigrationCommand extends Command
                 '--force' => true,
             ], $this->output);
         }
-        $this->warn('Seeded!!!');
+        $this->info('Seeded!!!');
     }
 
     private function seedDummyData()
@@ -120,6 +146,6 @@ class SetupMigrationCommand extends Command
             DB::statement(sprintf('drop table %s', $table->table_name));
         }
         DB::statement('set foreign_key_checks = 1');
-        $this->warn('Migration removed!!!');
+        $this->info('Migration removed!!!');
     }
 }

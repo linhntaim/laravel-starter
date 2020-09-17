@@ -14,7 +14,7 @@ trait SetupMigrationWithPassportTrait
         Artisan::call('passport:install', [
             '--force' => true,
         ], $this->output);
-        $this->warn('Passport!!!');
+        $this->info('Passport!!!');
     }
 
     private function seedPassportData()
@@ -30,7 +30,7 @@ trait SetupMigrationWithPassportTrait
                 ]);
             $this->info(sprintf('The client ID %d was updated to %s', $clientId, $clientSecret));
         }
-        $this->warn('Passport seeded!!!');
+        $this->info('Passport seeded!!!');
     }
 
     private function uninstallPassport()
@@ -38,6 +38,6 @@ trait SetupMigrationWithPassportTrait
         $this->warn('Removing passport...');
         @unlink(storage_path('oauth-private.key'));
         @unlink(storage_path('oauth-public.key'));
-        $this->warn('Passport removed!!!');
+        $this->info('Passport removed!!!');
     }
 }
