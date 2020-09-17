@@ -1,17 +1,26 @@
+### Basic authentication
+### Default: disabled, remove comment to enable
 # AuthType Basic
 # AuthName "Protected Area"
 # AuthUserFile /path/to/.htpasswd
 # <RequireAny>
+#    # Ignore: IPs (GBU - Security Room)
 #    Require ip 113.161.68.31
+#    # Ignore: IPs (GBU - Office)
 #    Require ip 113.161.68.89
+#    # Ignore: Images
 #    Require expr %{REQUEST_URI} =~ m#^.+\.(jpg|jpeg|png|gif|svg|ico)$#
+#    # Other must fill username and password
 #    Require valid-user
 # </RequireAny>
 
-DirectoryIndex index.htm index.html index.php
-
+### Set default charset
 AddDefaultCharset utf-8
 
+### Set default document
+DirectoryIndex index.htm index.html index.php
+
+### Set mime for some specific file extension
 AddType application/json .json
 AddType font/woff .woff
 AddType font/woff2 .woff2
@@ -19,23 +28,37 @@ AddType text/csv .csv
 AddType text/plain .txt
 AddType video/mp4 .mp4
 
+### Allow to include .html file in other .html files
 AddHandler server-parsed .html
 
 <IfModule mod_headers.c>
+    ### Enable cross-domain accessing
     Header add Access-Control-Allow-Origin "*"
-    Header add Access-Control-Allow-Headers "Accept, Authorization, Content-Type, Device, Origin, Referer, User-Agent, X-Authorization, X-Device, X-Settings, X-Requested-With"
+    Header add Access-Control-Allow-Headers "Accept, Authorization, Content-Type, Origin, Referer, User-Agent, X-Authorization, X-Device, X-Settings, X-Requested-With"
     Header add Access-Control-Allow-Methods "OPTIONS, GET, POST, PUT, DELETE"
     Header add Access-Control-Max-Age 86400
 
+    ### Force to use HTTPS
     Header add Strict-Transport-Security "max-age=86400; includeSubDomains"
+
+    ### Not allow browsers to change content type of response
     Header add X-Content-Type-Options "nosniff"
+
+    ### Not allow browsers to open downloaded file directly
     Header add X-Download-Options "noopen"
+
+    ### Not allow browsers to open the website in an iframe of other websites
     Header add X-Frame-Options "sameorigin"
+
+    ### Prevent from XSS attack
     Header add X-XSS-Protection "1; mode=block"
+
+    ### Allow to load resources from known places only
     Header add Content-Security-Policy "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com"
     Header add X-Content-Security-Policy "allow 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com"
     Header add X-WebKit-CSP "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com"
 
+    ### Cache for static files only, ignore other requests
     Header unset Cache-Control
     Header add Cache-Control "no-cache, no-store, private"
     Header add Pragma "no-cache"
@@ -52,34 +75,36 @@ AddHandler server-parsed .html
 
     RewriteEngine On
 
-    # Handle Authorization Header
+    ### Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
     RewriteCond %{HTTP:X-Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:X-Authorization}]
 
-    # Redirect Trailing Slashes If Not A Folder...
+    ### Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
-    # Handle Admin Controller...
+    ### Handle Admin
+    ### If there is no Admin, remove this
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^admin admin/index.html [L]
 
-    # Handle API Controller...
+    ### Handle API
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^api index.php [L]
 
-    # Handle Home Controller...
+    ### Handle Home
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.html [L]
 
-    # Handle Front Controller...
-    #RewriteCond %{REQUEST_FILENAME} !-d
-    #RewriteCond %{REQUEST_FILENAME} !-f
-    #RewriteRule ^ index.php [L]
+    ### Handle Front
+    ### If there is no Home, replace Handle API and Handle Home with this
+    # RewriteCond %{REQUEST_FILENAME} !-d
+    # RewriteCond %{REQUEST_FILENAME} !-f
+    # RewriteRule ^ index.php [L]
 </IfModule>
