@@ -6,18 +6,18 @@
     <configSections>
         <section name="httpAuthModule" type="System.Configuration.NameValueFileSectionHandler" />
     </configSections>
-	<httpAuthModule>
-		<add key="AuthMode" value="Basic" />
-		<add key="Realm" value="SecureZone" />
-		// Ignore: IPs (GBU - Security Room)
-		// Ignore: IPs (GBU - Office)
-		<add key="IgnoreIPAddresses" value="113.161.68.31;113.161.68.89"/>
-		// Ignore: Images
-		<add key="IgnorePathRegex" value="^.+\.(jpg|jpeg|png|gif|svg|ico)$"/>
-		// Other must fill username and password
-		<add key="Credentials" value="hakuhodo_base:Base@190708" />
-	</httpAuthModule>
-	-->
+    <httpAuthModule>
+        <add key="AuthMode" value="Basic" />
+        <add key="Realm" value="SecureZone" />
+        // Ignore: IPs (GBU - Security Room)
+        // Ignore: IPs (GBU - Office)
+        <add key="IgnoreIPAddresses" value="113.161.68.31;113.161.68.89"/>
+        // Ignore: Images
+        <add key="IgnorePathRegex" value="^.+\.(jpg|jpeg|png|gif|svg|ico)$"/>
+        // Other must fill username and password
+        <add key="Credentials" value="hakuhodo_base:Base@190708" />
+    </httpAuthModule>
+    -->
     <system.web>
         <!-- Set default charset -->
         <globalization
