@@ -2,8 +2,8 @@
 
 namespace App\ModelTraits;
 
-use App\Models\SysToken;
-use App\Models\User;
+use App\ModelRepositories\OAuthImpersonateRepository;
+use App\ModelRepositories\UserRepository;
 use App\Utils\ConfigHelper;
 use App\Utils\CryptoJs\AES;
 use App\Utils\SocialLogin;
@@ -18,14 +18,13 @@ trait PassportTrait
         if (request()->has('_e')) {
             $username = AES::decrypt($username, ConfigHelper::getClockBlockKey());
         }
+        $userRepository = new UserRepository();
         if ($advanced = json_decode($username)) {
             $socialLogin = SocialLogin::getInstance();
             if ($socialLogin->enabled()) {
                 if (!empty($advanced->provider) && !empty($advanced->provider_id)) {
-                    $user = User::whereHas('socials', function ($query) use ($advanced) {
-                        $query->where('provider', $advanced->provider)
-                            ->where('provider_id', $advanced->provider_id);
-                    })->first();
+                    $user = $userRepository->notStrict()
+                        ->getSocially($advanced->provider, $advanced->provider_id);
                     if ($user) {
                         if ($user->email && !$socialLogin->checkEmailDomain($user->email)) {
                             return null;
@@ -35,20 +34,20 @@ trait PassportTrait
                     return $user;
                 }
             }
-            if (!empty($advanced->token) && !empty($advanced->id)) {
-                $sysToken = SysToken::where('type', SysToken::TYPE_LOGIN)
-                    ->where('token', $advanced->token)->first();
-                if (!empty($sysToken)) {
-                    $sysToken->delete();
-                    $user = User::where('id', $advanced->id)
-                        ->orWhere('email', $advanced->id)
-                        ->first();
-                    if ($user) $user->via = 'token';
+            if (!empty($advanced->impersonate_token)) {
+                $oAuthImpersonate = (new OAuthImpersonateRepository())->notStrict()
+                    ->getByImpersonateToken($advanced->impersonate_token);
+                if (!empty($oAuthImpersonate)) {
+                    $user = $userRepository->notStrict()->getUniquely($oAuthImpersonate->user_id);
+                    if ($user) {
+                        $user->via = 'impersonate';
+                    }
                     return $user;
                 }
             }
         }
-        return User::where('email', $username)->first();
+        return $userRepository->notStrict()
+            ->getByEmail($username);
     }
 
     public function validateForPassportPasswordGrant($password)

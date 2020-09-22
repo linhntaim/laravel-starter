@@ -34,6 +34,36 @@ class UserRepository extends ModelRepository
     }
 
     /**
+     * @param string $unique
+     * @return User
+     * @throws
+     */
+    public function getUniquely($unique)
+    {
+        return $this->first(
+            $this->query()
+                ->where('id', $unique)
+                ->orWhere('email', $unique)
+        );
+    }
+
+    /**
+     * @param string $provider
+     * @param string $providerId
+     * @return User
+     * @throws
+     */
+    public function getSocially($provider, $providerId)
+    {
+        return SocialLogin::getInstance()->enabled() ? $this->first(
+            $this->query()->whereHas('socials', function ($query) use ($provider, $providerId) {
+                $query->where('provider', $provider)
+                    ->where('provider_id', $providerId);
+            })
+        ) : null;
+    }
+
+    /**
      * @param string $email
      * @return User
      * @throws

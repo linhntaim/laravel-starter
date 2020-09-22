@@ -31,7 +31,7 @@ abstract class ModelRepository
     private $with;
     private $withTrashed = false;
     private $lock;
-    private $strict;
+    private $strict = true;
     private $sorts = [];
     private $sortsDefault = [];
     private $sortsAllowed = [];
@@ -161,7 +161,7 @@ abstract class ModelRepository
         $model = $this->catch(function () use ($query) {
             return $this->strict ? $query->firstOrFail() : $query->first();
         });
-        $this->strict = false;
+        $this->strict = true;
         if ($this->pinned) {
             $this->pinned = false;
             $this->model = $model;

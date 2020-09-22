@@ -14,9 +14,9 @@ class UserResource extends ModelResource
     {
         return [
             $this->merge($this->toCurrentArray($request)),
-            SocialLogin::getInstance()->enabled() ? $this->merge([
+            $this->mergeWhen(SocialLogin::getInstance()->enabled(), [
                 'socials' => $this->modelTransform($this->whenLoaded('socials'), $request),
-            ]) : null,
+            ]),
         ];
     }
 }

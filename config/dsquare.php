@@ -40,6 +40,7 @@ return [
     'forgot_password_enabled' => [
         'admin' => (bool)env('ADMIN_FORGOT_PASSWORD_ENABLED', false),
     ],
+    'impersonated_by_admin' => (bool)env('IMPERSONATED_BY_ADMIN_ENABLED', true),
     'api_response_ok' => (bool)env('API_RESPONSE_OK', false),
     'api_response_headers' => [
         'Content-Type' => 'application/json; charset=utf-8',

@@ -33,7 +33,7 @@ Route::group([
     });
 
     Route::group([
-        'middleware' => 'auth:api',
+        'middleware' => ['auth:api', 'impersonate'],
     ], function () {
         Route::group([
             'prefix' => 'auth',

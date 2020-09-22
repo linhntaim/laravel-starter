@@ -19,7 +19,10 @@ trait AuthenticatedByPassportTrait
         $config = config(sprintf('auth.guards.%s', ($request->is('api/*') ? 'api' : 'web')));
         $user = (new TokenGuard(
             $app->make(ResourceServer::class),
-            new PassportUserProvider(Auth::createUserProvider($config['provider']), $config['provider']),
+            new PassportUserProvider(
+                Auth::createUserProvider($config['provider']),
+                $config['provider']
+            ),
             $app->make(TokenRepository::class),
             $app->make(ClientRepository::class),
             $app->make('encrypter')

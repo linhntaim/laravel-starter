@@ -29,7 +29,11 @@ class AdminAccountController extends ModelApiController
             throw new AppException(static::__transErrorWithModule('not_found'));
         }
         return $this->responseModel(
-            $this->setModelResourceClass(AdminAccountResource::class)->modelTransform($model)
+            $this->setModelResourceClass(AdminAccountResource::class)->modelTransform($model),
+            $request->hasImpersonator() ? [
+                'impersonator' => $this->setModelResourceClass(AdminAccountResource::class)
+                    ->modelTransform($request->impersonator()),
+            ] : []
         );
     }
 

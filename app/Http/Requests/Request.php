@@ -7,7 +7,7 @@ use Illuminate\Http\Request as BaseRequest;
 
 class Request extends BaseRequest
 {
-    use AdminRequestTrait;
+    use AdminRequestTrait, ImpersonateRequestTrait;
 
     public function input($key = null, $default = null)
     {

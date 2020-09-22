@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * Class Admin
  * @package App\Models
+ * @property int $user_id
  * @property string $display_name
  * @property string $roleName
  * @property string $avatarUrl

@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\ApiResponseTrait;
+use App\ModelRepositories\OAuthImpersonateRepository;
+use App\Utils\ConfigHelper;
 use App\Utils\Helper;
+use Illuminate\Http\Response;
 use Laminas\Diactoros\Response as Psr7Response;
 use Laravel\Passport\Exceptions\OAuthServerException;
 use Laravel\Passport\Http\Controllers\AccessTokenController;
@@ -24,6 +27,28 @@ class LoginController extends AccessTokenController
         $this->inlineMiddleware();
     }
 
+    /**
+     * @param Response $response
+     * @param string|null $impersonateToken
+     * @return Response
+     * @throws
+     */
+    private function impersonate($response, $impersonateToken)
+    {
+        if (!is_null($impersonateToken) && ConfigHelper::get('impersonated_by_admin')) {
+            $parsedToken = $this->jwt->parse(
+                json_decode($response->getContent(), true)['_data']['access_token']
+            );
+            $accessTokenId = $parsedToken->getClaim('jti');
+            $oAuthImpersonateRepository = new OAuthImpersonateRepository();
+            $oAuthImpersonateRepository->pinModel()->getByImpersonateToken($impersonateToken);
+            $oAuthImpersonateRepository->updateWithAttributes([
+                'access_token_id' => $accessTokenId,
+            ]);
+        }
+        return $response;
+    }
+
     public function issueToken(ServerRequestInterface $request)
     {
         $parsedBody = $request->getParsedBody();
@@ -32,7 +57,10 @@ class LoginController extends AccessTokenController
                 return $this->throwException(LeagueException::invalidClient($request));
             }
         }
-        return parent::issueToken($request);
+        return $this->impersonate(
+            parent::issueToken($request),
+            isset($parsedBody['impersonate_token']) ? $parsedBody['impersonate_token'] : null
+        );
     }
 
     protected function withErrorHandling($callback)

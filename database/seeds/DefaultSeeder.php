@@ -4,6 +4,7 @@ use App\Models\Admin;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use App\Utils\ConfigHelper;
 use App\Utils\Helper;
 use App\Utils\PasswordGenerator;
 use App\Utils\StringHelper;
@@ -47,6 +48,17 @@ class DefaultSeeder extends Seeder
         $superAdminRole->permissions()->attach([
             $beSuperAdmin->id,
         ]);
+
+        if (ConfigHelper::get('impersonated_by_admin')) {
+            $impersonate = Permission::query()->create([
+                'name' => 'impersonate',
+                'display_name' => 'Impersonate',
+                'description' => 'Can impersonate',
+            ]);
+            $superAdminRole->permissions()->attach([
+                $impersonate->id,
+            ]);
+        }
 
         Admin::query()->create([
             'user_id' => User::query()->create([

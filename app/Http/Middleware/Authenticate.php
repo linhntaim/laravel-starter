@@ -12,6 +12,18 @@ class Authenticate extends Middleware
     use ClassTrait;
 
     /**
+     * @param Request $request
+     * @param array $guards
+     * @throws AuthenticationException
+     */
+    protected function unauthenticated($request, array $guards)
+    {
+        throw new AuthenticationException(
+            static::__transErrorWithModule('unauthenticated'), $guards, $this->redirectTo($request)
+        );
+    }
+
+    /**
      * Get the path the user should be redirected to when they are not authenticated.
      *
      * @param Request $request
@@ -22,12 +34,6 @@ class Authenticate extends Middleware
         if (!$request->expectsJson()) {
             return route('login');
         }
-    }
-
-    protected function unauthenticated($request, array $guards)
-    {
-        throw new AuthenticationException(
-            static::__transErrorWithModule('unauthenticated'), $guards, $this->redirectTo($request)
-        );
+        return null;
     }
 }

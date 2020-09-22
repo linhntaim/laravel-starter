@@ -10,6 +10,7 @@ use App\Http\Middleware\AuthenticatedByPassportViaRequest;
 use App\Http\Middleware\AuthorizedWithAdmin;
 use App\Http\Middleware\AuthorizedWithPermissions;
 use App\Http\Middleware\Device;
+use App\Http\Middleware\Impersonate;
 use App\Http\Middleware\OverrideAuthorizationHeader;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Laravel\Passport\Http\Middleware\CheckClientCredentials;
@@ -85,6 +86,7 @@ class Kernel extends HttpKernel
         'authorized.permissions' => AuthorizedWithPermissions::class,
         'authorized.admin' => AuthorizedWithAdmin::class,
         'admin' => AdminMiddleware::class,
+        'impersonate' => Impersonate::class,
     ];
 
     protected $middlewarePriority = [
@@ -94,13 +96,14 @@ class Kernel extends HttpKernel
         \Illuminate\Routing\Middleware\ThrottleRequests::class,
 
         OverrideAuthorizationHeader::class,
+        Device::class,
 
         \Illuminate\Session\Middleware\AuthenticateSession::class,
 
         AuthenticatedByPassportViaCookie::class,
         AuthenticatedByPassportViaRequest::class,
         \App\Http\Middleware\Authenticate::class,
-        Device::class,
+        Impersonate::class,
 
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
 

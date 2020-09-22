@@ -11,6 +11,7 @@ use App\Utils\SocialLogin;
  * Class UserRepository
  * @package App\ModelRepositories
  * @property Admin $model
+ * @method Admin model($id = null)
  * @method Admin getById($id, callable $callback = null)
  */
 class AdminRepository extends DependedRepository
