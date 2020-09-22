@@ -5,6 +5,7 @@ namespace App\ModelRepositories;
 use App\Exceptions\AppException;
 use App\ModelRepositories\Base\ModelRepository;
 use App\Models\User;
+use App\Utils\ClientSettings\DateTimer;
 use App\Utils\SocialLogin;
 use App\Utils\StringHelper;
 
@@ -82,6 +83,7 @@ class UserRepository extends ModelRepository
         }
         if (!empty($attributes['password'])) {
             $attributes['password'] = StringHelper::hash($attributes['password']);
+            $attributes['password_changed_at'] = DateTimer::syncNow();
         } else {
             unset($attributes['password']);
         }
@@ -105,6 +107,7 @@ class UserRepository extends ModelRepository
 
         if (!empty($attributes['password'])) {
             $attributes['password'] = StringHelper::hash($attributes['password']);
+            $attributes['password_changed_at'] = DateTimer::syncNow();
         } else {
             unset($attributes['password']);
         }
