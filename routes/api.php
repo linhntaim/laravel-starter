@@ -81,7 +81,7 @@ Route::group([
 
         // Authenticated
         Route::group([
-            'middleware' => ['authenticated.passport.request', 'auth:api', 'authorized.admin'],
+            'middleware' => ['authenticated.passport.request', 'auth:api', 'authorized.admin', 'impersonate'],
         ], function () {
             Route::group([
                 'middleware' => 'authorized.permissions:be-super-admin',

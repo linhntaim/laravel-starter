@@ -19,7 +19,8 @@ class Impersonate
                 $config = config('auth.guards.api');
                 if ($config['driver'] == 'passport') {
                     $user = $request->user();
-                    $oAuthImpersonate = (new OAuthImpersonateRepository())->getByUserIdAndAccessTokenId($user->id, $user->token()->id);
+                    $oAuthImpersonate = (new OAuthImpersonateRepository())->notStrict()
+                        ->getByUserIdAndAccessTokenId($user->id, $user->token()->id);
                     if ($oAuthImpersonate) {
                         $request->setImpersonator($oAuthImpersonate->admin);
                     }
