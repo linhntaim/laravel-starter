@@ -112,6 +112,7 @@ Route::group([
             Route::group([
                 'prefix' => 'data-export',
             ], function () {
+                Route::get('/', 'DataExportController@index');
                 Route::get('{id}', 'DataExportController@show');
             });
 

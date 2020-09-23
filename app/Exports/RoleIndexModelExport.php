@@ -2,21 +2,19 @@
 
 namespace App\Exports;
 
-use App\Configuration;
-use App\Exports\Base\ModelExport;
+use App\Exports\Base\IndexModelExport;
 use App\ModelRepositories\RoleRepository;
-use App\ModelResources\Base\ModelTransformTrait;
 use App\ModelResources\ExportedRoleResource;
 
-class RoleExport extends ModelExport
+class RoleIndexModelExport extends IndexModelExport
 {
-    use ModelTransformTrait;
-
     const NAME = 'role';
 
-    public function __construct()
+    protected $search;
+
+    public function __construct($search = [], $sortBy = null, $sortOrder = 'asc')
     {
-        parent::__construct();
+        parent::__construct($search, $sortBy, $sortOrder);
 
         $this->modelRepository = new RoleRepository();
         $this->setModelResourceClass(ExportedRoleResource::class);
@@ -30,10 +28,5 @@ class RoleExport extends ModelExport
             'Display',
             'Description',
         ];
-    }
-
-    protected function query()
-    {
-        return $this->modelRepository->sort('name')->search([], Configuration::FETCH_QUERY);
     }
 }

@@ -32,10 +32,13 @@ class DataExport extends Model
     protected $visible = [
         'id',
         'url',
+        'state',
+        'sd_st_created_at',
     ];
 
     protected $appends = [
         'url',
+        'sd_st_created_at',
     ];
 
     public function getSdStCreatedAtAttribute()

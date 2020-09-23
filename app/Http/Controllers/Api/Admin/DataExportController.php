@@ -15,6 +15,16 @@ class DataExportController extends ModelApiController
         $this->modelRepository = new DataExportRepository();
     }
 
+    protected function search(Request $request)
+    {
+        $search = [];
+        $input = $request->input('names');
+        if (!empty($input)) {
+            $search['names'] = $input;
+        }
+        return $search;
+    }
+
     public function show(Request $request, $id)
     {
         if ($request->has('_download')) {

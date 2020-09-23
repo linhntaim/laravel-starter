@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Exports\RoleIndexModelExport;
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\RoleRepository;
@@ -33,6 +34,11 @@ class RoleController extends ModelApiController
         }
         $search['except_protected'] = 1;
         return $search;
+    }
+
+    protected function indexModelExporterClass(Request $request)
+    {
+        return RoleIndexModelExport::class;
     }
 
     protected function storeValidatedRules(Request $request)

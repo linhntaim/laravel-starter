@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\AppException;
+use App\Exports\Base\Export;
+use App\Exports\Base\IndexModelExport;
 use App\Http\Requests\Request;
 use App\ModelRepositories\Base\ModelRepository;
+use App\ModelRepositories\DataExportRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -25,6 +29,10 @@ abstract class ModelApiController extends ApiController
 
     public function index(Request $request)
     {
+        if ($request->has('_export')) {
+            return $this->export($request);
+        }
+
         $models = $this->modelRepository->sort($this->sortBy(), $this->sortOrder())
             ->search(
                 $this->search($request),
@@ -32,6 +40,61 @@ abstract class ModelApiController extends ApiController
                 $this->itemsPerPage()
             );
         return $this->responseModel($models);
+    }
+    #endregion
+
+    #region Export
+    /**
+     * @param Request $request
+     * @return string|null
+     */
+    protected function indexModelExporterClass(Request $request)
+    {
+        return null;
+    }
+
+    /**
+     * @param Request $request
+     * @return IndexModelExport|null
+     */
+    protected function indexModelExporter(Request $request)
+    {
+        $class = $this->indexModelExporterClass($request);
+        return $class ?
+            new $class($this->search($request), $this->sortBy(), $this->sortOrder()) : null;
+    }
+
+    /**
+     * @param Request $request
+     * @return Export|null
+     */
+    protected function exporter(Request $request)
+    {
+        return $this->indexModelExporter($request);
+    }
+
+    protected function exportExecute(Request $request, Export $exporter = null)
+    {
+        if (!$exporter) {
+            $exporter = $this->exporter($request);
+            if (!$exporter) {
+                throw new AppException('Exporter is not implemented');
+            }
+        }
+
+        $currentUser = $request->user();
+        (new DataExportRepository())->createWithAttributesAndExport(
+            [
+                'created_by' => $currentUser ? $currentUser->id : null,
+            ],
+            $exporter ? $exporter : $this->exporter($request)
+        );
+    }
+
+    protected function export(Request $request)
+    {
+        $this->exportExecute($request);
+        return $this->responseSuccess();
     }
     #endregion
 
