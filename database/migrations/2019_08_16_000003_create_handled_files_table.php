@@ -22,7 +22,7 @@ class CreateHandledFilesTable extends Migration
             $table->string('name')->nullable();
             $table->string('mime')->nullable();
             $table->string('size')->default('0');
-            $table->text('options')->default('{}');
+            $table->text('options')->nullable();
             $table->tinyInteger('handling')->default(2); // handled
             $table->timestamps();
 
