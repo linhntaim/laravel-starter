@@ -81,18 +81,16 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                    Laravel
+                    DSquare - GBU
                 </div>
 
                 <div class="links">
-                    <a href="https://laravel.com/docs">Docs</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://blog.laravel.com">Blog</a>
-                    <a href="https://nova.laravel.com">Nova</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://vapor.laravel.com">Vapor</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
+                    <a href="https://homepage-gbu.azurewebsites.net/" target="_blank">Homepage</a>
+                    <a href="https://homepage-gbu.azurewebsites.net/back-end/" target="_blank">Back-end Docs</a>
+                    <a href="http://git-gbu.japaneast.cloudapp.azure.com/" target="_blank">Gitlab</a>
+                    <a href="http://git-gbu.japaneast.cloudapp.azure.com/base/" target="_blank">Base Projects</a>
+                    <a href="https://www.npmjs.com/settings/dsquare-gbu/packages" target="_blank">Packages on NPM</a>
+                    <a href="https://hub.docker.com/orgs/gbuatdsquare" target="_blank">Images on Docker</a>
                 </div>
             </div>
         </div>
