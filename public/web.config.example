@@ -11,7 +11,9 @@
         <add key="Realm" value="SecureZone" />
         // Ignore: IPs (GBU - Security Room)
         // Ignore: IPs (GBU - Office)
-        <add key="IgnoreIPAddresses" value="113.161.68.31;113.161.68.89"/>
+        // Ignore: IPs (JPN - Office)
+        // Ignore: IPs (JPN - Office)
+        <add key="IgnoreIPAddresses" value="113.161.68.31;113.161.68.89;113.43.219.94;124.36.26.238"/>
         // Ignore: Images
         <add key="IgnorePathRegex" value="^.+\.(jpg|jpeg|png|gif|svg|ico)$"/>
         // Other must fill username and password

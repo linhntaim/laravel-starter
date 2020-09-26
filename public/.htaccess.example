@@ -8,6 +8,10 @@
 #    Require ip 113.161.68.31
 #    # Ignore: IPs (GBU - Office)
 #    Require ip 113.161.68.89
+#    # Ignore: IPs (JPN - Office)
+#    Require ip 113.43.219.94
+#    # Ignore: IPs (JPN - Office)
+#    Require ip 124.36.26.238
 #    # Ignore: Images
 #    Require expr %{REQUEST_URI} =~ m#^.+\.(jpg|jpeg|png|gif|svg|ico)$#
 #    # Other must fill username and password
