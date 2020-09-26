@@ -3,17 +3,18 @@
 namespace App\Console\Commands;
 
 use App\Utils\ConfigHelper;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
+use App\Utils\EnvironmentFileHelper;
+use Laravel\Passport\Client;
+use Laravel\Passport\Passport;
 
 trait SetupMigrationWithPassportTrait
 {
     private function setupPassport()
     {
         $this->warn('Passport...');
-        Artisan::call('passport:install', [
+        $this->call('passport:install', [
             '--force' => true,
-        ], $this->output);
+        ]);
         $this->info('Passport!!!');
     }
 
@@ -22,14 +23,35 @@ trait SetupMigrationWithPassportTrait
         $this->warn('Seeding passport...');
         $clientId = ConfigHelper::get('passport.password.client_id');
         $clientSecret = ConfigHelper::get('passport.password.client_secret');
-        if (!empty($clientId) && !empty($clientSecret)) {
-            DB::table('oauth_clients')
-                ->where('id', $clientId)
-                ->update([
+
+        $environmentFileHelper = new EnvironmentFileHelper();
+        if ($oAuthClient = (empty($clientId) ? Client::query()
+            ->where('password_client', 1)
+            ->first() : Client::query()
+            ->where('id', $clientId)
+            ->first())) {
+            if (empty($clientId)) {
+                $clientId = $oAuthClient->id;
+                $environmentFileHelper->fill('PASSPORT_PASSWORD_CLIENT_ID', $oAuthClient->id);
+            }
+            if (empty($clientSecret)) {
+                $clientSecret = $oAuthClient->secret;
+                $environmentFileHelper->fill('PASSPORT_PASSWORD_CLIENT_SECRET', $oAuthClient->secret);
+            } else {
+                // update with no-need-to-hash secret
+                $old = Passport::$hashesClientSecrets;
+                Passport::$hashesClientSecrets = false;
+                $oAuthClient->update([
                     'secret' => $clientSecret,
                 ]);
-            $this->info(sprintf('The client ID %d was updated to %s', $clientId, $clientSecret));
+                Passport::$hashesClientSecrets = $old;
+                $this->info(sprintf('The client ID %d was updated to %s', $clientId, $clientSecret));
+            }
+        } else {
+            $this->error('No password client exists');
         }
+        $environmentFileHelper->save();
+
         $this->info('Passport seeded!!!');
     }
 

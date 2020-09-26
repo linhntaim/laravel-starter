@@ -50,6 +50,10 @@ return [
         'cloud' => [
             'enabled' => (bool)env('HANDLED_FILE_CLOUD_ENABLED', false),
             'only' => (bool)env('HANDLED_FILE_CLOUD_ONLY', false),
+            'service' => [
+                's3' => (bool)env('HANDLED_FILE_CLOUD_SERVICE_S3', false),
+                'azure' => (bool)env('HANDLED_FILE_CLOUD_SERVICE_AZURE', false),
+            ],
         ],
         'image' => [
             'max_width' => (int)env('HANDLED_FILE_IMAGE_MAX_WIDTH'),

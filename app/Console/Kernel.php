@@ -2,7 +2,9 @@
 
 namespace App\Console;
 
-use App\Console\Schedules\Schedule as AppSchedule;
+use App\Console\Schedules\Base\Schedule as AppSchedule;
+use App\Console\Schedules\TestCommandSchedule;
+use App\Console\Schedules\TestShellSchedule;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -18,14 +20,16 @@ class Kernel extends ConsoleKernel
     ];
 
     protected $schedules = [
-        'minutely' => [
+        [
+            'frequencies' => [
+                'everyMinute',
+            ],
+            'schedules' => [
+                TestCommandSchedule::class,
+                TestShellSchedule::class,
+            ],
         ],
     ];
-
-    protected function getSchedulesByGroup($group)
-    {
-        return isset($this->schedules[$group]) ? $this->schedules[$group] : [];
-    }
 
     /**
      * @param $class
@@ -41,16 +45,47 @@ class Kernel extends ConsoleKernel
      *
      * @param Schedule $schedule
      * @return void
+     * @throws
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call(function () {
-            foreach ($this->getSchedulesByGroup('minutely') as $scheduleClass) {
-                $this->getSchedule($scheduleClass)
-                    ->withKernel($this)
-                    ->handle();
+        $scheduledNames = [];
+        $getScheduledName = function ($name) use (&$scheduledNames) {
+            if (in_array($name, $scheduledNames)) {
+                $i = 0;
+                while (($suffixName = $name . '_' . (++$i)) && in_array($suffixName, $scheduledNames)) ;
+                $name = $suffixName;
             }
-        })->everyMinute()->name('minutely')->onOneServer();
+            $scheduledNames[] = $name;
+            return $name;
+        };
+        foreach ($this->schedules as $scheduleDefinition) {
+            if (empty($scheduleDefinition['frequencies']) || empty($scheduleDefinition['schedules'])) continue;
+
+            $called = $schedule->call(function () use ($scheduleDefinition) {
+                foreach ($scheduleDefinition['schedules'] as $scheduleClass) {
+                    $this->getSchedule($scheduleClass)
+                        ->withKernel($this)
+                        ->handle();
+                }
+            });
+            $names = [];
+            foreach ($scheduleDefinition['frequencies'] as $key => $value) {
+                if (is_int($key)) {
+                    $method = $value;
+                    $parameters = [];
+                } else {
+                    $method = $key;
+                    $parameters = $value;
+                }
+                $names[] = $method;
+                $called = call_user_func_array([$called, $method], $parameters);
+            }
+            $called->name($getScheduledName(implode('_', $names)))
+                ->onOneServer()
+                ->runInBackground()
+                ->withoutOverlapping();
+        }
     }
 
     /**

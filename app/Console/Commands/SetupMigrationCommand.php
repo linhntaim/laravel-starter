@@ -3,14 +3,13 @@
 namespace App\Console\Commands;
 
 use App\Console\Commands\Base\Command;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 
 class SetupMigrationCommand extends Command
 {
     use SetupMigrationWithPassportTrait;
 
-    protected $signature = 'setup:migration {--u} {--key} {--dummy-data}';
+    protected $signature = 'setup:migration {--u} {--key} {--packages} {--dummy-data}';
 
     protected $defaultSeeders = [
         'DefaultSeeder',
@@ -20,10 +19,11 @@ class SetupMigrationCommand extends Command
 
     protected function go()
     {
-        $this->hasPassport = class_exists('Laravel\\Passport\\Passport');
+        $this->setupPackages();
+        $this->setupAppKey();
+        $this->setupStorageLink();
 
-        $this->setAppKey();
-        $this->setStorageLink();
+        $this->hasPassport = class_exists('Laravel\\Passport\\Passport');
 
         $this->uninstall();
         if (!$this->option('u')) {
@@ -32,16 +32,23 @@ class SetupMigrationCommand extends Command
         }
     }
 
-    protected function setAppKey()
+    protected function setupPackages()
     {
-        if ($this->option('key')) {
-            Artisan::call('key:generate', [], $this->output);
+        if ($this->option('packages')) {
+            $this->call('setup:packages', []);
         }
     }
 
-    protected function setStorageLink()
+    protected function setupAppKey()
     {
-        Artisan::call('storage:link', [], $this->output);
+        if ($this->option('key')) {
+            $this->call('key:generate', []);
+        }
+    }
+
+    protected function setupStorageLink()
+    {
+        $this->call('storage:link', []);
 
         $linkedStoragePath = public_path('storage');
         if (!file_exists($linkedStoragePath)) {
@@ -111,9 +118,9 @@ class SetupMigrationCommand extends Command
     private function setupMigration()
     {
         $this->warn('Migrating...');
-        Artisan::call('migrate', [
+        $this->call('migrate', [
             '--force' => true,
-        ], $this->output);
+        ]);
         $this->info('Migrated!!!');
     }
 
@@ -121,10 +128,10 @@ class SetupMigrationCommand extends Command
     {
         $this->warn('Seeding default data...');
         foreach ($this->defaultSeeders as $seeder) {
-            Artisan::call('db:seed', [
+            $this->call('db:seed', [
                 '--class' => $seeder,
                 '--force' => true,
-            ], $this->output);
+            ]);
         }
         $this->info('Seeded!!!');
     }
@@ -132,7 +139,7 @@ class SetupMigrationCommand extends Command
     private function seedDummyData()
     {
         if ($this->option('dummy-data')) {
-            Artisan::call('setup:dummy-data', [], $this->output);
+            $this->call('setup:dummy-data', []);
         }
     }
 
