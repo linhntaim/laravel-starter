@@ -125,7 +125,7 @@ abstract class Command extends BaseCommand
             $this->shellSuccess() ? 'executed' : 'failed',
             $shell,
             trim($this->shellOutput()),
-            $exitCode,
+            $exitCode
         ));
     }
 }
