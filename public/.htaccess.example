@@ -58,9 +58,9 @@ AddHandler server-parsed .html
     Header add X-XSS-Protection "1; mode=block"
 
     ### Allow to load resources from known places only
-    Header add Content-Security-Policy "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com"
-    Header add X-Content-Security-Policy "allow 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com"
-    Header add X-WebKit-CSP "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com"
+    Header add Content-Security-Policy "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com *.google-analytics.com"
+    Header add X-Content-Security-Policy "allow 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com *.google-analytics.com"
+    Header add X-WebKit-CSP "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com *.google-analytics.com"
 
     ### Cache for static files only, ignore other requests
     Header unset Cache-Control

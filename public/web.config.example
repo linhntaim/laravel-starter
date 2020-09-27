@@ -91,11 +91,11 @@
 
                 <!-- Allow to load resources from known places only -->
                 <add name="Content-Security-Policy"
-                     value="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com"/>
+                     value="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com *.google-analytics.com"/>
                 <add name="X-Content-Security-Policy"
-                     value="allow 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com"/>
+                     value="allow 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com *.google-analytics.com"/>
                 <add name="X-WebKit-CSP"
-                     value="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com"/>
+                     value="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: fonts.googleapis.com fonts.gstatic.com *.googletagmanager.com *.google-analytics.com"/>
 
                 <!-- Cache for static files only, ignore other requests -->
                 <remove name="Cache-Control"/>
