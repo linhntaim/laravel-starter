@@ -22,6 +22,12 @@ class UserRepository extends ModelRepository
         return User::class;
     }
 
+    public function query()
+    {
+        return SocialLogin::getInstance()->enabled() ?
+            parent::query()->with('socials') : parent::query();
+    }
+
     protected function searchOn($query, array $search)
     {
         if (!empty($search['except_protected'])) {
