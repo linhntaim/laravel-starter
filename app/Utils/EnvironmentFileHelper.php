@@ -66,7 +66,7 @@ class EnvironmentFileHelper
      */
     protected function replacing($key)
     {
-        return sprintf('/^%s=.+/m', $key);
+        return sprintf('/^%s=.*/m', $key);
     }
 
     /**
