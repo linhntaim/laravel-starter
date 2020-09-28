@@ -1,5 +1,15 @@
 # Laravel Starter
 
+---
+
+&raquo; [Commands](#commands)
+
+&raquo; [Configuration](#configuration)
+
+&raquo; [Features](#features)
+
+---
+
 ## Commands
 
 ### Check version
@@ -19,15 +29,43 @@ php artisan client:limit {--u} {--allow=} {--deny=} {--admin}
 - `--deny`: List of IPs, separated by comma. Only these IPs cannot access.
 - `--admin`: Limit with admin site only.
 
+### Impersonate
+
+Generate token to impersonate user.
+
+```
+php artisan impersonate {user} {admin_id}
+```
+
+- `user`: User for impersonating.
+- `admin_id`: Admin who does impersonating.
+
+### Manual run a shell
+
+```
+php artisan shell:manual {shell}
+```
+
+- `shell`: Shell for running, usually put in double quotes, i.e: `"echo Hello world!"`.
+
 ### Setup migration
 
 ```
-php artisan setup:migration {--u} {--key} {--dummy-data}
+php artisan setup:migration {--u} {--key} {--packages} {--dummy-data}
 ```
 
 - `--u`: Remove all tables and some files to run the application.
 - `--key`: Enable to generate application key.
+- `--packages`: Install extra packages based on configuration.
 - `--dummy-data`: Enable to generate dummy data.
+
+### Setup packages
+
+Automatically install extra packages based on configuration.
+
+```
+php artisan setup:packages
+```
 
 ### Setup dummy data
 
@@ -45,10 +83,28 @@ php artisan setup:test-data {--u}
 
 - `--u`: Remove all test data.
 
+### Test to execute event
+
+```
+php artisan test:event
+```
+
+### Test to execute job
+
+```
+php artisan test:job
+```
+
 ### Test to send mail
 
 ```
-php artisan test:send-mail
+php artisan test:mail
+```
+
+### Test to send mail by executing event
+
+```
+php artisan test:mail-event
 ```
 
 ### Update password
@@ -242,6 +298,8 @@ PASSPORT_PASSWORD_CLIENT_ID=2
 PASSPORT_PASSWORD_CLIENT_SECRET=<secret>
 ```
 
+Currently, this setting is automatically configured by running [Setup migration](#setup-migration) command.
+
 #### SOCIAL_LOGIN_*
 
 - **`SOCIAL_LOGIN_ENABLED`**: 
@@ -254,6 +312,10 @@ PASSPORT_PASSWORD_CLIENT_SECRET=<secret>
 #### ADMIN_FORGOT_PASSWORD_ENABLED
 
 Set the value to `true` to enable the application to handle the feature of forgetting password in admin site.
+
+#### IMPERSONATED_BY_ADMIN_ENABLED
+
+Set the value to `true` to enable the feature of impersonating.
 
 #### API_RESPONSE_OK
 
@@ -287,6 +349,14 @@ To determine if files could be stored in the cloud.
 
 - **`HANDLED_FILE_CLOUD_ENABLED`**: Set value to `true` and every file will be additionally stored in the cloud.
 - **`HANDLED_FILE_CLOUD_ONLY`**: Set value to `true` and every file will be stored in the cloud and the local ones will be deleted.
+
+##### HANDLED_FILE_CLOUD_SERVICE_*
+
+To enable to use cloud service. When any cloud service is enabled, 
+the required packages will be automcatically installed by running [Setup migration](#setup-migration) or [Setup packages](#setup-packages) command.
+
+- **`HANDLED_FILE_CLOUD_SERVICE_S3`**: Set value to `true` to enable Amazon S3. 
+- **`HANDLED_FILE_CLOUD_SERVICE_AZURE`**: Set value to `true` to enable Microsoft Azure Blog Storage. 
 
 ##### HANDLED_FILE_IMAGE_*
 
@@ -395,13 +465,18 @@ See [Azure Blob Storage Supported](#azure-blob-storage-supported).
 
 To add Azure Blob Storage as a disk for cloud storage.
 
-First, do require this package [matthewbdaly/laravel-azure-storage](https://github.com/matthewbdaly/laravel-azure-storage):
+This feature does require the package [matthewbdaly/laravel-azure-storage](https://github.com/matthewbdaly/laravel-azure-storage).
+
+You can manually install it by running this command:
 
 ```
 composer require matthewbdaly/laravel-azure-storage
 ```
 
-There's configuration in `filesystems.php`:
+... or **the better way**, set the value of `HANDLED_FILE_CLOUD_SERVICE_AZURE` in `.env` file to `true`, 
+then run [Setup migration](#setup-migration) or [Setup packages](#setup-packages) command. 
+
+Besides, there's configuration in `filesystems.php`:
 
 ```php
 'disks' => [

@@ -34,6 +34,8 @@
         </modules>
         -->
         <!-- Set default document -->
+        <!-- Default: disabled, 'cause App Services don't like it) -->
+        <!--
         <defaultDocument enabled="true">
             <files>
                 <add value="index.htm"/>
@@ -41,6 +43,7 @@
                 <add value="index.php"/>
             </files>
         </defaultDocument>
+        -->
         <!-- Set mime for some specific file extension -->
         <staticContent>
             <remove fileExtension=".json"/>
