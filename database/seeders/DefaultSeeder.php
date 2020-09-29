@@ -1,5 +1,7 @@
 <?php
 
+namespace Database\Seeders;
+
 use App\Models\Admin;
 use App\Models\Permission;
 use App\Models\Role;
