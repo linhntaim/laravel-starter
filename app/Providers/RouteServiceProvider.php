@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Configuration;
+use App\Utils\ConfigHelper;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
@@ -26,7 +28,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string|null
      */
-     protected $namespace = 'App\\Http\\Controllers';
+    protected $namespace = 'App\\Http\\Controllers';
 
     /**
      * Define your route model bindings, pattern filters, etc.
@@ -57,7 +59,12 @@ class RouteServiceProvider extends ServiceProvider
     protected function configureRateLimiting()
     {
         RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60);
+            $maxAttempts = ConfigHelper::get('throttle_request.max_attempts');
+            $decayMinutes = ConfigHelper::get('throttle_request.decay_minutes');
+            if ($decayMinutes == 1) {
+                return Limit::perMinute($maxAttempts);
+            }
+            return new Limit('', $maxAttempts, $decayMinutes);
         });
     }
 }

@@ -6,14 +6,13 @@ namespace App\Vendors\Illuminate\Database\Schema\Grammars;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar as BaseMySqlGrammar;
-use Illuminate\Support\Fluent;
 
 class MySqlGrammar extends BaseMySqlGrammar
 {
-    public function compileCreate(Blueprint $blueprint, Fluent $command, Connection $connection)
+    protected function compileCreateEngine($sql, Connection $connection, Blueprint $blueprint)
     {
         return $this->compileCreateRowFormat(
-            parent::compileCreate($blueprint, $command, $connection),
+            parent::compileCreateEngine($sql, $connection, $blueprint),
             $connection,
             $blueprint
         );

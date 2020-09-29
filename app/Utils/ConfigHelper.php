@@ -6,9 +6,7 @@ use App\Configuration;
 
 class ConfigHelper
 {
-    const NAME = 'dsquare';
-
-    protected static $socialLoginEnabled = null;
+    const NAME = 'starter';
 
     public static function get($key = null, $default = null)
     {

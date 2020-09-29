@@ -41,6 +41,10 @@ return [
         'admin' => (bool)env('ADMIN_FORGOT_PASSWORD_ENABLED', false),
     ],
     'impersonated_by_admin' => (bool)env('IMPERSONATED_BY_ADMIN_ENABLED', true),
+    'throttle_request' => [
+        'max_attempts' => (int)env('THROTTLE_REQUEST_MAX_ATTEMPTS', 60),
+        'decay_minutes' => (int)env('THROTTLE_REQUEST_DECAY_MINUTES', 1),
+    ],
     'api_response_ok' => (bool)env('API_RESPONSE_OK', false),
     'api_response_headers' => [
         'Content-Type' => 'application/json; charset=utf-8',

@@ -15,6 +15,9 @@ class CreateCacheTable extends Migration
     {
         if (config('cache.default') === 'database') {
             Schema::create('sys_cache', function (Blueprint $table) {
+                $table->engine = 'InnoDB';
+                $table->rowFormat = 'DYNAMIC';
+
                 $table->string('key')->unique();
                 $table->text('value');
                 $table->integer('expiration');

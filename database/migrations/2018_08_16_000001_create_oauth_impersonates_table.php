@@ -13,8 +13,11 @@ class CreateOAuthImpersonatesTable extends Migration
      */
     public function up()
     {
-        if (config('dsquare.impersonated_by_admin')) {
+        if (config('starter.impersonated_by_admin')) {
             Schema::create('oauth_impersonates', function (Blueprint $table) {
+                $table->engine = 'InnoDB';
+                $table->rowFormat = 'DYNAMIC';
+
                 $table->increments('id');
                 $table->integer('user_id')->unsigned();
                 $table->integer('via_user_id')->unsigned();
