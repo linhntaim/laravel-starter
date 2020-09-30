@@ -113,7 +113,7 @@ Route::group([
 
     Route::group([
         'prefix' => 'admin',
-        'middleware' => ['admin', 'authorized.admin'],
+        'middleware' => ['admin'],
     ], function () {
         // Anonymous
         Route::group([

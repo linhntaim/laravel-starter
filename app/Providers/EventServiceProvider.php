@@ -23,6 +23,12 @@ use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
+// TODO: Extra Events
+
+// TODO
+// TODO: Extra Listeners
+
+// TODO
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -56,6 +62,9 @@ class EventServiceProvider extends ServiceProvider
         MailTestingEvent::class => [
             OnMailTestingEvent::class,
         ],
+        // TODO: Register Events with Listeners
+
+        // TODO
     ];
 
     /**
