@@ -1,10 +1,14 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http\Middleware;
 
+use App\Http\Requests\Request;
 use App\Utils\Framework\ClientLimiter;
 use Closure;
-use App\Http\Requests\Request;
 
 class CheckForClientLimitation
 {

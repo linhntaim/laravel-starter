@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http\Middleware;
 
 use App\Http\Requests\Request;
@@ -11,7 +15,7 @@ trait AdminMiddlewareTrait
     {
         return $request->hasAdminViaMiddleware() ?
             $request->admin()
-            : $request->setAdminViaMiddleware((new AdminRepository())->notStrict()->getById($this->auth->user()->id))
+            : $request->setAdminViaMiddleware((new AdminRepository())->notStrict()->getById($request->user()->id))
                 ->admin();
     }
 }

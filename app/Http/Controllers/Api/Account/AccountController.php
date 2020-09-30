@@ -1,10 +1,14 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http\Controllers\Api\Account;
 
+use App\Exceptions\AppException;
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
-use App\Exceptions\AppException;
 use App\ModelRepositories\UserRepository;
 use App\ModelResources\UserAccountResource;
 

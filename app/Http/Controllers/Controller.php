@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Request;
@@ -17,7 +21,7 @@ use Illuminate\Routing\Controller as BaseController;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-    use ClassTrait, AbortTrait, TransactionTrait, ModelTransformTrait, ValidationTrait, ItemsPerPageTrait;
+    use ClassTrait, AbortTrait, TransactionTrait, ModelTransformTrait, ValidationTrait, PagingTrait;
 
     /**
      * @param Request $request

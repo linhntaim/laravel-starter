@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Exports\RoleIndexModelExport;
@@ -79,7 +83,6 @@ class RoleController extends ModelApiController
 
     protected function updateExecute(Request $request)
     {
-        $this->modelRepository->model();
         return $this->modelRepository->updateWithAttributes(
             [
                 'name' => $request->input('name'),

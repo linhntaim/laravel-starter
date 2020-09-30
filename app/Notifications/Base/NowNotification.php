@@ -1,8 +1,11 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Notifications\Base;
 
-use App\Configuration;
 use App\ModelRepositories\UserRepository;
 use App\Models\Base\IUser;
 use App\Models\User;

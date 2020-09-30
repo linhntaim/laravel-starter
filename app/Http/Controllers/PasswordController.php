@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Request;
@@ -10,16 +14,13 @@ use Illuminate\Support\Facades\Password;
 
 abstract class PasswordController extends ModelApiController
 {
+    use PasswordBrokerTrait;
+
     public function __construct()
     {
         parent::__construct();
 
         $this->modelRepository = new PasswordResetRepository();
-    }
-
-    protected function broker()
-    {
-        return Password::broker();
     }
 
     public function index(Request $request)
@@ -40,15 +41,13 @@ abstract class PasswordController extends ModelApiController
         $email = $this->modelRepository->getEmailByToken($request->input('token'));
         if (empty($email)) return $this->abort404();
 
-        $passwordBroker = $this->broker();
-
-        $user = $passwordBroker->getUser([
+        $user = $this->brokerGetUser([
             'email' => $email,
         ]);
         if (is_null($user)) {
             return $this->responseFail(trans(Password::INVALID_USER));
         }
-        if (!$passwordBroker->tokenExists($user, $request->input('token'))) {
+        if (!$this->brokerTokenExists($user, $request->input('token'))) {
             return $this->abort404();
         }
 
@@ -75,7 +74,7 @@ abstract class PasswordController extends ModelApiController
             'email' => 'required|email',
         ]);
 
-        $response = $this->broker()->sendResetLink([
+        $response = $this->brokerSendResetLink([
             'email' => $request->input('email'),
         ]);
 
@@ -97,7 +96,7 @@ abstract class PasswordController extends ModelApiController
     {
         $this->validated($request, $this->resetValidatedRules());
 
-        $response = $this->broker()->reset(
+        $response = $this->brokerReset(
             [
                 'email' => $request->input('email'),
                 'password' => $request->input('password'),

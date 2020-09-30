@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Vendors\League\OAuth2\Server\ResponseTypes;
 
 use App\Http\Controllers\ApiController;
@@ -21,7 +25,7 @@ class BearerTokenResponse extends BaseBearerTokenResponse
         ];
 
         if ($this->refreshToken instanceof RefreshTokenEntityInterface) {
-            $refreshTokenPayload = json_encode([
+            $refreshTokenPayload = \json_encode([
                 'client_id' => $this->accessToken->getClient()->getIdentifier(),
                 'refresh_token_id' => $this->refreshToken->getIdentifier(),
                 'access_token_id' => $this->accessToken->getIdentifier(),
@@ -37,7 +41,7 @@ class BearerTokenResponse extends BaseBearerTokenResponse
             $responseParams['refresh_token'] = $this->encrypt($refreshTokenPayload);
         }
 
-        $responseParams = json_encode(ApiController::successPayload(array_merge($this->getExtraParams($this->accessToken), $responseParams)));
+        $responseParams = \json_encode(ApiController::successPayload(\array_merge($this->getExtraParams($this->accessToken), $responseParams)));
 
         if ($responseParams === false) {
             throw new LogicException('Error encountered JSON encoding response parameters');

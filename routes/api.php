@@ -117,7 +117,7 @@ Route::group([
             'middleware' => ['authenticated.passport.request', 'auth:api', 'authorized.admin', 'impersonate'],
         ], function () {
             Route::group([
-                'middleware' => 'authorized.permissions:be-super-admin',
+                'middleware' => 'authorized.admin.permissions:be-super-admin',
             ], function () {
                 Route::group([
                     'prefix' => 'command',
@@ -161,13 +161,13 @@ Route::group([
                 'prefix' => 'role',
             ], function () {
                 Route::get('/', [AdminRoleController::class, 'index'])
-                    ->middleware('authorized.permissions:role-manage');
+                    ->middleware('authorized.admin.permissions:role-manage');
                 Route::post('/', [AdminRoleController::class, 'store'])
-                    ->middleware('authorized.permissions:role-manage');
+                    ->middleware('authorized.admin.permissions:role-manage');
                 Route::get('{id}', [AdminRoleController::class, 'show'])
-                    ->middleware('authorized.permissions:role-manage');
+                    ->middleware('authorized.admin.permissions:role-manage');
                 Route::post('{id}', [AdminRoleController::class, 'update'])
-                    ->middleware('authorized.permissions:role-manage');
+                    ->middleware('authorized.admin.permissions:role-manage');
             });
 
             // TODO: Expand Admin API

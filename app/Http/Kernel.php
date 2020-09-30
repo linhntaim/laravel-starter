@@ -1,14 +1,17 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http;
 
-use App\Configuration;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\AuthenticatedByPassportViaCookie;
 use App\Http\Middleware\AuthenticatedByPassportViaHeader;
 use App\Http\Middleware\AuthenticatedByPassportViaRequest;
 use App\Http\Middleware\AuthorizedWithAdmin;
-use App\Http\Middleware\AuthorizedWithPermissions;
+use App\Http\Middleware\AuthorizedWithAdminPermissions;
 use App\Http\Middleware\Device;
 use App\Http\Middleware\Impersonate;
 use App\Http\Middleware\OverrideAuthorizationHeader;
@@ -82,8 +85,8 @@ class Kernel extends HttpKernel
         'authenticated.passport.cookie' => AuthenticatedByPassportViaCookie::class,
         'authenticated.passport.header' => AuthenticatedByPassportViaHeader::class,
         'authenticated.passport.request' => AuthenticatedByPassportViaRequest::class,
-        'authorized.permissions' => AuthorizedWithPermissions::class,
         'authorized.admin' => AuthorizedWithAdmin::class,
+        'authorized.admin.permissions' => AuthorizedWithAdminPermissions::class,
         'admin' => AdminMiddleware::class,
         'impersonate' => Impersonate::class,
     ];
@@ -107,7 +110,7 @@ class Kernel extends HttpKernel
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
 
         AuthorizedWithAdmin::class,
-        AuthorizedWithPermissions::class,
+        AuthorizedWithAdminPermissions::class,
 
         \Illuminate\Auth\Middleware\Authorize::class,
     ];
