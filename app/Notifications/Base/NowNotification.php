@@ -6,15 +6,18 @@
 
 namespace App\Notifications\Base;
 
+use App\Exceptions\AppException;
 use App\ModelRepositories\UserRepository;
 use App\Models\Base\IUser;
 use App\Models\User;
 use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\DateTimer;
 use App\Utils\ClientSettings\Facade;
+use App\Utils\ConfigHelper;
 use App\Utils\Mail\TemplateMailable;
 use App\Utils\Mail\TemplateNowMailable;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification as BaseNotification;
 use Illuminate\Support\Facades\Notification;
@@ -24,7 +27,7 @@ abstract class NowNotification extends BaseNotification
     use ClassTrait;
 
     const VIA_DATABASE = 'database';
-    const VIA_WEB = 'broadcast';
+    const VIA_BROADCAST = 'broadcast';
     const VIA_MAIL = 'mail';
     const VIA_IOS = 'ios';
     const VIA_ANDROID = 'android';
@@ -36,12 +39,6 @@ abstract class NowNotification extends BaseNotification
         return 'notification';
     }
 
-    public $shouldStore;
-    public $shouldWeb;
-    public $shouldMail;
-    public $shouldIos;
-    public $shouldAndroid;
-
     /**
      * @var IUser
      */
@@ -49,12 +46,6 @@ abstract class NowNotification extends BaseNotification
 
     public function __construct(IUser $notifier = null)
     {
-        $this->shouldWeb = false;
-        $this->shouldStore = false;
-        $this->shouldMail = false;
-        $this->shouldIos = false;
-        $this->shouldAndroid = false;
-
         $this->setNotifier($notifier);
     }
 
@@ -67,58 +58,56 @@ abstract class NowNotification extends BaseNotification
         return $this;
     }
 
-    public function shouldWeb()
+    public function shouldDatabase()
     {
-        $this->shouldWeb = true;
-        return $this;
+        return false;
     }
 
-    public function shouldStore()
+    public function shouldBroadcast()
     {
-        $this->shouldStore = true;
-        return $this;
-    }
-
-    public function shouldIos()
-    {
-        $this->shouldIos = true;
-        return $this;
-    }
-
-    public function shouldAndroid()
-    {
-        $this->shouldAndroid = true;
-        return $this;
+        return false;
     }
 
     public function shouldMail()
     {
-        $this->shouldMail = true;
-        return $this;
+        return false;
+    }
+
+    public function shouldIos()
+    {
+        return false;
+    }
+
+    public function shouldAndroid()
+    {
+        return false;
     }
 
     protected function shouldSomething()
     {
-        return $this->shouldMail || $this->shouldWeb || $this->shouldStore
-            || $this->shouldIos || $this->shouldAndroid;
+        return $this->shouldDatabase() || $this->shouldBroadcast() || $this->shouldMail()
+            || $this->shouldIos() || $this->shouldAndroid();
     }
 
     public function via(IUser $notifiable)
     {
         $via = [];
-        if ($this->shouldStore) {
+        if ($this->shouldDatabase()) {
+            if (!ConfigHelper::get('notification.via.database')) {
+                throw new AppException('Notification via database is not enabled');
+            }
             $via[] = static::VIA_DATABASE;
         }
-        if ($this->shouldWeb) {
-            $via[] = static::VIA_WEB;
+        if ($this->shouldBroadcast()) {
+            $via[] = static::VIA_BROADCAST;
         }
-        if ($this->shouldMail) {
+        if ($this->shouldMail()) {
             $via[] = static::VIA_MAIL;
         }
-        if ($this->shouldIos) {
+        if ($this->shouldIos()) {
             $via[] = static::VIA_IOS;
         }
-        if ($this->shouldAndroid) {
+        if ($this->shouldAndroid()) {
             $via[] = static::VIA_ANDROID;
         }
         return $via;
@@ -143,7 +132,7 @@ abstract class NowNotification extends BaseNotification
 
     public function toBroadcast(IUser $notifiable)
     {
-        return $this->resolveData(static::VIA_WEB, $notifiable, function (IUser $notifiable) {
+        return $this->resolveData(static::VIA_BROADCAST, $notifiable, function (IUser $notifiable) {
             return $this->dataBroadcast($notifiable);
         });
     }
@@ -251,12 +240,12 @@ abstract class NowNotification extends BaseNotification
         ];
     }
 
-    protected function getTitle(IUser $notifiable)
+    public function getTitle(IUser $notifiable)
     {
         return null;
     }
 
-    protected function getContent(IUser $notifiable, $html = true)
+    public function getContent(IUser $notifiable, $html = true)
     {
         return null;
     }
@@ -313,9 +302,13 @@ abstract class NowNotification extends BaseNotification
             || !$this->shouldSomething();
     }
 
-    public function send()
+    public function send($notifiables = null)
     {
-        $notifiables = $this->getNotifiables();
+        $notifiables = $notifiables ? $notifiables : $this->getNotifiables();
+
+        if ($notifiables instanceof Model) {
+            $notifiables = [$notifiables];
+        }
 
         if ($this->cannotSend($notifiables)) return false;
 

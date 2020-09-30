@@ -7,8 +7,9 @@
 namespace App\Events;
 
 use App\Utils\ClientSettings\Capture;
+use Illuminate\Queue\SerializesModels;
 
 abstract class Event
 {
-    use Capture;
+    use SerializesModels, Capture;
 }

@@ -28,12 +28,9 @@ class AdminAccountController extends ModelApiController
 
     public function index(Request $request)
     {
-        $model = $this->modelRepository->notStrict()->getById($request->user()->id);
-        if (empty($model)) {
-            throw new AppException(static::__transErrorWithModule('not_found'));
-        }
         return $this->responseModel(
-            $this->setModelResourceClass(AdminAccountResource::class)->modelTransform($model),
+            $this->setModelResourceClass(AdminAccountResource::class)
+                ->modelTransform($this->modelRepository->getById($request->user()->id)),
             $request->hasImpersonator() ? [
                 'impersonator' => $this->setModelResourceClass(AdminAccountResource::class)
                     ->modelTransform($request->impersonator()),

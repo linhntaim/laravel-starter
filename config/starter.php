@@ -65,6 +65,11 @@ return [
             'inline' => (bool)env('HANDLED_FILE_IMAGE_INLINE'),
         ],
     ],
+    'notification' => [
+        'via' => [
+            'database' => (bool)env('NOTIFICATION_VIA_DATABASE', false),
+        ],
+    ],
     'variables' => json_decode(env('VARIABLES'), true),
     'client_limit_timeout' => (int)env('CLIENT_LIMIT_TIMEOUT'),
     'clients' => [

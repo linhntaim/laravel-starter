@@ -73,6 +73,7 @@ abstract class PrerequisiteController extends ApiController
                     ],
                 ],
                 'forgot_password_enabled' => ConfigHelper::get('forgot_password_enabled'),
+                'notification_via_database' => ConfigHelper::get('notification.via.database'),
             ];
         }
     }

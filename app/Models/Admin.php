@@ -58,14 +58,15 @@ class Admin extends ExtendedUserModel
     #region Get Attributes
     public function getRoleAttribute()
     {
-        if (!$this->memorized('role') || $this->remind('role')->id != $this->attributes['role_id']) {
+        return $this->remind('role', function () {
             $role = $this->role()->first();
             if (!empty($role)) {
                 $role->load('permissions');
             }
-            $this->memorize('role', $role);
-        }
-        return $this->remind('role');
+            return $role;
+        }, function ($memorizedRole) {
+            return $memorizedRole->id == $this->attributes['role_id'];
+        });
     }
 
     public function getRoleNameAttribute()
@@ -76,7 +77,7 @@ class Admin extends ExtendedUserModel
 
     public function getPermissionNamesAttribute()
     {
-        if (!$this->memorized('permission_names')) {
+        return $this->remind('permission_names', function () {
             $role = $this->role;
             $permissionNames = null;
             if (!empty($role)) {
@@ -87,9 +88,8 @@ class Admin extends ExtendedUserModel
                     }
                 });
             }
-            $this->memorize('permission_names', $permissionNames);
-        }
-        return $this->remind('permission_names');
+            return $permissionNames;
+        });
     }
 
     public function getAvatarUrlAttribute()
@@ -108,6 +108,7 @@ class Admin extends ExtendedUserModel
     {
         return $this->belongsTo(HandledFile::class, 'avatar_id', 'id');
     }
+
     #endregion
 
     public function sendPasswordResetNotification($token)

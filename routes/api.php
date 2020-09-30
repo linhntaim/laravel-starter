@@ -1,7 +1,12 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 use App\Http\Controllers\Api\Account\AccountController;
 use App\Http\Controllers\Api\Account\AdminAccountController;
+use App\Http\Controllers\Api\Account\AdminNotificationController;
 
 // TODO: Import Account Controller
 
@@ -83,10 +88,17 @@ Route::group([
 
             Route::group([
                 'prefix' => 'admin',
-                'middleware' => 'admin',
+                'middleware' => ['admin', 'authorized.admin'],
             ], function () {
                 Route::get('/', [AdminAccountController::class, 'index']);
                 Route::post('/', [AdminAccountController::class, 'store']);
+
+                Route::group([
+                    'prefix' => 'notification',
+                ], function () {
+                    Route::get('/', [AdminNotificationController::class, 'index']);
+                    Route::post('{id}', [AdminNotificationController::class, 'update']);
+                });
             });
         });
     });
@@ -101,7 +113,7 @@ Route::group([
 
     Route::group([
         'prefix' => 'admin',
-        'middleware' => 'admin',
+        'middleware' => ['admin', 'authorized.admin'],
     ], function () {
         // Anonymous
         Route::group([
