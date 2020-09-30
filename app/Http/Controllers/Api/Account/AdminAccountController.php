@@ -1,11 +1,15 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http\Controllers\Api\Account;
 
+use App\Exceptions\AppException;
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\AdminRepository;
-use App\Exceptions\AppException;
 use App\ModelRepositories\UserRepository;
 use App\ModelResources\AdminAccountResource;
 use App\Models\Admin;
@@ -24,12 +28,9 @@ class AdminAccountController extends ModelApiController
 
     public function index(Request $request)
     {
-        $model = $this->modelRepository->notStrict()->getById($request->user()->id);
-        if (empty($model)) {
-            throw new AppException(static::__transErrorWithModule('not_found'));
-        }
         return $this->responseModel(
-            $this->setModelResourceClass(AdminAccountResource::class)->modelTransform($model),
+            $this->setModelResourceClass(AdminAccountResource::class)
+                ->modelTransform($this->modelRepository->getById($request->user()->id)),
             $request->hasImpersonator() ? [
                 'impersonator' => $this->setModelResourceClass(AdminAccountResource::class)
                     ->modelTransform($request->impersonator()),
@@ -153,4 +154,8 @@ class AdminAccountController extends ModelApiController
             ])
         );
     }
+
+    // TODO:　Extra handles
+
+    // TODO
 }

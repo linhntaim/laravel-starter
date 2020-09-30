@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Notifications;
 
 use App\Models\Base\IUser;
@@ -18,8 +22,11 @@ class AdminResetPasswordNotification extends AdminNowNotification
         $this->token = $token;
 
         $this->appResetPasswordPath = request()->input('app_reset_password_path');
+    }
 
-        $this->shouldMail();
+    public function shouldMail()
+    {
+        return true;
     }
 
     protected function getMailTemplate(IUser $notifiable)

@@ -1,17 +1,23 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Models;
 
 use App\ModelResources\UserResource;
 use App\Models\Base\IResource;
 use App\Models\Base\IUser;
 use App\Models\Base\IUserHasSettings;
+use App\Models\Base\NotificationTrait;
 use App\ModelTraits\OnlyAttributesToArrayTrait;
 use App\ModelTraits\MemorizeTrait;
 use App\ModelTraits\PassportTrait;
 use App\ModelTraits\ResourceTrait;
 use App\Utils\ClientSettings\Facade;
 use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -29,14 +35,19 @@ use Laravel\Passport\HasApiTokens;
  */
 class User extends Authenticatable implements HasLocalePreference, IUser, IResource
 {
-    use OnlyAttributesToArrayTrait, PassportTrait, HasApiTokens, Notifiable, MemorizeTrait, ResourceTrait, SoftDeletes;
+    use HasFactory, Notifiable, NotificationTrait {
+        NotificationTrait::notifications insteadof Notifiable;
+    }
+    use OnlyAttributesToArrayTrait, PassportTrait, HasApiTokens, MemorizeTrait, ResourceTrait, SoftDeletes;
 
     const USER_SYSTEM_ID = 1;
     const USER_SUPER_ADMINISTRATOR_ID = 2;
+    const USER_ADMINISTRATOR_ID = 3;
 
     const PROTECTED = [
         User::USER_SYSTEM_ID,
         User::USER_SUPER_ADMINISTRATOR_ID,
+        User::USER_ADMINISTRATOR_ID,
     ];
 
     protected $table = 'users';

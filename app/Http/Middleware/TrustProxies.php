@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http\Middleware;
 
 use Fideloper\Proxy\TrustProxies as Middleware;
@@ -10,7 +14,7 @@ class TrustProxies extends Middleware
     /**
      * The trusted proxies for this application.
      *
-     * @var array|string
+     * @var array|string|null
      */
     protected $proxies;
 

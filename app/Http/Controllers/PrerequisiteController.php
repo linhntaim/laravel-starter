@@ -1,8 +1,11 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http\Controllers;
 
-use App\Configuration;
 use App\Http\Requests\Request;
 use App\ModelRepositories\AppOptionRepository;
 use App\ModelRepositories\PermissionRepository;
@@ -53,8 +56,8 @@ abstract class PrerequisiteController extends ApiController
                 'url' => url('/'),
                 'ips' => $request->ips(),
                 'throttle_request' => [
-                    'max_attempts' => Configuration::THROTTLE_REQUEST_MAX_ATTEMPTS,
-                    'decay_minutes' => Configuration::THROTTLE_REQUEST_DECAY_MINUTES,
+                    'max_attempts' => ConfigHelper::get('throttle_request.max_attempts'),
+                    'decay_minutes' => ConfigHelper::get('throttle_request.decay_minutes'),
                 ],
                 'max_upload_file_size' => Helper::maxUploadFileSize(),
                 'variables' => ConfigHelper::get('variables'),
@@ -70,6 +73,7 @@ abstract class PrerequisiteController extends ApiController
                     ],
                 ],
                 'forgot_password_enabled' => ConfigHelper::get('forgot_password_enabled'),
+                'notification_via_database' => ConfigHelper::get('notification.via.database'),
             ];
         }
     }

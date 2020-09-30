@@ -1,7 +1,12 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Models\Base;
 
+use App\Models\DatabaseNotification;
 use App\Models\User;
 use App\ModelTraits\MemorizeTrait;
 use Illuminate\Auth\Passwords\CanResetPassword;
@@ -11,10 +16,14 @@ use Illuminate\Notifications\Notifiable;
  * Trait UserExtendedTrait
  * @package App\ModelTraits
  * @property User $user
+ * @property DatabaseNotification[] $notifications
  */
 abstract class ExtendedUserModel extends Model implements IUser
 {
-    use Notifiable, CanResetPassword, MemorizeTrait;
+    use Notifiable, NotificationTrait {
+        NotificationTrait::notifications insteadof Notifiable;
+    }
+    use CanResetPassword, MemorizeTrait;
 
     protected $primaryKey = 'user_id';
 

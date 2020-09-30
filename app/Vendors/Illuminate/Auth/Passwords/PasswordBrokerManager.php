@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Vendors\Illuminate\Auth\Passwords;
 
 use Closure;
@@ -28,24 +32,12 @@ class PasswordBrokerManager extends BasePasswordBrokerManager
         );
     }
 
-    protected function resolve($name)
-    {
-        if ($name == 'admins') {
-            $config = $this->getConfig($this->getDefaultDriver());
-            return new AdminPasswordBroker(
-                $this->createTokenRepository($config),
-                $this->app['auth']->createUserProvider($config['provider'] ?? null)
-            );
-        }
-        return parent::resolve($name);
-    }
-
     /**
      * @inheritDoc
      */
-    public function sendResetLink(array $credentials)
+    public function sendResetLink(array $credentials, Closure $callback = null)
     {
-        return $this->__call(__FUNCTION__, [$credentials]);
+        return $this->__call(__FUNCTION__, [$credentials, $callback]);
     }
 
     /**

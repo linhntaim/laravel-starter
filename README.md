@@ -317,6 +317,10 @@ Set the value to `true` to enable the application to handle the feature of forge
 
 Set the value to `true` to enable the feature of impersonating.
 
+#### THROTTLE_REQUEST_*
+
+Set the limitation for accessing API with max access (set in **`THROTTLE_REQUEST_MAX_ATTEMPTS`**) in a time of minutes (set in **`THROTTLE_REQUEST_DECAY_MINUTES`**).
+
 #### API_RESPONSE_OK
 
 Set the value to `true` to force all the API responses to return status of `200 OK` (include error responses).

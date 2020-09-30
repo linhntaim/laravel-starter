@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\ApiResponseTrait;
@@ -7,13 +11,13 @@ use App\ModelRepositories\OAuthImpersonateRepository;
 use App\Utils\ConfigHelper;
 use App\Utils\Helper;
 use Illuminate\Http\Response;
-use Laminas\Diactoros\Response as Psr7Response;
 use Laravel\Passport\Exceptions\OAuthServerException;
 use Laravel\Passport\Http\Controllers\AccessTokenController;
 use Laravel\Passport\TokenRepository;
 use Lcobucci\JWT\Parser as JwtParser;
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\Exception\OAuthServerException as LeagueException;
+use Nyholm\Psr7\Response as Psr7Response;
 use Psr\Http\Message\ServerRequestInterface;
 
 class LoginController extends AccessTokenController
@@ -65,6 +69,7 @@ class LoginController extends AccessTokenController
 
     protected function withErrorHandling($callback)
     {
+
         try {
             return $callback();
         } catch (LeagueException $e) {

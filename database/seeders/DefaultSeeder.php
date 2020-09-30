@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
+namespace Database\Seeders;
+
 use App\Models\Admin;
 use App\Models\Permission;
 use App\Models\Role;

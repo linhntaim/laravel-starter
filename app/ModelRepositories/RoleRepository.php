@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\ModelRepositories;
 
 use App\Exceptions\AppException;
@@ -62,7 +66,7 @@ class RoleRepository extends ModelRepository
      */
     public function createWithAttributes(array $attributes = [], array $permissions = [])
     {
-        $this->createWithAttributes($attributes);
+        parent::createWithAttributes($attributes);
         return $this->catch(function () use ($permissions) {
             if (count($permissions) > 0) {
                 $this->model->permissions()->attach($permissions);

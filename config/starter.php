@@ -41,6 +41,10 @@ return [
         'admin' => (bool)env('ADMIN_FORGOT_PASSWORD_ENABLED', false),
     ],
     'impersonated_by_admin' => (bool)env('IMPERSONATED_BY_ADMIN_ENABLED', true),
+    'throttle_request' => [
+        'max_attempts' => (int)env('THROTTLE_REQUEST_MAX_ATTEMPTS', 60),
+        'decay_minutes' => (int)env('THROTTLE_REQUEST_DECAY_MINUTES', 1),
+    ],
     'api_response_ok' => (bool)env('API_RESPONSE_OK', false),
     'api_response_headers' => [
         'Content-Type' => 'application/json; charset=utf-8',
@@ -59,6 +63,11 @@ return [
             'max_width' => (int)env('HANDLED_FILE_IMAGE_MAX_WIDTH'),
             'max_height' => (int)env('HANDLED_FILE_IMAGE_MAX_HEIGHT'),
             'inline' => (bool)env('HANDLED_FILE_IMAGE_INLINE'),
+        ],
+    ],
+    'notification' => [
+        'via' => [
+            'database' => (bool)env('NOTIFICATION_VIA_DATABASE', false),
         ],
     ],
     'variables' => json_decode(env('VARIABLES'), true),

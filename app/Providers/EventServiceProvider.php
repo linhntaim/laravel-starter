@@ -1,17 +1,23 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Providers;
 
+use App\Events\Listeners\OnMailTestingEvent;
 use App\Events\Listeners\OnMessageSending;
 use App\Events\Listeners\OnMessageSent;
 use App\Events\Listeners\OnNotificationSending;
 use App\Events\Listeners\OnNotificationSent;
 use App\Events\Listeners\OnQueryExecuted;
+use App\Events\Listeners\OnTestingEvent;
 use App\Events\MailTestingEvent;
 use App\Events\TestingEvent;
-use App\Events\Listeners\OnMailTestingEvent;
-use App\Events\Listeners\OnTestingEvent;
 use Illuminate\Database\Events\QueryExecuted;
+//use Illuminate\Auth\Events\Registered;
+//use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
@@ -26,6 +32,9 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
+        //Registered::class => [
+        //    SendEmailVerificationNotification::class,
+        //],
         QueryExecuted::class => [
             OnQueryExecuted::class,
         ],
@@ -56,6 +65,6 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        parent::boot();
+        //
     }
 }

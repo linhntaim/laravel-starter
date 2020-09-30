@@ -1,8 +1,13 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\ModelTraits;
 
 use Illuminate\Support\Str;
+use Mockery\Matcher\Closure;
 
 trait MemorizeTrait
 {
@@ -13,9 +18,20 @@ trait MemorizeTrait
         return isset($this->memories[$key]);
     }
 
-    protected function remind($key)
+    /**
+     * @param $key
+     * @param \Closure|callable|null $valueCallback
+     * @param \Closure|callable|null $revalidateCallback
+     * @return mixed|null
+     */
+    protected function remind($key, callable $valueCallback = null, callable $revalidateCallback = null)
     {
-        return isset($this->memories[$key]) ? $this->memories[$key] : null;
+        if ($this->memorized($key) && (is_null($revalidateCallback) || $revalidateCallback($this->memories[$key]))) {
+            return $this->memories[$key];
+        }
+        return $valueCallback ?
+            $this->memorize($key, $valueCallback())
+            : null;
     }
 
     protected function memorize($key, $value)
@@ -27,7 +43,7 @@ trait MemorizeTrait
     protected function unmemorized($key)
     {
         unset($this->memories[$key]);
-        return true;
+        return $this;
     }
 
     public function __call($name, $arguments)

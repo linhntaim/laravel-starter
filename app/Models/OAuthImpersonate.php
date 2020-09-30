@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Models;
 
 use App\Models\Base\Model;
@@ -45,12 +49,11 @@ class OAuthImpersonate extends Model
 
     public function getAdminAttribute()
     {
-        if (!$this->memorized('admin')) {
+        return $this->remind('admin', function () {
             $admin = $this->admin()->first();
             $admin->load('user');
-            $this->memorize('admin', $admin);
-        }
-        return $this->remind('admin');
+            return $admin;
+        });
     }
 
     public function admin()

@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Vendors\Illuminate\Auth\Passwords;
 
 use Illuminate\Auth\Passwords\DatabaseTokenRepository as BaseDatabaseTokenRepository;
@@ -17,8 +21,7 @@ class DatabaseTokenRepository extends BaseDatabaseTokenRepository
 
     public function createNewToken()
     {
-        while (($token = parent::createNewToken()) && $this->tokenExists($token)) {
-        }
+        while (($token = parent::createNewToken()) && $this->tokenExists($token)) ;
         return $token;
     }
 

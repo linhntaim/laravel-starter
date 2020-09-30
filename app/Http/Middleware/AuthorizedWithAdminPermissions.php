@@ -1,22 +1,18 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http\Middleware;
 
 use App\Http\Requests\Request;
 use App\Utils\AbortTrait;
 use Closure;
-use Illuminate\Contracts\Auth\Guard;
 
-class AuthorizedWithPermissions
+class AuthorizedWithAdminPermissions
 {
     use AbortTrait, AdminMiddlewareTrait;
-
-    protected $auth;
-
-    public function __construct(Guard $auth)
-    {
-        $this->auth = $auth;
-    }
 
     public function handle(Request $request, Closure $next, $permissions = null)
     {

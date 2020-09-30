@@ -1,14 +1,16 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Utils;
 
 use App\Configuration;
 
 class ConfigHelper
 {
-    const NAME = 'dsquare';
-
-    protected static $socialLoginEnabled = null;
+    const NAME = 'starter';
 
     public static function get($key = null, $default = null)
     {

@@ -1,14 +1,17 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http;
 
-use App\Configuration;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\AuthenticatedByPassportViaCookie;
 use App\Http\Middleware\AuthenticatedByPassportViaHeader;
 use App\Http\Middleware\AuthenticatedByPassportViaRequest;
 use App\Http\Middleware\AuthorizedWithAdmin;
-use App\Http\Middleware\AuthorizedWithPermissions;
+use App\Http\Middleware\AuthorizedWithAdminPermissions;
 use App\Http\Middleware\Device;
 use App\Http\Middleware\Impersonate;
 use App\Http\Middleware\OverrideAuthorizationHeader;
@@ -27,8 +30,8 @@ class Kernel extends HttpKernel
     protected $middleware = [
         // \App\Http\Middleware\TrustHosts::class,
         \App\Http\Middleware\TrustProxies::class,
-        // \Fruitcake\Cors\HandleCors::class,
-        \App\Http\Middleware\CheckForMaintenanceMode::class,
+        //\Fruitcake\Cors\HandleCors::class,
+        \App\Http\Middleware\PreventRequestsDuringMaintenance::class,
         \App\Http\Middleware\CheckForClientLimitation::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
@@ -42,17 +45,17 @@ class Kernel extends HttpKernel
      */
     protected $middlewareGroups = [
         'web' => [
-            // \App\Http\Middleware\EncryptCookies::class,
-            // \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            // \Illuminate\Session\Middleware\StartSession::class,
+            //\App\Http\Middleware\EncryptCookies::class,
+            //\Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            //\Illuminate\Session\Middleware\StartSession::class,
             // \Illuminate\Session\Middleware\AuthenticateSession::class,
-            // \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            // \App\Http\Middleware\VerifyCsrfToken::class,
-            // \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            //\Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            //\App\Http\Middleware\VerifyCsrfToken::class,
+            //\Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
 
         'api' => [
-            'throttle:' . Configuration::THROTTLE_REQUEST_MAX_ATTEMPTS . ',' . Configuration::THROTTLE_REQUEST_DECAY_MINUTES,
+            'throttle:api',
             OverrideAuthorizationHeader::class,
             Device::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
@@ -69,7 +72,6 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         'auth' => \App\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
-        'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
@@ -83,8 +85,8 @@ class Kernel extends HttpKernel
         'authenticated.passport.cookie' => AuthenticatedByPassportViaCookie::class,
         'authenticated.passport.header' => AuthenticatedByPassportViaHeader::class,
         'authenticated.passport.request' => AuthenticatedByPassportViaRequest::class,
-        'authorized.permissions' => AuthorizedWithPermissions::class,
         'authorized.admin' => AuthorizedWithAdmin::class,
+        'authorized.admin.permissions' => AuthorizedWithAdminPermissions::class,
         'admin' => AdminMiddleware::class,
         'impersonate' => Impersonate::class,
     ];
@@ -108,7 +110,7 @@ class Kernel extends HttpKernel
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
 
         AuthorizedWithAdmin::class,
-        AuthorizedWithPermissions::class,
+        AuthorizedWithAdminPermissions::class,
 
         \Illuminate\Auth\Middleware\Authorize::class,
     ];

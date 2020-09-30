@@ -1,11 +1,15 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http\Middleware;
 
-use Closure;
 use App\Http\Requests\Request;
 use App\Utils\ConfigHelper;
 use App\Utils\CryptoJs\AES;
+use Closure;
 
 class AuthenticatedByPassportViaCookie
 {

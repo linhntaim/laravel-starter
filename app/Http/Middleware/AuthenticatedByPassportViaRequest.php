@@ -1,10 +1,14 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http\Middleware;
 
 use App\Configuration;
-use Closure;
 use App\Http\Requests\Request;
+use Closure;
 
 class AuthenticatedByPassportViaRequest
 {

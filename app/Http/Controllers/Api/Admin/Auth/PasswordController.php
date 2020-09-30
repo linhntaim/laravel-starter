@@ -1,18 +1,26 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http\Controllers\Api\Admin\Auth;
 
 use App\Http\Controllers\PasswordController as BasePasswordController;
 use App\Http\Requests\Request;
+use App\ModelRepositories\AdminRepository;
 use App\Models\Admin;
 use App\Utils\ConfigHelper;
+use Closure;
 use Illuminate\Support\Facades\Password;
 
 class PasswordController extends BasePasswordController
 {
-    protected function broker()
+    protected function brokerSendResetLink(array $credentials, Closure $callback = null)
     {
-        return Password::broker('admins');
+        return parent::brokerSendResetLink($credentials, $callback ? $callback : function ($user, $token) {
+            (new AdminRepository())->model($user->id)->sendPasswordResetNotification($token);
+        });
     }
 
     public function index(Request $request)

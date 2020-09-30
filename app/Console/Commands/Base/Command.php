@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Console\Commands\Base;
 
 use App\Utils\ClassTrait;
@@ -7,7 +11,6 @@ use App\Utils\LogHelper;
 use App\Utils\ShellTrait;
 use Illuminate\Console\Command as BaseCommand;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
 
 abstract class Command extends BaseCommand
 {
