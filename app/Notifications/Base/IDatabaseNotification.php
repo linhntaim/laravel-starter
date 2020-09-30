@@ -6,7 +6,7 @@
 
 namespace App\Notifications\Base;
 
-use Illuminate\Notifications\DatabaseNotification;
+use App\Models\DatabaseNotification;
 
 interface IDatabaseNotification
 {

@@ -7,27 +7,40 @@
 namespace App\Notifications;
 
 use App\Models\Base\IUser;
+use App\Models\DatabaseNotification;
 use App\Notifications\Base\DatabaseNotificationTrait;
 use App\Notifications\Base\IDatabaseNotification;
 use App\Notifications\Base\NowNotification;
-use Illuminate\Notifications\DatabaseNotification;
 
 class TestNotification extends NowNotification implements IDatabaseNotification
 {
     use DatabaseNotificationTrait;
 
+    protected $test;
+
     public static function makeFromModel(DatabaseNotification $notification)
     {
-        return new static();
+        return new static($notification->getDataByKey('test', 'test'));
     }
 
-    public function getTitle(IUser $notifiable)
+    public function __construct($test = 'test', IUser $notifier = null)
     {
-        return static::__transWithCurrentModule('title');
+        parent::__construct($notifier);
+
+        $this->test = $test;
+    }
+
+    protected function dataDatabase(IUser $notifiable)
+    {
+        return array_merge(parent::dataDatabase($notifiable), [
+            'test' => $this->test,
+        ]);
     }
 
     public function getContent(IUser $notifiable, $html = true)
     {
-        return static::__transWithCurrentModule('content');
+        return static::__transWithCurrentModule('content', [
+            'test' => $this->test,
+        ]);
     }
 }

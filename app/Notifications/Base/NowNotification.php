@@ -242,12 +242,12 @@ abstract class NowNotification extends BaseNotification
 
     public function getTitle(IUser $notifiable)
     {
-        return null;
+        return static::__transWithCurrentModule('title');
     }
 
     public function getContent(IUser $notifiable, $html = true)
     {
-        return null;
+        return static::__transWithCurrentModule('content');
     }
 
     protected function getAction(IUser $notifiable)

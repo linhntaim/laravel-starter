@@ -12,6 +12,7 @@ use App\Notifications\Base\DatabaseNotificationFactory;
 use App\Notifications\Base\NowNotification;
 use App\Utils\ClientSettings\Facade;
 use Illuminate\Notifications\DatabaseNotification as BaseDatabaseNotification;
+use function GuzzleHttp\json_decode;
 
 /**
  * Class DatabaseNotification
@@ -21,6 +22,7 @@ use Illuminate\Notifications\DatabaseNotification as BaseDatabaseNotification;
  * @property string $content
  * @property string $sdStCreatedAt
  * @property string $sdStReadAt
+ * @property array|null $data
  * @property IUser $notifiable
  * @property NowNotification|mixed $notification
  */
@@ -42,6 +44,11 @@ class DatabaseNotification extends BaseDatabaseNotification
         'sd_st_created_at',
         'sd_st_read_at',
     ];
+
+    public function getDataAttribute()
+    {
+        return json_decode($this->attributes['data'], true);
+    }
 
     public function getNotifiableAttribute()
     {
@@ -87,5 +94,11 @@ class DatabaseNotification extends BaseDatabaseNotification
         return $this->read() ? Facade::dateTimer()->compound(
             'shortDate', ' ', 'shortTime', $this->attributes['read_at']
         ) : null;
+    }
+
+    public function getDataByKey($key, $default = null)
+    {
+        $data = $this->data;
+        return isset($data[$key]) ? $data[$key] : $default;
     }
 }

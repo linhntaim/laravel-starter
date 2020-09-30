@@ -18,12 +18,12 @@ class TestNotificationCommand extends Command
     protected function go()
     {
         $this->info('Test notification sending...');
-        $superAdmin = (new AdminRepository())->getById(User::USER_ADMINISTRATOR_ID);
-        (new TestNotification())->send($superAdmin);
+        $admin = (new AdminRepository())->getById(User::USER_ADMINISTRATOR_ID);
+        (new TestNotification('test', ))->send($admin);
         $this->info('Test notification sent!');
 
         $this->info('Notifications listing...');
-        foreach ($superAdmin->notifications as $notification) {
+        foreach ($admin->notifications as $notification) {
             $this->info('------------------------------------');
             $this->warn('Title:');
             $this->line($notification->title);

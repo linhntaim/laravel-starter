@@ -7,7 +7,7 @@
 namespace App\Notifications\Base;
 
 use App\Exceptions\AppException;
-use Illuminate\Notifications\DatabaseNotification;
+use App\Models\DatabaseNotification;
 
 class DatabaseNotificationFactory
 {

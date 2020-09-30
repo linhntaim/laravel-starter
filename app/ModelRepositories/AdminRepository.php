@@ -61,6 +61,8 @@ class AdminRepository extends DependedRepository
     public function syncDefaultPermissions()
     {
         // TODO: Sync default permissions
+
+        // TODO
         return $this->model;
     }
 
@@ -89,4 +91,8 @@ class AdminRepository extends DependedRepository
                 ->queryByIds($ids)
         );
     }
+
+    // TODO: Extra methods
+
+    // TODO
 }

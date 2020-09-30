@@ -183,4 +183,8 @@ class UserRepository extends ModelRepository
             ->getByEmail($email);
         return $this->restore();
     }
+
+    // TODO: Extra methods
+
+    // TODO
 }
