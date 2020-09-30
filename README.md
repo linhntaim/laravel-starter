@@ -95,6 +95,12 @@ php artisan test:event
 php artisan test:job
 ```
 
+### Test to send notification
+
+```
+php artisan test:notification
+```
+
 ### Test to send mail
 
 ```
@@ -368,6 +374,15 @@ the required packages will be automcatically installed by running [Setup migrati
     - If these configuration are set, the image will be automatically resized when it gets over the limitation of **`HANDLED_FILE_IMAGE_MAX_WIDTH`** as maximum width and **`HANDLED_FILE_IMAGE_MAX_HEIGHT`** as maximum height.
     - Leave values empty for no limitation.
 - **`HANDLED_FILE_IMAGE_INLINE`**: Set value to `true` and images will be stored in the database instead of local or cloud.
+
+#### NOTIFICATION_*
+
+##### NOTIFICATION_VIA_*
+
+- **`NOTIFICATION_VIA_DATABASE`**: 
+    - Set value to `true` to enable to store notification to database.
+    - When value is set to `database`, a table named `notifications` will be automatically created when running migration
+      (see `database/migrations/2018_08_15_000002_create_notifications_table.php` file) and notifications could be stored in this table.
 
 #### VARIABLES
 
