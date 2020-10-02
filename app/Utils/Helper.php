@@ -25,20 +25,22 @@ class Helper
         return empty($currentUser) ? $default : $currentUser->id;
     }
 
-    public static function table($table, $connection = null)
+    public static function table($table, $connection = null, $as = null)
     {
         if (empty($connection)) {
             $connection = config('database.default');
         }
-        return DB::connection($connection)->getTablePrefix() . $table;
+        return $as ? DB::raw(sprintf('%s%s as %s', DB::connection($connection)->getTablePrefix(), $table, $as))
+            : DB::connection($connection)->getTablePrefix() . $table;
     }
 
-    public static function column($column, $table, $connection = null)
+    public static function column($column, $table, $connection = null, $as = null)
     {
         if (empty($connection)) {
             $connection = config('database.default');
         }
-        return sprintf('%s.%s', static::table($table, $connection), $column);
+        return $as ? DB::raw(sprintf('%s.%s as %s', static::table($table, $connection), $column, $as))
+            : sprintf('%s.%s', static::table($table, $connection), $column);
     }
 
     public static function runInProductionMode()
