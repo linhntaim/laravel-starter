@@ -76,6 +76,7 @@ class Settings implements ISettings, Arrayable, Jsonable
         if (!is_null($locale) && in_array($locale, ConfigHelper::getLocaleCodes())) {
             $this->locale = $locale;
         }
+        return $this;
     }
 
     public function getLocale()
@@ -88,6 +89,7 @@ class Settings implements ISettings, Arrayable, Jsonable
         if (!is_null($country) && in_array($country, ConfigHelper::getCountryCodes())) {
             $this->country = $country;
         }
+        return $this;
     }
 
     public function getCountry()
@@ -100,6 +102,7 @@ class Settings implements ISettings, Arrayable, Jsonable
         if (!is_null($timezone) && in_array($timezone, DateTimer::getTimezoneValues())) {
             $this->timezone = $timezone;
         }
+        return $this;
     }
 
     public function getTimezone()
@@ -112,6 +115,7 @@ class Settings implements ISettings, Arrayable, Jsonable
         if (!is_null($currency) && in_array($currency, ConfigHelper::getCurrencyCodes())) {
             $this->currency = $currency;
         }
+        return $this;
     }
 
     public function getCurrency()
@@ -124,6 +128,7 @@ class Settings implements ISettings, Arrayable, Jsonable
         if (!is_null($numberFormat) && in_array($numberFormat, ConfigHelper::getNumberFormats())) {
             $this->numberFormat = $numberFormat;
         }
+        return $this;
     }
 
     public function getNumberFormat()
@@ -136,6 +141,7 @@ class Settings implements ISettings, Arrayable, Jsonable
         if (!is_null($firstDayOfWeek) && in_array($firstDayOfWeek, DateTimer::getDaysOfWeekValues())) {
             $this->firstDayOfWeek = $firstDayOfWeek;
         }
+        return $this;
     }
 
     public function getFirstDayOfWeek()
@@ -148,6 +154,7 @@ class Settings implements ISettings, Arrayable, Jsonable
         if (!is_null($longDateFormat) && in_array($longDateFormat, DateTimer::getLongDateFormatValues())) {
             $this->longDateFormat = $longDateFormat;
         }
+        return $this;
     }
 
     public function getLongDateFormat()
@@ -160,6 +167,7 @@ class Settings implements ISettings, Arrayable, Jsonable
         if (!is_null($shortDateFormat) && in_array($shortDateFormat, DateTimer::getShortDateFormatValues())) {
             $this->shortDateFormat = $shortDateFormat;
         }
+        return $this;
     }
 
     public function getShortDateFormat()
@@ -172,6 +180,7 @@ class Settings implements ISettings, Arrayable, Jsonable
         if (!is_null($longTimeFormat) && in_array($longTimeFormat, DateTimer::getLongTimeFormatValues())) {
             $this->longTimeFormat = $longTimeFormat;
         }
+        return $this;
     }
 
     public function getLongTimeFormat()
@@ -184,6 +193,7 @@ class Settings implements ISettings, Arrayable, Jsonable
         if (!is_null($shortTimeFormat) && DateTimer::getShortTimeFormatValues()) {
             $this->shortTimeFormat = $shortTimeFormat;
         }
+        return $this;
     }
 
     public function getShortTimeFormat()
