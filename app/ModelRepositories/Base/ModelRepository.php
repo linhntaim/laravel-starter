@@ -7,6 +7,7 @@
 namespace App\ModelRepositories\Base;
 
 use App\Configuration;
+use App\Exceptions\AppException;
 use App\Exceptions\DatabaseException;
 use App\Exceptions\Exception;
 use App\Utils\AbortTrait;
@@ -186,13 +187,27 @@ abstract class ModelRepository
     /**
      * @param Model|mixed|null $id
      * @return Model|mixed|null
+     * @throws
      */
     public function model($id = null)
     {
-        if (!empty($id)) {
-            $this->model = $id instanceof Model ? $id : $this->getById($id);
+        if (!is_null($id)) {
+            if ($id instanceof Model) {
+                if (get_class($id) != $this->modelClass) {
+                    throw new AppException('Model does not match the class');
+                }
+                $this->model = $id;
+            } else {
+                $this->model = $this->getById($id);
+            }
         }
         return $this->model;
+    }
+
+    public function withModel($id = null)
+    {
+        $this->model($id);
+        return $this;
     }
 
     public function doesntHaveModel()
@@ -214,6 +229,15 @@ abstract class ModelRepository
     public function getId()
     {
         return empty($this->model) ? null : $this->model->getKey();
+    }
+
+    /**
+     * @param Model|int|mixed $id
+     * @return mixed
+     */
+    public function retrieveId($id)
+    {
+        return $id instanceof Model ? $id->getKey() : $id;
     }
 
     /**
