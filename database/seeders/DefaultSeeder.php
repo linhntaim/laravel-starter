@@ -87,6 +87,11 @@ class DefaultSeeder extends Seeder
         $this->output()->writeln(sprintf('Super admin: %s / %s', $this->superAdminEmail, $this->superAdminPassword));
 
         // Normal administrative users
+        $manageActivityLogs = Permission::query()->create([
+            'name' => 'activity-log-manage',
+            'display_name' => 'Manage activity logs',
+            'description' => 'Manage activity logs',
+        ]);
         $manageRoles = Permission::query()->create([
             'name' => 'role-manage',
             'display_name' => 'Manage roles',
@@ -104,6 +109,7 @@ class DefaultSeeder extends Seeder
             'description' => 'Admin',
         ]);
         $adminRole->permissions()->attach([
+            $manageActivityLogs->id,
             $manageRoles->id,
             $manageAdmins->id,
         ]);

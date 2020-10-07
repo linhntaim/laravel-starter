@@ -21,7 +21,7 @@ class UpdateByInTables extends Migration
             $table->integer('created_by')->after('id')->unsigned()->nullable();
 
             $table->foreign('created_by')->references('id')->on('users')
-                ->onUpdate('cascade')->onDelete('cascade');
+                ->onUpdate('cascade')->onDelete('set null');
         });
     }
 

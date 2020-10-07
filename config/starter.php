@@ -65,6 +65,7 @@ return [
             'inline' => (bool)env('HANDLED_FILE_IMAGE_INLINE'),
         ],
     ],
+    'activity_log_enabled' => (bool)env('ACTIVITY_LOG_ENABLED'),
     'notification' => [
         'via' => [
             'database' => (bool)env('NOTIFICATION_VIA_DATABASE', false),
@@ -116,6 +117,7 @@ return [
         'disabled' => (bool)env('ADMIN_DISABLED', false),
     ],
     'headers' => [
+        'screen' => env('HEADER_SCREEN_NAME'),
         'settings' => env('HEADER_SETTINGS_NAME'),
         'device' => env('HEADER_DEVICE_NAME'),
         'token_authorization' => env('HEADER_TOKEN_AUTHORIZATION_NAME'),

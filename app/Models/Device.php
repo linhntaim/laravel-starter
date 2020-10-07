@@ -35,5 +35,12 @@ class Device extends Model
     protected $visible = [
         'provider',
         'secret',
+        'client_ips',
+        'client_agent',
     ];
+
+    public function getClientIpsAttribute()
+    {
+        return json_decode($this->attributes['client_ips']);
+    }
 }

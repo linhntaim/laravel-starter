@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\Account\AdminNotificationController;
 
 use App\Http\Controllers\Api\Admin\Auth\RegisterController as AdminRegisterController;
 use App\Http\Controllers\Api\Admin\Auth\PasswordController as AdminPasswordController;
+use App\Http\Controllers\Api\Admin\ActivityLogController as AdminActivityLogController;
 use App\Http\Controllers\Api\Admin\CommandController as AdminCommandController;
 use App\Http\Controllers\Api\Admin\SystemLogController as AdminSystemLogController;
 use App\Http\Controllers\Api\Admin\AppOptionController as AdminAppOptionController;
@@ -167,6 +168,15 @@ Route::group([
                 Route::post('/', [AdminHandledFileController::class, 'store']);
                 Route::post('ck-editor-simple-upload', [AdminHandledFileController::class, 'storeCkEditorSimpleUpload']);
                 Route::post('{id}', [AdminHandledFileController::class, 'update']);
+            });
+
+            Route::group([
+                'prefix' => 'activity-log',
+            ], function () {
+                Route::get('/', [AdminActivityLogController::class, 'index'])
+                    ->middleware('authorized.admin.permissions:activity-log-manage');
+                Route::get('{id}', [AdminActivityLogController::class, 'show'])
+                    ->middleware('authorized.admin.permissions:activity-log-manage');
             });
 
             Route::group([

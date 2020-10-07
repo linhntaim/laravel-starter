@@ -37,13 +37,17 @@ abstract class ModelApiController extends ApiController
             return $this->export($request);
         }
 
-        $models = $this->modelRepository->sort($this->sortBy(), $this->sortOrder())
+        return $this->responseModel($this->indexExecute($request));
+    }
+
+    protected function indexExecute(Request $request)
+    {
+        return $this->modelRepository->sort($this->sortBy(), $this->sortOrder())
             ->search(
                 $this->search($request),
                 $this->paging(),
                 $this->itemsPerPage()
             );
-        return $this->responseModel($models);
     }
     #endregion
 
@@ -184,19 +188,27 @@ abstract class ModelApiController extends ApiController
     public function bulkDestroy(Request $request)
     {
         $this->bulkDestroyValidated($request);
-        $ids = $request->input('ids');
         $this->transactionStart();
-        $this->modelRepository->deleteWithIds($ids);
+        $this->bulkDestroyExecute($request, $request->input('ids'));
         return $this->responseSuccess();
+    }
+
+    protected function bulkDestroyExecute(Request $request, $ids)
+    {
+        $this->modelRepository->deleteWithIds($ids);
     }
 
     public function destroy(Request $request, $id)
     {
         $this->modelRepository->model($id);
-        $ids = [$id];
         $this->transactionStart();
-        $this->modelRepository->deleteWithIds($ids);
+        $this->destroyExecute($request);
         return $this->responseSuccess();
+    }
+
+    protected function destroyExecute(Request $request)
+    {
+        $this->modelRepository->delete();
     }
     #endregion
 

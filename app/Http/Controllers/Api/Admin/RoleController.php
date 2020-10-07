@@ -6,10 +6,13 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Exports\Base\Export;
 use App\Exports\RoleIndexModelExport;
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\RoleRepository;
+use App\Models\ActivityLog;
+use App\Models\Role;
 use Illuminate\Validation\Rule;
 
 class RoleController extends ModelApiController
@@ -40,9 +43,28 @@ class RoleController extends ModelApiController
         return $search;
     }
 
+    protected function indexExecute(Request $request)
+    {
+        $models = parent::indexExecute($request);
+        $this->logAction(ActivityLog::ACTION_LIST, null, [
+            'model' => Role::class,
+            'params' => $request->all(),
+        ]);
+        return $models;
+    }
+
     protected function indexModelExporterClass(Request $request)
     {
         return RoleIndexModelExport::class;
+    }
+
+    protected function exportExecute(Request $request, Export $exporter = null)
+    {
+        parent::exportExecute($request, $exporter);
+        $this->logAction(ActivityLog::ACTION_EXPORT, null, [
+            'model' => Role::class,
+            'params' => $request->all(),
+        ]);
     }
 
     protected function storeValidatedRules(Request $request)
@@ -56,7 +78,7 @@ class RoleController extends ModelApiController
 
     protected function storeExecute(Request $request)
     {
-        return $this->modelRepository->createWithAttributes(
+        $model = $this->modelRepository->createWithAttributes(
             [
                 'name' => $request->input('name'),
                 'display_name' => $request->input('display_name'),
@@ -64,6 +86,11 @@ class RoleController extends ModelApiController
             ],
             $request->input('permissions')
         );
+        $this->logAction(ActivityLog::ACTION_CREATE, null, [
+            'model' => Role::class,
+            'params' => $request->all(),
+        ]);
+        return $model;
     }
 
     protected function updateValidatedRules(Request $request)
@@ -83,7 +110,7 @@ class RoleController extends ModelApiController
 
     protected function updateExecute(Request $request)
     {
-        return $this->modelRepository->updateWithAttributes(
+        $model = $this->modelRepository->updateWithAttributes(
             [
                 'name' => $request->input('name'),
                 'display_name' => $request->input('display_name'),
@@ -91,5 +118,29 @@ class RoleController extends ModelApiController
             ],
             $request->input('permissions')
         );
+        $this->logAction(ActivityLog::ACTION_EDIT, null, [
+            'model' => Role::class,
+            'id' => $this->modelRepository->getId(),
+            'params' => $request->all(),
+        ]);
+        return $model;
+    }
+
+    protected function bulkDestroyExecute(Request $request, $ids)
+    {
+        parent::bulkDestroyExecute($request, $ids);
+        $this->logAction(ActivityLog::ACTION_DELETE, null, [
+            'model' => Role::class,
+            'params' => $request->all(),
+        ]);
+    }
+
+    protected function destroyExecute(Request $request)
+    {
+        parent::destroyExecute($request);
+        $this->logAction(ActivityLog::ACTION_DELETE, null, [
+            'model' => Role::class,
+            'id' => $this->modelRepository->getId(),
+        ]);
     }
 }

@@ -15,6 +15,7 @@ use App\Http\Middleware\AuthorizedWithAdminPermissions;
 use App\Http\Middleware\Device;
 use App\Http\Middleware\Impersonate;
 use App\Http\Middleware\OverrideAuthorizationHeader;
+use App\Http\Middleware\Screen;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Laravel\Passport\Http\Middleware\CheckClientCredentials;
 
@@ -57,6 +58,7 @@ class Kernel extends HttpKernel
         'api' => [
             'throttle:api',
             OverrideAuthorizationHeader::class,
+            Screen::class,
             Device::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
@@ -98,6 +100,7 @@ class Kernel extends HttpKernel
         \Illuminate\Routing\Middleware\ThrottleRequests::class,
 
         OverrideAuthorizationHeader::class,
+        Screen::class,
         Device::class,
 
         \Illuminate\Session\Middleware\AuthenticateSession::class,

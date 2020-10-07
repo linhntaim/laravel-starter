@@ -17,12 +17,56 @@ trait ModelTransformTrait
     /**
      * @var string
      */
-    private $modelResourceClass;
+    private $temporaryModelResourceClass;
 
-    protected function setModelResourceClass($value)
+    /**
+     * @var array
+     */
+    private $temporaryModelResourceClasses = [];
+
+    /**
+     * @var string
+     */
+    private $fixedModelResourceClass;
+
+    /**
+     * @var array
+     */
+    private $fixedModelResourceClasses = [];
+
+    protected function setTemporaryModelResourceClass($modelResourceClass, $modelClass = null)
     {
-        $this->modelResourceClass = $value;
+        if (is_null($modelClass)) {
+            $this->temporaryModelResourceClass = $modelResourceClass;
+        } else {
+            if (is_null($modelResourceClass)) {
+                unset($this->temporaryModelResourceClasses[$modelClass]);
+            } else {
+                $this->temporaryModelResourceClasses[$modelClass] = $modelResourceClass;
+            }
+        }
         return $this;
+    }
+
+    protected function setFixedModelResourceClass($modelResourceClass, $modelClass = null)
+    {
+        if (is_null($modelClass)) {
+            $this->fixedModelResourceClass = $modelResourceClass;
+        } else {
+            if (is_null($modelResourceClass)) {
+                unset($this->fixedModelResourceClasses[$modelClass]);
+            } else {
+                $this->fixedModelResourceClasses[$modelClass] = $modelResourceClass;
+            }
+        }
+        return $this;
+    }
+
+    protected function setModelResourceClass($modelResourceClass, $fixed = false, $modelClass = null)
+    {
+        return $fixed ?
+            $this->setTemporaryModelResourceClass($modelResourceClass, $modelClass)
+            : $this->setFixedModelResourceClass($modelResourceClass, $modelClass);
     }
 
     /**
@@ -44,19 +88,47 @@ trait ModelTransformTrait
      */
     private function getModelResource($model)
     {
-        $resourceModel = $model instanceof Model ?
-            $model : ($model->count() > 0 ? ($model instanceof Collection ? $model->first() : $model->items()[0]) : null);
-        $resourceClass = !is_null($this->modelResourceClass) ?
-            $this->modelResourceClass
-            : ($resourceModel && $resourceModel instanceof IResource ?
-                $resourceModel->getResourceClass() : null);
-        if (is_null($resourceClass)) {
-            $resourceClass = ModelResource::class;
-        }
+        $modelResourceClass = $this->getModelResourceClass(
+            $model instanceof Model ?
+                $model : ($model->count() > 0 ? ($model instanceof Collection ? $model->first() : $model->items()[0]) : null)
+        );
         $modelResource = $model instanceof Collection || $model instanceof LengthAwarePaginator ?
-            $resourceClass::collection($model)
-            : ($model instanceof Model ? new $resourceClass($model) : null);
+            $modelResourceClass::collection($model)
+            : ($model instanceof Model ? new $modelResourceClass($model) : null);
         $this->setModelResourceClass(null);
         return $modelResource;
+    }
+
+    /**
+     * @param Model $model
+     * @return string
+     */
+    private function getModelResourceClass($model)
+    {
+        if (!is_null($this->temporaryModelResourceClass)) {
+            $modelResourceClass = $this->temporaryModelResourceClass;
+            $this->setTemporaryModelResourceClass(null);
+            return $modelResourceClass;
+        }
+        if (!is_null($this->fixedModelResourceClass)) {
+            return $this->fixedModelResourceClass;
+        }
+        if ($model) {
+            $modelClass = get_class($model);
+            if (isset($this->temporaryModelResourceClasses[$modelClass])) {
+                $modelResourceClass = $this->temporaryModelResourceClasses[$modelClass];
+                $this->setTemporaryModelResourceClass(null, $modelClass);
+                return $modelResourceClass;
+            }
+            if (isset($this->fixedModelResourceClasses[$modelClass])) {
+                return $this->fixedModelResourceClasses[$modelClass];
+            }
+            if ($model instanceof IResource) {
+                $modelResourceClass = $model->getResourceClass();
+                if ($modelResourceClass) return $modelResourceClass;
+            }
+        }
+
+        return ModelResource::class;
     }
 }
