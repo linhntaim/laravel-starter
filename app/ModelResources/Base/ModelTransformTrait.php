@@ -92,11 +92,9 @@ trait ModelTransformTrait
             $model instanceof Model ?
                 $model : ($model->count() > 0 ? ($model instanceof Collection ? $model->first() : $model->items()[0]) : null)
         );
-        $modelResource = $model instanceof Collection || $model instanceof LengthAwarePaginator ?
+        return $model instanceof Collection || $model instanceof LengthAwarePaginator ?
             $modelResourceClass::collection($model)
             : ($model instanceof Model ? new $modelResourceClass($model) : null);
-        $this->setModelResourceClass(null);
-        return $modelResource;
     }
 
     /**

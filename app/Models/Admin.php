@@ -147,6 +147,12 @@ class Admin extends ExtendedUserModel
         }
         return true;
     }
+
+    public function toActivityLogArray($except = [])
+    {
+        $except[] = 'user_id';
+        return array_merge($this->user->toActivityLogArray(), parent::toActivityLogArray($except));
+    }
     #endregion
 
     // TODO:

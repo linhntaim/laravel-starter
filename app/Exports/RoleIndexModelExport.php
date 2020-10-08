@@ -21,7 +21,10 @@ class RoleIndexModelExport extends IndexModelExport
         parent::__construct($search, $sortBy, $sortOrder);
 
         $this->modelRepository = new RoleRepository();
-        $this->setModelResourceClass(ExportedRoleResource::class);
+        $this->setTemporaryModelResourceClass(
+            ExportedRoleResource::class,
+            $this->modelRepository->modelClass()
+        );
     }
 
     public function csvHeaders()

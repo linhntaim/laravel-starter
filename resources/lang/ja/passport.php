@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 return [
     'invalid_client' => 'Client authentication failed',
     'invalid_credentials' => 'メールアドレス、もしくはパスワードが異なります。',

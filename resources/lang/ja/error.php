@@ -1,11 +1,21 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 return [
     'def' => [
         'abort' => [
             '403' => '認証されていません',
             '404' => 'ページが見つかりません。',
+            // TODO:
+
+            // TODO
         ],
+        // TODO:
+
+        // TODO
     ],
 
     'exceptions' => [
@@ -32,6 +42,9 @@ return [
             'level_failed' => 'ユーザーアクションに問題が発生しました',
             'level' => ':message',
         ],
+        // TODO:
+
+        // TODO
     ],
 
     'http' => [
@@ -66,31 +79,55 @@ return [
                             'min' => 'パスワードは少なくとも8文字でなければなりません',
                             'required' => '表示名フィールドは必須です',
                         ],
+                        // TODO:
+
+                        // TODO
                     ],
+                    // TODO:
+
+                    // TODO
                 ],
                 'admin' => [
+                    // TODO:
+
+                    // TODO
                 ],
                 'home' => [
+                    // TODO:
+
+                    // TODO
                 ],
             ],
         ],
         'middleware' => [
             'authenticate' => [
-                'unauthenticated' => 'メールアドレス、もしくはパスワードが異なります。'
-            ]
+                'unauthenticated' => 'メールアドレス、もしくはパスワードが異なります。',
+            ],
+            // TODO:
+
+            // TODO
         ],
     ],
 
     'model_repositories' => [
+        // TODO:
+
+        // TODO
     ],
 
     'imports' => [
+        // TODO:
+
+        // TODO
     ],
 
     'rules' => [
         'current_password' => '入力されたパスワードが間違っています。',
         'not_trashed' => 'The :attribute has already been trashed',
         'trashed' => 'The :attribute has not already been trashed',
+        // TODO:
+
+        // TODO
     ],
 
     'utils' => [

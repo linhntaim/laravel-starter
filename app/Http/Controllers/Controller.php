@@ -7,12 +7,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Request;
-use App\ModelRepositories\ActivityLogRepository;
 use App\ModelResources\Base\ModelTransformTrait;
 use App\Models\HandledFile;
 use App\Utils\AbortTrait;
+use App\Utils\ActivityLogTrait;
 use App\Utils\ClassTrait;
-use App\Utils\ConfigHelper;
 use App\Utils\TransactionTrait;
 use App\Utils\ValidationTrait;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -23,7 +22,7 @@ use Illuminate\Routing\Controller as BaseController;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-    use ClassTrait, AbortTrait, TransactionTrait, ModelTransformTrait, ValidationTrait, PagingTrait;
+    use ClassTrait, AbortTrait, TransactionTrait, ModelTransformTrait, ActivityLogTrait, ValidationTrait, PagingTrait;
 
     /**
      * @param Request $request
@@ -36,22 +35,6 @@ class Controller extends BaseController
     protected function validated(Request $request, array $rules, array $messages = [], array $customAttributes = [])
     {
         return $this->validatedData($request->all(), $rules, $messages, $customAttributes);
-    }
-
-    protected function logAction($action, $actedBy = null, $payload = [])
-    {
-        if (!ConfigHelper::get('activity_log_enabled')) return;
-        
-        if (is_null($actedBy)) {
-            $actedBy = request()->user();
-        }
-        if ($actedBy) {
-            try {
-                (new ActivityLogRepository())->createWithAction($action, $actedBy, $payload);
-            } catch (\Exception $exception) {
-
-            }
-        }
     }
 
     protected function responseFile($file, array $headers = [])

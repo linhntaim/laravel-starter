@@ -18,6 +18,10 @@ class RegisterController extends BaseRegisterController
         parent::__construct();
 
         $this->modelRepository = new UserRepository();
+        $this->setFixedModelResourceClass(
+            UserAccountResource::class,
+            $this->modelRepository->modelClass()
+        );
     }
 
     public function storeSocial(Request $request)
@@ -29,14 +33,12 @@ class RegisterController extends BaseRegisterController
         ]);
 
         return $this->responseModel(
-            $this->setModelResourceClass(UserAccountResource::class)->modelTransform(
-                $this->modelRepository->createWithAttributesFromSocial([
-                    'email' => $request->input('email'),
-                ], [
-                    'provider' => $request->input('provider'),
-                    'provider_id' => $request->input('provider_id'),
-                ])
-            )
+            $this->modelRepository->createWithAttributesFromSocial([
+                'email' => $request->input('email'),
+            ], [
+                'provider' => $request->input('provider'),
+                'provider_id' => $request->input('provider_id'),
+            ])
         );
     }
 }

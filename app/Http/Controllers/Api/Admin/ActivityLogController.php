@@ -8,9 +8,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
-use App\ModelRepositories\ActivityLogRepository;
-use App\ModelResources\ActivityLogOfAdminResource;
-use App\Models\ActivityLog;
+use App\ModelRepositories\ActivityLogAdminRepository;
 use App\Utils\ClientSettings\Facade;
 
 class ActivityLogController extends ModelApiController
@@ -19,8 +17,7 @@ class ActivityLogController extends ModelApiController
     {
         parent::__construct();
 
-        $this->modelRepository = new ActivityLogRepository();
-        $this->setFixedModelResourceClass(ActivityLogOfAdminResource::class, ActivityLog::class);
+        $this->modelRepository = new ActivityLogAdminRepository();
     }
 
     public function search(Request $request)
@@ -31,7 +28,7 @@ class ActivityLogController extends ModelApiController
         if (!empty($input)) {
             $search['user_id'] = $input;
         }
-        $search['admin'] = 1;
+        $search['client'] = 'admin';
         $input = $request->input('screen');
         if (!empty($input)) {
             $search['screen'] = $input;

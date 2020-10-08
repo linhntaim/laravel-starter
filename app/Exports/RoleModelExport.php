@@ -22,7 +22,10 @@ class RoleModelExport extends ModelExport
         parent::__construct();
 
         $this->modelRepository = new RoleRepository();
-        $this->setModelResourceClass(ExportedRoleResource::class);
+        $this->setTemporaryModelResourceClass(
+            ExportedRoleResource::class,
+            $this->modelRepository->modelClass()
+        );
     }
 
     public function csvHeaders()

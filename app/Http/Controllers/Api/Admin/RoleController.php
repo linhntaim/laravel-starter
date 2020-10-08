@@ -11,7 +11,6 @@ use App\Exports\RoleIndexModelExport;
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\RoleRepository;
-use App\Models\ActivityLog;
 use App\Models\Role;
 use Illuminate\Validation\Rule;
 
@@ -46,10 +45,7 @@ class RoleController extends ModelApiController
     protected function indexExecute(Request $request)
     {
         $models = parent::indexExecute($request);
-        $this->logAction(ActivityLog::ACTION_LIST, null, [
-            'model' => Role::class,
-            'params' => $request->all(),
-        ]);
+        $this->logActionModelList(Role::class, $request->all());
         return $models;
     }
 
@@ -61,10 +57,7 @@ class RoleController extends ModelApiController
     protected function exportExecute(Request $request, Export $exporter = null)
     {
         parent::exportExecute($request, $exporter);
-        $this->logAction(ActivityLog::ACTION_EXPORT, null, [
-            'model' => Role::class,
-            'params' => $request->all(),
-        ]);
+        $this->logActionModelExport(Role::class, $request->all());
     }
 
     protected function storeValidatedRules(Request $request)
@@ -86,10 +79,7 @@ class RoleController extends ModelApiController
             ],
             $request->input('permissions')
         );
-        $this->logAction(ActivityLog::ACTION_CREATE, null, [
-            'model' => Role::class,
-            'params' => $request->all(),
-        ]);
+        $this->logActionModelCreate(Role::class, $model);
         return $model;
     }
 
@@ -110,6 +100,7 @@ class RoleController extends ModelApiController
 
     protected function updateExecute(Request $request)
     {
+        $oldModel = clone $this->modelRepository->model();
         $model = $this->modelRepository->updateWithAttributes(
             [
                 'name' => $request->input('name'),
@@ -118,29 +109,21 @@ class RoleController extends ModelApiController
             ],
             $request->input('permissions')
         );
-        $this->logAction(ActivityLog::ACTION_EDIT, null, [
-            'model' => Role::class,
-            'id' => $this->modelRepository->getId(),
-            'params' => $request->all(),
-        ]);
+        $this->logActionModelEdit(Role::class, $oldModel, $model);
         return $model;
     }
 
     protected function bulkDestroyExecute(Request $request, $ids)
     {
+        $models = $this->modelRepository->getByIds($ids);
         parent::bulkDestroyExecute($request, $ids);
-        $this->logAction(ActivityLog::ACTION_DELETE, null, [
-            'model' => Role::class,
-            'params' => $request->all(),
-        ]);
+        $this->logActionModelDelete(Role::class, $models);
     }
 
     protected function destroyExecute(Request $request)
     {
+        $model = $this->modelRepository->model();
         parent::destroyExecute($request);
-        $this->logAction(ActivityLog::ACTION_DELETE, null, [
-            'model' => Role::class,
-            'id' => $this->modelRepository->getId(),
-        ]);
+        $this->logActionModelDelete(Role::class, [$model]);
     }
 }

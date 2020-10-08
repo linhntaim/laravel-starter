@@ -12,6 +12,7 @@ use App\Http\Requests\Request;
 use App\ModelRepositories\AdminRepository;
 use App\ModelRepositories\UserRepository;
 use App\ModelResources\AdminAccountResource;
+use App\Models\ActivityLog;
 use App\Models\Admin;
 use App\Rules\CurrentPasswordRule;
 use App\Utils\SocialLogin;
@@ -24,16 +25,25 @@ class AdminAccountController extends ModelApiController
         parent::__construct();
 
         $this->modelRepository = new AdminRepository();
+        $this->setFixedModelResourceClass(
+            AdminAccountResource::class,
+            $this->modelRepository->modelClass()
+        );
     }
 
     public function index(Request $request)
     {
+        $model = $this->modelRepository->notStrict()->getById($request->user()->id);
+        if (empty($model)) {
+            throw new AppException(static::__transErrorWithModule('not_found'));
+        }
+        if ($request->has('_login')) {
+            $this->logAction(ActivityLog::ACTION_LOGIN);
+        }
         return $this->responseModel(
-            $this->setModelResourceClass(AdminAccountResource::class)
-                ->modelTransform($this->modelRepository->getById($request->user()->id)),
+            $model,
             $request->hasImpersonator() ? [
-                'impersonator' => $this->setModelResourceClass(AdminAccountResource::class)
-                    ->modelTransform($request->impersonator()),
+                'impersonator' => $this->modelTransform($request->impersonator()),
             ] : []
         );
     }

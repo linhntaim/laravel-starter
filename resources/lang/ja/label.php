@@ -5,8 +5,10 @@
  */
 
 return [
-    'en' => 'English',
-    'ja' => '日本語',
+    'page' => 'Page',
+    'items_per_page' => 'Items per page',
+    'sort_by' => 'Sort by',
+    'sort_order' => 'Sort order',
     // TODO:
 
     // TODO

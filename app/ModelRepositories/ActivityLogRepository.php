@@ -43,9 +43,8 @@ class ActivityLogRepository extends ModelRepository
         if (!empty($search['user_id'])) {
             $query->where('user_id', $search['user_id']);
         }
-        if (!empty($search['admin'])) {
-            $query->with('admin')
-                ->where('client', 'admin');
+        if (!empty($search['client'])) {
+            $query->where('client', $search['client']);
         }
         if (!empty($search['screen'])) {
             $query->where('screen', $search['screen']);

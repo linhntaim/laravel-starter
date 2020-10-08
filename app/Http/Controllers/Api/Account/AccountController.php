@@ -11,6 +11,7 @@ use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\UserRepository;
 use App\ModelResources\UserAccountResource;
+use App\Models\ActivityLog;
 
 class AccountController extends ModelApiController
 {
@@ -19,6 +20,10 @@ class AccountController extends ModelApiController
         parent::__construct();
 
         $this->modelRepository = new UserRepository();
+        $this->setFixedModelResourceClass(
+            UserAccountResource::class,
+            $this->modelRepository->modelClass()
+        );
     }
 
     public function index(Request $request)
@@ -27,8 +32,9 @@ class AccountController extends ModelApiController
         if (empty($model)) {
             throw new AppException(static::__transErrorWithModule('not_found'));
         }
-        return $this->responseModel(
-            $this->setModelResourceClass(UserAccountResource::class)->modelTransform($model)
-        );
+        if ($request->has('_login')) {
+            $this->logAction(ActivityLog::ACTION_LOGIN);
+        }
+        return $this->responseModel($model);
     }
 }

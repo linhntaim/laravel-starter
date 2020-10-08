@@ -8,12 +8,14 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\ApiController;
 use App\Http\Requests\Request;
+use App\Models\ActivityLog;
 
 class LogoutController extends ApiController
 {
     public function logout(Request $request)
     {
         $request->user()->token()->revoke();
+        $this->logAction(ActivityLog::ACTION_LOGOUT);
         return $this->responseSuccess();
     }
 }

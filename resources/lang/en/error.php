@@ -1,11 +1,21 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 return [
     'def' => [
         'abort' => [
             '403' => 'Not authorized',
             '404' => 'Not found',
+            // TODO:
+
+            // TODO
         ],
+        // TODO:
+
+        // TODO
     ],
 
     'exceptions' => [
@@ -32,6 +42,9 @@ return [
             'level_failed' => 'Something went wrong with user action',
             'level' => ':message',
         ],
+        // TODO:
+
+        // TODO
     ],
 
     'http' => [
@@ -66,11 +79,23 @@ return [
                             'min' => 'The password must be at least 8 characters',
                             'required' => 'The display name field is required',
                         ],
+                        // TODO:
+
+                        // TODO
                     ],
+                    // TODO:
+
+                    // TODO
                 ],
                 'admin' => [
+                    // TODO:
+
+                    // TODO
                 ],
                 'home' => [
+                    // TODO:
+
+                    // TODO
                 ],
             ],
         ],
@@ -78,19 +103,31 @@ return [
             'authenticate' => [
                 'unauthenticated' => 'The user credentials were incorrect',
             ],
+            // TODO:
+
+            // TODO
         ],
     ],
 
     'model_repositories' => [
+        // TODO:
+
+        // TODO
     ],
 
     'imports' => [
+        // TODO:
+
+        // TODO
     ],
 
     'rules' => [
         'current_password' => 'The current password must be matched',
         'not_trashed' => 'The :attribute has already been trashed',
         'trashed' => 'The :attribute has not already been trashed',
+        // TODO:
+
+        // TODO
     ],
 
     'utils' => [

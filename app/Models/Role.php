@@ -8,6 +8,8 @@ namespace App\Models;
 
 use App\ModelResources\RoleResource;
 use App\Models\Base\Model;
+use App\ModelTraits\MemorizeTrait;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Class Role
@@ -16,10 +18,13 @@ use App\Models\Base\Model;
  * @property string $name
  * @property string $display_name
  * @property string $description
- * @property Permission[] permissions
+ * @property string[]|array $permissionNames
+ * @property Permission[]|Collection $permissions
  */
 class Role extends Model
 {
+    use MemorizeTrait;
+
     const PROTECTED = [1, 2];
 
     protected $table = 'roles';
@@ -39,9 +44,11 @@ class Role extends Model
 
     protected $resourceClass = RoleResource::class;
 
-    public function scopeNoneProtected($query)
+    public function getPermissionNamesAttribute()
     {
-        return $query->whereNotIn('id', static::PROTECTED);
+        return $this->remind('permission_names', function () {
+            return $this->permissions->pluck('name')->all();
+        });
     }
 
     public function users()
@@ -52,6 +59,18 @@ class Role extends Model
     public function permissions()
     {
         return $this->belongsToMany(Permission::class, 'permissions_roles', 'role_id', 'permission_id');
+    }
+
+    public function scopeNoneProtected($query)
+    {
+        return $query->whereNotIn('id', static::PROTECTED);
+    }
+
+    public function toActivityLogArray($except = [])
+    {
+        return array_merge(parent::toActivityLogArray($except), $this->toActivityLogArrayFrom([
+            'permission_names' => $this->permissionNames,
+        ]));
     }
 
     // TODO：

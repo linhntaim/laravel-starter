@@ -13,7 +13,7 @@ use App\Models\ActivityLog;
  * @package App\ModelResources
  * @mixin ActivityLog
  */
-class ActivityLogOfAdminResource extends ActivityLogResource
+class ActivityLogAdminResource extends ActivityLogResource
 {
     public function toCustomArray($request)
     {

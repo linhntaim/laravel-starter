@@ -375,13 +375,19 @@ the required packages will be automcatically installed by running [Setup migrati
     - Leave values empty for no limitation.
 - **`HANDLED_FILE_IMAGE_INLINE`**: Set value to `true` and images will be stored in the database instead of local or cloud.
 
+#### ACTIVITY_LOG_ENABLED
+
+Set value to `true` to enable to store activity logs to database.
+When value is set to `true`, a table named `activity_logs` will be automatically created when running migration 
+(see `database/migrations/2019_08_16_000006_create_activity_logs_table.php` file) and activity logs could be stored in this table.
+
 #### NOTIFICATION_*
 
 ##### NOTIFICATION_VIA_*
 
 - **`NOTIFICATION_VIA_DATABASE`**: 
     - Set value to `true` to enable to store notification to database.
-    - When value is set to `database`, a table named `notifications` will be automatically created when running migration
+    - When value is set to `true`, a table named `notifications` will be automatically created when running migration
       (see `database/migrations/2018_08_15_000002_create_notifications_table.php` file) and notifications could be stored in this table.
 
 #### VARIABLES
@@ -460,9 +466,13 @@ For each client, the application needs to know the name and URL of it. Besides, 
 
 Set the name of some request headers.
 
+##### HEADER_SCREEN_NAME
+
+Current screen will be passed from client to the application via default `X-Screen` header.
+
 ##### HEADER_SETTINGS_NAME
 
-Localization settings will be passed form client to the application via default `X-Settings` header.
+Localization settings will be passed from client to the application via default `X-Settings` header.
 
 ##### HEADER_DEVICE_NAME
 
