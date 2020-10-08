@@ -35,6 +35,9 @@ class ActivityLog extends Model
     const ACTION_MODEL_CREATE = 'model_create';
     const ACTION_MODEL_EDIT = 'model_edit';
     const ACTION_MODEL_DELETE = 'model_delete';
+    // TODO: Add actions
+
+    // TODO
 
     protected $table = 'activity_logs';
 
@@ -227,4 +230,8 @@ class ActivityLog extends Model
             })($this->payload_array_value['deleted']),
         ]);
     }
+
+    // TODO: Add log message methods
+
+    // TODO
 }
