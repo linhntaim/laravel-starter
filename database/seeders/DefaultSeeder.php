@@ -28,12 +28,12 @@ class DefaultSeeder extends Seeder
     {
         // System users
         $beSystem = Permission::query()->create([
-            'name' => 'be-system',
+            'name' => Permission::BE_SYSTEM,
             'display_name' => 'Be system',
             'description' => 'Be system',
         ]);
         $systemRole = Role::query()->create([
-            'name' => 'system',
+            'name' => Role::SYSTEM,
             'display_name' => 'System',
             'description' => 'Representation of the system',
         ]);
@@ -42,12 +42,12 @@ class DefaultSeeder extends Seeder
         ]);
 
         $beSuperAdmin = Permission::query()->create([
-            'name' => 'be-super-admin',
+            'name' => Permission::BE_SUPER_ADMIN,
             'display_name' => 'Be super-admin',
             'description' => 'Be super-admin',
         ]);
         $superAdminRole = Role::query()->create([
-            'name' => 'superadmin',
+            'name' => Role::SUPER_ADMIN,
             'display_name' => 'Super-admin',
             'description' => 'Super-admin of the system',
         ]);
@@ -57,7 +57,7 @@ class DefaultSeeder extends Seeder
 
         if (ConfigHelper::get('impersonated_by_admin')) {
             $impersonate = Permission::query()->create([
-                'name' => 'impersonate',
+                'name' => Permission::IMPERSONATE,
                 'display_name' => 'Impersonate',
                 'description' => 'Can impersonate',
             ]);
@@ -88,18 +88,18 @@ class DefaultSeeder extends Seeder
 
         // Normal administrative users
         $manageRoles = Permission::query()->create([
-            'name' => 'role-manage',
+            'name' => Permission::ROLE_MANAGE,
             'display_name' => 'Manage roles',
             'description' => 'Manage roles',
         ]);
         $manageAdmins = Permission::query()->create([
-            'name' => 'admin-manage',
+            'name' => Permission::ADMIN_MANAGE,
             'display_name' => 'Manage admins',
             'description' => 'Manage admins',
         ]);
 
         $adminRole = Role::query()->create([
-            'name' => 'admin',
+            'name' => Role::ADMIN,
             'display_name' => 'Admin',
             'description' => 'Admin',
         ]);
@@ -110,7 +110,7 @@ class DefaultSeeder extends Seeder
 
         if (ConfigHelper::get('activity_log_enabled')) {
             $manageActivityLogs = Permission::query()->create([
-                'name' => 'activity-log-manage',
+                'name' => Permission::ACTIVITY_MANAGE,
                 'display_name' => 'Manage activity logs',
                 'description' => 'Manage activity logs',
             ]);
@@ -128,5 +128,16 @@ class DefaultSeeder extends Seeder
             'display_name' => 'Administrator',
         ]);
         $this->output()->writeln(sprintf('Admin: %s / %s', $this->administratorEmail, $this->administratorPassword));
+
+        $this->extends();
+    }
+
+    protected function extends()
+    {
+        $this->output()->writeln('Extending...');
+        // TODO:
+
+        // TODO
+        $this->output()->writeln('Extended!');
     }
 }

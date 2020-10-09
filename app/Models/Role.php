@@ -25,8 +25,9 @@ class Role extends Model
 {
     use MemorizeTrait;
 
-    const SYSTEM = 1;
-    const SUPER_ADMIN = 2;
+    const SYSTEM = 'system';
+    const SUPER_ADMIN = 'super_admin';
+    const ADMIN = 'admin';
     // TODO: Define roles
 
     // TODO
@@ -75,7 +76,7 @@ class Role extends Model
 
     public function scopeNoneProtected($query)
     {
-        return $query->whereNotIn('id', static::PROTECTED);
+        return $query->whereNotIn('name', static::PROTECTED);
     }
 
     public function toActivityLogArray($except = [])

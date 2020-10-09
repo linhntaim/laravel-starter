@@ -11,6 +11,11 @@ use App\ModelRepositories\Base\ModelRepository;
 use App\Models\Permission;
 use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * Class PermissionRepository
+ * @package App\ModelRepositories
+ * @property Permission $model
+ */
 class PermissionRepository extends ModelRepository
 {
     public function modelClass()
@@ -31,7 +36,7 @@ class PermissionRepository extends ModelRepository
 
     public function updateWithAttributes(array $attributes = [])
     {
-        if (in_array($this->getId(), Permission::PROTECTED)) {
+        if (in_array($this->model->name, Permission::PROTECTED)) {
             throw new AppException('Cannot edit this permission');
         }
         return parent::updateWithAttributes($attributes);
@@ -48,7 +53,7 @@ class PermissionRepository extends ModelRepository
 
     public function delete()
     {
-        if (in_array($this->getId(), Permission::PROTECTED)) {
+        if (in_array($this->model->name, Permission::PROTECTED)) {
             throw new AppException('Cannot delete this permission');
         }
 

@@ -83,7 +83,7 @@ class RoleRepository extends ModelRepository
      */
     public function updateWithAttributes(array $attributes = [], array $permissions = [])
     {
-        if (in_array($this->getId(), Role::PROTECTED)) {
+        if (in_array($this->model->name, Role::PROTECTED)) {
             throw new AppException('Cannot edit this role');
         }
 
@@ -109,7 +109,7 @@ class RoleRepository extends ModelRepository
 
     public function delete()
     {
-        if (in_array($this->getId(), Role::PROTECTED)) {
+        if (in_array($this->model->name, Role::PROTECTED)) {
             throw new AppException('Cannot delete this role');
         }
 

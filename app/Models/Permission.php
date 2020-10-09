@@ -18,8 +18,12 @@ use App\Models\Base\Model;
  */
 class Permission extends Model
 {
-    const BE_SYSTEM = 1;
-    const BE_SUPER_ADMIN = 2;
+    const BE_SYSTEM = 'be-system';
+    const BE_SUPER_ADMIN = 'be-super-admin';
+    const IMPERSONATE = 'impersonate';
+    const ROLE_MANAGE = 'role-manage';
+    const ADMIN_MANAGE = 'admin-manage';
+    const ACTIVITY_MANAGE = 'activity-log-manage';
     // TODO: Define perms
 
     // TODO
@@ -27,6 +31,7 @@ class Permission extends Model
     const PROTECTED = [
         Permission::BE_SYSTEM,
         Permission::BE_SUPER_ADMIN,
+        Permission::IMPERSONATE,
         // TODO: Protected perms
 
         // TODO
@@ -47,13 +52,13 @@ class Permission extends Model
         'description',
     ];
 
-    public function scopeNoneProtected($query)
-    {
-        return $query->whereNotIn('id', static::PROTECTED);
-    }
-
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'permissions_roles', 'permission_id', 'role_id');
+    }
+
+    public function scopeNoneProtected($query)
+    {
+        return $query->whereNotIn('name', static::PROTECTED);
     }
 }
