@@ -18,7 +18,19 @@ use App\Models\Base\Model;
  */
 class Permission extends Model
 {
-    const PROTECTED = [1, 2];
+    const BE_SYSTEM = 1;
+    const BE_SUPER_ADMIN = 2;
+    // TODO: Define perms
+
+    // TODO
+
+    const PROTECTED = [
+        Permission::BE_SYSTEM,
+        Permission::BE_SUPER_ADMIN,
+        // TODO: Protected perms
+
+        // TODO
+    ];
 
     protected $table = 'permissions';
 

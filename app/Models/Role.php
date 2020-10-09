@@ -25,7 +25,19 @@ class Role extends Model
 {
     use MemorizeTrait;
 
-    const PROTECTED = [1, 2];
+    const SYSTEM = 1;
+    const SUPER_ADMIN = 2;
+    // TODO: Define roles
+
+    // TODO
+
+    const PROTECTED = [
+        Role::SYSTEM,
+        Role::SUPER_ADMIN,
+        // TODO: Protected roles
+
+        // TODO
+    ];
 
     protected $table = 'roles';
 
