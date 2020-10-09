@@ -66,25 +66,27 @@ class DefaultSeeder extends Seeder
             ]);
         }
 
+        $systemPassword = Helper::runInProductionMode() ? PasswordGenerator::random() : $this->systemPassword;
         Admin::query()->create([
             'user_id' => User::query()->create([
                 'email' => $this->systemEmail,
-                'password' => StringHelper::hash(Helper::runInProductionMode() ? PasswordGenerator::random() : $this->systemPassword),
+                'password' => StringHelper::hash($systemPassword),
             ])->id,
             'role_id' => $systemRole->id,
             'display_name' => 'System',
         ]);
-        $this->output()->writeln(sprintf('System: %s / %s', $this->systemEmail, $this->systemPassword));
+        $this->output()->writeln(sprintf('System: %s / %s', $this->systemEmail, $systemPassword));
 
+        $superAdminPassword = Helper::runInProductionMode() ? PasswordGenerator::random() : $this->superAdminPassword;
         Admin::query()->create([
             'user_id' => User::query()->create([
                 'email' => $this->superAdminEmail,
-                'password' => StringHelper::hash(Helper::runInProductionMode() ? PasswordGenerator::random() : $this->superAdminPassword),
+                'password' => StringHelper::hash($superAdminPassword),
             ])->id,
             'role_id' => $superAdminRole->id,
             'display_name' => 'Super Administrator',
         ]);
-        $this->output()->writeln(sprintf('Super admin: %s / %s', $this->superAdminEmail, $this->superAdminPassword));
+        $this->output()->writeln(sprintf('Super admin: %s / %s', $this->superAdminEmail, $superAdminPassword));
 
         // Normal administrative users
         $manageRoles = Permission::query()->create([
@@ -119,15 +121,16 @@ class DefaultSeeder extends Seeder
             ]);
         }
 
+        $adminPassword = Helper::runInProductionMode() ? PasswordGenerator::random() : $this->administratorPassword;
         Admin::query()->create([
             'user_id' => User::query()->create([
                 'email' => $this->administratorEmail,
-                'password' => StringHelper::hash($this->administratorPassword),
+                'password' => StringHelper::hash($adminPassword),
             ])->id,
             'role_id' => $adminRole->id,
             'display_name' => 'Administrator',
         ]);
-        $this->output()->writeln(sprintf('Admin: %s / %s', $this->administratorEmail, $this->administratorPassword));
+        $this->output()->writeln(sprintf('Admin: %s / %s', $this->administratorEmail, $adminPassword));
 
         $this->extends();
     }

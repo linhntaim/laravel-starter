@@ -24,6 +24,17 @@ class PermissionRepository extends ModelRepository
     }
 
     /**
+     * @param string $name
+     * @return Permission
+     */
+    public function getByName(string $name)
+    {
+        return $this->first(
+            $this->query()->where('name', $name)
+        );
+    }
+
+    /**
      * @return Collection
      * @throws
      */

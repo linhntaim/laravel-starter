@@ -28,6 +28,17 @@ class RoleRepository extends ModelRepository
         return parent::query()->with('permissions');
     }
 
+    /**
+     * @param string $name
+     * @return Role
+     */
+    public function getByName(string $name)
+    {
+        return $this->first(
+            $this->query()->where('name', $name)
+        );
+    }
+
     protected function searchOn($query, array $search)
     {
         if (!empty($search['except_protected'])) {
