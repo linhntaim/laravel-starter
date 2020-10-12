@@ -37,6 +37,8 @@ abstract class ModelRepository
     private $withTrashed = false;
     private $lock;
     private $strict = true;
+    private $more = false;
+    private $mores = [];
     private $sorts = [];
     private $sortsDefault = [];
     private $sortsAllowed = [];
@@ -93,6 +95,22 @@ abstract class ModelRepository
         return $this->lock(false);
     }
 
+    public function beenMore()
+    {
+        return $this->more;
+    }
+
+    public function more($moreBy = null, $moreOrder = 'asc', $morePivot = null)
+    {
+        if ($moreBy) {
+            $this->mores[$moreBy] = [
+                'order' => $moreOrder,
+                'pivot' => $morePivot,
+            ];
+        }
+        return $this;
+    }
+
     public function sorts($sorts = [])
     {
         $this->sorts = $sorts;
@@ -126,6 +144,20 @@ abstract class ModelRepository
         if ($this->withTrashed) {
             $query->withTrashed();
             $this->withTrashed = false;
+        }
+        $this->more = false;
+        if (!empty($this->mores)) {
+            $query->where(function ($query) {
+                foreach ($this->mores as $moreBy => $more) {
+                    if ($more['pivot']) {
+                        $query->where($moreBy, $more['order'] == 'asc' ? '>' : '<', $more['pivot']);
+                    }
+                }
+            });
+            foreach ($this->mores as $moreBy => $more) {
+                $query->orderBy($moreBy, $more['order']);
+            }
+            $this->mores = [];
         }
         if (!empty($this->sorts)) {
             $sortsAllowed = array_merge($this->sortsAllowed, $this->sortsAllowedDefault);
@@ -337,6 +369,15 @@ abstract class ModelRepository
             case Configuration::FETCH_PAGING_YES:
                 return $this->catch(function () use ($query, $itemsPerPage) {
                     return $query->paginate($itemsPerPage);
+                });
+            case Configuration::FETCH_PAGING_MORE:
+                return $this->catch(function () use ($query, $itemsPerPage) {
+                    $models = $query->limit($itemsPerPage + 1)->get();
+                    if ($models->count() - $itemsPerPage) {
+                        $this->more = true;
+                        $models->pop();
+                    }
+                    return $models;
                 });
             default:
                 return $query;

@@ -35,6 +35,7 @@ class Configuration
     const FETCH_QUERY = 0;
     const FETCH_PAGING_YES = 1;
     const FETCH_PAGING_NO = 2;
+    const FETCH_PAGING_MORE = 3;
 
     const REGEX_HOSTNAME = '/^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$/';
     const REGEX_IP = '/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/';

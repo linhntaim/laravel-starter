@@ -12,6 +12,8 @@ trait PagingTrait
 {
     protected $sortBy = null;
     protected $sortOrder = 'asc';
+    protected $moreBy = null;
+    protected $moreOrder = 'asc';
 
     protected function paging()
     {
@@ -42,9 +44,22 @@ trait PagingTrait
     protected function sortOrder()
     {
         $sortOrder = strtolower(request()->input('sort_order', $this->sortOrder));
-        if (!in_array($sortOrder, ['asc', 'desc'])) {
-            $sortOrder = 'asc';
-        }
-        return $sortOrder;
+        return in_array($sortOrder, ['asc', 'desc']) ? $sortOrder : 'asc';
+    }
+
+    protected function moreBy()
+    {
+        return request()->input('more_by', $this->moreBy);
+    }
+
+    protected function moreOrder()
+    {
+        $moreOrder = strtolower(request()->input('more_order', $this->moreOrder));
+        return in_array($moreOrder, ['asc', 'desc']) ? $moreOrder : 'asc';
+    }
+
+    protected function morePivot()
+    {
+        return request()->input('more_pivot', $this->moreBy);
     }
 }

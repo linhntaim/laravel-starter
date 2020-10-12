@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Configuration;
 use App\Exceptions\AppException;
 use App\Exports\Base\Export;
 use App\Exports\Base\IndexModelExport;
@@ -42,12 +43,37 @@ abstract class ModelApiController extends ApiController
 
     protected function indexExecute(Request $request)
     {
-        return $this->modelRepository->sort($this->sortBy(), $this->sortOrder())
-            ->search(
-                $this->search($request),
-                $this->paging(),
-                $this->itemsPerPage()
-            );
+        return $this->sortExecute()->search(
+            $this->search($request),
+            $this->paging(),
+            $this->itemsPerPage()
+        );
+    }
+
+    protected function sortExecute()
+    {
+        return $this->modelRepository->sort($this->sortBy(), $this->sortOrder());
+    }
+
+    protected function load(Request $request)
+    {
+        return $this->responseModel($this->loadExecute($request), [
+            'more' => $this->modelRepository->beenMore(),
+        ]);
+    }
+
+    protected function loadExecute(Request $request)
+    {
+        return $this->moreExecute()->search(
+            $this->search($request),
+            Configuration::FETCH_PAGING_MORE,
+            $this->itemsPerPage()
+        );
+    }
+
+    protected function moreExecute()
+    {
+        return $this->modelRepository->more($this->moreBy(), $this->moreOrder(), $this->morePivot());
     }
     #endregion
 
