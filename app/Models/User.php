@@ -13,6 +13,7 @@ use App\Models\Base\IUser;
 use App\Models\Base\IUserHasSettings;
 use App\Models\Base\NotificationTrait;
 use App\ModelTraits\ActivityLogTrait;
+use App\ModelTraits\FromModelTrait;
 use App\ModelTraits\OnlyAttributesToArrayTrait;
 use App\ModelTraits\MemorizeTrait;
 use App\ModelTraits\PassportTrait;
@@ -40,7 +41,7 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
     use HasFactory, Notifiable, NotificationTrait {
         NotificationTrait::notifications insteadof Notifiable;
     }
-    use OnlyAttributesToArrayTrait, PassportTrait, HasApiTokens, MemorizeTrait, ResourceTrait, SoftDeletes, ActivityLogTrait;
+    use OnlyAttributesToArrayTrait, PassportTrait, HasApiTokens, MemorizeTrait, ResourceTrait, SoftDeletes, ActivityLogTrait, FromModelTrait;
 
     const USER_SYSTEM_ID = 1;
     const USER_SUPER_ADMINISTRATOR_ID = 2;

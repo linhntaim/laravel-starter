@@ -49,6 +49,13 @@ trait PassportTrait
                     return $user;
                 }
             }
+            if (method_exists($this, 'findForPassportWithAdvancedViaOther')) {
+                $user = $this->findForPassportWithAdvancedViaOther($advanced);
+                if ($user) {
+                    $user->via = 'other';
+                }
+                return $user;
+            }
         }
         return $userRepository->notStrict()
             ->getByEmail($username);
@@ -61,8 +68,9 @@ trait PassportTrait
         }
         $advanced = json_decode($password);
         if ($advanced !== false) {
-            if (!empty($advanced->source) && !empty($this->via)
-                && $advanced->source == $this->via) return true;
+            if (!empty($advanced->source) && !empty($this->via) && $advanced->source == $this->via) {
+                return true;
+            }
         }
         return Hash::check($password, $this->password);
     }
