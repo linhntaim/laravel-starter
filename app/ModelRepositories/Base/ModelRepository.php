@@ -373,7 +373,7 @@ abstract class ModelRepository
             case Configuration::FETCH_PAGING_MORE:
                 return $this->catch(function () use ($query, $itemsPerPage) {
                     $models = $query->limit($itemsPerPage + 1)->get();
-                    if ($models->count() - $itemsPerPage) {
+                    if ($models->count() > $itemsPerPage) {
                         $this->more = true;
                         $models->pop();
                     }
