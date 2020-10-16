@@ -30,12 +30,12 @@ class HandledFileRepository extends ModelRepository
 
     public function createWithUploadedFile(UploadedFile $uploadedFile)
     {
-        return $this->createWithFiler((new Filer())->fromExisted($uploadedFile, null, false));
+        return $this->createWithFiler((new Filer())->fromExisted($uploadedFile, false, false));
     }
 
     public function createWithUploadedImageFile(UploadedFile $uploadedFile)
     {
-        return $this->createWithImageFiler((new ImageFiler())->fromExisted($uploadedFile, null, false));
+        return $this->createWithImageFiler((new ImageFiler())->fromExisted($uploadedFile, false, false));
     }
 
     /**
