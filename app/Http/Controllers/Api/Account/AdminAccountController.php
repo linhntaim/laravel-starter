@@ -6,19 +6,17 @@
 
 namespace App\Http\Controllers\Api\Account;
 
-use App\Exceptions\AppException;
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\AdminRepository;
 use App\ModelRepositories\UserRepository;
 use App\ModelResources\AdminAccountResource;
-use App\Models\ActivityLog;
 use App\Models\Admin;
 use App\Rules\CurrentPasswordRule;
 use App\Utils\SocialLogin;
 use Illuminate\Validation\Rule;
 
-class AdminAccountController extends ModelApiController
+class AdminAccountController extends BaseAccountController
 {
     public function __construct()
     {
@@ -31,26 +29,14 @@ class AdminAccountController extends ModelApiController
         );
     }
 
-    public function index(Request $request)
+    protected function getAccountModel(Request $request)
     {
-        $model = $this->modelRepository->notStrict()->getById($request->user()->id);
-        if (empty($model)) {
-            throw new AppException(static::__transErrorWithModule('not_found'));
-        }
-        if ($request->has('_login')) {
-            $this->logAction(ActivityLog::ACTION_LOGIN);
-        }
-        return $this->responseModel(
-            $model,
-            $request->hasImpersonator() ? [
-                'impersonator' => $this->modelTransform($request->impersonator()),
-            ] : []
-        );
+        return $request->admin();
     }
 
     public function store(Request $request)
     {
-        $this->modelRepository->model($request->user()->id);
+        $this->modelRepository->model($this->getAccountModel($request));
 
         if ($request->has('_avatar')) {
             return $this->updateAvatar($request);
