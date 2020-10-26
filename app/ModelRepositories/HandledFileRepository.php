@@ -23,9 +23,24 @@ use Illuminate\Http\UploadedFile;
  */
 class HandledFileRepository extends ModelRepository
 {
+    protected $public = false;
+    protected $inline = false;
+
     public function modelClass()
     {
         return HandledFile::class;
+    }
+
+    public function usePublic($public = true)
+    {
+        $this->public = $public;
+        return $this;
+    }
+
+    public function useInline($inline = true)
+    {
+        $this->inline = $inline;
+        return $this;
     }
 
     /**
@@ -89,7 +104,7 @@ class HandledFileRepository extends ModelRepository
             $imageFiler->imageResize($imageMaxWidth ? $imageMaxWidth : null, $imageMaxHeight ? $imageMaxHeight : null)
                 ->imageSave();
         }
-        if (ConfigHelper::get('handled_file.image.inline')) {
+        if (ConfigHelper::get('handled_file.image.inline') && !isset($options['inline'])) {
             $options['inline'] = true;
         }
         return $this->createWithFiler($imageFiler, $options);
@@ -97,6 +112,19 @@ class HandledFileRepository extends ModelRepository
 
     public function createWithFiler(Filer $filer, $options = [])
     {
+        if ($this->public) {
+            $options['public'] = true;
+            $this->public = false;
+        } else {
+            unset($options['public']);
+        }
+        if ($this->inline) {
+            $options['inline'] = true;
+            $this->inline = false;
+        } else {
+            unset($options['inline']);
+        }
+
         $hasPostProcessed = isset($options['has_post_processed']) && $options['has_post_processed'];
         if (!$hasPostProcessed) {
             $filer = $this->handleFilerWithOptions($filer, $options);

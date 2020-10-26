@@ -81,7 +81,8 @@ class HandledFileController extends BaseHandledFileController
             'upload' => 'required|image',
         ]);
 
-        $handledFile = $this->modelRepository->createWithUploadedImageFile($request->file('upload'));
+        $handledFile = $this->modelRepository->usePublic()
+            ->createWithUploadedImageFile($request->file('upload'));
         return response()->json([
             'url' => $handledFile->url,
         ]);
@@ -113,11 +114,13 @@ class HandledFileController extends BaseHandledFileController
 
     public function handle(Request $request, $id)
     {
-        $this->modelRepository->model($id);
         return $this->responseModel(
-            $this->modelRepository->handlePostProcessed(function ($model) {
-                // TODO: Handle something
-            })
+            $this->modelRepository->withModel($id)
+                ->handlePostProcessed(function ($model) {
+                    // TODO: Handle something
+
+                    // TODO
+                })
         );
     }
 }
