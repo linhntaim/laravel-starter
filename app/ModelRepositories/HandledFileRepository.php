@@ -28,14 +28,28 @@ class HandledFileRepository extends ModelRepository
         return HandledFile::class;
     }
 
-    public function createWithUploadedFile(UploadedFile $uploadedFile)
+    /**
+     * @param UploadedFile $uploadedFile
+     * @param array $options
+     * @return HandledFile
+     * @throws
+     */
+    public function createWithUploadedFile(UploadedFile $uploadedFile, $options = [])
     {
-        return $this->createWithFiler((new Filer())->fromExisted($uploadedFile, false, false));
+        return $this->createWithFiler((new Filer())->fromExisted($uploadedFile, false, false), $options);
     }
 
-    public function createWithUploadedImageFile(UploadedFile $uploadedFile)
+    /**
+     * @param UploadedFile $uploadedFile
+     * @param array $options
+     * @param int|null|bool $imageMaxWidth
+     * @param int|null|bool $imageMaxHeight
+     * @return HandledFile
+     * @throws
+     */
+    public function createWithUploadedImageFile(UploadedFile $uploadedFile, $options = [], $imageMaxWidth = null, $imageMaxHeight = null)
     {
-        return $this->createWithImageFiler((new ImageFiler())->fromExisted($uploadedFile, false, false));
+        return $this->createWithImageFiler((new ImageFiler())->fromExisted($uploadedFile, false, false), $options, $imageMaxWidth, $imageMaxHeight);
     }
 
     /**
@@ -45,7 +59,9 @@ class HandledFileRepository extends ModelRepository
      */
     protected function handleFilerWithOptions(Filer $filer, $options = [])
     {
-        if (isset($options['public']) && $options['public']) {
+        if (isset($options['inline']) && $options['inline']) {
+            $filer->moveToInline();
+        } elseif (isset($options['public']) && $options['public']) {
             $filer->moveToPublic();
             if (ConfigHelper::get('handled_file.cloud.enabled')) {
                 $filer->moveToCloud(null, true, ConfigHelper::get('handled_file.cloud.only'));
@@ -54,21 +70,27 @@ class HandledFileRepository extends ModelRepository
         return $filer;
     }
 
+    /**
+     * @param ImageFiler $imageFiler
+     * @param array $options
+     * @param int|null|bool $imageMaxWidth
+     * @param int|null|bool $imageMaxHeight
+     * @return HandledFile
+     */
     public function createWithImageFiler(ImageFiler $imageFiler, $options = [], $imageMaxWidth = null, $imageMaxHeight = null)
     {
-        if (empty($imageMaxWidth)) {
+        if ($imageMaxWidth !== false && empty($imageMaxWidth)) {
             $imageMaxWidth = ConfigHelper::get('handled_file.image.max_width');
         }
-        if (empty($imageMaxHeight)) {
+        if ($imageMaxHeight !== false && empty($imageMaxHeight)) {
             $imageMaxHeight = ConfigHelper::get('handled_file.image.max_height');
         }
         if ($imageMaxWidth || $imageMaxHeight) {
             $imageFiler->imageResize($imageMaxWidth ? $imageMaxWidth : null, $imageMaxHeight ? $imageMaxHeight : null)
                 ->imageSave();
         }
-        $imageFiler->moveToPublic();
         if (ConfigHelper::get('handled_file.image.inline')) {
-            $imageFiler->moveToInline();
+            $options['inline'] = true;
         }
         return $this->createWithFiler($imageFiler, $options);
     }
