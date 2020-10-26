@@ -115,14 +115,10 @@ class HandledFileRepository extends ModelRepository
         if ($this->public) {
             $options['public'] = true;
             $this->public = false;
-        } else {
-            unset($options['public']);
         }
         if ($this->inline) {
             $options['inline'] = true;
             $this->inline = false;
-        } else {
-            unset($options['inline']);
         }
 
         $hasPostProcessed = isset($options['has_post_processed']) && $options['has_post_processed'];
