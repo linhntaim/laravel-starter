@@ -67,6 +67,7 @@ abstract class Command extends BaseCommand
         if (!$this->noInformation) {
             $this->lineBreak();
             $this->info(sprintf('END %s!!!', strtoupper($this->__friendlyClassBaseName())));
+            $this->lineBreak();
         }
     }
 

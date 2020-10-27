@@ -64,13 +64,24 @@ class EnvironmentFileHelper
         return $this;
     }
 
+    public function clear($key)
+    {
+        return $this->fill($key, '');
+    }
+
+    public function hasKey($key, $withValue = false)
+    {
+        return preg_match_all($this->replacing($key, $withValue), $this->content) === 1;
+    }
+
     /**
      * @param string $key
+     * @param bool $withValue
      * @return string
      */
-    protected function replacing($key)
+    protected function replacing($key, $withValue = false)
     {
-        return sprintf('/^%s=.*/m', $key);
+        return sprintf('/^%s=.%s/m', $key, $withValue ? '+' : '*');
     }
 
     /**
