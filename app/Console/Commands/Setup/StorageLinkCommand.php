@@ -1,10 +1,21 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Console\Commands\Setup;
 
 class StorageLinkCommand extends Command
 {
-    protected $signature = 'setup:storage:link {--u}';
+    protected $signature = 'setup:storage:link {--u} {--f}';
+
+    protected function goForcingToInstall()
+    {
+        $this->goUninstalling();
+
+        parent::goForcingToInstall();
+    }
 
     protected function goInstalling()
     {
@@ -23,6 +34,7 @@ class StorageLinkCommand extends Command
                     }
                 }
             }
+            $this->lineBreak();
         }
     }
 

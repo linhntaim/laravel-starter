@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Console\Commands\Setup;
 
 use App\Console\Commands\Base\Command as BaseCommand;
@@ -11,19 +15,33 @@ abstract class Command extends BaseCommand
         return !!$this->option('u');
     }
 
+    protected function forced()
+    {
+        return !!$this->option('f');
+    }
+
     protected function go()
     {
         if ($this->uninstalled()) {
-            $this->info('Uninstalling...');
+            $this->warn(sprintf('Uninstalling [%s]...', $this->__friendlyName()));
             $this->lineBreak();
             $this->goUninstalling();
-            $this->info('Uninstalled!');
+            $this->info(sprintf('[%s] uninstalled!!!', $this->__friendlyName()));
         } else {
-            $this->info('Installing...');
+            $this->warn(sprintf('Setting up [%s]...', $this->__friendlyName()));
             $this->lineBreak();
-            $this->goInstalling();
-            $this->info('Installed!');
+            if ($this->forced()) {
+                $this->goForcingToInstall();
+            } else {
+                $this->goInstalling();
+            }
+            $this->info(sprintf('[%s] set up!!!', $this->__friendlyName()));
         }
+    }
+
+    protected function goForcingToInstall()
+    {
+        $this->goInstalling();
     }
 
     protected abstract function goInstalling();
