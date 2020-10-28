@@ -16,6 +16,16 @@ abstract class Command extends BaseCommand
 {
     use ClassTrait, ShellTrait;
 
+    protected $__friendlyName;
+
+    protected function __friendlyName()
+    {
+        if (empty($this->__friendlyName)) {
+            $this->__friendlyName = trim(preg_replace('/command$/i', '', static::__friendlyClassBaseName()));
+        }
+        return $this->__friendlyName;
+    }
+
     protected $noInformation = false;
 
     /**
@@ -67,7 +77,6 @@ abstract class Command extends BaseCommand
         if (!$this->noInformation) {
             $this->lineBreak();
             $this->info(sprintf('END %s!!!', strtoupper($this->__friendlyClassBaseName())));
-            $this->lineBreak();
         }
     }
 
