@@ -12,7 +12,7 @@ use App\Models\PasswordReset;
 /**
  * Class PasswordResetRepository
  * @package App\ModelRepositories
- * @method PasswordReset first($query)
+ * @property  PasswordReset $model
  */
 class PasswordResetRepository extends ModelRepository
 {
@@ -21,6 +21,10 @@ class PasswordResetRepository extends ModelRepository
         return PasswordReset::class;
     }
 
+    /**
+     * @param string $token
+     * @return PasswordReset
+     */
     public function getByToken($token)
     {
         return $this->first(

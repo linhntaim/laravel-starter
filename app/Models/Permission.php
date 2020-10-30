@@ -6,7 +6,9 @@
 
 namespace App\Models;
 
+use App\Models\Base\IProtected;
 use App\Models\Base\Model;
+use App\ModelTraits\ProtectedTrait;
 
 /**
  * Class Permission
@@ -16,8 +18,10 @@ use App\Models\Base\Model;
  * @property string $display_name
  * @property string $description
  */
-class Permission extends Model
+class Permission extends Model implements IProtected
 {
+    use ProtectedTrait;
+
     const BE_SYSTEM = 'be-system';
     const BE_SUPER_ADMIN = 'be-super-admin';
     const IMPERSONATE = 'impersonate';
@@ -52,13 +56,13 @@ class Permission extends Model
         'description',
     ];
 
+    public static function getProtectedKey()
+    {
+        return 'name';
+    }
+
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'permissions_roles', 'permission_id', 'role_id');
-    }
-
-    public function scopeNoneProtected($query)
-    {
-        return $query->whereNotIn('name', static::PROTECTED);
     }
 }

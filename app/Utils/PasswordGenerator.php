@@ -8,100 +8,125 @@ namespace App\Utils;
 
 class PasswordGenerator
 {
-    protected $includeSymbols;
-    protected $includeNumbers;
-    protected $includeLowerCases;
-    protected $includeUpperCases;
-    protected $symbolLength;
-    protected $numberLength;
-    protected $lowerCaseLength;
-    protected $upperCaseLength;
-    protected $lowercaseCharacter = 'abcdefghijklmnopqrstuvwxyz';
-    protected $uppercaseCharacter = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    protected $numberCharacter = '0123456789';
-    protected $symbolCharacter = '!@#$%^&*()-=_+';
+    protected $symbolsIncluded;
+    protected $numbersIncluded;
+    protected $lowerCasesIncluded;
+    protected $upperCasesIncluded;
+    protected $symbolsLength;
+    protected $numbersLength;
+    protected $lowerCasesLength;
+    protected $upperCasesLength;
+    protected $lowerCaseCharacters = 'abcdefghijklmnopqrstuvwxyz';
+    protected $upperCaseCharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    protected $numberCharacters = '0123456789';
+    protected $symbolCharacters = '!@#$%^&*()-=_+';
 
-    public function excludeSimilarCharacter($isExclude = true)
+    public function excludeSimilarCharacters($excluded = true)
     {
-        if ($isExclude == true) {
-            // Exclude: e.g. i, l, 1, L, o, 0, O
-            $this->lowercaseCharacter = 'abcdefghjkmnpqrstuvwxyz';
-            $this->uppercaseCharacter = 'ABCDEFGHJKMNPQRSTUVWXYZ';
-            $this->numberCharacter = '23456789';
+        if ($excluded == true) {
+            // Exclude: i, I, l, L, 1, o, O, 0
+            $this->lowerCaseCharacters = 'abcdefghjkmnpqrstuvwxyz';
+            $this->upperCaseCharacters = 'ABCDEFGHJKMNPQRSTUVWXYZ';
+            $this->numberCharacters = '23456789';
         }
         return $this;
     }
 
-    public function includeUpperCases($includeUpperCases = true)
+    public function includeUpperCases($upperCasesIncluded = true)
     {
-        $this->includeUpperCases = $includeUpperCases;
+        $this->upperCasesIncluded = $upperCasesIncluded;
         return $this;
     }
 
-    public function includeLowerCases($includeLowerCases = true)
+    public function includeLowerCases($lowerCasesIncluded = true)
     {
-        $this->includeLowerCases = $includeLowerCases;
+        $this->lowerCasesIncluded = $lowerCasesIncluded;
         return $this;
     }
 
-    public function includeNumbers($includeNumbers = true)
+    public function includeNumbers($numbersIncluded = true)
     {
-        $this->includeNumbers = $includeNumbers;
+        $this->numbersIncluded = $numbersIncluded;
         return $this;
     }
 
-    public function includeSymbols($includeSymbols = true)
+    public function includeSymbols($symbolsIncluded = true)
     {
-        $this->includeSymbols = $includeSymbols;
+        $this->symbolsIncluded = $symbolsIncluded;
         return $this;
     }
 
-    public function setSymbolLength($symbolLength)
+    public function setLowerCasesLength($lowerCasesLength = 3)
     {
-        $this->symbolLength = $symbolLength;
+        $this->lowerCasesLength = $lowerCasesLength;
         return $this;
     }
 
-    public function setNumberLength($numberLength)
+    public function setUpperCasesLength($upperCasesLength = 3)
     {
-        $this->numberLength = $numberLength;
+        $this->upperCasesLength = $upperCasesLength;
         return $this;
     }
 
-    public function setUpperCaseLength($upperCaseLength)
+    public function setNumbersLength($numbersLength = 3)
     {
-        $this->upperCaseLength = $upperCaseLength;
+        $this->numbersLength = $numbersLength;
         return $this;
     }
 
-    public function setLowerCaseLength($lowerCaseLength)
+    public function setSymbolsLength($symbolsLength = 3)
     {
-        $this->lowerCaseLength = $lowerCaseLength;
+        $this->symbolsLength = $symbolsLength;
         return $this;
+    }
+
+    protected function randomString($included, $length, $characters) {
+        $random = '';
+        if ($included && $length) {
+            while (($d = $length - strlen($random)) > 0) {
+                $random .= substr(str_shuffle($characters), 0, $d);
+            }
+        }
+        return $random;
     }
 
     public function generate()
     {
-        $str1 = $this->includeLowerCases ? substr(str_shuffle($this->lowercaseCharacter), 0, $this->lowerCaseLength) : '';
-        $str2 = $this->includeUpperCases ? substr(str_shuffle($this->uppercaseCharacter), 0, $this->upperCaseLength) : '';
-        $str3 = $this->includeNumbers ? substr(str_shuffle($this->numberCharacter), 0, $this->numberLength) : '';
-        $str4 = $this->includeSymbols ? substr(str_shuffle($this->symbolCharacter), 0, $this->symbolLength) : '';
-
-
-        return str_shuffle($str1 . $str2 . $str3 . $str4);
+        return str_shuffle(
+            $this->randomString(
+                $this->lowerCasesIncluded,
+                $this->lowerCasesLength,
+                $this->lowerCaseCharacters
+            )
+            . $this->randomString(
+                $this->upperCasesIncluded,
+                $this->upperCasesLength,
+                $this->upperCaseCharacters
+            )
+            . $this->randomString(
+                $this->numbersIncluded,
+                $this->numbersLength,
+                $this->numberCharacters
+            )
+            . $this->randomString(
+                $this->symbolsIncluded,
+                $this->symbolsLength,
+                $this->symbolCharacters
+            )
+        );
     }
 
     public static function random()
     {
-        return (new PasswordGenerator())->excludeSimilarCharacter(true)
+        return (new PasswordGenerator())->excludeSimilarCharacters(true)
             ->includeUpperCases(true)
-            ->setUpperCaseLength(3)
+            ->setUpperCasesLength(3)
             ->includeLowerCases(true)
-            ->setLowerCaseLength(3)
+            ->setLowerCasesLength(3)
             ->includeNumbers(true)
-            ->setNumberLength(3)
+            ->setNumbersLength(3)
             ->includeSymbols(true)
-            ->setSymbolLength(3)
+            ->setSymbolsLength(3)
             ->generate();
     }
 }

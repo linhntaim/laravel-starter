@@ -9,6 +9,7 @@ namespace App\Models\Base;
 use App\Models\DatabaseNotification;
 use App\Models\User;
 use App\ModelTraits\MemorizeTrait;
+use App\ModelTraits\NotificationTrait;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Notifications\Notifiable;
 

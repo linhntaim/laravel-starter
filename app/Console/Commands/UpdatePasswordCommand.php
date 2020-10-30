@@ -12,98 +12,104 @@ use App\Utils\PasswordGenerator;
 
 class UpdatePasswordCommand extends Command
 {
-    protected $signature = 'update:password {email} {--password=}';
+    protected $signature = 'update:password {user} {--password=}';
 
-    protected $options = [
-        'lowerCases' => false,
-        'upperCases' => false,
-        'numbers' => false,
-        'symbols' => false,
+    protected $passwordOptions = [
+        'lowerCases' => true,
+        'upperCases' => true,
+        'numbers' => true,
+        'symbols' => true,
         'excludeSimilar' => false,
-        'lowerCaseLength' => 0,
-        'upperCaseLength' => 0,
-        'numberLength' => 0,
-        'symbolLength' => 0,
+        'lowerCaseLength' => 4,
+        'upperCaseLength' => 4,
+        'numberLength' => 4,
+        'symbolLength' => 4,
     ];
+
+    /**
+     * @var UserRepository
+     */
+    protected $userRepository;
+    protected $password;
 
     protected function go()
     {
-        if (!$this->issetPassword()) {
-            if ($this->confirm('Do you want to exclude similar characters (e.g. i, l, 1, L, o, 0, O ) ?', true)) {
-                $this->options['excludeSimilar'] = true;
-            }
-            if ($this->confirm('Do you want password contain lower case characters?', true)) {
-                $this->options['lowerCases'] = true;
-                $this->options['lowerCaseLength'] = $this->ask('How many characters do you want?');
-            }
-            if ($this->confirm('Do you want password contain upper case characters?', true)) {
-                $this->options['upperCases'] = true;
-                $this->options['upperCaseLength'] = $this->ask('How many characters do you want?');
-            }
-            if ($this->confirm('Do you want password contain numbers?', true)) {
-                $this->options['numbers'] = true;
-                $this->options['numberLength'] = $this->ask('How many number do you want?');
-            }
-            if ($this->confirm('Do you want password contain symbols?', true)) {
-                $this->options['symbols'] = true;
-                $this->options['symbolLength'] = $this->ask('How many characters do you want?');
-            }
-            if ($this->validateHandledOptions()) {
-                $this->updatePassword();
-            }
-        } else {
+        if ($this->parseUser() && $this->parsePassword()) {
             $this->updatePassword();
         }
-
     }
 
-    private function getEmail()
+    protected function updatePassword()
     {
-        return $this->argument('email');
+        $this->userRepository->skipProtected()
+            ->updateWithAttributes([
+                'password' => $this->password,
+            ]);
+        $this->warn(
+            sprintf(
+                '[%s] was updated as password for User ID [%s] successfully!',
+                $this->password,
+                $this->userRepository->getId(),
+            )
+        );
     }
 
-    private function issetPassword()
+    protected function parseUser()
     {
-        return !empty($this->option('password')) ? true : false;
-    }
-
-    private function validateHandledOptions()
-    {
-        if (!is_int($this->options['lowerCaseLength']) || !is_int($this->options['upperCaseLength']) || !is_int($this->options['numberLength']) || !is_int($this->options['symbolLength'])) {
-            $this->error('Number of characters must be numeric.');
+        $this->userRepository = new UserRepository();
+        $this->userRepository->pinModel()
+            ->notStrict()
+            ->getUniquely($this->argument('user'));
+        if ($this->userRepository->doesntHaveModel()) {
+            $this->error('Cannot find user');
             return false;
         }
         return true;
     }
 
-    private function generatePassword()
+    protected function parsePassword()
     {
-        return (new PasswordGenerator())
-            ->excludeSimilarCharacter($this->options['excludeSimilar'])
-            ->includeUpperCases($this->options['upperCases'])
-            ->includeLowerCases($this->options['lowerCases'])
-            ->includeNumbers($this->options['numbers'])
-            ->includeSymbols($this->options['symbols'])
-            ->setUpperCaseLength($this->options['upperCaseLength'])
-            ->setLowerCaseLength($this->options['lowerCaseLength'])
-            ->setNumberLength($this->options['numberLength'])
-            ->setSymbolLength($this->options['symbolLength'])
-            ->generate();
-    }
+        $this->password = $this->option('password');
 
-    private function updatePassword()
-    {
-        $userRepository = new UserRepository();
-        $user = $userRepository->notStrict()->getByEmail($this->getEmail());
-        if (empty($user)) {
-            $this->error('Email does not exist!');
-        } else {
-            $password = $this->issetPassword() ? $this->option('password') : $this->generatePassword();
-            $userRepository->model($user);
-            $userRepository->updateWithAttributes([
-                'password' => $password,
-            ]);
-            $this->warn(sprintf('%s was updated as password successfully!', $password));
+        if (empty($this->password)) {
+            $similarCharactersExcluded = $this->confirm('Do you want to exclude similar characters (e.g. i, I, l, L, 1, o, O, 0) ?', false);
+            $lowerCasesIncluded = $this->confirm('Do you want password contain lowercase characters?', true);
+            $lowerCasesLength = $lowerCasesIncluded ? intval($this->ask('How many characters do you want?', 3)) : 0;
+            $upperCasesIncluded = $this->confirm('Do you want password contain uppercase characters?', true);
+            $upperCasesLength = $upperCasesIncluded ? intval($this->ask('How many characters do you want?', 3)) : 0;
+            $numbersIncluded = $this->confirm('Do you want password contain numbers?', true);
+            $numbersLength = $numbersIncluded ? intval($this->ask('How many number do you want?', 3)) : 0;
+            $symbolsIncluded = $this->confirm('Do you want password contain symbols?', true);
+            $symbolsLength = $symbolsIncluded ? intval($this->ask('How many characters do you want?', 3)) : 0;
+
+            if (!$lowerCasesIncluded
+                && !$upperCasesIncluded
+                && !$numbersIncluded
+                && !$symbolsIncluded) {
+                $this->error('Password must include at least one of following types: lower or upper cases, numbers, symbols.');
+                return false;
+            }
+
+            if (!$lowerCasesLength
+                && !$upperCasesLength
+                && !$numbersLength
+                && !$symbolsLength) {
+                $this->error('Password cannot be zero length');
+                return false;
+            }
+
+            $this->password = (new PasswordGenerator())
+                ->excludeSimilarCharacters($similarCharactersExcluded)
+                ->includeLowerCases($lowerCasesIncluded)
+                ->includeUpperCases($upperCasesIncluded)
+                ->includeNumbers($numbersIncluded)
+                ->includeSymbols($symbolsIncluded)
+                ->setLowerCasesLength($lowerCasesLength)
+                ->setUpperCasesLength($upperCasesLength)
+                ->setNumbersLength($numbersLength)
+                ->setSymbolsLength($symbolsLength)
+                ->generate();
         }
+        return true;
     }
 }
