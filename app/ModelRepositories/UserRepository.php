@@ -7,7 +7,10 @@
 namespace App\ModelRepositories;
 
 use App\Exceptions\AppException;
+use App\ModelRepositories\Base\IProtectedRepository;
 use App\ModelRepositories\Base\ModelRepository;
+use App\ModelRepositories\Base\ProtectedRepositoryTrait;
+use App\Models\Base\IProtected;
 use App\Models\User;
 use App\Utils\ClientSettings\DateTimer;
 use App\Utils\SocialLogin;
@@ -16,11 +19,12 @@ use App\Utils\StringHelper;
 /**
  * Class UserRepository
  * @package App\ModelRepositories
- * @property User $model
- * @method User first($query)
+ * @property User|IProtected $model
  */
-class UserRepository extends ModelRepository
+class UserRepository extends ModelRepository implements IProtectedRepository
 {
+    use ProtectedRepositoryTrait;
+
     public function modelClass()
     {
         return User::class;
@@ -34,9 +38,7 @@ class UserRepository extends ModelRepository
 
     protected function searchOn($query, array $search)
     {
-        if (!empty($search['except_protected'])) {
-            $query->noneProtected();
-        }
+        $query = $this->queryProtected($query);
         if (!empty($search['email'])) {
             $query->where('email', 'like', '%' . $search['email'] . '%');
         }
@@ -141,9 +143,7 @@ class UserRepository extends ModelRepository
      */
     public function updateWithAttributes(array $attributes = [])
     {
-        if (in_array($this->getId(), User::PROTECTED)) {
-            throw new AppException('Cannot edit this role');
-        }
+        $this->validateProtected('Cannot edit this protected user');
 
         if (!empty($attributes['password'])) {
             $attributes['password'] = StringHelper::hash($attributes['password']);
@@ -157,20 +157,9 @@ class UserRepository extends ModelRepository
         return parent::updateWithAttributes($attributes);
     }
 
-    /**
-     * @param array $ids
-     * @return bool
-     */
-    public function deleteWithIds(array $ids)
-    {
-        return $this->queryDelete($this->queryByIds($ids)->noneProtected());
-    }
-
     public function delete()
     {
-        if (in_array($this->getId(), User::PROTECTED)) {
-            throw new AppException('Cannot delete this user');
-        }
+        $this->validateProtected('Cannot delete this protected user');
 
         return parent::delete();
     }

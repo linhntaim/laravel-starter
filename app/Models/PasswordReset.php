@@ -12,6 +12,7 @@ use App\Utils\ClientSettings\Facade;
 /**
  * Class PasswordReset
  * @package App\Models
+ * @property string $email
  * @property string $sdStExpiredAt
  */
 class PasswordReset extends Model

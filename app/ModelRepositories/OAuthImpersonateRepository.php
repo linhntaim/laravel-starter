@@ -12,7 +12,6 @@ use App\Models\OAuthImpersonate;
 /**
  * Class OAuthImpersonateRepository
  * @package App\ModelRepositories
- * @method OAuthImpersonate first($query)
  */
 class OAuthImpersonateRepository extends ModelRepository
 {

@@ -12,7 +12,6 @@ use App\ModelRepositories\AdminRepository;
 use App\Models\Admin;
 use App\Utils\ConfigHelper;
 use Closure;
-use Illuminate\Support\Facades\Password;
 
 class PasswordController extends BasePasswordController
 {

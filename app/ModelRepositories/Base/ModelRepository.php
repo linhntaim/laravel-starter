@@ -190,7 +190,7 @@ abstract class ModelRepository
 
     /**
      * @param Builder $query
-     * @return Model
+     * @return Model|mixed
      * @throws
      */
     public function first($query)
