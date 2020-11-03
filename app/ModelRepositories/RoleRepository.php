@@ -44,7 +44,6 @@ class RoleRepository extends ModelRepository implements IProtectedRepository
 
     protected function searchOn($query, array $search)
     {
-        $query = $this->queryProtected($query);
         if (!empty($search['name'])) {
             $query->where('name', 'like', '%' . $search['name'] . '%');
         }

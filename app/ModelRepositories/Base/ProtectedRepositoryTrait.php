@@ -48,6 +48,11 @@ trait ProtectedRepositoryTrait
         });
     }
 
+    protected function searchQuery()
+    {
+        return $this->queryProtected(parent::searchQuery());
+    }
+
     protected function queryProtected($query)
     {
         if ($this->protected) {

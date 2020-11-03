@@ -347,6 +347,14 @@ abstract class ModelRepository
     }
 
     /**
+     * @return Builder
+     */
+    protected function searchQuery()
+    {
+        return $this->query();
+    }
+
+    /**
      * @param array $search
      * @param int $paging
      * @param int $itemsPerPage
@@ -355,7 +363,7 @@ abstract class ModelRepository
      */
     public function search(array $search = [], $paging = Configuration::FETCH_PAGING_YES, $itemsPerPage = Configuration::DEFAULT_ITEMS_PER_PAGE)
     {
-        $query = $this->query();
+        $query = $this->searchQuery();
 
         if (!empty($search)) {
             $query = $this->searchOn($query, $search);

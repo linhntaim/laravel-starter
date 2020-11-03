@@ -38,7 +38,6 @@ class UserRepository extends ModelRepository implements IProtectedRepository
 
     protected function searchOn($query, array $search)
     {
-        $query = $this->queryProtected($query);
         if (!empty($search['email'])) {
             $query->where('email', 'like', '%' . $search['email'] . '%');
         }
