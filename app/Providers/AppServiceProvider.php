@@ -57,5 +57,17 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Facade::autoFetch();
+
+        mb_detect_order([
+            'UTF-8',
+            'UTF-7',
+            'ASCII',
+            'EUC-JP',
+            'SJIS',
+            'eucJP-win',
+            'SJIS-win',
+            'JIS',
+            'ISO-2022-JP'
+        ]);
     }
 }

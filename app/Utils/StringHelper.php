@@ -44,6 +44,7 @@ class StringHelper
 
         $utf8Encoding = 'UTF-8';
         $currentEncoding = mb_detect_encoding($text);
-        return $currentEncoding == $utf8Encoding ? $text : mb_convert_encoding($text, $utf8Encoding, $currentEncoding);
+        return $currentEncoding === false || $currentEncoding == $utf8Encoding ?
+            $text : mb_convert_encoding($text, $utf8Encoding, $currentEncoding);
     }
 }

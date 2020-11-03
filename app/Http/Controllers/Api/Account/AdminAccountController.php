@@ -6,7 +6,6 @@
 
 namespace App\Http\Controllers\Api\Account;
 
-use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\AdminRepository;
 use App\ModelRepositories\UserRepository;
@@ -124,7 +123,7 @@ class AdminAccountController extends BaseAccountController
         $this->validated($request, $rules);
 
         return $this->responseModel(
-            (new UserRepository($request->user()->id))->updateWithAttributes([
+            (new UserRepository($currentUser))->skipProtected()->updateWithAttributes([
                 'email' => $request->input('email'),
             ])
         );
@@ -145,7 +144,7 @@ class AdminAccountController extends BaseAccountController
         ]);
 
         return $this->responseModel(
-            (new UserRepository($currentUser->id))->updateWithAttributes([
+            (new UserRepository($currentUser))->skipProtected()->updateWithAttributes([
                 'password' => $request->input('password'),
             ])
         );
