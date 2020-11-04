@@ -247,9 +247,22 @@ abstract class ModelRepository
         return empty($this->model);
     }
 
+    public function hasModel()
+    {
+        return !$this->doesntHaveModel();
+    }
+
     public function forgetModel()
     {
         $this->model = null;
+        return $this;
+    }
+
+    public function load($relations)
+    {
+        if ($this->hasModel()) {
+            $this->model->load($relations);
+        }
         return $this;
     }
 

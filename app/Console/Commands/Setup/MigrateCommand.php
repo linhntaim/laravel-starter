@@ -57,13 +57,25 @@ class MigrateCommand extends Command
         switch ($databaseConnection['driver']) {
             case 'mysql':
             default:
+                $databaseConnectionWrite = $databaseConnection;
+                if (isset($databaseConnection['write'])) {
+                    $databaseConnectionWrite = $databaseConnection['write'];
+                }
+                $get = function ($key) use ($databaseConnectionWrite, $databaseConnection) {
+                    return isset($databaseConnectionWrite[$key]) ? $databaseConnectionWrite[$key] : $databaseConnection[$key];
+                };
+                print_r($databaseConnectionWrite);
                 $pdo = new \PDO(
-                    sprintf('mysql:host=%s;port:%d', $databaseConnection['host'], $databaseConnection['port']),
-                    $databaseConnection['username'],
-                    $databaseConnection['password'],
-                    $databaseConnection['options']
+                    sprintf(
+                        'mysql:host=%s;port:%d',
+                        $get('host'),
+                        $get('port')
+                    ),
+                    $get('username'),
+                    $get('password'),
+                    $get('options')
                 );
-                $pdo->query(sprintf('CREATE DATABASE IF NOT EXISTS `%s`', $databaseConnection['database']));
+                $pdo->query(sprintf('CREATE DATABASE IF NOT EXISTS `%s`', $get('database')));
                 break;
         }
         $this->info('Database migrated!');

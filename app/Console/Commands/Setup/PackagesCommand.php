@@ -34,20 +34,20 @@ class PackagesCommand extends Command
         $requiredPackages = [];
         $removedPackages = [];
         if (ConfigHelper::get('handled_file.cloud.service.s3')) {
-            if (!$this->existed(static::PACKAGE_AWS_S3)) {
+            if ($this->forced() || !$this->existed(static::PACKAGE_AWS_S3)) {
                 $requiredPackages[] = static::PACKAGE_AWS_S3;
             }
         } else {
-            if ($this->existed(static::PACKAGE_AWS_S3)) {
+            if ($this->forced() || $this->existed(static::PACKAGE_AWS_S3)) {
                 $removedPackages[] = static::PACKAGE_AWS_S3;
             }
         }
         if (ConfigHelper::get('handled_file.cloud.service.azure')) {
-            if (!$this->existed(static::PACKAGE_AZURE_BLOB)) {
+            if ($this->forced() || !$this->existed(static::PACKAGE_AZURE_BLOB)) {
                 $requiredPackages[] = static::PACKAGE_AZURE_BLOB;
             }
         } else {
-            if ($this->existed(static::PACKAGE_AZURE_BLOB)) {
+            if ($this->forced() || $this->existed(static::PACKAGE_AZURE_BLOB)) {
                 $removedPackages[] = static::PACKAGE_AZURE_BLOB;
             }
         }
