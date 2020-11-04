@@ -64,7 +64,6 @@ class MigrateCommand extends Command
                 $get = function ($key) use ($databaseConnectionWrite, $databaseConnection) {
                     return isset($databaseConnectionWrite[$key]) ? $databaseConnectionWrite[$key] : $databaseConnection[$key];
                 };
-                print_r($databaseConnectionWrite);
                 $pdo = new \PDO(
                     sprintf(
                         'mysql:host=%s;port:%d',
