@@ -149,16 +149,5 @@ class DefaultSeeder extends Seeder
             'display_name' => 'Administrator',
         ]);
         $this->output()->writeln(sprintf('Admin: %s / %s', $this->administratorEmail, $adminPassword));
-
-        $this->extends();
-    }
-
-    protected function extends()
-    {
-        $this->output()->writeln('Extending...');
-        // TODO:
-
-        // TODO
-        $this->output()->writeln('Extended!');
     }
 }
