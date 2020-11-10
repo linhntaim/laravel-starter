@@ -82,7 +82,7 @@ class Admin extends ExtendedUserModel
             $permissionNames = null;
             if (!empty($role)) {
                 $permissionNames = [];
-                $this->role->permissions->each(function ($permission) use (&$permissionNames) {
+                $role->permissions->each(function (Permission $permission) use (&$permissionNames) {
                     if (!in_array($permission->name, $permissionNames)) {
                         $permissionNames[] = $permission->name;
                     }

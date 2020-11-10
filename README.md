@@ -141,11 +141,13 @@ php artisan setup:seed:test {--u} {--f}
 Setup everything if it needs to.
 
 ```
-php artisan setup {--u} {--f}
+php artisan setup {--u} {--f} {--seed-dummy} {--seed-test}
 ```
 
 - `--u`: Remove everything.
 - `--f`: Forced to re-setup everything.
+- `--seed-dummy`: To seed dummy data.
+- `--seed-test`: To seed test data.
 
 ### Test to execute event
 

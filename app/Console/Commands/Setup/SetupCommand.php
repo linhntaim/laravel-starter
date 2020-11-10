@@ -8,7 +8,7 @@ namespace App\Console\Commands\Setup;
 
 class SetupCommand extends Command
 {
-    protected $signature = 'setup {--u} {--f}';
+    protected $signature = 'setup {--u} {--f} {--seed-dummy} {--seed-test}';
 
     protected function goInstalling()
     {
@@ -33,6 +33,20 @@ class SetupCommand extends Command
             '--f' => true,
         ] : []);
         $this->lineBreak();
+
+        if ($this->option('seed-dummy')) {
+            $this->call('setup:seed:dummy', $forced ? [
+                '--f' => true,
+            ] : []);
+            $this->lineBreak();
+        }
+
+        if ($this->option('seed-test')) {
+            $this->call('setup:seed:test', $forced ? [
+                '--f' => true,
+            ] : []);
+            $this->lineBreak();
+        }
     }
 
     protected function goUninstalling()
@@ -57,5 +71,19 @@ class SetupCommand extends Command
             '--u' => true,
         ]);
         $this->lineBreak();
+
+        if ($this->option('seed-dummy')) {
+            $this->call('setup:seed:dummy', [
+                '--u' => true,
+            ]);
+            $this->lineBreak();
+        }
+
+        if ($this->option('seed-test')) {
+            $this->call('setup:seed:test', [
+                '--u' => true,
+            ]);
+            $this->lineBreak();
+        }
     }
 }
