@@ -10,7 +10,6 @@ use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\DatabaseNotificationRepository;
 use App\Models\Admin;
-use App\Models\DatabaseNotification;
 
 class AdminNotificationController extends ModelApiController
 {
@@ -27,16 +26,6 @@ class AdminNotificationController extends ModelApiController
             'notifiable_type' => Admin::class,
             'notifiable_id' => $request->admin()->user_id,
         ];
-    }
-
-    /**
-     * @param Request $request
-     * @param $id
-     * @return DatabaseNotification
-     */
-    private function getById(Request $request, $id)
-    {
-        return $request->admin()->notifications()->findOrFail($id);
     }
 
     public function update(Request $request, $id)

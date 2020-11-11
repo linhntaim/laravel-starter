@@ -14,7 +14,6 @@ use App\Utils\StringHelper;
 /**
  * Class DeviceRepository
  * @package App\ModelRepositories
- * @method Device first($query)
  */
 class DeviceRepository extends ModelRepository
 {

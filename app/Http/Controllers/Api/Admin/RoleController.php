@@ -38,7 +38,6 @@ class RoleController extends ModelApiController
         if (!empty($input)) {
             $search['permissions'] = (array)$input;
         }
-        $search['except_protected'] = 1;
         return $search;
     }
 

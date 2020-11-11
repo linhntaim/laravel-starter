@@ -25,8 +25,8 @@ php artisan client:limit {--u} {--allow=} {--deny=} {--admin}
 ```
 
 - `--u`: Remove all limitation.
-- `--allow`: List of IPs, separated by comma. Only these IPs can access.
-- `--deny`: List of IPs, separated by comma. Only these IPs cannot access.
+- `--allow`: List of IPs, separated by the comma. Only these IPs can access.
+- `--deny`: List of IPs, separated by the comma. Only these IPs cannot access.
 - `--admin`: Limit with admin site only.
 
 ### Impersonate
@@ -38,7 +38,7 @@ php artisan impersonate {user} {admin_id}
 ```
 
 - `user`: User for impersonating.
-- `admin_id`: Admin who does impersonating.
+- `admin_id`: Admin who goes impersonating.
 
 ### Manual run a shell
 
@@ -48,40 +48,106 @@ php artisan shell:manual {shell}
 
 - `shell`: Shell for running, usually put in double quotes, i.e: `"echo Hello world!"`.
 
-### Setup migration
+### Setup web server
+
+Make some configuration for web server if it needs to.
 
 ```
-php artisan setup:migration {--u} {--key} {--packages} {--dummy-data}
+php artisan setup:web-server {--u} {--f}
 ```
 
-- `--u`: Remove all tables and some files to run the application.
-- `--key`: Enable to generate application key.
-- `--packages`: Install extra packages based on configuration.
-- `--dummy-data`: Enable to generate dummy data.
+- `--u`: Remove configuration made.
+- `--f`: Forced to make fresh copies of configuration.
 
 ### Setup packages
 
-Automatically install extra packages based on configuration.
+Automatically install or remove extra packages based on the configuration if they need to.
 
 ```
-php artisan setup:packages
+php artisan setup:packages {--u} {--f}
 ```
+
+- `--u`: Remove extra packages.
+- `--f`: Forced to install or remove without any condition.
+
+### Setup application's key
+
+Generate the application's key if it does not exist.
+
+```
+php artisan setup:key:generate {--u} {--f}
+```
+
+- `--u`: Remove the key.
+- `--f`: Forced to re-generate a new key.
+
+### Setup storage link
+
+Create all storage links if it does not exist.
+
+```
+php artisan setup:storage:link {--u} {--f}
+```
+
+- `--u`: Remove all storage links.
+- `--f`: Forced to re-create all storage links.
+
+### Setup migrate
+
+Create all tables and seeds if it does not exist.
+
+```
+php artisan setup:migrate {--u} {--f}
+```
+
+- `--u`: Remove all tables.
+- `--f`: Forced to re-create all tables and seeds.
+
+### Setup default data
+
+Seed default data.
+
+```
+php artisan setup:seed:default {--u} {--f}
+```
+
+- `--u`: Do nothing.
+- `--f`: Do nothing.
 
 ### Setup dummy data
 
-```
-php artisan setup:dummy-data {--u}
-```
-
-- `--u`: Remove all dummy data.
-
-### Setup data for testing
+Seed dummy data.
 
 ```
-php artisan setup:test-data {--u}
+php artisan setup:seed:dummy {--u} {--f}
 ```
 
-- `--u`: Remove all test data.
+- `--u`: Do nothing.
+- `--f`: Do nothing.
+
+### Setup test data
+
+Seed test data.
+
+```
+php artisan setup:seed:test {--u} {--f}
+```
+
+- `--u`: Do nothing.
+- `--f`: Do nothing.
+
+### Setup
+
+Setup everything if it needs to.
+
+```
+php artisan setup {--u} {--f} {--seed-dummy} {--seed-test}
+```
+
+- `--u`: Remove everything.
+- `--f`: Forced to re-setup everything.
+- `--seed-dummy`: To seed dummy data.
+- `--seed-test`: To seed test data.
 
 ### Test to execute event
 
@@ -114,20 +180,34 @@ php artisan test:mail-event
 ```
 
 ### Update password
-```
-php artisan update:password {email} {--password=}
 
 ```
-- `email`: User's email needs to update password.
+php artisan update:password {user} {--password=}
+```
+
+- `user`: Email or ID of user who needs to update password.
 - `--password`: The password needs to update. Leave empty for auto-generating random password.
 
 ### Try something
 
-Go into `app\Console\Commands` and clone the file `TryCommand.php.example` to `TryCommand.php`. Then change some codes in it (find `TODO` block) and run:
+Go into `app\Console\Commands` and clone the file `TryCommand.php.example` to `TryCommand.php` 
+(or quickly, run [Make try command](#make-try-command)), then change some codes in it 
+(find `TODO` block) and run:
 
 ```
 php artisan try
 ```
+
+### Make try command
+
+Clone `TryCommand.php.example` to `TryCommand.php` in directory `app\Console\Commands` if it does not exist.
+(`TryCommand.php` is ignored from Git)
+
+```
+php artisan make:command:try {--f}
+```
+
+- `--f`: Forced to make a fresh copy.
 
 ## Configuration
 
@@ -175,13 +255,13 @@ Value is string.
 
 #### APP_ID
 
-Unique name of the application.
+The unique name of the application.
 
 Value is string. Should be valid with this regular expression: `^[a-z][a-z0-9_]*$`.
 
 #### APP_URL
 
-URL of the application. The application will get this URL as the root URL when running in console.
+URL of the application. The application will get this URL as the root URL when running in the console.
 
 #### APP_VERSION
 
@@ -212,9 +292,20 @@ DB_CHARSET=utf8mb4
 DB_COLLATION=utf8mb4_unicode_ci
 ```
 
+For MySQL database, to split READ/WRITE connection, modify those configurations: 
+
+- **`DB_SPLIT`**:
+    - Default value is `false`. 
+    - Set the value to `true` to split.
+- **`DB_READ_HOST`**:
+    - Set the host for READ connection when `DB_SPLIT` is `true`.
+- **`DB_WRITE_HOST`**:
+    - Set the host for WRITE connection when `DB_SPLIT` is `true`.
+
 #### MYSQL_ATTR_SSL_CA
 
-For the default database connection by MySQL, if it is necessary to connect database server via SSL, place the absolute path to SSL certificate file here as the value.
+For the default database connection by MySQL, if it is necessary to connect database server via SSL, 
+place the absolute path to SSL certificate file here as the value.
 
 For example, if this application is deployed to Azure App Service, the setting should be:
 
@@ -226,7 +317,10 @@ MYSQL_ATTR_SSL_CA="D:\\home\\site\\wwwroot\\storage\\BaltimoreCyberTrustRoot.crt
 MYSQL_ATTR_SSL_CA="/home/site/wwwroot/storage/BaltimoreCyberTrustRoot.crt.pem"
 ```
 
-- `BaltimoreCyberTrustRoot.crt.pem`: The SSL certificate file which is used for connecting to the `Azure Database for MySQL server` \([reference](https://docs.microsoft.com/en-us/azure/mysql/howto-configure-ssl)\), which is already included in `storage` folder.
+- `BaltimoreCyberTrustRoot.crt.pem` The SSL certificate file which is used for connecting to 
+the `Azure Database for MySQL server` 
+([reference](https://docs.microsoft.com/en-us/azure/mysql/howto-configure-ssl)), 
+which is already included in `storage` folder.
 
 #### CACHE_DRIVER
 
@@ -246,7 +340,8 @@ Default value is `sync` and queued jobs will be executed immediately when runnin
 
 If you want to queue the jobs, value could be set to `database`.
 When value is set to `database`, a table named `sys_jobs` will be automatically created when running migration 
-(see `database/migrations/2018_08_16_000000_create_failed_jobs_table.php` file) and queued jobs will be stored in this table then wait for executing.
+(see `database/migrations/2018_08_16_000000_create_failed_jobs_table.php` file) and queued jobs will be stored in 
+this table then wait for executing.
 
 #### MAIL_*
 
@@ -277,19 +372,25 @@ MAIL_TESTED_TO_ADDRESS=
 MAIL_TESTED_TO_NAME=
 ```
 
-- **`MAIL_SEND_OFF`**: Set value to `true` if you don't want to send any email. Useful when doing massive tests without sending **massive emails**.
+- **`MAIL_SEND_OFF`**: Set the value to `true` if you don't want to send any email. Useful when doing massive tests 
+without sending **massive emails**.
 - **`MAIL_SEND_RATE_*`**: Control limit the rate of sending emails.
     - **`MAIL_SEND_RATE_KEY`**: Name of the cache storing the current rate of sending emails.
     - **`MAIL_SEND_RATE_PER_SECOND`**: Limitation of number of emails should be sent in a second.
-    - **`MAIL_SEND_RATE_WAIT_FOR_SECONDS`**: Time in seconds the application should wait before sending next email if the rate limit is reached.
-- **`MAIL_NO_REPLY_*`**: If there is no `from` header set when sending email, the no-reply email account (**`MAIL_NO_REPLY_FROM_ADDRESS`** as email address and **`MAIL_NO_REPLY_FROM_NAME`** as name) will be set as default `from` header.
-- **`MAIL_TESTED_USED`**: Set value to `true` then all emails will be sent to the only tested-to email account (**`MAIL_TESTED_TO_ADDRESS`** as email address and **`MAIL_TESTED_TO_NAME`** as name) instead of email account set in `to` header. Useful when doing massive tests without sending massive emails to **massive users**.
+    - **`MAIL_SEND_RATE_WAIT_FOR_SECONDS`**: Time in seconds the application should wait before sending next email 
+    if the rate limit is reached.
+- **`MAIL_NO_REPLY_*`**: If there is no `from` header set when sending email, the no-reply email account 
+(**`MAIL_NO_REPLY_FROM_ADDRESS`** as email address and **`MAIL_NO_REPLY_FROM_NAME`** as name) will be set 
+as default `from` header.
+- **`MAIL_TESTED_USED`**: Set the value to `true` then all emails will be sent to the only tested-to email account 
+(**`MAIL_TESTED_TO_ADDRESS`** as email address and **`MAIL_TESTED_TO_NAME`** as name) instead of email account 
+set in `to` header. Useful when doing massive tests without sending massive emails to **massive users**.
 
 ** **Note**: Always use methods of `App\Utils\Mail\MailHelper` class to send any email.
 
 #### TRUSTED_PROXIES
 
-When deploying to hosting service, the value should be set to `*` (or specific proxy IPs separated by comma).
+When deploying to hosting service, the value should be set to `*` (or specific proxy IPs separated by the comma).
 
 #### PUBLIC_PATH
 
@@ -309,11 +410,14 @@ Currently, this setting is automatically configured by running [Setup migration]
 #### SOCIAL_LOGIN_*
 
 - **`SOCIAL_LOGIN_ENABLED`**: 
-    - Set value to `true` if you want to enable the application to support the features of login with social network.
-    - If value is set to `true`, a table named `user_socials` will ve automatically created when running migration. (See `database/migrations/2019_11_13_000004_create_user_socials_table.php` file)
-- **`SOCIAL_LOGIN_EMAIL_DOMAIN_*`**: Limit the email domains of social account can do login. Domains should be separated by comma.
-    - **`SOCIAL_LOGIN_EMAIL_DOMAIN_ALLOWED`**: Allowed domains separated by comma.
-    - **`SOCIAL_LOGIN_EMAIL_DOMAIN_DENIED`**: Denied domains separated by comma.
+    - Set the value to `true` if you want to enable the application to support the features of login with 
+    social networks.
+    - If value is set to `true`, a table named `user_socials` will ve automatically created when running migration. 
+    (See `database/migrations/2019_11_13_000004_create_user_socials_table.php` file)
+- **`SOCIAL_LOGIN_EMAIL_DOMAIN_*`**: Limit the email domains of social account can log in with. 
+Domains should be separated by the comma.
+    - **`SOCIAL_LOGIN_EMAIL_DOMAIN_ALLOWED`**: Allowed domains separated by the comma.
+    - **`SOCIAL_LOGIN_EMAIL_DOMAIN_DENIED`**: Denied domains separated by the comma.
 
 #### ADMIN_FORGOT_PASSWORD_ENABLED
 
@@ -325,13 +429,15 @@ Set the value to `true` to enable the feature of impersonating.
 
 #### THROTTLE_REQUEST_*
 
-Set the limitation for accessing API with max access (set in **`THROTTLE_REQUEST_MAX_ATTEMPTS`**) in a time of minutes (set in **`THROTTLE_REQUEST_DECAY_MINUTES`**).
+Set the limitation for accessing API with max access (set in **`THROTTLE_REQUEST_MAX_ATTEMPTS`**) in a time of minutes 
+(set in **`THROTTLE_REQUEST_DECAY_MINUTES`**).
 
 #### API_RESPONSE_OK
 
 Set the value to `true` to force all the API responses to return status of `200 OK` (include error responses).
 
-** **Note**: It will help the application to pass the [penetration test](https://homepage-gbu.azurewebsites.net/back-end/penetration-testing#problem-2-inconsistent-response).
+** **Note**: It will help the application to pass the 
+[penetration test](https://homepage-gbu.azurewebsites.net/back-end/penetration-testing#problem-2-inconsistent-response).
 
 #### FORCE_COMMON_EXCEPTION
 
@@ -350,45 +456,51 @@ For Azure support, see [Azure Blob Storage Supported](#azure-blob-storage-suppor
 Uploaded/Created files should be handled by `App\Utils\HandledFiles` feature.
 
 By default, files should be handled in local. 
-To save information of files into database, use the `App\ModelRepositories\HandledFileRepository` class.
+To save information of files into the database, use the `App\ModelRepositories\HandledFileRepository` class.
 When saving to database, there are some configuration to automatically do extra jobs as following:
 
 ##### HANDLED_FILE_CLOUD_*
 
 To determine if files could be stored in the cloud.
 
-- **`HANDLED_FILE_CLOUD_ENABLED`**: Set value to `true` and every file will be additionally stored in the cloud.
-- **`HANDLED_FILE_CLOUD_ONLY`**: Set value to `true` and every file will be stored in the cloud and the local ones will be deleted.
+- **`HANDLED_FILE_CLOUD_ENABLED`**: Set the value to `true` and every file will be additionally stored in the cloud.
+- **`HANDLED_FILE_CLOUD_ONLY`**: Set the value to `true` and every file will be stored in the cloud, 
+and the local ones will be deleted.
 
 ##### HANDLED_FILE_CLOUD_SERVICE_*
 
 To enable to use cloud service. When any cloud service is enabled, 
-the required packages will be automcatically installed by running [Setup migration](#setup-migration) or [Setup packages](#setup-packages) command.
+the required packages will be automatically installed by running [Setup migrate](#setup-migrate) 
+or [Setup packages](#setup-packages) command.
 
-- **`HANDLED_FILE_CLOUD_SERVICE_S3`**: Set value to `true` to enable Amazon S3. 
-- **`HANDLED_FILE_CLOUD_SERVICE_AZURE`**: Set value to `true` to enable Microsoft Azure Blog Storage. 
+- **`HANDLED_FILE_CLOUD_SERVICE_S3`**: Set the value to `true` to enable Amazon S3. 
+- **`HANDLED_FILE_CLOUD_SERVICE_AZURE`**: Set the value to `true` to enable Microsoft Azure Blog Storage. 
 
 ##### HANDLED_FILE_IMAGE_*
 
 - **`HANDLED_FILE_IMAGE_MAX_*`**: 
-    - If these configuration are set, the image will be automatically resized when it gets over the limitation of **`HANDLED_FILE_IMAGE_MAX_WIDTH`** as maximum width and **`HANDLED_FILE_IMAGE_MAX_HEIGHT`** as maximum height.
+    - If these configurations are set, the image will be automatically resized when it gets over the limitation 
+    of **`HANDLED_FILE_IMAGE_MAX_WIDTH`** as maximum width and **`HANDLED_FILE_IMAGE_MAX_HEIGHT`** as maximum height.
     - Leave values empty for no limitation.
-- **`HANDLED_FILE_IMAGE_INLINE`**: Set value to `true` and images will be stored in the database instead of local or cloud.
+- **`HANDLED_FILE_IMAGE_INLINE`**: Set the value to `true` and images will be stored in the database 
+instead of local or cloud.
 
 #### ACTIVITY_LOG_ENABLED
 
-Set value to `true` to enable to store activity logs to database.
+Set the value to `true` to enable to store activity logs to database.
 When value is set to `true`, a table named `activity_logs` will be automatically created when running migration 
-(see `database/migrations/2019_08_16_000006_create_activity_logs_table.php` file) and activity logs could be stored in this table.
+(see `database/migrations/2019_08_16_000006_create_activity_logs_table.php` file) and activity logs could be stored 
+in this table.
 
 #### NOTIFICATION_*
 
 ##### NOTIFICATION_VIA_*
 
 - **`NOTIFICATION_VIA_DATABASE`**: 
-    - Set value to `true` to enable to store notification to database.
+    - Set the value to `true` to enable to store notification to database.
     - When value is set to `true`, a table named `notifications` will be automatically created when running migration
-      (see `database/migrations/2018_08_15_000002_create_notifications_table.php` file) and notifications could be stored in this table.
+      (see `database/migrations/2018_08_15_000002_create_notifications_table.php` file) 
+      and notifications could be stored in this table.
 
 #### VARIABLES
 
@@ -402,7 +514,7 @@ For example:
 VARIABLES={"sample":"Value of sample"}
 ```
 
-- .. access in code:
+- ... access in code:
 
 ```
 $variables = ConfigHeldper::get('variables);
@@ -416,7 +528,7 @@ Array (
 **/
 ```
 
-- .. or get it in response of Prerequisite API - Server:
+- ... or get it in response of Prerequisite API - Server:
 
 ```
 /**
@@ -441,7 +553,8 @@ Request to Prerequisite API - Server
 
 #### CLIENT_LIMIT_TIMEOUT
 
-The application has a feature of access limitation and this setting is used to set the time in seconds to cache the client limitation settings from database to local file.
+The application has a feature of access limitation and this setting is used to set the time in seconds 
+to cache the client limitation settings from database to local file.
 
 Default value is `60` seconds.
 
@@ -460,7 +573,8 @@ CLIENT_HOME_URL="${APP_URL}"
 
 The application now treats client as admin or home cause maybe the user sets and use cases of them is different.
 
-For each client, the application needs to know the name and URL of it. Besides, the cookie settings is also needed for some cases.
+For each client, the application needs to know the name and URL of it. 
+Besides, the cookie settings is also needed for some cases.
 
 #### HEADER_*
 
@@ -468,7 +582,7 @@ Set the name of some request headers.
 
 ##### HEADER_SCREEN_NAME
 
-Current screen will be passed from client to the application via default `X-Screen` header.
+The current screen will be passed from client to the application via default `X-Screen` header.
 
 ##### HEADER_SETTINGS_NAME
 
@@ -482,7 +596,8 @@ Device identification will be passed form client to the application via default 
 
 Default value is empty.
 
-If the name of authorization header sent from client is different from `Authorization`, please set it as value here (i.e. `X-Authorization`).
+If the name of authorization header sent from client is different from `Authorization`, 
+please set it as value here (i.e. `X-Authorization`).
 
 #### AZURE_*
 
@@ -494,7 +609,8 @@ See [Azure Blob Storage Supported](#azure-blob-storage-supported).
 
 To add Azure Blob Storage as a disk for cloud storage.
 
-This feature does require the package [matthewbdaly/laravel-azure-storage](https://github.com/matthewbdaly/laravel-azure-storage).
+This feature does require the package 
+[matthewbdaly/laravel-azure-storage](https://github.com/matthewbdaly/laravel-azure-storage).
 
 You can manually install it by running this command:
 
@@ -503,7 +619,7 @@ composer require matthewbdaly/laravel-azure-storage
 ```
 
 ... or **the better way**, set the value of `HANDLED_FILE_CLOUD_SERVICE_AZURE` in `.env` file to `true`, 
-then run [Setup migration](#setup-migration) or [Setup packages](#setup-packages) command. 
+then run [Setup migrate](#setup-migrate) or [Setup packages](#setup-packages) command. 
 
 Besides, there's configuration in `filesystems.php`:
 

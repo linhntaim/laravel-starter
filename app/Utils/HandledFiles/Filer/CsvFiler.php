@@ -16,15 +16,6 @@ class CsvFiler extends Filer
     protected $fReadSkipHeader = true;
     protected $fHasTrimBomCharacters = false;
 
-    public function fStartReading()
-    {
-        parent::fStartReading();
-        $this->fReadExtraHeaders = [];
-        $this->fReadExtraHeaders = [];
-        $this->fReadSkipHeader = true;
-        return $this;
-    }
-
     public function fReadSetMatchedHeaders(array $matchHeaders = [], array $extraHeaders = [])
     {
         $this->fReadMatchedHeaders = $matchHeaders;

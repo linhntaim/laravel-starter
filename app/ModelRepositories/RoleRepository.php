@@ -6,18 +6,21 @@
 
 namespace App\ModelRepositories;
 
-use App\Exceptions\AppException;
+use App\ModelRepositories\Base\IProtectedRepository;
 use App\ModelRepositories\Base\ModelRepository;
+use App\ModelRepositories\Base\ProtectedRepositoryTrait;
+use App\Models\Base\IProtected;
 use App\Models\Role;
-use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Class RoleRepository
  * @package App\ModelRepositories
- * @property Role $model
+ * @property Role|IProtected $model
  */
-class RoleRepository extends ModelRepository
+class RoleRepository extends ModelRepository implements IProtectedRepository
 {
+    use ProtectedRepositoryTrait;
+
     public function modelClass()
     {
         return Role::class;
@@ -41,9 +44,6 @@ class RoleRepository extends ModelRepository
 
     protected function searchOn($query, array $search)
     {
-        if (!empty($search['except_protected'])) {
-            $query->noneProtected();
-        }
         if (!empty($search['name'])) {
             $query->where('name', 'like', '%' . $search['name'] . '%');
         }
@@ -56,17 +56,6 @@ class RoleRepository extends ModelRepository
             });
         }
         return parent::searchOn($query, $search);
-    }
-
-    /**
-     * @return Collection
-     * @throws
-     */
-    public function getNoneProtected()
-    {
-        return $this->catch(function () {
-            return $this->query()->noneProtected()->get();
-        });
     }
 
     /**
@@ -94,9 +83,7 @@ class RoleRepository extends ModelRepository
      */
     public function updateWithAttributes(array $attributes = [], array $permissions = [])
     {
-        if (in_array($this->model->name, Role::PROTECTED)) {
-            throw new AppException('Cannot edit this role');
-        }
+        $this->validateProtected('Cannot edit this protected role');
 
         parent::updateWithAttributes($attributes);
         return $this->catch(function () use ($permissions) {
@@ -109,20 +96,9 @@ class RoleRepository extends ModelRepository
         });
     }
 
-    /**
-     * @param array $ids
-     * @return bool
-     */
-    public function deleteWithIds(array $ids)
-    {
-        return $this->queryDelete($this->queryByIds($ids)->noneProtected());
-    }
-
     public function delete()
     {
-        if (in_array($this->model->name, Role::PROTECTED)) {
-            throw new AppException('Cannot delete this role');
-        }
+        $this->validateProtected('Cannot delete this protected role');
 
         return parent::delete();
     }

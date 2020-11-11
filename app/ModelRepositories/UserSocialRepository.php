@@ -12,7 +12,6 @@ use App\Models\UserSocial;
 /**
  * Class UserSocialRepository
  * @package App\ModelRepositories
- * @method UserSocial first($query)
  */
 class UserSocialRepository extends ModelRepository
 {

@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Collection;
  * @property int $id
  * @property string $name
  * @property string $mime
+ * @property string $url
  * @property bool $ready
  * @property array $options_array_value
  * @property Collection $handledFileStores

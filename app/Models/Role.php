@@ -7,8 +7,10 @@
 namespace App\Models;
 
 use App\ModelResources\RoleResource;
+use App\Models\Base\IProtected;
 use App\Models\Base\Model;
 use App\ModelTraits\MemorizeTrait;
+use App\ModelTraits\ProtectedTrait;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
@@ -21,9 +23,9 @@ use Illuminate\Database\Eloquent\Collection;
  * @property string[]|array $permissionNames
  * @property Permission[]|Collection $permissions
  */
-class Role extends Model
+class Role extends Model implements IProtected
 {
-    use MemorizeTrait;
+    use MemorizeTrait, ProtectedTrait;
 
     const SYSTEM = 'system';
     const SUPER_ADMIN = 'super_admin';
@@ -57,6 +59,11 @@ class Role extends Model
 
     protected $resourceClass = RoleResource::class;
 
+    public static function getProtectedKey()
+    {
+        return 'name';
+    }
+
     public function getPermissionNamesAttribute()
     {
         return $this->remind('permission_names', function () {
@@ -72,11 +79,6 @@ class Role extends Model
     public function permissions()
     {
         return $this->belongsToMany(Permission::class, 'permissions_roles', 'role_id', 'permission_id');
-    }
-
-    public function scopeNoneProtected($query)
-    {
-        return $query->whereNotIn('name', static::PROTECTED);
     }
 
     public function toActivityLogArray($except = [])

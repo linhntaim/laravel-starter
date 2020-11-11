@@ -70,7 +70,6 @@ class TransactionHelper
         }
         if (!in_array($connection, $this->currentTransactionConnections)) {
             $connector = DB::connection($connection);
-            $connector->beginTransaction();
             if ($connection == 'mysql') {
                 if (in_array($isolationLevel, static::ISOLATION_LEVELS) || in_array($accessMode, self::ACCESS_MODES)) {
                     $transactionScope = in_array($transactionScope, static::TRANSACTION_SCOPES) ? $transactionScope . ' ' : '';
@@ -81,6 +80,7 @@ class TransactionHelper
                     );
                 }
             }
+            $connector->beginTransaction();
             $this->currentTransactionConnections[] = $connection;
             $this->hasTransaction = true;
         }

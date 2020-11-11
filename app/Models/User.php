@@ -8,15 +8,17 @@ namespace App\Models;
 
 use App\ModelResources\UserResource;
 use App\Models\Base\IActivityLog;
+use App\Models\Base\IProtected;
 use App\Models\Base\IResource;
 use App\Models\Base\IUser;
 use App\Models\Base\IUserHasSettings;
-use App\Models\Base\NotificationTrait;
 use App\ModelTraits\ActivityLogTrait;
 use App\ModelTraits\FromModelTrait;
 use App\ModelTraits\OnlyAttributesToArrayTrait;
 use App\ModelTraits\MemorizeTrait;
+use App\ModelTraits\NotificationTrait;
 use App\ModelTraits\PassportTrait;
+use App\ModelTraits\ProtectedTrait;
 use App\ModelTraits\ResourceTrait;
 use App\Utils\ClientSettings\Facade;
 use Illuminate\Contracts\Translation\HasLocalePreference;
@@ -36,12 +38,12 @@ use Laravel\Passport\HasApiTokens;
  * @property bool $hasPassword
  * @property PasswordReset $passwordReset
  */
-class User extends Authenticatable implements HasLocalePreference, IUser, IResource, IActivityLog
+class User extends Authenticatable implements HasLocalePreference, IUser, IResource, IActivityLog, IProtected
 {
     use HasFactory, Notifiable, NotificationTrait {
         NotificationTrait::notifications insteadof Notifiable;
     }
-    use OnlyAttributesToArrayTrait, PassportTrait, HasApiTokens, MemorizeTrait, ResourceTrait, SoftDeletes, ActivityLogTrait, FromModelTrait;
+    use OnlyAttributesToArrayTrait, PassportTrait, HasApiTokens, MemorizeTrait, ResourceTrait, SoftDeletes, ActivityLogTrait, FromModelTrait, ProtectedTrait;
 
     const USER_SYSTEM_ID = 1;
     const USER_SUPER_ADMINISTRATOR_ID = 2;
@@ -87,6 +89,11 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
     public function getResourceClass()
     {
         return UserResource::class;
+    }
+
+    public static function getProtectedKey()
+    {
+        return 'id';
     }
 
     public function getHasPasswordAttribute()

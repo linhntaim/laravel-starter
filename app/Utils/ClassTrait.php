@@ -14,7 +14,7 @@ trait ClassTrait
 {
     protected static $__transNamespace = '';
 
-    protected static $__friendlyClassBaseName;
+    protected $__friendlyClassBaseName;
 
     protected static $__snakyClassBaseName;
 
@@ -41,12 +41,12 @@ trait ClassTrait
         return static::$__snakyClassBaseName;
     }
 
-    protected static function __friendlyClassBaseName()
+    protected function __friendlyClassBaseName()
     {
-        if (empty(static::$__friendlyClassBaseName)) {
-            static::$__friendlyClassBaseName = Str::title(Str::snake(static::__classBaseName(), ' '));
+        if (empty($this->__friendlyClassBaseName)) {
+            $this->__friendlyClassBaseName = Str::title(Str::snake(static::__classBaseName(), ' '));
         }
-        return static::$__friendlyClassBaseName;
+        return $this->__friendlyClassBaseName;
     }
 
     protected static function __transCurrentModule()

@@ -190,7 +190,7 @@ abstract class ModelRepository
 
     /**
      * @param Builder $query
-     * @return Model
+     * @return Model|mixed
      * @throws
      */
     public function first($query)
@@ -247,9 +247,22 @@ abstract class ModelRepository
         return empty($this->model);
     }
 
+    public function hasModel()
+    {
+        return !$this->doesntHaveModel();
+    }
+
     public function forgetModel()
     {
         $this->model = null;
+        return $this;
+    }
+
+    public function load($relations)
+    {
+        if ($this->hasModel()) {
+            $this->model->load($relations);
+        }
         return $this;
     }
 
@@ -347,6 +360,14 @@ abstract class ModelRepository
     }
 
     /**
+     * @return Builder
+     */
+    protected function searchQuery()
+    {
+        return $this->query();
+    }
+
+    /**
      * @param array $search
      * @param int $paging
      * @param int $itemsPerPage
@@ -355,7 +376,7 @@ abstract class ModelRepository
      */
     public function search(array $search = [], $paging = Configuration::FETCH_PAGING_YES, $itemsPerPage = Configuration::DEFAULT_ITEMS_PER_PAGE)
     {
-        $query = $this->query();
+        $query = $this->searchQuery();
 
         if (!empty($search)) {
             $query = $this->searchOn($query, $search);

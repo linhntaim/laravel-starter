@@ -113,7 +113,7 @@ Route::group([
     });
 
     Route::group([
-        // Home
+        'prefix' => 'home',
     ], function () {
         // TODO: Home API
 

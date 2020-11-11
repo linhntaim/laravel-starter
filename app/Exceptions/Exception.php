@@ -53,7 +53,7 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
             $this->messages = [$message];
         }
 
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, $code ? $code : static::CODE, $previous);
 
         if ($previous) {
             $this->line = $previous->getLine();
@@ -72,7 +72,7 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
 
     public function getStatusCode()
     {
-        return static::CODE;
+        return $this->getCode();
     }
 
     public function getHeaders()
