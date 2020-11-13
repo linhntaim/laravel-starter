@@ -138,16 +138,32 @@ php artisan setup:seed:test {--u} {--f}
 
 ### Setup
 
-Setup everything if it needs to.
+Setup **everything** if it needs to.
 
 ```
-php artisan setup {--u} {--f} {--seed-dummy} {--seed-test}
+php artisan setup {--u} {--f} {--seed-dummy} {--seed-test} {--skip=*}
 ```
 
 - `--u`: Remove everything.
 - `--f`: Forced to re-setup everything.
 - `--seed-dummy`: To seed dummy data.
 - `--seed-test`: To seed test data.
+- `--skip`: 
+    - To skip some steps in set up.
+    - Can be multiple values, i.e. to skip [Setup Packages](#setup-packages) 
+    and [Setup Application Key](#setup-applications-key), 
+    please run: `php artisan setup --skip=packages --skip=key:generate`.
+    
+**Everything** means to include:
+
+- [Setup Web Server](#setup-web-server)
+- [Setup Packages](#setup-packages)
+- [Setup Application Key](#setup-applications-key)
+- [Setup Storage Link](#setup-storage-link)
+- [Setup Migrate](#setup-migrate)
+- [Setup Default Data](#setup-default-data)
+- [Setup Dummy Data](#setup-dummy-data) (optional)
+- [Setup Test Data](#setup-test-data) (optional)
 
 ### Test to execute event
 
