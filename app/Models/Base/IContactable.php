@@ -6,6 +6,6 @@
 
 namespace App\Models\Base;
 
-interface IUserHasSettings extends IUser, IHasSettings
+interface IContactable extends INameable, IMailable
 {
 }

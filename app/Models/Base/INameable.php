@@ -6,6 +6,7 @@
 
 namespace App\Models\Base;
 
-interface IUserHasSettings extends IUser, IHasSettings
+interface INameable
 {
+    public function preferredName();
 }

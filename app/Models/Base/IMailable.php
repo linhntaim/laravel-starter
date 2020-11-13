@@ -6,6 +6,7 @@
 
 namespace App\Models\Base;
 
-interface IUserHasSettings extends IUser, IHasSettings
+interface IMailable
 {
+    public function preferredEmail();
 }

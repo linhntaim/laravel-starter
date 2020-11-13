@@ -6,12 +6,8 @@
 
 namespace App\Models\Base;
 
-interface IUser
+interface IUser extends IContactable
 {
-    public function preferredEmail();
-
-    public function preferredName();
-
     public function preferredAvatarUrl();
 
     public function preferredLocale();
