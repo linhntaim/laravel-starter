@@ -7,7 +7,6 @@
 namespace App\ModelTraits;
 
 use Illuminate\Support\Str;
-use Mockery\Matcher\Closure;
 
 trait MemorizeTrait
 {
@@ -43,6 +42,12 @@ trait MemorizeTrait
     protected function unmemorized($key)
     {
         unset($this->memories[$key]);
+        return $this;
+    }
+
+    protected function forgetAll()
+    {
+        $this->memories = [];
         return $this;
     }
 

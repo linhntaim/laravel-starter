@@ -12,14 +12,17 @@ use App\Notifications\Base\DatabaseNotificationFactory;
 use App\Notifications\Base\NowNotification;
 use App\Utils\ClientSettings\Facade;
 use Illuminate\Notifications\DatabaseNotification as BaseDatabaseNotification;
-use function GuzzleHttp\json_decode;
 
 /**
  * Class DatabaseNotification
  * @package App\Models
  * @property string $type
+ * @property string $name
+ * @property string $image
  * @property string $title
  * @property string $content
+ * @property string $htmlContent
+ * @property string $action
  * @property string $sdStCreatedAt
  * @property string $sdStReadAt
  * @property array|null $data
@@ -32,15 +35,23 @@ class DatabaseNotification extends BaseDatabaseNotification
 
     protected $visible = [
         'id',
+        'name',
+        'image',
         'title',
         'content',
+        'html_content',
+        'action',
         'sd_st_created_at',
         'sd_st_read_at',
     ];
 
     protected $appends = [
+        'name',
+        'image',
         'title',
         'content',
+        'html_content',
+        'action',
         'sd_st_created_at',
         'sd_st_read_at',
     ];
@@ -68,6 +79,20 @@ class DatabaseNotification extends BaseDatabaseNotification
         });
     }
 
+    public function getNameAttribute()
+    {
+        return $this->remind('name', function () {
+            return $this->notification->getName();
+        });
+    }
+
+    public function getImageAttribute()
+    {
+        return $this->remind('image', function () {
+            return $this->notification->getImage($this->notifiable);
+        });
+    }
+
     public function getTitleAttribute()
     {
         return $this->remind('title', function () {
@@ -78,7 +103,21 @@ class DatabaseNotification extends BaseDatabaseNotification
     public function getContentAttribute()
     {
         return $this->remind('content', function () {
+            return $this->notification->getContent($this->notifiable, false);
+        });
+    }
+
+    public function getHtmlContentAttribute()
+    {
+        return $this->remind('html_content', function () {
             return $this->notification->getContent($this->notifiable);
+        });
+    }
+
+    public function getActionAttribute()
+    {
+        return $this->remind('action', function () {
+            return $this->notification->getAction($this->notifiable);
         });
     }
 

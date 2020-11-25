@@ -10,6 +10,7 @@ use App\Models\Base\IUser;
 use App\Models\DatabaseNotification;
 use App\Notifications\Base\DatabaseNotificationTrait;
 use App\Notifications\Base\IDatabaseNotification;
+use App\Notifications\Base\NotificationActions;
 use App\Notifications\Base\NowNotification;
 
 class TestNotification extends NowNotification implements IDatabaseNotification
@@ -42,5 +43,19 @@ class TestNotification extends NowNotification implements IDatabaseNotification
         return static::__transWithCurrentModule('content', [
             'test' => $this->test,
         ]);
+    }
+
+    public function getAction(IUser $notifiable)
+    {
+        return NotificationActions::actionGo(
+            'test',
+            [
+                'test' => $this->test,
+            ],
+            [
+                'test' => $this->test,
+            ],
+            'test'
+        );
     }
 }

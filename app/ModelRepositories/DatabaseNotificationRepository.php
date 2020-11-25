@@ -40,6 +40,9 @@ class DatabaseNotificationRepository extends ModelRepository
         if (!empty($search['notifiable_id'])) {
             $query->where('notifiable_id', $search['notifiable_id']);
         }
+        if (!empty($search['types'])) {
+            $query->whereIn('type', $search['types']);
+        }
         return parent::searchOn($query, $search);
     }
 

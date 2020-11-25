@@ -232,12 +232,22 @@ abstract class NowNotification extends BaseNotification
     protected function dataArray(IUser $notifiable)
     {
         return [
-            'name' => $this::NAME,
-            'image' => $this->notifier->preferredAvatarUrl(),
+            'name' => $this->getName(),
+            'image' => $this->getImage($notifiable),
             'content' => $this->getContent($notifiable, false),
             'html_content' => $this->getContent($notifiable),
             'action' => $this->getAction($notifiable),
         ];
+    }
+
+    public function getName()
+    {
+        return static::NAME;
+    }
+
+    public function getImage(IUser $notifiable)
+    {
+        return $this->notifier->preferredAvatarUrl();
     }
 
     public function getTitle(IUser $notifiable)
@@ -250,7 +260,7 @@ abstract class NowNotification extends BaseNotification
         return static::__transWithCurrentModule('content');
     }
 
-    protected function getAction(IUser $notifiable)
+    public function getAction(IUser $notifiable)
     {
         return null;
     }
