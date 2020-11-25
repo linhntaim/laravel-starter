@@ -6,6 +6,10 @@
 
 namespace App\Models\Base;
 
+/**
+ * Interface IUser
+ * @package App\Models\Base
+ */
 interface IUser extends IContactable
 {
     public function preferredAvatarUrl();

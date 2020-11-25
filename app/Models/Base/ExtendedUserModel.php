@@ -11,6 +11,7 @@ use App\Models\User;
 use App\ModelTraits\MemorizeTrait;
 use App\ModelTraits\NotificationTrait;
 use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 
 /**
@@ -24,7 +25,7 @@ abstract class ExtendedUserModel extends Model implements IUser
     use Notifiable, NotificationTrait {
         NotificationTrait::notifications insteadof Notifiable;
     }
-    use CanResetPassword, MemorizeTrait;
+    use CanResetPassword, MemorizeTrait, SoftDeletes;
 
     protected $primaryKey = 'user_id';
 

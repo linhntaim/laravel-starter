@@ -6,8 +6,12 @@
 
 namespace App\Models;
 
+use App\ModelResources\DatabaseNotificationResource;
+use App\Models\Base\IResource;
 use App\Models\Base\IUser;
+use App\Models\Base\Model;
 use App\ModelTraits\MemorizeTrait;
+use App\ModelTraits\ResourceTrait;
 use App\Notifications\Base\DatabaseNotificationFactory;
 use App\Notifications\Base\NowNotification;
 use App\Utils\ClientSettings\Facade;
@@ -26,12 +30,13 @@ use Illuminate\Notifications\DatabaseNotification as BaseDatabaseNotification;
  * @property string $sdStCreatedAt
  * @property string $sdStReadAt
  * @property array|null $data
- * @property IUser $notifiable
+ * @property Model|IUser $notifiable
+ * @property Model|IUser $notifier
  * @property NowNotification|mixed $notification
  */
-class DatabaseNotification extends BaseDatabaseNotification
+class DatabaseNotification extends BaseDatabaseNotification implements IResource
 {
-    use MemorizeTrait;
+    use MemorizeTrait, ResourceTrait;
 
     protected $visible = [
         'id',
@@ -56,6 +61,13 @@ class DatabaseNotification extends BaseDatabaseNotification
         'sd_st_read_at',
     ];
 
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->resourceClass = DatabaseNotificationResource::class;
+    }
+
     public function getDataAttribute()
     {
         return json_decode($this->attributes['data'], true);
@@ -76,6 +88,13 @@ class DatabaseNotification extends BaseDatabaseNotification
     {
         return $this->remind('notification', function () {
             return DatabaseNotificationFactory::makeFromModel($this);
+        });
+    }
+
+    public function getNotifierAttribute()
+    {
+        return $this->remind('notifier', function () {
+            return $this->notification->getNotifier();
         });
     }
 
@@ -139,5 +158,13 @@ class DatabaseNotification extends BaseDatabaseNotification
     {
         $data = $this->data;
         return isset($data[$key]) ? $data[$key] : $default;
+    }
+
+    public function getDataNotifier()
+    {
+        $notifierType = $this->getDataByKey('notifier_type');
+        $notifierId = $this->getDataByKey('notifier_id');
+        return $notifierType && $notifierId ? call_user_func($this->getDataByKey('notifier_type') . '::withTrashed')
+            ->find($this->getDataByKey('notifier_id')) : null;
     }
 }

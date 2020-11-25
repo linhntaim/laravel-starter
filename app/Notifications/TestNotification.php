@@ -21,7 +21,10 @@ class TestNotification extends NowNotification implements IDatabaseNotification
 
     public static function makeFromModel(DatabaseNotification $notification)
     {
-        return new static($notification->getDataByKey('test', 'test'));
+        return new static(
+            $notification->getDataByKey('test', 'test'),
+            $notification->getDataNotifier()
+        );
     }
 
     public function __construct($test = 'test', IUser $notifier = null)

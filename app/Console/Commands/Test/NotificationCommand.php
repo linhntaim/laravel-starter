@@ -8,11 +8,14 @@ namespace App\Console\Commands\Test;
 
 use App\Console\Commands\Base\Command;
 use App\ModelRepositories\AdminRepository;
+use App\ModelResources\Base\ModelTransformTrait;
 use App\Models\User;
 use App\Notifications\TestNotification;
 
 class NotificationCommand extends Command
 {
+    use ModelTransformTrait;
+
     protected $signature = 'test:notification {--test=test}';
 
     protected function go()
@@ -31,6 +34,8 @@ class NotificationCommand extends Command
             $this->line($notification->content);
             $this->warn('Created at:');
             $this->line($notification->sdStCreatedAt);
+            $this->warn('[Transformed]');
+            print_r($this->modelTransform($notification));
             if ($notification->read()) {
                 $this->warn('Read at:');
                 $this->line($notification->sdStReadAt);
