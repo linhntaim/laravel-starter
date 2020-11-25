@@ -180,8 +180,12 @@ php artisan test:job
 ### Test to send notification
 
 ```
-php artisan test:notification
+php artisan test:notification {--test=*}
 ```
+
+- `--test`: 
+    - Value that would be shown in dynamic content `This is a {value} notification` of the notification.
+    - Default value is `test`, which make the content is `This is a test notification`.
 
 ### Test to send mail
 

@@ -13,13 +13,13 @@ use App\Notifications\TestNotification;
 
 class NotificationCommand extends Command
 {
-    protected $signature = 'test:notification';
+    protected $signature = 'test:notification {--test=test}';
 
     protected function go()
     {
         $this->info('Test notification sending...');
         $admin = (new AdminRepository())->getById(User::USER_ADMINISTRATOR_ID);
-        (new TestNotification('test', ))->send($admin);
+        (new TestNotification($this->option('test')))->send($admin);
         $this->info('Test notification sent!');
 
         $this->info('Notifications listing...');
