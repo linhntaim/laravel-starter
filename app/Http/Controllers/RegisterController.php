@@ -15,11 +15,19 @@ abstract class RegisterController extends ModelApiController
     {
         if (SocialLogin::getInstance()->enabled()) {
             if ($request->has('_social')) {
-                return $this->storeSocial($request);
+                return $this->registerSocially($request);
             }
         }
+        return $this->register($request);
+    }
+
+    public function register(Request $request)
+    {
         return $this->responseFail();
     }
 
-    public abstract function storeSocial(Request $request);
+    public function registerSocially(Request $request)
+    {
+        return $this->responseFail();
+    }
 }

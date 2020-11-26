@@ -45,6 +45,8 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
     }
     use OnlyAttributesToArrayTrait, PassportTrait, HasApiTokens, MemorizeTrait, ResourceTrait, SoftDeletes, ActivityLogTrait, FromModelTrait, ProtectedTrait;
 
+    const MIN_PASSWORD_LENGTH = 8;
+
     const USER_SYSTEM_ID = 1;
     const USER_SUPER_ADMINISTRATOR_ID = 2;
     const USER_ADMINISTRATOR_ID = 3;

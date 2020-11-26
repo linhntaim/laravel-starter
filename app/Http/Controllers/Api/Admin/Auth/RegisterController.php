@@ -24,7 +24,7 @@ class RegisterController extends BaseRegisterController
         );
     }
 
-    public function storeSocial(Request $request)
+    public function registerSocially(Request $request)
     {
         $this->validated($request, [
             'email' => 'nullable|sometimes|max:255',
