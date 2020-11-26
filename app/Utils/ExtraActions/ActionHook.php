@@ -9,12 +9,12 @@ namespace App\Utils\ExtraActions;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * Class Hooker
+ * Class ActionHook
  * @package App\Utils\ExtraActions
- * @method static int add(string $name, callable $callback)
- * @method static array activate(string $name, ...$params)
+ * @method static string register(callable $callback, string $namespace, $id = null)
+ * @method static array activate(string $namespace, ...$params)
  */
-class Hooker extends Facade
+class ActionHook extends Facade
 {
     /**
      * Get the registered name of the component.
@@ -23,6 +23,6 @@ class Hooker extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return HookExtraAction::class;
+        return HookAction::class;
     }
 }
