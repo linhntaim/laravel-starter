@@ -40,10 +40,9 @@ abstract class Action
 
     public function activate(string $namespace, ...$params)
     {
-        $this->executed = [];
+        $this->clearResult();
         foreach ($this->getCallbacksByNamespace($namespace) as $id => $callback) {
             $this->execute($id, $callback, $params);
-            $callback(...$params);
         }
         return $this->result();
     }
@@ -58,5 +57,11 @@ abstract class Action
     protected function result()
     {
         return $this->executed;
+    }
+
+    protected function clearResult()
+    {
+        $this->executed = [];
+        return $this;
     }
 }
