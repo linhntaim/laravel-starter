@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 
 class Settings implements ISettings, Arrayable, Jsonable
 {
+    protected $appId;
     protected $appName;
     protected $appUrl;
 
@@ -32,6 +33,7 @@ class Settings implements ISettings, Arrayable, Jsonable
 
     public function __construct()
     {
+        $this->appId = ConfigHelper::get('app.id');
         $this->appName = config('app.name');
         $this->appUrl = config('app.url');
 
@@ -47,6 +49,17 @@ class Settings implements ISettings, Arrayable, Jsonable
         $this->shortTimeFormat = ConfigHelper::get('localization.short_time_format');
 
         $this->clearChanges();
+    }
+
+    public function setAppId($appId)
+    {
+        $this->appId = $appId;
+        return $this;
+    }
+
+    public function getAppId()
+    {
+        return $this->appId;
     }
 
     public function setAppName($appName)

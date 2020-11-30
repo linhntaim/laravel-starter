@@ -15,10 +15,10 @@ class AuthenticatedByPassportViaCookie
 {
     use AuthenticatedByPassportTrait;
 
-    public function handle(Request $request, Closure $next, $client = 'admin')
+    public function handle(Request $request, Closure $next, $clientType = 'admin')
     {
         if (!auth()->check()) {
-            $clientConfig = ConfigHelper::getClient($client);
+            $clientConfig = ConfigHelper::getClient($clientType);
             if (!empty($clientConfig) && isset($clientConfig['cookie'])) {
                 $clientCookieConfig = $clientConfig['cookie'];
                 $defaultCookieName = $clientCookieConfig['names']['default'];

@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Facade as BaseFacade;
  * @method static DateTimer dateTimer()
  * @method static NumberFormatter numberFormatter()
  * @method static Settings capture()
+ * @method static string getAppId()
  * @method static string getAppName()
  * @method static string getAppUrl()
  * @method static string getLocale()

@@ -91,7 +91,7 @@ class Manager
      */
     public function temporaryFromClientType($clientType, callable $callback)
     {
-        if (($settings = ConfigHelper::get('clients.' . $clientType)) && !empty($settings)) {
+        if (($settings = ConfigHelper::getClient($clientType)) && !empty($settings)) {
             return $this->temporary($settings, $callback);
         }
         return $callback();
