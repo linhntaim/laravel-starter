@@ -53,7 +53,7 @@ class AdminAccountController extends BaseAccountController
             return $this->updatePassword($request);
         }
 
-        return $this->responseFail();
+        return parent::store($request);
     }
 
     private function updateAvatar(Request $request)

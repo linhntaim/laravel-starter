@@ -26,9 +26,6 @@ abstract class BaseAccountController extends ModelApiController
             throw new AppException(static::__transErrorWithModule('not_found'));
         }
         if ($request->has('_login')) {
-            if ($this->modelRepository instanceof IUserRepository) {
-                $this->modelRepository->updateLastAccessedAt();
-            }
             $this->logAction(ActivityLog::ACTION_LOGIN);
         }
         return $this->responseModel(
@@ -37,5 +34,23 @@ abstract class BaseAccountController extends ModelApiController
                 'impersonator' => $this->modelTransform($request->impersonator()),
             ] : []
         );
+    }
+
+    public function store(Request $request)
+    {
+        if ($request->has('_last_access')) {
+            return $this->updateLastAccess($request);
+        }
+        return $this->responseFail();
+    }
+
+    private function updateLastAccess(Request $request)
+    {
+        if ($this->modelRepository instanceof IUserRepository) {
+            return $this->responseModel(
+                $this->modelRepository->updateLastAccessedAt()
+            );
+        }
+        return $this->responseFail();
     }
 }
