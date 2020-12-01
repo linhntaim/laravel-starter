@@ -86,6 +86,7 @@ Route::group([
             'prefix' => 'account',
         ], function () {
             Route::get('/', [AccountController::class, 'index']);
+            Route::post('/', [AccountController::class, 'store']);
 
             Route::group([
                 'prefix' => 'admin',
