@@ -140,7 +140,7 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
         );
     }
 
-    public function getLastAccessedSince6MonthAtAttribute()
+    public function getLastAccessedSince6MonthAttribute()
     {
         return empty($this->attributes['last_accessed_at']) ?
             false : Carbon::parse($this->attributes['last_accessed_at'])->diffInMonths(Carbon::now()) >= 6;
