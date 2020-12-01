@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api\Account;
 use App\Exceptions\AppException;
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
+use App\ModelRepositories\Base\IUserRepository;
 use App\Models\ActivityLog;
 
 abstract class BaseAccountController extends ModelApiController
@@ -25,6 +26,9 @@ abstract class BaseAccountController extends ModelApiController
             throw new AppException(static::__transErrorWithModule('not_found'));
         }
         if ($request->has('_login')) {
+            if ($this->modelRepository instanceof IUserRepository) {
+                $this->modelRepository->updateLastAccessedAt();
+            }
             $this->logAction(ActivityLog::ACTION_LOGIN);
         }
         return $this->responseModel(

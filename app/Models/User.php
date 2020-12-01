@@ -21,6 +21,7 @@ use App\ModelTraits\PassportTrait;
 use App\ModelTraits\ProtectedTrait;
 use App\ModelTraits\ResourceTrait;
 use App\Utils\ClientSettings\Facade;
+use Carbon\Carbon;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -67,16 +68,22 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
     protected $fillable = [
         'email',
         'password',
+        'password_changed_at',
+        'last_accessed_at',
     ];
 
     protected $visible = [
         'id',
         'email',
         'has_password',
+        'sd_st_last_accessed_at',
+        'last_accessed_since_6_month',
     ];
 
     protected $appends = [
         'has_password',
+        'sd_st_last_accessed_at',
+        'last_accessed_since_6_month',
     ];
 
     /**
@@ -121,6 +128,22 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
             'shortTime',
             $this->attributes['updated_at']
         );
+    }
+
+    public function getSdStLastsAccessedAtAttribute()
+    {
+        return empty($this->attributes['last_accessed_at']) ? null : Facade::dateTimer()->compound(
+            'shortDate',
+            ' ',
+            'shortTime',
+            $this->attributes['last_accessed_at']
+        );
+    }
+
+    public function getLastsAccessedSince6MonthAtAttribute()
+    {
+        return empty($this->attributes['last_accessed_at']) ?
+            false : Carbon::parse($this->attributes['last_accessed_at'])->diffInMonths(Carbon::now()) >= 6;
     }
 
     public function scopeNoneProtected($query)
