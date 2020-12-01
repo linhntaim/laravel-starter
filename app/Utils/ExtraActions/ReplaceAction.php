@@ -7,17 +7,12 @@ class ReplaceAction extends Action
     /**
      * @var callable[]|bool[]
      */
-    protected $conditionCallbacks;
+    protected $conditionCallbacks = [];
 
     /**
      * @var callable[]
      */
-    protected $defaultCallbacks;
-
-    /**
-     * @var array[]
-     */
-    protected $defaultParams;
+    protected $defaultCallbacks = [];
 
     /**
      * @param string $namespace
@@ -49,7 +44,8 @@ class ReplaceAction extends Action
     protected function executeCondition(string $namespace, array $params)
     {
         $callback = isset($this->conditionCallbacks[$namespace]) ? $this->conditionCallbacks[$namespace] : true;
-        return is_bool($callback) ? $callback : ($callback ? $callback(...$params) : true);
+        if (is_bool($callback)) return $callback;
+        return $callback ? $callback(...$params) : true;
     }
 
     /**
@@ -66,10 +62,10 @@ class ReplaceAction extends Action
     public function activate(string $namespace, ...$params)
     {
         if ($this->executeCondition($namespace, $params)) {
-            parent::activate($namespace, $params);
-            return empty($this->executed) ?
-                $this->executeDefault($namespace, $params) : $this->executed;
+            $executed = parent::activate($namespace, $params);
+            return empty($executed) ? $this->executeDefault($namespace, $params) : $executed;
         }
-        return $this->clearResult()->executeDefault($namespace, $params);
+        return $this->clearResult($namespace)
+            ->executeDefault($namespace, $params);
     }
 }

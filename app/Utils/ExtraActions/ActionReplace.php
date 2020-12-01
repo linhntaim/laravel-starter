@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Facade;
  * Class ActionReplace
  * @package App\Utils\ExtraActions
  * @method static string register(callable $callback, string $namespace, $id = null)
- * @method static ReplaceAction setConditionCallback(string $namespace, $conditionCallback = null)
+ * @method static ReplaceAction setConditionCallback(string $namespace, $conditionCallback = true)
  * @method static ReplaceAction setDefaultCallback(string $namespace, callable $defaultCallback = null)
  * @method static array activate(string $namespace, ...$params)
  */

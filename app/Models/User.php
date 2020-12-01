@@ -130,7 +130,7 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
         );
     }
 
-    public function getSdStLastsAccessedAtAttribute()
+    public function getSdStLastAccessedAtAttribute()
     {
         return empty($this->attributes['last_accessed_at']) ? null : Facade::dateTimer()->compound(
             'shortDate',
@@ -140,7 +140,7 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
         );
     }
 
-    public function getLastsAccessedSince6MonthAtAttribute()
+    public function getLastAccessedSince6MonthAtAttribute()
     {
         return empty($this->attributes['last_accessed_at']) ?
             false : Carbon::parse($this->attributes['last_accessed_at'])->diffInMonths(Carbon::now()) >= 6;

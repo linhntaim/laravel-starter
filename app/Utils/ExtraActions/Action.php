@@ -40,28 +40,28 @@ abstract class Action
 
     public function activate(string $namespace, ...$params)
     {
-        $this->clearResult();
+        $this->clearResult($namespace);
         foreach ($this->getCallbacksByNamespace($namespace) as $id => $callback) {
-            $this->execute($id, $callback, $params);
+            $this->execute($namespace, $id, $callback, $params);
         }
-        return $this->result();
+        return $this->result($namespace);
     }
 
-    protected function execute($id, $callback, $params)
+    protected function execute(string $namespace, $id, $callback, $params)
     {
         $executed = $callback(...$params);
-        $this->executed[$id] = $executed;
+        $this->executed[$namespace][$id] = $executed;
         return $executed;
     }
 
-    protected function result()
+    protected function result(string $namespace)
     {
-        return $this->executed;
+        return $this->executed[$namespace];
     }
 
-    protected function clearResult()
+    protected function clearResult(string $namespace)
     {
-        $this->executed = [];
+        $this->executed[$namespace] = [];
         return $this;
     }
 }

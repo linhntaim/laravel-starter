@@ -4,8 +4,6 @@
  * Base - Any modification needs to be approved, except the space inside the block of TODO
  */
 
-use App\Utils\ExtraActions\ActionReplace;
-
 use App\Http\Controllers\Api\Account\AccountController;
 use App\Http\Controllers\Api\Account\AdminAccountController;
 use App\Http\Controllers\Api\Account\AdminNotificationController;
@@ -71,10 +69,8 @@ Route::group([
     Route::group([
         'prefix' => 'auth',
     ], function () {
-        ActionReplace::setDefaultCallback('routes.api.auth', function () {
-            Route::post('login', [LoginController::class, 'issueToken']);
-            Route::post('register', [RegisterController::class, 'store']);
-        })->activate('routes.api.auth');
+        Route::post('login', [LoginController::class, 'issueToken']);
+        Route::post('register', [RegisterController::class, 'store']);
     });
 
     Route::group([
@@ -83,9 +79,7 @@ Route::group([
         Route::group([
             'prefix' => 'auth',
         ], function () {
-            ActionReplace::setDefaultCallback('routes.api.auth.in', function () {
-                Route::post('logout', [LogoutController::class, 'logout']);
-            })->activate('routes.api.auth.in');
+            Route::post('logout', [LogoutController::class, 'logout']);
         });
 
         Route::group([
