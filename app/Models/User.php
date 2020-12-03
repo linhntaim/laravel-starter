@@ -78,14 +78,12 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
         'has_password',
         'ts_last_accessed_at',
         'sd_st_last_accessed_at',
-        'last_access_since_6_month',
     ];
 
     protected $appends = [
         'has_password',
         'ts_last_accessed_at',
         'sd_st_last_accessed_at',
-        'last_access_since_6_month',
     ];
 
     /**
@@ -146,12 +144,6 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
             'shortTime',
             $this->attributes['last_accessed_at']
         );
-    }
-
-    public function getLastAccessSince6MonthAttribute()
-    {
-        return empty($this->attributes['last_accessed_at']) ?
-            false : Carbon::parse($this->attributes['last_accessed_at'])->diffInMonths(Carbon::now()) >= 6;
     }
 
     public function scopeNoneProtected($query)
