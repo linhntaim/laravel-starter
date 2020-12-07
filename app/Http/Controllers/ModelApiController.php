@@ -37,6 +37,9 @@ abstract class ModelApiController extends ApiController
         if ($request->has('_export')) {
             return $this->export($request);
         }
+        if ($request->has('_load')) {
+            return $this->load($request);
+        }
 
         return $this->responseModel($this->indexExecute($request));
     }

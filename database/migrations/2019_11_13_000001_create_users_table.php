@@ -36,6 +36,7 @@ class CreateUsersTable extends Migration
 
             $table->unique('email');
             $table->index('password_changed_at');
+            $table->index('last_accessed_at');
             $table->index('created_at');
             $table->index('deleted_at');
         });

@@ -28,7 +28,7 @@ use App\Http\Controllers\Api\Admin\Auth\PasswordController as AdminPasswordContr
 
 // Admin account
 use App\Http\Controllers\Api\Admin\Account\AccountController as AdminAccountController;
-use App\Http\Controllers\Api\Admin\Account\NotificationController as AdminNotificationController;
+use App\Http\Controllers\Api\Admin\Account\NotificationController as AdminAccountNotificationController;
 
 // Admin manage
 use App\Http\Controllers\Api\Admin\ActivityLogController as AdminActivityLogController;
@@ -114,6 +114,10 @@ Route::group([
                 'prefix' => 'auth',
             ], function () {
                 Route::post('logout', [HomeLogoutController::class, 'logout']);
+
+                // TODO:
+
+                // TODO
             });
 
             // Account
@@ -122,6 +126,10 @@ Route::group([
             ], function () {
                 Route::get('/', [HomeAccountController::class, 'index']);
                 Route::post('/', [HomeAccountController::class, 'store']);
+
+                // TODO:
+
+                // TODO
             });
 
             // TODO:
@@ -184,8 +192,8 @@ Route::group([
                 Route::group([
                     'prefix' => 'notification',
                 ], function () {
-                    Route::get('/', [AdminNotificationController::class, 'index']);
-                    Route::post('{id}', [AdminNotificationController::class, 'update']);
+                    Route::get('/', [AdminAccountNotificationController::class, 'index']);
+                    Route::post('{id}', [AdminAccountNotificationController::class, 'update']);
                 });
 
                 // TODO:
