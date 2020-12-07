@@ -4,12 +4,12 @@
  * Base - Any modification needs to be approved, except the space inside the block of TODO
  */
 
-namespace App\Http\Controllers\Api\Admin\Auth;
+namespace App\Http\Controllers\Api\Home\Auth;
 
 use App\Http\Controllers\Api\Auth\RegisterController as BaseRegisterController;
 use App\Http\Requests\Request;
-use App\ModelRepositories\AdminRepository;
-use App\ModelResources\AdminAccountResource;
+use App\ModelRepositories\UserRepository;
+use App\ModelResources\UserAccountResource;
 
 class RegisterController extends BaseRegisterController
 {
@@ -17,9 +17,9 @@ class RegisterController extends BaseRegisterController
     {
         parent::__construct();
 
-        $this->modelRepository = new AdminRepository();
+        $this->modelRepository = new UserRepository();
         $this->setFixedModelResourceClass(
-            AdminAccountResource::class,
+            UserAccountResource::class,
             $this->modelRepository->modelClass()
         );
     }
@@ -28,15 +28,12 @@ class RegisterController extends BaseRegisterController
     {
         $this->validated($request, [
             'email' => 'nullable|sometimes|max:255',
-            'display_name' => 'nullable|sometimes|max:255',
             'provider' => 'required|max:255',
             'provider_id' => 'required|max:255',
         ]);
 
         return $this->responseModel(
             $this->modelRepository->createWithAttributesFromSocial([
-                'display_name' => $request->input('display_name'),
-            ], [
                 'email' => $request->input('email'),
             ], [
                 'provider' => $request->input('provider'),

@@ -4,7 +4,7 @@
  * Base - Any modification needs to be approved, except the space inside the block of TODO
  */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\Auth;
 
 use Closure;
 use Illuminate\Auth\Passwords\PasswordBroker;
