@@ -23,8 +23,10 @@ class HeaderDecrypt
             }
             $secret = $clientConfig['key'];
             foreach ($headers as $header) {
-                if ($request->hasHeader($header) && !in_array($header, $headerEncryptExcepts)) {
-                    $request->headers->set($header, AES::decrypt($request->header($header), $secret));
+                if ($request->hasHeader($header)
+                    && !in_array($header, $headerEncryptExcepts)
+                    && !empty($headerValue = $request->header($header))) {
+                    $request->headers->set($header, AES::decrypt($headerValue, $secret));
                 }
             }
         }
