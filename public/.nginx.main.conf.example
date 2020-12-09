@@ -53,7 +53,7 @@ location /admin {
 }
 
 ### Handle API
-location ~* ^/(api|cb) {
+location ~* ^/(api|md) {
      try_files $uri $uri/ /index.php?$query_string;
 }
 

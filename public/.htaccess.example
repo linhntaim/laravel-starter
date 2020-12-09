@@ -104,7 +104,7 @@ AddHandler server-parsed .html
     ### Handle API
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^(api|cb) index.php [L]
+    RewriteRule ^(api|md) index.php [L]
 
     ### Handle Home
     RewriteCond %{REQUEST_FILENAME} !-d

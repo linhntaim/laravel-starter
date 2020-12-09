@@ -16,13 +16,12 @@ use App\Events\Listeners\OnTestingEvent;
 use App\Events\MailTestingEvent;
 use App\Events\TestingEvent;
 use Illuminate\Database\Events\QueryExecuted;
-//use Illuminate\Auth\Events\Registered;
-//use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
+
 // TODO: Extra Events
 
 // TODO
@@ -38,9 +37,6 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        //Registered::class => [
-        //    SendEmailVerificationNotification::class,
-        //],
         QueryExecuted::class => [
             OnQueryExecuted::class,
         ],

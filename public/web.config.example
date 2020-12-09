@@ -133,7 +133,7 @@
                 </rule>
                 <!-- Handle API -->
                 <rule name="API" stopProcessing="true">
-                    <match url="^(api|cb)(.*)" ignoreCase="false"/>
+                    <match url="^(api|md)(.*)" ignoreCase="false"/>
                     <conditions logicalGrouping="MatchAll">
                         <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true"/>
                         <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true"/>
