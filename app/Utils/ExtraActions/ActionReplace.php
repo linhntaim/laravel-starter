@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string register(callable $callback, string $namespace, $id = null)
  * @method static ReplaceAction setConditionCallback(string $namespace, $conditionCallback = true)
  * @method static ReplaceAction setDefaultCallback(string $namespace, callable $defaultCallback = null)
- * @method static array activate(string $namespace, ...$params)
+ * @method static array|mixed activate(string $namespace, ...$params)
  */
 class ActionReplace extends Facade
 {
