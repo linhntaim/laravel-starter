@@ -28,6 +28,7 @@ DirectoryIndex index.htm index.html index.php
 AddType application/json .json
 AddType font/woff .woff
 AddType font/woff2 .woff2
+AddType font/opentype .otf
 AddType text/csv .csv
 AddType text/plain .txt
 AddType video/mp4 .mp4
@@ -103,7 +104,7 @@ AddHandler server-parsed .html
     ### Handle API
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^api index.php [L]
+    RewriteRule ^(api|md) index.php [L]
 
     ### Handle Home
     RewriteCond %{REQUEST_FILENAME} !-d

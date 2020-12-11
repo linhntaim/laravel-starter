@@ -2,6 +2,7 @@
 
 return [
     'app' => [
+        'id' => env('APP_ID', 'base'),
         'version' => env('APP_VERSION', '1.0.0'),
     ],
     'public_path' => env('PUBLIC_PATH'),
@@ -74,16 +75,31 @@ return [
     'variables' => json_decode(env('VARIABLES'), true),
     'client_limit_timeout' => (int)env('CLIENT_LIMIT_TIMEOUT'),
     'clients' => [
-        'admin' => [
-            'name' => env('CLIENT_ADMIN_NAME'),
-            'url' => env('CLIENT_ADMIN_URL'),
-            'cookie' => [
-                'names' => [
-                    'default' => env('CLIENT_ADMIN_COOKIE_DEFAULT_NAME', ''),
+        env('APP_ID', 'base') => [
+            'admin' => [
+                'name' => env('CLIENT_ADMIN_NAME'),
+                'key' => env('CLIENT_ADMIN_KEY'),
+                'url' => env('CLIENT_ADMIN_URL'),
+                'locale' => 'ja',
+                'country' => 'JP',
+                'timezone' => 'Asia/Tokyo',
+                'currency' => 'JPY',
+                'number_format' => 'point_comma',
+                'first_day_of_week' => 0,
+                'long_date_format' => 0,
+                'short_date_format' => 0,
+                'long_time_format' => 0,
+                'short_time_format' => 0,
+                'cookie' => [
+                    'names' => [
+                        'default' => env('CLIENT_ADMIN_COOKIE_DEFAULT_NAME', ''),
+                    ],
                 ],
-                'secret' => env('CLIENT_ADMIN_COOKIE_SECRET', ''),
             ],
-            'default_localization' => [
+            'home' => [
+                'name' => env('CLIENT_HOME_NAME'),
+                'key' => env('CLIENT_HOME_KEY'),
+                'url' => env('CLIENT_HOME_URL'),
                 'locale' => 'ja',
                 'country' => 'JP',
                 'timezone' => 'Asia/Tokyo',
@@ -94,12 +110,16 @@ return [
                 'short_date_format' => 0,
                 'long_time_format' => 0,
                 'short_time_format' => 0,
+                'cookie' => [
+                    'names' => [
+                        'default' => env('CLIENT_HOME_COOKIE_DEFAULT_NAME', ''),
+                    ],
+                ],
             ],
-        ],
-        'home' => [
-            'name' => env('CLIENT_HOME_NAME'),
-            'url' => env('CLIENT_HOME_URL'),
-            'default_localization' => [
+            'common' => [
+                'name' => env('CLIENT_COMMON_NAME'),
+                'key' => env('CLIENT_COMMON_KEY'),
+                'url' => env('CLIENT_COMMON_URL'),
                 'locale' => 'ja',
                 'country' => 'JP',
                 'timezone' => 'Asia/Tokyo',
@@ -110,18 +130,28 @@ return [
                 'short_date_format' => 0,
                 'long_time_format' => 0,
                 'short_time_format' => 0,
+                'cookie' => [
+                    'names' => [
+                        'default' => env('CLIENT_COMMON_COOKIE_DEFAULT_NAME', ''),
+                    ],
+                ],
             ],
         ],
     ],
-    'admin' => [
-        'disabled' => (bool)env('ADMIN_DISABLED', false),
+    'client_aliases' => [
+        env('APP_ID', 'base') . '_admin' => env('APP_ID', 'base'),
+        env('APP_ID', 'base') . '_home' => env('APP_ID', 'base'),
+        env('APP_ID', 'base') . '_common' => env('APP_ID', 'base'),
     ],
+    'header_token_authorization' => env('HEADER_TOKEN_AUTHORIZATION_NAME'),
     'headers' => [
         'screen' => env('HEADER_SCREEN_NAME'),
         'settings' => env('HEADER_SETTINGS_NAME'),
         'device' => env('HEADER_DEVICE_NAME'),
-        'token_authorization' => env('HEADER_TOKEN_AUTHORIZATION_NAME'),
     ],
+    'header_encrypt_excepts' => array_filter(explode(',', env('HEADER_ENCRYPT_EXCEPTS', '')), function ($header) {
+        return !empty($header);
+    }),
 
     'localization' => [
         'country' => 'US',

@@ -4,8 +4,9 @@
  * Base - Any modification needs to be approved, except the space inside the block of TODO
  */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\Auth;
 
+use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\PasswordResetRepository;
 use App\Utils\StringHelper;

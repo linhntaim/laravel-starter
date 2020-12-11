@@ -21,6 +21,7 @@ use App\ModelTraits\PassportTrait;
 use App\ModelTraits\ProtectedTrait;
 use App\ModelTraits\ResourceTrait;
 use App\Utils\ClientSettings\Facade;
+use Carbon\Carbon;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -45,6 +46,8 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
     }
     use OnlyAttributesToArrayTrait, PassportTrait, HasApiTokens, MemorizeTrait, ResourceTrait, SoftDeletes, ActivityLogTrait, FromModelTrait, ProtectedTrait;
 
+    const MIN_PASSWORD_LENGTH = 8;
+
     const USER_SYSTEM_ID = 1;
     const USER_SUPER_ADMINISTRATOR_ID = 2;
     const USER_ADMINISTRATOR_ID = 3;
@@ -65,16 +68,22 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
     protected $fillable = [
         'email',
         'password',
+        'password_changed_at',
+        'last_accessed_at',
     ];
 
     protected $visible = [
         'id',
         'email',
         'has_password',
+        'ts_last_accessed_at',
+        'sd_st_last_accessed_at',
     ];
 
     protected $appends = [
         'has_password',
+        'ts_last_accessed_at',
+        'sd_st_last_accessed_at',
     ];
 
     /**
@@ -118,6 +127,22 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
             ' ',
             'shortTime',
             $this->attributes['updated_at']
+        );
+    }
+
+    public function getTsLastAccessedAtAttribute()
+    {
+        return empty($this->attributes['last_accessed_at']) ?
+            null : Facade::dateTimer()->getObject($this->attributes['last_accessed_at'])->getTimestamp();
+    }
+
+    public function getSdStLastAccessedAtAttribute()
+    {
+        return empty($this->attributes['last_accessed_at']) ? null : Facade::dateTimer()->compound(
+            'shortDate',
+            ' ',
+            'shortTime',
+            $this->attributes['last_accessed_at']
         );
     }
 

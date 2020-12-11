@@ -9,9 +9,9 @@ namespace App\Http\Controllers\Api\Account;
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\DatabaseNotificationRepository;
-use App\Models\Admin;
+use Illuminate\Database\Eloquent\Model;
 
-class AdminNotificationController extends ModelApiController
+abstract class NotificationController extends ModelApiController
 {
     public function __construct()
     {
@@ -20,17 +20,27 @@ class AdminNotificationController extends ModelApiController
         $this->modelRepository = new DatabaseNotificationRepository();
     }
 
+    /**
+     * @param Request $request
+     * @return Model
+     */
+    protected function getAccountModel(Request $request)
+    {
+        return $request->user();
+    }
+
     protected function search(Request $request)
     {
+        $notifiable = $this->getAccountModel($request);
         return [
-            'notifiable_type' => Admin::class,
-            'notifiable_id' => $request->admin()->user_id,
+            'notifiable_type' => get_class($notifiable),
+            'notifiable_id' => $notifiable->getKey(),
         ];
     }
 
     public function update(Request $request, $id)
     {
-        $this->modelRepository->pinModel()->getByIdBelongedToNotifiable($id, $request->admin());
+        $this->modelRepository->pinModel()->getByIdBelongedToNotifiable($id, $this->getAccountModel($request));
 
         if ($request->has('_read')) {
             return $this->responseModel($this->modelRepository->markAsRead());

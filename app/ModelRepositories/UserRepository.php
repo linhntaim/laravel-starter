@@ -8,6 +8,7 @@ namespace App\ModelRepositories;
 
 use App\Exceptions\AppException;
 use App\ModelRepositories\Base\IProtectedRepository;
+use App\ModelRepositories\Base\IUserRepository;
 use App\ModelRepositories\Base\ModelRepository;
 use App\ModelRepositories\Base\ProtectedRepositoryTrait;
 use App\Models\Base\IProtected;
@@ -21,7 +22,7 @@ use App\Utils\StringHelper;
  * @package App\ModelRepositories
  * @property User|IProtected $model
  */
-class UserRepository extends ModelRepository implements IProtectedRepository
+class UserRepository extends ModelRepository implements IProtectedRepository, IUserRepository
 {
     use ProtectedRepositoryTrait;
 
@@ -154,6 +155,13 @@ class UserRepository extends ModelRepository implements IProtectedRepository
             unset($attributes['email']);
         }
         return parent::updateWithAttributes($attributes);
+    }
+
+    public function updateLastAccessedAt()
+    {
+        return $this->skipProtected()->updateWithAttributes([
+            'last_accessed_at' => DateTimer::syncNow(),
+        ]);
     }
 
     public function delete()

@@ -6,7 +6,7 @@
 
 namespace App\Http\Controllers\Api\Admin\Auth;
 
-use App\Http\Controllers\RegisterController as BaseRegisterController;
+use App\Http\Controllers\Api\Auth\RegisterController as BaseRegisterController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\AdminRepository;
 use App\ModelResources\AdminAccountResource;
@@ -24,7 +24,7 @@ class RegisterController extends BaseRegisterController
         );
     }
 
-    public function storeSocial(Request $request)
+    public function registerSocially(Request $request)
     {
         $this->validated($request, [
             'email' => 'nullable|sometimes|max:255',

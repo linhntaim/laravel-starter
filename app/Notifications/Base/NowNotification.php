@@ -7,7 +7,7 @@
 namespace App\Notifications\Base;
 
 use App\Exceptions\AppException;
-use App\ModelRepositories\UserRepository;
+use App\ModelRepositories\AdminRepository;
 use App\Models\Base\IUser;
 use App\Models\User;
 use App\Utils\ClassTrait;
@@ -40,7 +40,7 @@ abstract class NowNotification extends BaseNotification
     }
 
     /**
-     * @var IUser
+     * @var IUser|Model
      */
     public $notifier;
 
@@ -49,10 +49,18 @@ abstract class NowNotification extends BaseNotification
         $this->setNotifier($notifier);
     }
 
+    /**
+     * @return IUser
+     */
+    public function getNotifier()
+    {
+        return $this->notifier;
+    }
+
     public function setNotifier(IUser $notifier = null)
     {
         $this->notifier = empty($notifier) ?
-            (new UserRepository())->getById(User::USER_SYSTEM_ID)
+            (new AdminRepository())->getById(User::USER_SYSTEM_ID)
             : $notifier;
 
         return $this;
@@ -158,7 +166,8 @@ abstract class NowNotification extends BaseNotification
     protected function dataDatabase(IUser $notifiable)
     {
         return [
-            'sender_id' => $this->notifier->id,
+            'notifier_id' => $this->notifier->getKey(),
+            'notifier_type' => get_class($this->notifier),
         ];
     }
 
@@ -232,12 +241,22 @@ abstract class NowNotification extends BaseNotification
     protected function dataArray(IUser $notifiable)
     {
         return [
-            'name' => $this::NAME,
-            'image' => $this->notifier->preferredAvatarUrl(),
+            'name' => $this->getName(),
+            'image' => $this->getImage($notifiable),
             'content' => $this->getContent($notifiable, false),
             'html_content' => $this->getContent($notifiable),
             'action' => $this->getAction($notifiable),
         ];
+    }
+
+    public function getName()
+    {
+        return static::NAME;
+    }
+
+    public function getImage(IUser $notifiable)
+    {
+        return $this->notifier->preferredAvatarUrl();
     }
 
     public function getTitle(IUser $notifiable)
@@ -250,7 +269,7 @@ abstract class NowNotification extends BaseNotification
         return static::__transWithCurrentModule('content');
     }
 
-    protected function getAction(IUser $notifiable)
+    public function getAction(IUser $notifiable)
     {
         return null;
     }

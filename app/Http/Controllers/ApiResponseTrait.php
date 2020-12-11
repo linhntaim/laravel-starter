@@ -15,7 +15,6 @@ use App\Utils\ConfigHelper;
 use App\Utils\Helper;
 use App\Utils\LogHelper;
 use Closure;
-use Exception as BaseException;
 use Illuminate\Http\JsonResponse;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -87,11 +86,11 @@ trait ApiResponseTrait
         ];
     }
 
-    public static function failPayload($data = null, $message = null, $code = Configuration::HTTP_RESPONSE_STATUS_ERROR)
+    public static function failPayload($data = null, $message = null, $statusCode = Configuration::HTTP_RESPONSE_STATUS_ERROR)
     {
         return array_merge(static::payload($data, $message), [
             '_status' => false,
-            '_code' => $code,
+            '_code' => $statusCode,
         ]);
     }
 
@@ -146,22 +145,26 @@ trait ApiResponseTrait
     /**
      * @param Exception|array|string|null $message
      * @param array|null $data
+     * @param int $statusCode
      * @param array $headers
      * @return JsonResponse
      */
-    protected function responseFail($message = null, $data = null, $headers = [])
+    protected function responseFail($message = null, $data = null, $statusCode = Configuration::HTTP_RESPONSE_STATUS_ERROR, $headers = [])
     {
         $this->transactionStop();
-        if ($message instanceof BaseException) {
+        if ($message instanceof \Exception) {
             LogHelper::error($message);
+        }
+        if ($message instanceof HttpExceptionInterface) {
+            $statusCode = $message->getStatusCode();
         }
         return $this->response(
             static::failPayload(
                 $data,
                 $message,
-                $message instanceof HttpExceptionInterface ? $message->getStatusCode() : Configuration::HTTP_RESPONSE_STATUS_ERROR
+                $statusCode
             ),
-            Configuration::HTTP_RESPONSE_STATUS_ERROR,
+            $statusCode,
             $headers
         );
     }

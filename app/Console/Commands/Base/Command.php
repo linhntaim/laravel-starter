@@ -6,6 +6,7 @@
 
 namespace App\Console\Commands\Base;
 
+use App\Exceptions\Exception;
 use App\Utils\ClassTrait;
 use App\Utils\LogHelper;
 use App\Utils\ShellTrait;
@@ -98,9 +99,14 @@ abstract class Command extends BaseCommand
         LogHelper::error($exception);
 
         $this->error('EXCEPTION:');
+        $this->warn('- Code: ' . $exception->getCode());
         $this->warn('- Message: ' . $exception->getMessage());
         $this->warn('- File: ' . $exception->getFile());
-        $this->warn('- Line:' . $exception->getLine());
+        $this->warn('- Line: ' . $exception->getLine());
+        if ($exception instanceof Exception) {
+            $this->warn('- Data:');
+            print_r($exception->getAttachedData());
+        }
         $this->warn('- Trace:');
         $this->warn($exception->getTraceAsString());
     }

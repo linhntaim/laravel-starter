@@ -4,41 +4,58 @@
  * Base - Any modification needs to be approved, except the space inside the block of TODO
  */
 
-use App\Http\Controllers\Api\Account\AccountController;
-use App\Http\Controllers\Api\Account\AdminAccountController;
-use App\Http\Controllers\Api\Account\AdminNotificationController;
+// Common common
+use App\Http\Controllers\Api\Common\DeviceController as CommonDeviceController;
+use App\Http\Controllers\Api\Common\PrerequisiteController as CommonPrerequisiteController;
 
-// TODO: Import Account Controller
+// Common auth
+use App\Http\Controllers\Api\Common\Auth\LoginController as CommonLoginController;
+use App\Http\Controllers\Api\Common\Auth\LogoutController as CommonLogoutController;
 
-// TODO
+// Common account
+use App\Http\Controllers\Api\Common\Account\AccountController as CommonAccountController;
 
+// Admin common
+use App\Http\Controllers\Api\Admin\DeviceController as AdminDeviceController;
+use App\Http\Controllers\Api\Admin\HandledFileController as AdminHandledFileController;
+use App\Http\Controllers\Api\Admin\PrerequisiteController as AdminPrerequisiteController;
+
+// Admin auth
+use App\Http\Controllers\Api\Admin\Auth\LoginController as AdminLoginController;
+use App\Http\Controllers\Api\Admin\Auth\LogoutController as AdminLogoutController;
 use App\Http\Controllers\Api\Admin\Auth\RegisterController as AdminRegisterController;
 use App\Http\Controllers\Api\Admin\Auth\PasswordController as AdminPasswordController;
+
+// Admin account
+use App\Http\Controllers\Api\Admin\Account\AccountController as AdminAccountController;
+use App\Http\Controllers\Api\Admin\Account\NotificationController as AdminAccountNotificationController;
+
+// Admin manage
 use App\Http\Controllers\Api\Admin\ActivityLogController as AdminActivityLogController;
 use App\Http\Controllers\Api\Admin\CommandController as AdminCommandController;
 use App\Http\Controllers\Api\Admin\SystemLogController as AdminSystemLogController;
 use App\Http\Controllers\Api\Admin\AppOptionController as AdminAppOptionController;
 use App\Http\Controllers\Api\Admin\DataExportController as AdminDataExportController;
-use App\Http\Controllers\Api\Admin\HandledFileController as AdminHandledFileController;
 use App\Http\Controllers\Api\Admin\RoleController as AdminRoleController;
 
 // TODO: Import Admin Controller
 
 // TODO
 
-use App\Http\Controllers\Api\Auth\LoginController;
-use App\Http\Controllers\Api\Auth\LogoutController;
-use App\Http\Controllers\Api\Auth\RegisterController;
+// Home common
+use App\Http\Controllers\Api\Home\DeviceController as HomeDeviceController;
+use App\Http\Controllers\Api\Home\HandledFileController as HomeHandledFileController;
+use App\Http\Controllers\Api\Home\PrerequisiteController as HomePrerequisiteController;
+
+// Home auth
+use App\Http\Controllers\Api\Home\Auth\LoginController as HomeLoginController;
+use App\Http\Controllers\Api\Home\Auth\LogoutController as HomeLogoutController;
+use App\Http\Controllers\Api\Home\Auth\RegisterController as HomeRegisterController;
+
+// Home account
+use App\Http\Controllers\Api\Home\Account\AccountController as HomeAccountController;
 
 // TODO: Import Home Controller
-
-// TODO
-
-use App\Http\Controllers\Api\DeviceController;
-use App\Http\Controllers\Api\HandledFileController;
-use App\Http\Controllers\Api\PrerequisiteController;
-
-// TODO: Import Common Controller
 
 // TODO
 
@@ -58,49 +75,57 @@ use Illuminate\Support\Facades\Route;
 Route::group([
     // API
 ], function () {
-    #region Common
-    Route::get('prerequisite', [PrerequisiteController::class, 'index']);
 
-    Route::post('device/current', [DeviceController::class, 'currentStore']);
-
-    Route::get('handled-file/{id}', [HandledFileController::class, 'show'])->name('handled_file.show');
-    #endregion
-
+    #region Home
     Route::group([
-        'prefix' => 'auth',
+        'prefix' => 'home',
+        'middleware' => ['header.decrypt:home'],
     ], function () {
-        Route::post('login', [LoginController::class, 'issueToken']);
-        Route::post('register', [RegisterController::class, 'store']);
-    });
+        #region Common
+        Route::get('prerequisite', [HomePrerequisiteController::class, 'index']);
 
-    Route::group([
-        'middleware' => ['auth:api', 'impersonate'],
-    ], function () {
+        Route::post('device/current', [HomeDeviceController::class, 'currentStore']);
+
+        Route::get('handled-file/{id}', [HomeHandledFileController::class, 'show'])->name('handled_file.show');
+
+        // TODO:
+
+        // TODO
+        #endregion
+
+        #region Authentication
         Route::group([
             'prefix' => 'auth',
         ], function () {
-            Route::post('logout', [LogoutController::class, 'logout']);
+            Route::post('login', [HomeLoginController::class, 'issueToken']);
+            Route::post('register', [HomeRegisterController::class, 'store']);
+
+            // TODO:
+
+            // TODO
         });
+        #endregion
 
+        #region Authenticated
         Route::group([
-            'prefix' => 'account',
+            'middleware' => ['authenticated.passport.request', 'auth:api', 'impersonate'],
         ], function () {
-            Route::get('/', [AccountController::class, 'index']);
-            Route::post('/', [AccountController::class, 'store']);
-
             Route::group([
-                'prefix' => 'admin',
-                'middleware' => ['admin', 'authorized.admin'],
+                'prefix' => 'auth',
             ], function () {
-                Route::get('/', [AdminAccountController::class, 'index']);
-                Route::post('/', [AdminAccountController::class, 'store']);
+                Route::post('logout', [HomeLogoutController::class, 'logout']);
 
-                Route::group([
-                    'prefix' => 'notification',
-                ], function () {
-                    Route::get('/', [AdminNotificationController::class, 'index']);
-                    Route::post('{id}', [AdminNotificationController::class, 'update']);
-                });
+                // TODO:
+
+                // TODO
+            });
+
+            // Account
+            Route::group([
+                'prefix' => 'account',
+            ], function () {
+                Route::get('/', [HomeAccountController::class, 'index']);
+                Route::post('/', [HomeAccountController::class, 'store']);
 
                 // TODO:
 
@@ -111,33 +136,71 @@ Route::group([
 
             // TODO
         });
+        #endregion
     });
+    #endregion
 
-    Route::group([
-        'prefix' => 'home',
-    ], function () {
-        // TODO: Home API
-
-        // TODO
-    });
-
+    #region Admin
     Route::group([
         'prefix' => 'admin',
-        'middleware' => ['admin'],
+        'middleware' => ['header.decrypt:admin'],
     ], function () {
-        // Anonymous
+        #region Common
+        Route::get('prerequisite', [AdminPrerequisiteController::class, 'index']);
+
+        Route::post('device/current', [AdminDeviceController::class, 'currentStore']);
+
+        Route::get('handled-file/{id}', [AdminHandledFileController::class, 'show'])->name('handled_file.show');
+
+        // TODO:
+
+        // TODO
+        #endregion
+
+        #region Authentication
         Route::group([
             'prefix' => 'auth',
         ], function () {
+            Route::post('login', [AdminLoginController::class, 'issueToken']);
             Route::post('register', [AdminRegisterController::class, 'store']);
             Route::post('password', [AdminPasswordController::class, 'store']);
             Route::get('password', [AdminPasswordController::class, 'index']);
-        });
 
-        // Authenticated
+            // TODO:
+
+            // TODO
+        });
+        #endregion
+
+        #region Authenticated
         Route::group([
             'middleware' => ['authenticated.passport.request', 'auth:api', 'authorized.admin', 'impersonate'],
         ], function () {
+            Route::group([
+                'prefix' => 'auth',
+            ], function () {
+                Route::post('logout', [AdminLogoutController::class, 'logout']);
+            });
+
+            // Account
+            Route::group([
+                'prefix' => 'account',
+            ], function () {
+                Route::get('/', [AdminAccountController::class, 'index']);
+                Route::post('/', [AdminAccountController::class, 'store']);
+
+                Route::group([
+                    'prefix' => 'notification',
+                ], function () {
+                    Route::get('/', [AdminAccountNotificationController::class, 'index']);
+                    Route::post('{id}', [AdminAccountNotificationController::class, 'update']);
+                });
+
+                // TODO:
+
+                // TODO
+            });
+
             Route::group([
                 'middleware' => 'authorized.admin.permissions:be-super-admin',
             ], function () {
@@ -201,9 +264,51 @@ Route::group([
                     ->middleware('authorized.admin.permissions:role-manage');
             });
 
-            // TODO: Expand Admin API
+            // TODO:
 
             // TODO
         });
+        #endregion
     });
+    #endregion
+
+    #region Common
+    Route::group([
+        'prefix' => 'common',
+        'middleware' => ['header.decrypt:common'],
+    ], function () {
+        #region Common
+        Route::get('prerequisite', [CommonPrerequisiteController::class, 'index']);
+        Route::post('device/current', [CommonDeviceController::class, 'currentStore']);
+        #endregion
+
+        #region Authentication
+        Route::group([
+            'prefix' => 'auth',
+        ], function () {
+            Route::post('login', [CommonLoginController::class, 'issueToken']);
+        });
+        #endregion
+
+        #region Authenticated
+        Route::group([
+            'middleware' => ['authenticated.passport.request', 'auth:api', 'impersonate'],
+        ], function () {
+            Route::group([
+                'prefix' => 'auth',
+            ], function () {
+                Route::post('logout', [CommonLogoutController::class, 'logout']);
+            });
+
+            // Account
+            Route::group([
+                'prefix' => 'account',
+            ], function () {
+                Route::get('/', [CommonAccountController::class, 'index']);
+                Route::post('/', [CommonAccountController::class, 'store']);
+            });
+        });
+        #endregion
+    });
+    #endregion
 });

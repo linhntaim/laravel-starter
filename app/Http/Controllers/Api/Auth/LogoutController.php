@@ -10,7 +10,7 @@ use App\Http\Controllers\ApiController;
 use App\Http\Requests\Request;
 use App\Models\ActivityLog;
 
-class LogoutController extends ApiController
+abstract class LogoutController extends ApiController
 {
     public function logout(Request $request)
     {

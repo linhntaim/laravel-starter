@@ -6,7 +6,7 @@
 
 namespace App\Http\Controllers\Api\Admin\Auth;
 
-use App\Http\Controllers\PasswordController as BasePasswordController;
+use App\Http\Controllers\Api\Auth\PasswordController as BasePasswordController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\AdminRepository;
 use App\Models\Admin;

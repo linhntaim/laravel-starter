@@ -20,7 +20,7 @@ use League\OAuth2\Server\Exception\OAuthServerException as LeagueException;
 use Nyholm\Psr7\Response as Psr7Response;
 use Psr\Http\Message\ServerRequestInterface;
 
-class LoginController extends AccessTokenController
+abstract class LoginController extends AccessTokenController
 {
     use ApiResponseTrait;
 

@@ -30,11 +30,13 @@ class CreateUsersTable extends Migration
             }
             $table->string('password')->nullable();
             $table->timestamp('password_changed_at')->nullable();
+            $table->timestamp('last_accessed_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
             $table->unique('email');
             $table->index('password_changed_at');
+            $table->index('last_accessed_at');
             $table->index('created_at');
             $table->index('deleted_at');
         });

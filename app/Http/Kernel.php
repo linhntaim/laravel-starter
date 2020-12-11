@@ -6,13 +6,13 @@
 
 namespace App\Http;
 
-use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\AuthenticatedByPassportViaCookie;
 use App\Http\Middleware\AuthenticatedByPassportViaHeader;
 use App\Http\Middleware\AuthenticatedByPassportViaRequest;
 use App\Http\Middleware\AuthorizedWithAdmin;
 use App\Http\Middleware\AuthorizedWithAdminPermissions;
 use App\Http\Middleware\Device;
+use App\Http\Middleware\HeaderDecrypt;
 use App\Http\Middleware\Impersonate;
 use App\Http\Middleware\OverrideAuthorizationHeader;
 use App\Http\Middleware\Screen;
@@ -83,13 +83,13 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'client' => CheckClientCredentials::class,
 
+        'header.decrypt' => HeaderDecrypt::class,
         'device' => Device::class,
         'authenticated.passport.cookie' => AuthenticatedByPassportViaCookie::class,
         'authenticated.passport.header' => AuthenticatedByPassportViaHeader::class,
         'authenticated.passport.request' => AuthenticatedByPassportViaRequest::class,
         'authorized.admin' => AuthorizedWithAdmin::class,
         'authorized.admin.permissions' => AuthorizedWithAdminPermissions::class,
-        'admin' => AdminMiddleware::class,
         'impersonate' => Impersonate::class,
     ];
 
@@ -100,6 +100,7 @@ class Kernel extends HttpKernel
         \Illuminate\Routing\Middleware\ThrottleRequests::class,
 
         OverrideAuthorizationHeader::class,
+        HeaderDecrypt::class,
         Screen::class,
         Device::class,
 

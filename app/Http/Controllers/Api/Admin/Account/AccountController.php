@@ -4,10 +4,14 @@
  * Base - Any modification needs to be approved, except the space inside the block of TODO
  */
 
-namespace App\Http\Controllers\Api\Account;
+namespace App\Http\Controllers\Api\Admin\Account;
 
+use App\Http\Controllers\Api\Account\AccountController as BaseAccountController;
+use App\Http\Controllers\Api\Admin\AdminAccountTrait;
 use App\Http\Requests\Request;
 use App\ModelRepositories\AdminRepository;
+use App\ModelRepositories\Base\IUserRepository;
+use App\ModelRepositories\Base\ModelRepository;
 use App\ModelRepositories\UserRepository;
 use App\ModelResources\AdminAccountResource;
 use App\Models\Admin;
@@ -15,17 +19,23 @@ use App\Rules\CurrentPasswordRule;
 use App\Utils\SocialLogin;
 use Illuminate\Validation\Rule;
 
-class AdminAccountController extends BaseAccountController
+/**
+ * Class AccountController
+ * @package App\Http\Controllers\Api\Admin\Account
+ * @property ModelRepository|IUserRepository|AdminRepository $modelRepository
+ */
+class AccountController extends BaseAccountController
 {
-    public function __construct()
-    {
-        parent::__construct();
+    use AdminAccountTrait;
 
-        $this->modelRepository = new AdminRepository();
-        $this->setFixedModelResourceClass(
-            AdminAccountResource::class,
-            $this->modelRepository->modelClass()
-        );
+    protected function getAccountRepositoryClass()
+    {
+        return AdminRepository::class;
+    }
+
+    protected function getAccountResourceClass()
+    {
+        return AdminAccountResource::class;
     }
 
     protected function getAccountModel(Request $request)
@@ -53,7 +63,7 @@ class AdminAccountController extends BaseAccountController
             return $this->updatePassword($request);
         }
 
-        return $this->responseFail();
+        return parent::store($request);
     }
 
     private function updateAvatar(Request $request)

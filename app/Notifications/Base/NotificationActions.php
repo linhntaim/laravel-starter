@@ -8,7 +8,7 @@ namespace App\Notifications\Base;
 
 class NotificationActions
 {
-    protected static function actionGo($screen, $arguments = null, $options = null, $position = null)
+    public static function actionGo($screen, $arguments = null, $options = null, $position = null)
     {
         return [
             'name' => 'go',
@@ -19,7 +19,7 @@ class NotificationActions
         ];
     }
 
-    protected static function actionUrl($url)
+    public static function actionUrl($url)
     {
         return [
             'name' => 'url',

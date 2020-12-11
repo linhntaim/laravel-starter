@@ -1,0 +1,82 @@
+### Basic authentication
+#auth_basic "Protected Area";
+#auth_basic_user_file /path/to/.htpasswd;
+#satisfy any;
+# Ignore: IPs (GBU - Security Room)
+#allow 113.161.68.31;
+# Ignore: IPs (GBU - Office)
+#allow 113.161.68.89;
+# Ignore: IPs (JPN - Office)
+#allow 113.43.219.94;
+# Ignore: IPs (JPN - Office)
+#allow 124.36.26.238;
+# Other must fill username and password
+#deny all;
+# Ignore: Images
+#location ~ \.(jpg|jpeg|png|gif|svg|ico)$ {
+#    auth_basic off;
+#}
+
+### Set default charset
+charset utf-8;
+
+### Set default document
+index index.htm index.html index.php;
+
+### Set mime for some specific file extension
+types {
+    application/json json;
+    font/woff woff;
+    font/woff2 woff2;
+    text/csv csv;
+    text/plain txt;
+    video/mp4 mp4;
+}
+
+### Allow to include .html file in other .html files
+ssi on;
+ssi_last_modified on;
+ssi_min_file_chunk 1k;
+ssi_silent_errors off;
+ssi_types text/html;
+ssi_value_length 256;
+
+include common-headers.conf
+### Cache for static files only, ignore other requests
+add_header Cache-Control "no-cache, no-store, private";
+add_header Pragma "no-cache";
+
+### Handle Admin
+### If there is no Admin, remove this
+location /admin {
+    try_files $uri $uri/ /admin/index.php?$query_string;
+}
+
+### Handle API
+location ~* ^/(api|md) {
+     try_files $uri $uri/ /index.php?$query_string;
+}
+
+### Handle Home
+location / {
+     try_files $uri $uri/ /index.html?$query_string;
+}
+
+### Handle Front
+### If there is no Home, replace Handle API and Handle Home with this
+#location / {
+#    try_files $uri $uri/ /index.php?$query_string;
+#}
+
+location ~* \.(html|jpg|jpeg|png|gif|svg|ico|css|js|json|woff|woff2|mp4)$ {
+    include common-headers.conf;
+    ### Cache for static files only, ignore other requests
+    add_header Cache-Control "max-age=84600, public";
+}
+
+location ~* \.php$ {
+    fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+    fastcgi_index index.php;
+    fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+    include fastcgi_params;
+}

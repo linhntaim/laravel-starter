@@ -6,39 +6,29 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
-use App\Http\Controllers\RegisterController as BaseRegisterController;
+use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
-use App\ModelRepositories\UserRepository;
-use App\ModelResources\UserAccountResource;
+use App\Utils\SocialLogin;
 
-class RegisterController extends BaseRegisterController
+abstract class RegisterController extends ModelApiController
 {
-    public function __construct()
+    public function store(Request $request)
     {
-        parent::__construct();
-
-        $this->modelRepository = new UserRepository();
-        $this->setFixedModelResourceClass(
-            UserAccountResource::class,
-            $this->modelRepository->modelClass()
-        );
+        if (SocialLogin::getInstance()->enabled()) {
+            if ($request->has('_social')) {
+                return $this->registerSocially($request);
+            }
+        }
+        return $this->register($request);
     }
 
-    public function storeSocial(Request $request)
+    public function register(Request $request)
     {
-        $this->validated($request, [
-            'email' => 'nullable|sometimes|max:255',
-            'provider' => 'required|max:255',
-            'provider_id' => 'required|max:255',
-        ]);
+        return $this->responseFail();
+    }
 
-        return $this->responseModel(
-            $this->modelRepository->createWithAttributesFromSocial([
-                'email' => $request->input('email'),
-            ], [
-                'provider' => $request->input('provider'),
-                'provider_id' => $request->input('provider_id'),
-            ])
-        );
+    public function registerSocially(Request $request)
+    {
+        return $this->responseFail();
     }
 }

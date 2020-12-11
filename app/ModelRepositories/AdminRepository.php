@@ -7,8 +7,9 @@
 namespace App\ModelRepositories;
 
 use App\ModelRepositories\Base\DependedRepository;
+use App\ModelRepositories\Base\ExtendedUserRepository;
+use App\ModelRepositories\Base\IUserRepository;
 use App\Models\Admin;
-use App\Utils\HandledFiles\Filer\ImageFiler;
 use App\Utils\SocialLogin;
 
 /**
@@ -18,8 +19,10 @@ use App\Utils\SocialLogin;
  * @method Admin model($id = null)
  * @method Admin getById($id, callable $callback = null)
  */
-class AdminRepository extends DependedRepository
+class AdminRepository extends DependedRepository implements IUserRepository
 {
+    use ExtendedUserRepository;
+
     public function __construct($id = null)
     {
         parent::__construct(SocialLogin::getInstance()->enabled() ? ['user', 'user.socials'] : 'user', $id);

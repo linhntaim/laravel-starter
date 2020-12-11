@@ -9,7 +9,6 @@ namespace App\Models;
 use App\ModelResources\AdminResource;
 use App\Models\Base\ExtendedUserModel;
 use App\Notifications\AdminResetPasswordNotification;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Admin
@@ -25,8 +24,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Admin extends ExtendedUserModel
 {
-    use SoftDeletes;
-
     const MAX_AVATAR_SIZE = 512;
     const MIN_PASSWORD_LENGTH = 8;
 

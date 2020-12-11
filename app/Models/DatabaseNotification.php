@@ -6,44 +6,67 @@
 
 namespace App\Models;
 
+use App\ModelResources\DatabaseNotificationResource;
+use App\Models\Base\IResource;
 use App\Models\Base\IUser;
+use App\Models\Base\Model;
 use App\ModelTraits\MemorizeTrait;
+use App\ModelTraits\ResourceTrait;
 use App\Notifications\Base\DatabaseNotificationFactory;
 use App\Notifications\Base\NowNotification;
 use App\Utils\ClientSettings\Facade;
 use Illuminate\Notifications\DatabaseNotification as BaseDatabaseNotification;
-use function GuzzleHttp\json_decode;
 
 /**
  * Class DatabaseNotification
  * @package App\Models
  * @property string $type
+ * @property string $name
+ * @property string $image
  * @property string $title
  * @property string $content
+ * @property string $htmlContent
+ * @property string $action
  * @property string $sdStCreatedAt
  * @property string $sdStReadAt
  * @property array|null $data
- * @property IUser $notifiable
+ * @property Model|IUser $notifiable
+ * @property Model|IUser $notifier
  * @property NowNotification|mixed $notification
  */
-class DatabaseNotification extends BaseDatabaseNotification
+class DatabaseNotification extends BaseDatabaseNotification implements IResource
 {
-    use MemorizeTrait;
+    use MemorizeTrait, ResourceTrait;
 
     protected $visible = [
         'id',
+        'name',
+        'image',
         'title',
         'content',
+        'html_content',
+        'action',
         'sd_st_created_at',
         'sd_st_read_at',
     ];
 
     protected $appends = [
+        'name',
+        'image',
         'title',
         'content',
+        'html_content',
+        'action',
         'sd_st_created_at',
         'sd_st_read_at',
     ];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->resourceClass = DatabaseNotificationResource::class;
+    }
 
     public function getDataAttribute()
     {
@@ -68,6 +91,27 @@ class DatabaseNotification extends BaseDatabaseNotification
         });
     }
 
+    public function getNotifierAttribute()
+    {
+        return $this->remind('notifier', function () {
+            return $this->notification->getNotifier();
+        });
+    }
+
+    public function getNameAttribute()
+    {
+        return $this->remind('name', function () {
+            return $this->notification->getName();
+        });
+    }
+
+    public function getImageAttribute()
+    {
+        return $this->remind('image', function () {
+            return $this->notification->getImage($this->notifiable);
+        });
+    }
+
     public function getTitleAttribute()
     {
         return $this->remind('title', function () {
@@ -78,7 +122,21 @@ class DatabaseNotification extends BaseDatabaseNotification
     public function getContentAttribute()
     {
         return $this->remind('content', function () {
+            return $this->notification->getContent($this->notifiable, false);
+        });
+    }
+
+    public function getHtmlContentAttribute()
+    {
+        return $this->remind('html_content', function () {
             return $this->notification->getContent($this->notifiable);
+        });
+    }
+
+    public function getActionAttribute()
+    {
+        return $this->remind('action', function () {
+            return $this->notification->getAction($this->notifiable);
         });
     }
 
@@ -100,5 +158,13 @@ class DatabaseNotification extends BaseDatabaseNotification
     {
         $data = $this->data;
         return isset($data[$key]) ? $data[$key] : $default;
+    }
+
+    public function getDataNotifier()
+    {
+        $notifierType = $this->getDataByKey('notifier_type');
+        $notifierId = $this->getDataByKey('notifier_id');
+        return $notifierType && $notifierId ? call_user_func($this->getDataByKey('notifier_type') . '::withTrashed')
+            ->find($this->getDataByKey('notifier_id')) : null;
     }
 }

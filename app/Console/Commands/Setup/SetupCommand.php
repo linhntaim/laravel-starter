@@ -8,31 +8,47 @@ namespace App\Console\Commands\Setup;
 
 class SetupCommand extends Command
 {
-    protected $signature = 'setup {--u} {--f} {--seed-dummy} {--seed-test}';
+    protected $signature = 'setup {--u} {--f} {--seed-dummy} {--seed-test} {--skip=*}';
+
+    protected function skipped()
+    {
+        return $this->option('skip');
+    }
 
     protected function goInstalling()
     {
+        $skipped = $this->skipped();
         $forced = $this->forced();
-        $this->call('setup:web-server', $forced ? [
-            '--f' => true,
-        ] : []);
-        $this->lineBreak();
-        $this->call('setup:packages', $forced ? [
-            '--f' => true,
-        ] : []);
-        $this->lineBreak();
-        $this->call('setup:key:generate', $forced ? [
-            '--f' => true,
-        ] : []);
-        $this->lineBreak();
-        $this->call('setup:storage:link', $forced ? [
-            '--f' => true,
-        ] : []);
-        $this->lineBreak();
-        $this->call('setup:migrate', $forced ? [
-            '--f' => true,
-        ] : []);
-        $this->lineBreak();
+        if (!in_array('web-server', $skipped)) {
+            $this->call('setup:web-server', $forced ? [
+                '--f' => true,
+            ] : []);
+            $this->lineBreak();
+        }
+        if (!in_array('packages', $skipped)) {
+            $this->call('setup:packages', $forced ? [
+                '--f' => true,
+            ] : []);
+            $this->lineBreak();
+        }
+        if (!in_array('key:generate', $skipped)) {
+            $this->call('setup:key:generate', $forced ? [
+                '--f' => true,
+            ] : []);
+            $this->lineBreak();
+        }
+        if (!in_array('storage:link', $skipped)) {
+            $this->call('setup:storage:link', $forced ? [
+                '--f' => true,
+            ] : []);
+            $this->lineBreak();
+        }
+        if (!in_array('migrate', $skipped)) {
+            $this->call('setup:migrate', $forced ? [
+                '--f' => true,
+            ] : []);
+            $this->lineBreak();
+        }
 
         if ($this->option('seed-dummy')) {
             $this->call('setup:seed:dummy', $forced ? [

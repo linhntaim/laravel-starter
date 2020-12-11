@@ -8,12 +8,19 @@ namespace App\Http\Middleware;
 
 use App\Http\Requests\Request;
 use App\Utils\ClassTrait;
+use App\Utils\ExtraActions\ActionFilter;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 
 class Authenticate extends Middleware
 {
     use ClassTrait;
+
+    protected function authenticate($request, array $guards)
+    {
+        $guards = ActionFilter::activate(Authenticate::class, $guards);
+        parent::authenticate($request, $guards);
+    }
 
     /**
      * @param Request $request

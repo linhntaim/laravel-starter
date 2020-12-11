@@ -10,6 +10,7 @@ use App\Utils\ConfigHelper;
 
 class PackagesCommand extends Command
 {
+    const PACKAGE_AWS = 'aws/aws-sdk-php';
     const PACKAGE_AWS_S3 = 'league/flysystem-aws-s3-v3';
     const PACKAGE_AZURE_BLOB = 'matthewbdaly/laravel-azure-storage';
 
@@ -33,24 +34,30 @@ class PackagesCommand extends Command
 
         $requiredPackages = [];
         $removedPackages = [];
-        if (ConfigHelper::get('handled_file.cloud.service.s3')) {
-            if ($this->forced() || !$this->existed(static::PACKAGE_AWS_S3)) {
-                $requiredPackages[] = static::PACKAGE_AWS_S3;
+        $checkPackage = function ($check, $package) use (&$requiredPackages, &$removedPackages) {
+            if ($check) {
+                if ($this->forced() || !$this->existed($package)) {
+                    $requiredPackages[] = $package;
+                }
+            } else {
+                if ($this->forced() || $this->existed($package)) {
+                    $removedPackages[] = $package;
+                }
             }
-        } else {
-            if ($this->forced() || $this->existed(static::PACKAGE_AWS_S3)) {
-                $removedPackages[] = static::PACKAGE_AWS_S3;
-            }
-        }
-        if (ConfigHelper::get('handled_file.cloud.service.azure')) {
-            if ($this->forced() || !$this->existed(static::PACKAGE_AZURE_BLOB)) {
-                $requiredPackages[] = static::PACKAGE_AZURE_BLOB;
-            }
-        } else {
-            if ($this->forced() || $this->existed(static::PACKAGE_AZURE_BLOB)) {
-                $removedPackages[] = static::PACKAGE_AZURE_BLOB;
-            }
-        }
+        };
+
+        $checkPackage(
+            config('services.ses.key') && config('services.ses.secret'),
+            static::PACKAGE_AWS
+        );
+        $checkPackage(
+            ConfigHelper::get('handled_file.cloud.service.s3'),
+            static::PACKAGE_AWS_S3
+        );
+        $checkPackage(
+            ConfigHelper::get('handled_file.cloud.service.azure'),
+            static::PACKAGE_AZURE_BLOB
+        );
 
         if (!empty($removedPackages)) {
             $this->goShell('composer remove ' . implode(' ', $removedPackages));

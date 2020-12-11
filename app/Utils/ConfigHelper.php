@@ -7,6 +7,7 @@
 namespace App\Utils;
 
 use App\Configuration;
+use App\Utils\ClientSettings\Facade;
 
 class ConfigHelper
 {
@@ -110,8 +111,13 @@ class ConfigHelper
         return !empty($callback) ? $callback($blockKey) : $blockKey;
     }
 
-    public static function getClient($name = null)
+    public static function getClient($type = null, $id = null)
     {
-        return empty($name) ? static::get('clients') : static::get('clients.' . $name);
+        if (empty($id)) {
+            $id = Facade::getAppId();
+            $clientAliases = static::get('client_aliases');
+            if (isset($clientAliases[$id])) $id = $clientAliases[$id];
+        }
+        return empty($type) ? static::get('clients.' . $id) : static::get(sprintf('clients.%s.%s', $id, $type));
     }
 }
