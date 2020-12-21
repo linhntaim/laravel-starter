@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Facade as BaseFacade;
  * @method static Manager temporaryFromUser(mixed $user, callable $callback)
  * @method static Manager temporaryFromClientType(string $clientType, callable $callback)
  * @method static Manager temporary(array|Settings $settings, callable $callback)
+ * @method static Manager update($settings)
  * @method static DateTimer dateTimer()
  * @method static NumberFormatter numberFormatter()
  * @method static Settings capture()
