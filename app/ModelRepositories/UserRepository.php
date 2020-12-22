@@ -56,6 +56,7 @@ class UserRepository extends ModelRepository implements IProtectedRepository, IU
             $this->query()
                 ->where('id', $unique)
                 ->orWhere('email', $unique)
+                ->orWhere('username', $unique)
         );
     }
 

@@ -67,6 +67,7 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
      */
     protected $fillable = [
         'email',
+        'username',
         'password',
         'password_changed_at',
         'last_accessed_at',
@@ -75,6 +76,7 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
     protected $visible = [
         'id',
         'email',
+        'username',
         'has_password',
         'ts_last_accessed_at',
         'sd_st_last_accessed_at',

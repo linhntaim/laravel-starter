@@ -58,7 +58,7 @@ trait PassportTrait
             }
         }
         return $userRepository->notStrict()
-            ->getByEmail($username);
+            ->getUniquely($username);
     }
 
     public function validateForPassportPasswordGrant($password)
