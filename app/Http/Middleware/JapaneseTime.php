@@ -13,5 +13,6 @@ class JapaneseTime
         Facade::update([
             'timezone' => 'Asia/Tokyo',
         ]);
+        return $next($request);
     }
 }
