@@ -8,6 +8,8 @@ namespace App\Models\Base;
 
 use App\ModelCasts\SelfCast;
 use App\ModelResources\Base\PropertyResource;
+use App\ModelTraits\SelfCasterTrait;
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
 /**
  * Class PropertyModel
@@ -15,8 +17,10 @@ use App\ModelResources\Base\PropertyResource;
  * @property string $name
  * @property mixed $value
  */
-abstract class PropertyModel extends Model implements ICaster
+abstract class PropertyModel extends Model implements ISelfCaster
 {
+    use SelfCasterTrait;
+
     public $timestamps = false;
 
     protected $visible = [
@@ -29,9 +33,16 @@ abstract class PropertyModel extends Model implements ICaster
 
     protected $resourceClass = PropertyResource::class;
 
-    public function getCaster(string $key, array $attributes)
+    public function applyValueCaster()
     {
-        return $this->getPropertyDefinition()->getCaster($attributes['name']);
+        $caster = $this->getPropertyDefinition()->getCaster($this->name);
+        if ($caster instanceof CastsAttributes) {
+            $this->casts['value'] = SelfCast::class;
+            $this->setCaster('value', $caster);
+        } elseif (is_string($caster)) {
+            $this->casts['value'] = $caster;
+        }
+        return $this;
     }
 
     public static function nullInstance(string $name)

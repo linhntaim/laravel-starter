@@ -6,25 +6,27 @@
 
 namespace App\ModelCasts;
 
-use App\Models\Base\ICaster;
+use App\Models\Base\ISelfCaster;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
 class SelfCast implements CastsAttributes
 {
     public function set($model, string $key, $value, array $attributes)
     {
-        if ($model instanceof ICaster) {
-            return $model->getCaster($key, $attributes)
-                ->set($model, $key, $value, $attributes);
+        if ($model instanceof ISelfCaster) {
+            if (($caster = $model->getCaster($key)) && $caster instanceof CastsAttributes) {
+                return $caster->set($model, $key, $value, $attributes);
+            }
         }
         return $value;
     }
 
     public function get($model, string $key, $value, array $attributes)
     {
-        if ($model instanceof ICaster) {
-            return $model->getCaster($key, $attributes)
-                ->get($model, $key, $value, $attributes);
+        if ($model instanceof ISelfCaster) {
+            if (($caster = $model->getCaster($key)) && $caster instanceof CastsAttributes) {
+                return $caster->get($model, $key, $value, $attributes);
+            }
         }
         return $value;
     }

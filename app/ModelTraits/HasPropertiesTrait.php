@@ -45,7 +45,13 @@ trait HasPropertiesTrait
         $keyedProperties = $this->properties()->get()->keyBy('name');
         $properties = new Collection();
         foreach ($propertyDefinition->getNames() as $name) {
-            $properties->put($name, $keyedProperties->get($name, $this->getNullPropertyInstance($name)));
+            $properties->put(
+                $name,
+                tap($keyedProperties->get($name, $this->getNullPropertyInstance($name)), function (PropertyModel $property) {
+                    $property->applyValueCaster();
+                    return $property;
+                })
+            );
         }
         return $keyedProperties;
     }
