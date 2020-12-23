@@ -6,62 +6,88 @@
 
 namespace App\ModelRepositories\Base;
 
-use App\Models\Base\IHasProperties;
-use App\Models\Base\Model;
-use App\Models\Base\PropertyModel;
+use App\Exceptions\AppException;
+use App\Models\Base\IProtected;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
- * Class PropertyRepository
+ * Trait ProtectedRepositoryTrait
  * @package App\ModelRepositories\Base
- * @method PropertyModel newModel()
+ * @property IProtected $model
  */
-abstract class PropertyRepository extends ModelRepository
+trait ProtectedRepositoryTrait
 {
-    public function getPropertyDefinition()
+    protected $protected = true;
+
+    public function getProtectedValues()
     {
-        return $this->newModel()->getPropertyDefinition();
+        return call_user_func($this->modelClass . '::getProtectedValues');
     }
 
-    /**
-     * @param string $name
-     * @param mixed $value
-     * @param IHasProperties|Model $hasPropertyModel
-     * @param array $extraAttributes
-     * @return PropertyModel
-     * @throws
-     */
-    public function save(string $name, $value, $hasPropertyModel, $extraAttributes = [])
+    public function getProtectedValue()
     {
-        $newModel = $this->newModel();
-        $newModel->name = $name;
-        $newModel->applyValueCaster();
-        $hasPropertyModelForeignKey = $newModel->getHasPropertyModelForeignKey();
-        return $this->useModelQuery($newModel)
-            ->updateOrCreateWithAttributes([
-                $hasPropertyModelForeignKey => $this->retrieveId($hasPropertyModel),
-                'name' => $name,
-            ], array_merge([
-                'value' => $value,
-            ], $extraAttributes));
+        return $this->model->getProtectedValue();
     }
 
-    /**
-     * @param array $properties
-     * @param IHasProperties|Model $hasPropertyModel
-     * @param array $extraAttributes
-     * @return boolean
-     * @throws
-     */
-    public function saveMany(array $properties, $hasPropertyModel, $extraAttributes = [])
+    public function skipProtected()
     {
-        foreach ($properties as $name => $value) {
-            $this->save(
-                $name,
-                $value,
-                $hasPropertyModel,
-                isset($extraAttributes[$name]) ? $extraAttributes[$name] : []
-            );
+        $this->protected = false;
+        return $this;
+    }
+
+    protected function onProtected(callable $callback)
+    {
+        if ($this->protected) {
+            $callback();
         }
-        return true;
+        $this->protected = true;
+    }
+
+    protected function validateProtected($notValidMessage = '')
+    {
+        $this->onProtected(function () use ($notValidMessage) {
+            if (in_array($this->getProtectedValue(), $this->getProtectedValues())) {
+                throw new AppException($notValidMessage);
+            }
+        });
+    }
+
+    protected function searchQuery()
+    {
+        return $this->queryProtected(parent::searchQuery());
+    }
+
+    protected function queryProtected($query)
+    {
+        if ($this->protected) {
+            return $this->queryNoneProtected($query);
+        }
+        $this->protected = true;
+        return $query;
+    }
+
+    protected function queryNoneProtected($query)
+    {
+        return $query->noneProtected();
+    }
+
+    /**
+     * @return Collection
+     * @throws
+     */
+    public function getNoneProtected()
+    {
+        return $this->catch(function () {
+            return $this->queryNoneProtected($this->query())->get();
+        });
+    }
+
+    /**
+     * @param array $ids
+     * @return bool
+     */
+    public function deleteWithIds(array $ids)
+    {
+        return $this->queryDelete($this->queryProtected($this->queryByIds($ids)));
     }
 }

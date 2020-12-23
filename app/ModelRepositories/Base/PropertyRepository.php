@@ -26,10 +26,11 @@ abstract class PropertyRepository extends ModelRepository
      * @param string $name
      * @param mixed $value
      * @param IHasProperties|Model $hasPropertyModel
+     * @param array $extraAttributes
      * @return PropertyModel
      * @throws
      */
-    public function save(string $name, $value, $hasPropertyModel)
+    public function save(string $name, $value, $hasPropertyModel, $extraAttributes = [])
     {
         $newModel = $this->newModel();
         $newModel->name = $name;
@@ -39,21 +40,27 @@ abstract class PropertyRepository extends ModelRepository
             ->updateOrCreateWithAttributes([
                 $hasPropertyModelForeignKey => $this->retrieveId($hasPropertyModel),
                 'name' => $name,
-            ], [
+            ], array_merge([
                 'value' => $value,
-            ]);
+            ], $extraAttributes));
     }
 
     /**
      * @param array $properties
      * @param IHasProperties|Model $hasPropertyModel
+     * @param array $extraAttributes
      * @return boolean
      * @throws
      */
-    public function saveMany(array $properties, $hasPropertyModel)
+    public function saveMany(array $properties, $hasPropertyModel, $extraAttributes = [])
     {
         foreach ($properties as $name => $value) {
-            $this->save($name, $value, $hasPropertyModel);
+            $this->save(
+                $name,
+                $value,
+                $hasPropertyModel,
+                isset($extraAttributes[$name]) ? $extraAttributes[$name] : []
+            );
         }
         return true;
     }
