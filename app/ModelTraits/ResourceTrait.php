@@ -6,10 +6,13 @@
 
 namespace App\ModelTraits;
 
+/**
+ * Trait ResourceTrait
+ * @package App\ModelTraits
+ * @property string $resourceClass
+ */
 trait ResourceTrait
 {
-    protected $resourceClass;
-
     public function getResourceClass()
     {
         return $this->resourceClass;

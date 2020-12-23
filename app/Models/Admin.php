@@ -25,7 +25,6 @@ use App\Notifications\AdminResetPasswordNotification;
 class Admin extends ExtendedUserModel
 {
     const MAX_AVATAR_SIZE = 512;
-    const MIN_PASSWORD_LENGTH = 8;
 
     protected $table = 'admins';
 

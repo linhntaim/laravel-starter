@@ -10,5 +10,7 @@ use App\Http\Controllers\Api\DeviceController as BaseDeviceController;
 
 class DeviceController extends BaseDeviceController
 {
+    // TODO:
 
+    // TODO
 }

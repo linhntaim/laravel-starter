@@ -6,9 +6,11 @@
 
 namespace App\Http\Controllers\Api\Common\Account;
 
-use App\Http\Controllers\Api\Account\UserAccountController;
+use App\Http\Controllers\Api\Account\UserAccountController as BaseAccountController;
 
-class AccountController extends UserAccountController
+class AccountController extends BaseAccountController
 {
+    // TODO:
 
+    // TODO
 }

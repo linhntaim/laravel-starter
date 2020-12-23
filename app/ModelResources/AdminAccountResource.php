@@ -6,22 +6,17 @@
 
 namespace App\ModelResources;
 
+use App\ModelResources\Base\ExtendedAccountResource;
 use App\Models\Admin;
 
 /**
- * Class RoleResource
+ * Class AdminAccountResource
  * @package App\ModelResources
  * @mixin Admin
  */
-class AdminAccountResource extends AdminResource
+class AdminAccountResource extends ExtendedAccountResource
 {
-    public function toCustomArray($request)
-    {
-        return [
-            $this->merge(parent::toCustomArray($request)),
-            $this->merge([
-                'settings' => $this->preferredSettings()->toArray(),
-            ]),
-        ];
-    }
+    // TODO:
+
+    // TODO
 }

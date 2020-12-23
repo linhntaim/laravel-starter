@@ -6,6 +6,7 @@
 
 namespace App\Models\Base;
 
+use App\Configuration;
 use App\Models\DatabaseNotification;
 use App\Models\User;
 use App\ModelTraits\MemorizeTrait;
@@ -31,7 +32,10 @@ abstract class ExtendedUserModel extends Model implements IUser
 
     public $incrementing = false;
 
-    public $timestamps = false;
+    public function getPasswordMinLength()
+    {
+        return Configuration::PASSWORD_MIN_LENGTH;
+    }
 
     public function user()
     {
@@ -43,9 +47,19 @@ abstract class ExtendedUserModel extends Model implements IUser
         return $this->preferredEmail();
     }
 
+    public function preferredName()
+    {
+        return $this->user->preferredName();
+    }
+
     public function preferredEmail()
     {
         return $this->user->preferredEmail();
+    }
+
+    public function preferredAvatarUrl()
+    {
+        return $this->user->preferredAvatarUrl();
     }
 
     public function preferredLocale()

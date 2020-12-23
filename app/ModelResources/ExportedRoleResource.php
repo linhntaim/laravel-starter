@@ -10,7 +10,7 @@ use App\ModelResources\Base\ModelResource;
 use App\Models\Role;
 
 /**
- * Class RoleResource
+ * Class ExportedRoleResource
  * @package App\ModelResources
  * @mixin Role
  */

@@ -101,8 +101,8 @@ class Kernel extends HttpKernel
         \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
         \Illuminate\Routing\Middleware\ThrottleRequests::class,
 
-        OverrideAuthorizationHeader::class,
         JapaneseTime::class,
+        OverrideAuthorizationHeader::class,
         HeaderDecrypt::class,
         Screen::class,
         Device::class,

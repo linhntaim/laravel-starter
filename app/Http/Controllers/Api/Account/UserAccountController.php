@@ -7,15 +7,12 @@
 namespace App\Http\Controllers\Api\Account;
 
 use App\Http\Requests\Request;
-use App\ModelRepositories\Base\IUserRepository;
-use App\ModelRepositories\Base\ModelRepository;
 use App\ModelRepositories\UserRepository;
 use App\ModelResources\UserAccountResource;
 
 /**
  * Class UserAccountController
  * @package App\Http\Controllers\Api\Account
- * @property ModelRepository|IUserRepository|UserRepository $modelRepository
  */
 abstract class UserAccountController extends AccountController
 {
@@ -39,4 +36,8 @@ abstract class UserAccountController extends AccountController
 
         return parent::store($request);
     }
+
+    // TODO:
+
+    // TODO
 }

@@ -15,4 +15,6 @@ use Illuminate\Database\Eloquent\Model as BaseModel;
 abstract class Model extends BaseModel implements IResource, IActivityLog
 {
     use OnlyAttributesToArrayTrait, ResourceTrait, ActivityLogTrait, FromModelTrait;
+
+    protected $resourceClass;
 }

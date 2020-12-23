@@ -45,6 +45,8 @@ abstract class ModelRepository
     private $sortsAllowedDefault = [];
     private $force = false;
     private $pinned = false;
+    private $rawQuery = null;
+    private $fixedRawQuery = null;
 
     /**
      * @var array|null
@@ -60,10 +62,75 @@ abstract class ModelRepository
     public abstract function modelClass();
 
     /**
+     * @param Model|callable|null $model
+     * @param callable|null $callback
+     * @return ModelRepository
+     * @throws
+     */
+    public function useModelQuery($model = null, $callback = null)
+    {
+        $this->rawQuery = $this->modelQuery($model, $callback);
+        return $this;
+    }
+
+    /**
+     * @param Model|callable|null $model
+     * @param callable|null $callback
+     * @return ModelRepository
+     * @throws
+     */
+    public function useModelQueryAsFixed($model = null, $callback = null)
+    {
+        $this->fixedRawQuery = $this->modelQuery($model, $callback);
+        return $this;
+    }
+
+    /**
+     * @return ModelRepository
+     * @throws
+     */
+    public function clearUsingModelQuery()
+    {
+        $this->rawQuery = null;
+        $this->fixedRawQuery = null;
+        return $this;
+    }
+
+    /**
+     * @param Model|callable|null $model
+     * @param callable|null $callback
+     * @return Builder
+     * @throws
+     */
+    public function modelQuery($model = null, $callback = null)
+    {
+        if (is_null($model)) {
+            $model = $this->newModel();
+        } elseif (is_callable($model)) {
+            $model = $model($this->newModel());
+        }
+        if (is_callable($callback)) {
+            $model = $callback($model);
+        }
+        if (get_class($model) != $this->modelClass) {
+            throw new AppException('Model does not match the class');
+        }
+        return $model->newQuery();
+    }
+
+    /**
      * @return Builder
      */
     public function rawQuery()
     {
+        if ($this->rawQuery) {
+            $rawQuery = $this->rawQuery;
+            $this->rawQuery = null;
+            return $rawQuery;
+        }
+        if ($this->fixedRawQuery) {
+            return $this->fixedRawQuery;
+        }
         return call_user_func($this->modelClass . '::query');
     }
 
@@ -443,7 +510,7 @@ abstract class ModelRepository
     {
         return $this->catch(function () use ($attributes, $values) {
             if (!empty($attributes)) {
-                $this->model = $this->query()->updateOrCreate($attributes, $values);
+                $this->model = $this->rawQuery()->updateOrCreate($attributes, $values);
             }
             return $this->model;
         });

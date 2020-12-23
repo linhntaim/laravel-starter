@@ -43,4 +43,6 @@ class Configuration
 
     const CLIENT_APP_HOME = 'home';
     const CLIENT_APP_ADMIN = 'admin';
+
+    const PASSWORD_MIN_LENGTH = 8;
 }

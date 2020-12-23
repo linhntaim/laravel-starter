@@ -19,4 +19,8 @@ interface IUser extends IContactable
     public function preferredSettings();
 
     public function getPasswordResetExpiredAt();
+
+    public function getPasswordMinLength();
+
+    public function sendPasswordResetNotification($token);
 }

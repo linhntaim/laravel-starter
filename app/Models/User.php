@@ -6,6 +6,7 @@
 
 namespace App\Models;
 
+use App\Configuration;
 use App\ModelResources\UserResource;
 use App\Models\Base\IActivityLog;
 use App\Models\Base\IProtected;
@@ -33,7 +34,7 @@ use Laravel\Passport\HasApiTokens;
  * Class User
  * @package App\Models
  * @property int $id
- * @property string $display_name
+ * @property string $username
  * @property string $email
  * @property bool $hasPassword
  * @property PasswordReset $passwordReset
@@ -96,9 +97,11 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
         'password', 'remember_token',
     ];
 
-    public function getResourceClass()
+    protected $resourceClass = UserResource::class;
+
+    public function getPasswordMinLength()
     {
-        return UserResource::class;
+        return Configuration::PASSWORD_MIN_LENGTH;
     }
 
     public static function getProtectedKey()
@@ -179,7 +182,9 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
 
     public function preferredName()
     {
-        return Str::before($this->preferredEmail(), '@');
+        return isset($this->attributes['username']) ?
+            $this->attributes['username']
+            : Str::before($this->preferredEmail(), '@');
     }
 
     public function preferredAvatarUrl()

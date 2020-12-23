@@ -8,20 +8,71 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
+use App\ModelRepositories\Base\IUserRepository;
 use App\ModelRepositories\PasswordResetRepository;
 use App\Utils\StringHelper;
+use Closure;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Auth\Passwords\PasswordBroker;
+use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Support\Facades\Password;
 
 abstract class PasswordController extends ModelApiController
 {
-    use PasswordBrokerTrait;
-
     public function __construct()
     {
         parent::__construct();
 
         $this->modelRepository = new PasswordResetRepository();
+    }
+
+    /**
+     * @return string
+     */
+    protected abstract function getUserRepositoryClass();
+
+    /**
+     * @return IUserRepository
+     */
+    protected function getUserRepository()
+    {
+        $repositoryClass = $this->getUserRepositoryClass();
+        return new $repositoryClass();
+    }
+
+    protected function getPasswordMinLength()
+    {
+        return $this->getUserRepository()->newModel()->getPasswordMinLength();
+    }
+
+    /**
+     * @return PasswordBroker
+     */
+    protected function broker()
+    {
+        return Password::broker();
+    }
+
+    protected function brokerGetUser(array $credentials)
+    {
+        return $this->broker()->getUser($credentials);
+    }
+
+    protected function brokerTokenExists(CanResetPassword $user, $token)
+    {
+        return $this->broker()->tokenExists($user, $token);
+    }
+
+    protected function brokerSendResetLink(array $credentials, Closure $callback = null)
+    {
+        return $this->broker()->sendResetLink($credentials, $callback ? $callback : function ($user, $token) {
+            $this->getUserRepository()->model($user)->sendPasswordResetNotification($token);
+        });
+    }
+
+    protected function brokerReset(array $credentials, Closure $callback)
+    {
+        return $this->broker()->reset($credentials, $callback);
     }
 
     public function index(Request $request)
@@ -89,7 +140,7 @@ abstract class PasswordController extends ModelApiController
         return [
             'token' => 'required',
             'email' => 'required|email',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:' . $this->getPasswordMinLength() . '|confirmed',
         ];
     }
 
