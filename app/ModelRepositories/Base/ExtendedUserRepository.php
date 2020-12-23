@@ -39,6 +39,15 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
         return parent::model($id);
     }
 
+    public function queryUniquely($query, $unique)
+    {
+        return parent::queryUniquely($query, $unique)
+            ->orWhereHas('user', function ($query) use ($unique) {
+                $query->where('username', $unique)
+                    ->orWhere('email', $unique);
+            });
+    }
+
     public function createWithAttributes(array $attributes = [], array $userAttributes = [], array $userSocialAttributes = [])
     {
         $attributes['user_id'] = (new UserRepository())->createWithAttributes($userAttributes, $userSocialAttributes)->id;

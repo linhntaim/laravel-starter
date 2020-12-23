@@ -46,9 +46,9 @@ class UserRepository extends ModelRepository implements IProtectedRepository, IU
         return parent::searchOn($query, $search);
     }
 
-    public function queryUniquely($unique)
+    public function queryUniquely($query, $unique)
     {
-        return parent::queryUniquely($unique)
+        return parent::queryUniquely($query, $unique)
             ->orWhere('email', $unique)
             ->orWhere('username', $unique);
     }

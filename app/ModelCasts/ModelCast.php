@@ -2,8 +2,10 @@
 
 namespace App\ModelCasts;
 
+use App\Exceptions\AppException;
 use App\ModelRepositories\Base\ModelRepository;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Illuminate\Database\Eloquent\Model;
 
 class ModelCast implements CastsAttributes
 {
@@ -24,8 +26,11 @@ class ModelCast implements CastsAttributes
 
     public function set($model, string $key, $value, array $attributes)
     {
-        if (get_class($value) == $this->modelRepository->modelClass()) {
-            return $value->getKey();
+        if ($value instanceof Model) {
+            if (get_class($value) == $this->modelRepository->modelClass()) {
+                return $value->getKey();
+            }
+            throw new AppException('Model does not match');
         }
         if ($value = $this->getModel($value)) {
             return $value->getKey();

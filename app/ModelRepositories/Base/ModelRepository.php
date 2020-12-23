@@ -410,10 +410,14 @@ abstract class ModelRepository
         });
     }
 
-    public function queryUniquely($unique)
+    /**
+     * @param Builder $query
+     * @param string|mixed $unique
+     * @return Builder
+     */
+    public function queryUniquely($query, $unique)
     {
-        return $this->query()
-            ->where($this->getIdKey(), $unique);
+        return $query->orWhere($this->getIdKey(), $unique);
     }
 
     /**
@@ -424,7 +428,9 @@ abstract class ModelRepository
     public function getUniquely($unique)
     {
         return $this->first(
-            $this->queryUniquely($unique)
+            $this->query()->where(function ($query) use ($unique) {
+                return $this->queryUniquely($query, $unique);
+            })
         );
     }
 
