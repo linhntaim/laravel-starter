@@ -10,6 +10,7 @@ use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\Base\IUserRepository;
 use App\ModelRepositories\PasswordResetRepository;
+use App\Models\User;
 use App\Utils\StringHelper;
 use Closure;
 use Illuminate\Auth\Events\PasswordReset;
@@ -84,7 +85,7 @@ abstract class PasswordController extends ModelApiController
         return $this->responseFail();
     }
 
-    private function indexReset(Request $request)
+    protected function indexReset(Request $request)
     {
         $this->validated($request, [
             'token' => 'required',
@@ -120,7 +121,7 @@ abstract class PasswordController extends ModelApiController
         return $this->responseFail();
     }
 
-    private function forgot(Request $request)
+    protected function forgot(Request $request)
     {
         $this->validated($request, [
             'email' => 'required|email',
@@ -144,7 +145,7 @@ abstract class PasswordController extends ModelApiController
         ];
     }
 
-    private function reset(Request $request)
+    protected function reset(Request $request)
     {
         $this->validated($request, $this->resetValidatedRules());
 
@@ -155,15 +156,20 @@ abstract class PasswordController extends ModelApiController
                 'token' => $request->input('token'),
             ],
             function ($user, $password) {
-                $user->password = StringHelper::hash($password);
-                $user->save();
-
-                event(new PasswordReset($user));
+                $this->afterReset($user, $password);
             }
         );
 
         return $response == Password::PASSWORD_RESET
             ? $this->responseSuccess()
             : $this->responseFail(trans($response));
+    }
+
+    protected function afterReset(User $user, $password)
+    {
+        $user->password = StringHelper::hash($password);
+        $user->save();
+
+        event(new PasswordReset($user));
     }
 }

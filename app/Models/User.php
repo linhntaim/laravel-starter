@@ -36,6 +36,7 @@ use Laravel\Passport\HasApiTokens;
  * @property int $id
  * @property string $username
  * @property string $email
+ * @property string $password
  * @property bool $hasPassword
  * @property PasswordReset $passwordReset
  */

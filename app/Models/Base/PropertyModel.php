@@ -21,6 +21,8 @@ abstract class PropertyModel extends Model implements ISelfCaster
 {
     use SelfCasterTrait;
 
+    public $incrementing = false;
+
     public $timestamps = false;
 
     protected $visible = [
