@@ -110,7 +110,7 @@ trait MigrateWithPassportTrait
 
     private function rollbackPassport()
     {
-        $this->warn('Migrating passport...');
+        $this->warn('Immigrating passport...');
 
         $tablePrefix = DB::getTablePrefix();
         $database = config(sprintf('database.connections.%s.database', config('database.default')));
@@ -127,7 +127,7 @@ trait MigrateWithPassportTrait
         @unlink(storage_path('oauth-private.key'));
         @unlink(storage_path('oauth-public.key'));
 
-        $this->info('Passport migrated!!!');
+        $this->info('Passport immigrated!!!');
         $this->lineBreak();
     }
 }

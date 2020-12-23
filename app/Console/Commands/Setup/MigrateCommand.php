@@ -106,7 +106,7 @@ class MigrateCommand extends Command
 
     private function rollbackTables()
     {
-        $this->warn('Migrating tables...');
+        $this->warn('Immigrating tables...');
         $database = config(sprintf('database.connections.%s.database', config('database.default')));
         $tables = DB::select('select table_name from information_schema.tables where table_schema = ?', [$database]);
         DB::statement('set foreign_key_checks = 0');
@@ -114,7 +114,7 @@ class MigrateCommand extends Command
             DB::statement(sprintf('drop table %s', $table->table_name));
         }
         DB::statement('set foreign_key_checks = 1');
-        $this->info('Tables migrated!!!');
+        $this->info('Tables immigrated!!!');
         $this->lineBreak();
     }
 
