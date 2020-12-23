@@ -7,9 +7,12 @@
 namespace App\Notifications;
 
 use App\Models\Base\IUser;
+use App\Notifications\Base\AdminNowNotification;
 
-class AdminResetPasswordNotification extends UserResetPasswordNotification
+class AdminResetPasswordNotification extends AdminNowNotification
 {
+    use UserResetPasswordNotificationTrait;
+
     protected function getMailTemplate(IUser $notifiable)
     {
         return 'admin_password_reset';

@@ -7,10 +7,9 @@
 namespace App\Notifications;
 
 use App\Models\Base\IUser;
-use App\Notifications\Base\AdminNowNotification;
 use App\Utils\ClientSettings\Facade;
 
-class UserResetPasswordNotification extends AdminNowNotification
+trait UserResetPasswordNotificationTrait
 {
     protected $token;
     protected $appResetPasswordPath;
