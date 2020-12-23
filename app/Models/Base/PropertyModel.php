@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Models\Base;
 
 use App\ModelCasts\SelfCast;
@@ -27,7 +31,7 @@ abstract class PropertyModel extends Model implements ICaster
 
     public function getCaster(string $key, array $attributes)
     {
-        return $this->getPropertyDefinition()->getCast($attributes['name']);
+        return $this->getPropertyDefinition()->getCaster($attributes['name']);
     }
 
     public static function nullInstance(string $name)

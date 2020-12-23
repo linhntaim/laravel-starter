@@ -21,6 +21,7 @@ use App\Utils\StringHelper;
  * Class UserRepository
  * @package App\ModelRepositories
  * @property User|IProtected $model
+ * @method User|null getUniquely($unique)
  */
 class UserRepository extends ModelRepository implements IProtectedRepository, IUserRepository
 {
@@ -45,19 +46,11 @@ class UserRepository extends ModelRepository implements IProtectedRepository, IU
         return parent::searchOn($query, $search);
     }
 
-    /**
-     * @param string $unique
-     * @return User
-     * @throws
-     */
-    public function getUniquely($unique)
+    public function queryUniquely($unique)
     {
-        return $this->first(
-            $this->query()
-                ->where('id', $unique)
-                ->orWhere('email', $unique)
-                ->orWhere('username', $unique)
-        );
+        return parent::queryUniquely($unique)
+            ->orWhere('email', $unique)
+            ->orWhere('username', $unique);
     }
 
     /**

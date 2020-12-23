@@ -26,6 +26,12 @@ class PermissionRepository extends ModelRepository implements IProtectedReposito
         return Permission::class;
     }
 
+    public function queryUniquely($unique)
+    {
+        return parent::queryUniquely($unique)
+            ->orWhere('name', $unique);
+    }
+
     /**
      * @param string $name
      * @return Permission
