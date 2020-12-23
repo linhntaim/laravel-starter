@@ -27,10 +27,6 @@ abstract class PropertyModel extends Model implements ISelfCaster
         'name',
     ];
 
-    protected $casts = [
-        'value' => SelfCast::class,
-    ];
-
     protected $resourceClass = PropertyResource::class;
 
     public function applyValueCaster()
