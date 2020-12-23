@@ -53,7 +53,7 @@ trait HasPropertiesTrait
                 })
             );
         }
-        return $keyedProperties;
+        return $properties;
     }
 
     /**
