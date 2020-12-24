@@ -19,8 +19,10 @@ use App\Utils\SocialLogin;
  * @property ExtendedUserModel $model
  * @method ExtendedUserModel newModel()
  */
-abstract class ExtendedUserRepository extends DependedRepository implements IUserRepository
+abstract class ExtendedUserRepository extends DependedRepository implements IUserRepository, IProtectedRepository
 {
+    use ProtectedRepositoryTrait;
+
     public function __construct($id = null)
     {
         parent::__construct(SocialLogin::getInstance()->enabled() ? ['user', 'user.socials'] : 'user', $id);
@@ -50,8 +52,33 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
 
     public function createWithAttributes(array $attributes = [], array $userAttributes = [], array $userSocialAttributes = [])
     {
-        $attributes['user_id'] = (new UserRepository())->createWithAttributes($userAttributes, $userSocialAttributes)->id;
-        parent::createWithAttributes($attributes);
+        $userRepository = new UserRepository();
+        foreach (['email', 'username'] as $uniqueAttributeName) {
+            if (isset($userAttributes[$uniqueAttributeName])) {
+                $userRepository->pinModel()
+                    ->notStrict()
+                    ->withTrashed()
+                    ->getUniquely($userAttributes[$uniqueAttributeName]);
+                if ($userRepository->hasModel()) {
+                    $userRepository->restore();
+                }
+            }
+        }
+        if ($userRepository->hasModel()) {
+            $userRepository->updateWithAttributes($userAttributes, $userSocialAttributes);
+        } else {
+            $userRepository->createWithAttributes($userAttributes, $userSocialAttributes);
+        }
+
+        $userId = $userRepository->getId();
+        $this->pinModel()->notStrict()->withTrashed()->getById($userId);
+        if ($this->hasModel()) {
+            $this->restore();
+            $this->updateWithAttributes($attributes);
+        } else {
+            $attributes['user_id'] = $userRepository->getId();
+            parent::createWithAttributes($attributes);
+        }
         return $this->afterCreated();
     }
 
@@ -75,6 +102,12 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
         return $this->model;
     }
 
+    public function updateWithAttributes(array $attributes = [], array $userAttributes = [])
+    {
+        (new UserRepository())->withModel($this->model->user)->updateWithAttributes($userAttributes);
+        return parent::updateWithAttributes($attributes);
+    }
+
     public function updateLastAccessedAt()
     {
         return (new UserRepository())
@@ -89,11 +122,18 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
      */
     public function deleteWithIds(array $ids)
     {
+        (new UserRepository())->deleteWithIds($ids);
         return $this->queryDelete(
             $this->dependedWhere(function ($query) {
                 $query->noneProtected();
             }, SocialLogin::getInstance()->enabled() ? 'user' : null)
                 ->queryByIds($ids)
         );
+    }
+
+    public function delete()
+    {
+        (new UserRepository())->withModel($this->model->user)->delete();
+        return parent::delete();
     }
 }

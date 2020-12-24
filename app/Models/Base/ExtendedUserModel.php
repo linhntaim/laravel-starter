@@ -11,6 +11,7 @@ use App\Models\DatabaseNotification;
 use App\Models\User;
 use App\ModelTraits\MemorizeTrait;
 use App\ModelTraits\NotificationTrait;
+use App\ModelTraits\ProtectedTrait;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
@@ -18,6 +19,7 @@ use Illuminate\Notifications\Notifiable;
 /**
  * Trait UserExtendedTrait
  * @package App\ModelTraits
+ * @property int $user_id
  * @property User $user
  * @property DatabaseNotification[] $notifications
  */
@@ -26,7 +28,9 @@ abstract class ExtendedUserModel extends Model implements IUser
     use Notifiable, NotificationTrait {
         NotificationTrait::notifications insteadof Notifiable;
     }
-    use CanResetPassword, MemorizeTrait, SoftDeletes;
+    use CanResetPassword, MemorizeTrait, ProtectedTrait, SoftDeletes;
+
+    const PROTECTED = User::PROTECTED;
 
     protected $primaryKey = 'user_id';
 
@@ -35,6 +39,11 @@ abstract class ExtendedUserModel extends Model implements IUser
     public function getPasswordMinLength()
     {
         return Configuration::PASSWORD_MIN_LENGTH;
+    }
+
+    public static function getProtectedKey()
+    {
+        return 'user_id';
     }
 
     public function user()
