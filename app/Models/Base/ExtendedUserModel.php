@@ -20,6 +20,8 @@ use Illuminate\Notifications\Notifiable;
  * Trait UserExtendedTrait
  * @package App\ModelTraits
  * @property int $user_id
+ * @property string $username
+ * @property string $email
  * @property User $user
  * @property DatabaseNotification[] $notifications
  */
@@ -44,6 +46,16 @@ abstract class ExtendedUserModel extends Model implements IUser
     public static function getProtectedKey()
     {
         return 'user_id';
+    }
+
+    public function getUsernameAttribute()
+    {
+        return $this->user->username;
+    }
+
+    public function getEmailAttribute()
+    {
+        return $this->user->email;
     }
 
     public function user()

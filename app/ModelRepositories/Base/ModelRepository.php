@@ -141,6 +141,17 @@ abstract class ModelRepository
     }
 
     /**
+     * @param Collection|array $ids
+     * @return mixed
+     */
+    public function retrieveIds($ids)
+    {
+        return $ids instanceof Collection ? $ids->map(function (Model $model) {
+            return $model->getKey();
+        })->all() : $ids;
+    }
+
+    /**
      * @return Builder
      */
     public function rawQuery()
@@ -539,7 +550,7 @@ abstract class ModelRepository
     {
         return $this->catch(function () use ($attributes, $values) {
             if (!empty($attributes)) {
-                $this->model = $this->rawQuery()->updateOrCreate($attributes, $values);
+                $this->model = $this->query()->updateOrCreate($attributes, $values);
             }
             return $this->model;
         });
