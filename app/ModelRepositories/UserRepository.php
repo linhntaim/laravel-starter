@@ -70,6 +70,18 @@ class UserRepository extends ModelRepository implements IProtectedRepository, IU
     }
 
     /**
+     * @param string $username
+     * @return User
+     * @throws
+     */
+    public function getByUsername($username)
+    {
+        return $this->first(
+            $this->query()->where('username', $username)
+        );
+    }
+
+    /**
      * @param string $email
      * @return User
      * @throws

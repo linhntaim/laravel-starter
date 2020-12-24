@@ -30,8 +30,8 @@ class CreateUsersTable extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->unique('email');
-            $table->unique('username');
+            $table->index('email');
+            $table->index('username');
             $table->index('password_changed_at');
             $table->index('last_accessed_at');
             $table->index('created_at');

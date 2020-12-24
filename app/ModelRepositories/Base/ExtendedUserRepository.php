@@ -52,33 +52,8 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
 
     public function createWithAttributes(array $attributes = [], array $userAttributes = [], array $userSocialAttributes = [])
     {
-        $userRepository = new UserRepository();
-        foreach (['email', 'username'] as $uniqueAttributeName) {
-            if (isset($userAttributes[$uniqueAttributeName])) {
-                $userRepository->pinModel()
-                    ->notStrict()
-                    ->withTrashed()
-                    ->getUniquely($userAttributes[$uniqueAttributeName]);
-                if ($userRepository->hasModel()) {
-                    $userRepository->restore();
-                }
-            }
-        }
-        if ($userRepository->hasModel()) {
-            $userRepository->updateWithAttributes($userAttributes, $userSocialAttributes);
-        } else {
-            $userRepository->createWithAttributes($userAttributes, $userSocialAttributes);
-        }
-
-        $userId = $userRepository->getId();
-        $this->pinModel()->notStrict()->withTrashed()->getById($userId);
-        if ($this->hasModel()) {
-            $this->restore();
-            $this->updateWithAttributes($attributes);
-        } else {
-            $attributes['user_id'] = $userRepository->getId();
-            parent::createWithAttributes($attributes);
-        }
+        $attributes['user_id'] = (new UserRepository())->createWithAttributes($userAttributes, $userSocialAttributes)->id;
+        parent::createWithAttributes($attributes);
         return $this->afterCreated();
     }
 
