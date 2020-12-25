@@ -165,9 +165,16 @@ abstract class ModelApiController extends ApiController
 
     #endregion
 
+    public function showExecute(Request $request, $id)
+    {
+        return $this->modelRepository->model($id);
+    }
+
     public function show(Request $request, $id)
     {
-        return $this->responseModel($this->modelRepository->model($id));
+        return $this->responseModel(
+            $this->showExecute($request, $id)
+        );
     }
 
     #region Update

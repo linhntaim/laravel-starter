@@ -61,17 +61,7 @@ class DatabaseNotification extends BaseDatabaseNotification implements IResource
         'sd_st_read_at',
     ];
 
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-
-        $this->resourceClass = DatabaseNotificationResource::class;
-    }
-
-    public function getDataAttribute()
-    {
-        return json_decode($this->attributes['data'], true);
-    }
+    protected $resourceClass = DatabaseNotificationResource::class;
 
     public function getNotifiableAttribute()
     {
