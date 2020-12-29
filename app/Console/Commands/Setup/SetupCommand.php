@@ -32,25 +32,25 @@ class SetupCommand extends Command
             ] : []);
             $this->lineBreak();
         }
-        if (!in_array('packages', $skipped) && (!$hasOnly ||in_array('packages', $only))) {
+        if (!in_array('packages', $skipped) && (!$hasOnly || in_array('packages', $only))) {
             $this->call('setup:packages', $forced ? [
                 '--f' => true,
             ] : []);
             $this->lineBreak();
         }
-        if (!in_array('key:generate', $skipped) && (!$hasOnly ||in_array('key:generate', $only))) {
+        if (!in_array('key:generate', $skipped) && (!$hasOnly || in_array('key:generate', $only))) {
             $this->call('setup:key:generate', $forced ? [
                 '--f' => true,
             ] : []);
             $this->lineBreak();
         }
-        if (!in_array('storage:link', $skipped) && (!$hasOnly ||in_array('storage:link', $only))) {
+        if (!in_array('storage:link', $skipped) && (!$hasOnly || in_array('storage:link', $only))) {
             $this->call('setup:storage:link', $forced ? [
                 '--f' => true,
             ] : []);
             $this->lineBreak();
         }
-        if (!in_array('migrate', $skipped) && (!$hasOnly ||in_array('migrate', $only))) {
+        if (!in_array('migrate', $skipped) && (!$hasOnly || in_array('migrate', $only))) {
             $this->call('setup:migrate', $forced ? [
                 '--f' => true,
             ] : []);

@@ -16,11 +16,65 @@ class MigrateCommand extends Command
 
     protected $hasPassport = false;
 
+    protected $databaseName = null;
+
+    protected $databaseExisted = false;
+
+    /**
+     * @var \PDO|null
+     */
+    protected $pdo = null;
+
     protected function go()
     {
         $this->hasPassport = class_exists('Laravel\\Passport\\Passport');
 
+        $this->connectToDatabase();
         parent::go();
+        $this->disconnectToDatabase();
+    }
+
+    protected function connectToDatabase()
+    {
+        $databaseConnection = config('database.connections.' . config('database.default'));
+        switch ($databaseConnection['driver']) {
+            case 'mysql':
+            default:
+                $databaseConnectionWrite = $databaseConnection;
+                if (isset($databaseConnection['write'])) {
+                    $databaseConnectionWrite = $databaseConnection['write'];
+                }
+                $get = function ($key) use ($databaseConnectionWrite, $databaseConnection) {
+                    return isset($databaseConnectionWrite[$key]) ? $databaseConnectionWrite[$key] : $databaseConnection[$key];
+                };
+                $this->databaseName = $get('database');
+                $this->pdo = new \PDO(
+                    sprintf(
+                        'mysql:host=%s;port:%d',
+                        $get('host'),
+                        $get('port')
+                    ),
+                    $get('username'),
+                    $get('password'),
+                    $get('options')
+                );
+                break;
+        }
+
+        $this->checkIfDatabaseExists();
+    }
+
+    protected function checkIfDatabaseExists()
+    {
+        $query = $this->pdo->prepare(sprintf('show databases like `%s`', $this->databaseName));
+        $query->execute();
+        $this->databaseExisted = count($query->fetchAll()) > 0;
+        return $this->databaseExisted;
+    }
+
+    protected function disconnectToDatabase()
+    {
+        $this->pdo = null;
     }
 
     protected function goForcingToInstall()
@@ -42,40 +96,23 @@ class MigrateCommand extends Command
 
     protected function goUninstalling()
     {
-        $this->rollbackSeed();
-        if ($this->hasPassport) {
-            $this->rollbackPassport();
+        if ($this->databaseExisted) {
+            $this->rollbackSeed();
+            if ($this->hasPassport) {
+                $this->rollbackPassport();
+            }
+            $this->rollbackTables();
+            $this->rollbackDatabase();
         }
-        $this->rollbackTables();
-        $this->rollbackDatabase();
     }
 
     protected function migrateDatabase()
     {
         $this->warn('Migrating database...');
-        $databaseConnection = config('database.connections.' . config('database.default'));
-        switch ($databaseConnection['driver']) {
-            case 'mysql':
-            default:
-                $databaseConnectionWrite = $databaseConnection;
-                if (isset($databaseConnection['write'])) {
-                    $databaseConnectionWrite = $databaseConnection['write'];
-                }
-                $get = function ($key) use ($databaseConnectionWrite, $databaseConnection) {
-                    return isset($databaseConnectionWrite[$key]) ? $databaseConnectionWrite[$key] : $databaseConnection[$key];
-                };
-                $pdo = new \PDO(
-                    sprintf(
-                        'mysql:host=%s;port:%d',
-                        $get('host'),
-                        $get('port')
-                    ),
-                    $get('username'),
-                    $get('password'),
-                    $get('options')
-                );
-                $pdo->query(sprintf('CREATE DATABASE IF NOT EXISTS `%s`', $get('database')));
-                break;
+        if (!$this->databaseExisted) {
+            $this->pdo
+                ->prepare(sprintf('create database if not exists `%s`', $this->databaseName))
+                ->execute();
         }
         $this->info('Database migrated!');
         $this->lineBreak();
