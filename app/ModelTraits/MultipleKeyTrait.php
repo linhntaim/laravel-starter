@@ -63,6 +63,7 @@ trait MultipleKeyTrait
                     $query->where($keyName, $keyValue);
                 }
             });
+            return $query;
         }
         return parent::setKeysForSelectQuery($query);
     }
@@ -87,6 +88,7 @@ trait MultipleKeyTrait
                     $query->where($keyName, $keyValue);
                 }
             });
+            return $query;
         }
         return parent::setKeysForSaveQuery($query);
     }
