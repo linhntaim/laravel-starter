@@ -8,6 +8,7 @@ namespace App\Models\Base;
 
 use App\ModelCasts\SelfCast;
 use App\ModelResources\Base\PropertyResource;
+use App\ModelTraits\MultipleKeyTrait;
 use App\ModelTraits\SelfCasterTrait;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
@@ -19,7 +20,7 @@ use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
  */
 abstract class PropertyModel extends Model implements ISelfCaster
 {
-    use SelfCasterTrait;
+    use SelfCasterTrait, MultipleKeyTrait;
 
     public $incrementing = false;
 
@@ -31,6 +32,21 @@ abstract class PropertyModel extends Model implements ISelfCaster
 
     protected $resourceClass = PropertyResource::class;
 
+    public static function nullInstance(string $name)
+    {
+        $model = new static();
+        $model->name = $name;
+        return $model;
+    }
+
+    public function getKeyName()
+    {
+        return [
+            $this->getHasPropertyModelForeignKey(),
+            'name',
+        ];
+    }
+
     public function applyValueCaster()
     {
         $caster = $this->getPropertyDefinition()->getCaster($this->name);
@@ -41,13 +57,6 @@ abstract class PropertyModel extends Model implements ISelfCaster
             $this->casts['value'] = $caster;
         }
         return $this;
-    }
-
-    public static function nullInstance(string $name)
-    {
-        $model = new static();
-        $model->name = $name;
-        return $model;
     }
 
     /**
