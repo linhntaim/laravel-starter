@@ -66,7 +66,8 @@ class MigrateCommand extends Command
 
     protected function checkIfDatabaseExists()
     {
-        $query = $this->pdo->prepare(sprintf('show databases like `%s`', $this->databaseName));
+        $query = $this->pdo->prepare('show databases like ?');
+        $query->bindValue(1, $this->databaseName);
         $query->execute();
         $this->databaseExisted = count($query->fetchAll()) > 0;
         return $this->databaseExisted;
