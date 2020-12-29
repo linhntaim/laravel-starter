@@ -14,8 +14,19 @@ interface ISelfCaster
 
     /**
      * @param string $key
+     * @return boolean
+     */
+    public function hasCaster(string $key);
+
+    /**
+     * @param string $key
      * @param CastsAttributes|string $caster
      * @return static
      */
     public function setCaster(string $key, $caster);
+
+    /**
+     * @return static
+     */
+    public function applyCasters();
 }

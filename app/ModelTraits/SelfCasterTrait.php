@@ -19,6 +19,11 @@ trait SelfCasterTrait
 
     public function getCaster(string $key)
     {
-        return isset($this->casters[$key]) ? $this->casters[$key] : null;
+        return $this->hasCaster($key) ? $this->casters[$key] : null;
+    }
+
+    public function hasCaster(string $key)
+    {
+        return isset($this->casters[$key]);
     }
 }

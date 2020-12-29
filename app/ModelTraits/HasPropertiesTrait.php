@@ -48,7 +48,7 @@ trait HasPropertiesTrait
             $properties->put(
                 $name,
                 tap($keyedProperties->get($name, $this->getNullPropertyInstance($name)), function (PropertyModel $property) {
-                    $property->applyValueCaster();
+                    $property->applyCasters();
                     return $property;
                 })
             );

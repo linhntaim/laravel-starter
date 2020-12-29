@@ -34,7 +34,7 @@ abstract class PropertyRepository extends ModelRepository
     {
         $newModel = $this->newModel();
         $newModel->name = $name;
-        $newModel->applyValueCaster();
+        $newModel->applyCasters();
         $hasPropertyModelForeignKey = $newModel->getHasPropertyModelForeignKey();
         return $this->useModelQuery($newModel)
             ->updateOrCreateWithAttributes([

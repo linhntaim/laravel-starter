@@ -59,6 +59,11 @@ abstract class PropertyModel extends Model implements ISelfCaster
         return $this;
     }
 
+    public function applyCasters()
+    {
+        return $this->hasCaster('value') ? $this : $this->applyValueCaster();
+    }
+
     /**
      * @return PropertyDefinition
      */
