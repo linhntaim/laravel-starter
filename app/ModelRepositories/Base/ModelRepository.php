@@ -451,9 +451,7 @@ abstract class ModelRepository
      */
     public function getAll()
     {
-        return $this->catch(function () {
-            return $this->search([], Configuration::FETCH_PAGING_NO, 0);
-        });
+        return $this->search([], Configuration::FETCH_PAGING_NO, 0);
     }
 
     /**
