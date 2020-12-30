@@ -33,7 +33,8 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
     protected static function getThrowableMessage(Throwable $throwable)
     {
         if ($throwable instanceof PDOException) {
-            return $throwable->errorInfo[2];
+            return is_array($throwable->errorInfo) && isset($throwable->errorInfo[2])
+                ? $throwable->errorInfo[2] : $throwable->getMessage();
         }
         return $throwable->getMessage();
     }
