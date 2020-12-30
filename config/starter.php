@@ -4,6 +4,15 @@ return [
     'app' => [
         'id' => env('APP_ID', 'base'),
         'version' => env('APP_VERSION', '1.0.0'),
+        'html_index' => [
+            'file_names' => [
+                'index.html',
+                'index.htm',
+            ],
+            'folder_names' => [
+                'admin',
+            ],
+        ],
     ],
     'public_path' => env('PUBLIC_PATH'),
     'passport' => [

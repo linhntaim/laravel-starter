@@ -46,27 +46,10 @@ include common-headers.conf
 add_header Cache-Control "no-cache, no-store, private";
 add_header Pragma "no-cache";
 
-### Handle Admin
-### If there is no Admin, remove this
-location /admin {
-    try_files $uri $uri/ /admin/index.php?$query_string;
-}
-
-### Handle API
-location ~* ^/(api|md) {
-     try_files $uri $uri/ /index.php?$query_string;
-}
-
-### Handle Home
-location / {
-     try_files $uri $uri/ /index.html?$query_string;
-}
-
 ### Handle Front
-### If there is no Home, replace Handle API and Handle Home with this
-#location / {
-#    try_files $uri $uri/ /index.php?$query_string;
-#}
+location / {
+    try_files $uri $uri/ /index.php?$query_string;
+}
 
 location ~* \.(html|jpg|jpeg|png|gif|svg|ico|css|js|json|woff|woff2|mp4)$ {
     include common-headers.conf;

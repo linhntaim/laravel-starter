@@ -17,6 +17,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::group([
+    // TODO:
+
+    // TODO
+], function () {
+    // TODO:
+
+    // TODO
+
+    Route::any('/{path?}', [App\Http\Controllers\Web\IndexController::class, 'index'])
+        ->where('path', '.*');
 });

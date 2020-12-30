@@ -73,7 +73,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group([
-    // API
+    // TODO:
+
+    // TODO
 ], function () {
 
     #region Home
@@ -311,4 +313,7 @@ Route::group([
         #endregion
     });
     #endregion
+
+    Route::any('/{path?}', [App\Http\Controllers\Api\IndexController::class, 'index'])
+        ->where('path', '.*');
 });

@@ -121,37 +121,7 @@
                 </rule>
             </outboundRules>
             <rules>
-                <!-- Handle Admin -->
-                <!-- If there is no Admin, remove this -->
-                <rule name="Admin" stopProcessing="true">
-                    <match url="^admin(.*)" ignoreCase="false"/>
-                    <conditions logicalGrouping="MatchAll">
-                        <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true"/>
-                        <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true"/>
-                    </conditions>
-                    <action type="Rewrite" url="admin/index.html" appendQueryString="true"/>
-                </rule>
-                <!-- Handle API -->
-                <rule name="API" stopProcessing="true">
-                    <match url="^(api|md)(.*)" ignoreCase="false"/>
-                    <conditions logicalGrouping="MatchAll">
-                        <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true"/>
-                        <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true"/>
-                    </conditions>
-                    <action type="Rewrite" url="index.php" appendQueryString="true"/>
-                </rule>
-                <!-- Handle Home -->
-                <rule name="Home" stopProcessing="true">
-                    <match url="^" ignoreCase="false"/>
-                    <conditions logicalGrouping="MatchAll">
-                        <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true"/>
-                        <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true"/>
-                    </conditions>
-                    <action type="Rewrite" url="index.html" appendQueryString="true"/>
-                </rule>
                 <!-- Handle Front -->
-                <!-- If there is no Home, replace Handle API and Handle Home with this -->
-                <!--
                 <rule name="Front" stopProcessing="true">
                     <match url="^" ignoreCase="false"/>
                     <conditions logicalGrouping="MatchAll">
@@ -160,7 +130,6 @@
                     </conditions>
                     <action type="Rewrite" url="index.php" appendQueryString="true"/>
                 </rule>
-                -->
             </rules>
         </rewrite>
     </system.webServer>
