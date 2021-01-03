@@ -314,6 +314,11 @@ class DateTimer
         return $this->shortTimeFromBags($this->getBags($time));
     }
 
+    public function custom($name, $time = 'now')
+    {
+        return trans('datetime.custom_formats.' . $name, $this->getBags($time), $this->locale);
+    }
+
     public function compoundFormat($func1, $separation, $func2)
     {
         $allowedFunctions = [static::LONG_DATE_FUNCTION, static::LONG_TIME_FUNCTION, static::SHORT_DATE_FUNCTION, static::SHORT_TIME_FUNCTION];
