@@ -313,7 +313,4 @@ Route::group([
         #endregion
     });
     #endregion
-
-    Route::any('/{path?}', [App\Http\Controllers\Api\IndexController::class, 'index'])
-        ->where('path', '.*');
 });

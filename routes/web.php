@@ -25,7 +25,4 @@ Route::group([
     // TODO:
 
     // TODO
-
-    Route::any('/{path?}', [App\Http\Controllers\Web\IndexController::class, 'index'])
-        ->where('path', '.*');
 });

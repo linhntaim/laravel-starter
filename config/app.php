@@ -177,6 +177,11 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        /*
+         * Overriding/Extending Service Providers...
+         */
+
+        App\Providers\RouteIndexServiceProvider::class,
     ],
 
     /*
