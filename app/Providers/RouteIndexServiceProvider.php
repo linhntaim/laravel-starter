@@ -23,7 +23,7 @@ class RouteIndexServiceProvider extends ServiceProvider
 
                         // TODO
                     ], function () {
-                        Route::any('/{path?}', [\App\Http\Controllers\Api\IndexController::class, 'index'])
+                        Route::match(['get', 'post', 'put', 'delete'], '/{path?}', [\App\Http\Controllers\Api\IndexController::class, 'index'])
                             ->where('path', '.*');
                     });
                 });
@@ -36,7 +36,7 @@ class RouteIndexServiceProvider extends ServiceProvider
 
                         // TODO
                     ], function () {
-                        Route::any('/{path?}', [\App\Http\Controllers\Web\IndexController::class, 'index'])
+                        Route::match(['get', 'post', 'put', 'delete'], '/{path?}', [\App\Http\Controllers\Web\IndexController::class, 'index'])
                             ->where('path', '.*');
                     });
                 });
