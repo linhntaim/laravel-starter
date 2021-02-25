@@ -28,6 +28,9 @@ class DataExportRepository extends ModelRepository
         if (!empty($search['names'])) {
             $query->whereIn('name', $search['names']);
         }
+        if (!empty($search['created_by'])) {
+            $query->where('created_by', $search['created_by']);
+        }
         return parent::searchOn($query, $search);
     }
 
