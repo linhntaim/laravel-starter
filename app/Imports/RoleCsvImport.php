@@ -11,13 +11,9 @@ use App\ModelRepositories\RoleRepository;
 
 class RoleCsvImport extends ModelCsvImport
 {
-    protected $deleteAfterImporting = false;
-
-    public function __construct($file)
+    protected function modelRepositoryClass()
     {
-        parent::__construct($file);
-
-        $this->modelRepository = new RoleRepository();
+        return RoleRepository::class;
     }
 
     protected function csvHeaders()
@@ -37,7 +33,7 @@ class RoleCsvImport extends ModelCsvImport
         ];
     }
 
-    protected function modelImporting($read)
+    protected function modelImporting($read, $counter)
     {
         return $this->modelRepository->updateOrCreateWithAttributes(['name' => $read['name']], $read);
     }

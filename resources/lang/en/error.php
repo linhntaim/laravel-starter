@@ -135,6 +135,11 @@ return [
             'filer' => [
                 'csv_filer' => [
                     'read_line' => 'Error at line :line',
+                    'read' => ':message (Line :line)',
+                ],
+                'filer' => [
+                    'read_count' => 'Error at count :count',
+                    'read' => ':message (Count :count)',
                 ],
             ],
         ],

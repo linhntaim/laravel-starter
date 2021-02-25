@@ -8,7 +8,6 @@ namespace App\Imports\Base;
 
 use App\ModelRepositories\Base\ModelRepository;
 use App\Models\Base\Model;
-use App\Utils\TransactionHelper;
 use App\Utils\TransactionTrait;
 
 /**
@@ -24,17 +23,44 @@ abstract class ModelCsvImport extends CsvImport
      */
     protected $modelRepository;
 
+    public function __construct($file)
+    {
+        parent::__construct($file);
+
+        $this->modelRepository = $this->modelRepository();
+    }
+
+    /**
+     * @return string
+     */
+    protected abstract function modelRepositoryClass();
+
+    /**
+     * @return ModelRepository|null
+     */
+    private function modelRepository()
+    {
+        $modelRepositoryClass = $this->modelRepositoryClass();
+        return new $modelRepositoryClass();
+    }
+
     protected function validatedRules()
+    {
+        return [];
+    }
+
+    protected function validatedMessages()
     {
         return [];
     }
 
     /**
      * @param $read
+     * @param $counter
      * @return Model
      * @throws
      */
-    protected function modelImporting($read)
+    protected function modelImporting($read, $counter)
     {
         return $this->modelRepository->createWithAttributes($read);
     }
@@ -47,29 +73,25 @@ abstract class ModelCsvImport extends CsvImport
      */
     protected function csvImporting($read, $counter)
     {
-        $this->transactionStart(null, TransactionHelper::ISOLATION_LEVEL_READ_COMMITTED);
+        $this->transactionStart();
         try {
             if (!empty($validatedRules = $this->validatedRules())) {
-                $this->validatedData($read, $validatedRules);
+                $this->validatedData($read, $validatedRules, $this->validatedMessages());
             }
 
-            try {
-                $this->modelImporting($read);
-            } catch (\Exception $exception) {
-                if ($this->filer->fIsExcludedException($exception)) {
-                    $this->transactionStop();
-                    return $read;
-                }
-                throw $exception;
-            }
-
+            $this->modelImporting($read, $counter);
             $this->transactionComplete();
         } catch (\Exception $exception) {
             $this->transactionStop();
 
-            throw $exception;
+            $this->csvHandleImportingException($exception);
         }
 
         return $read;
+    }
+
+    protected function csvHandleImportingException($exception)
+    {
+        throw $exception;
     }
 }

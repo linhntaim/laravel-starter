@@ -10,6 +10,7 @@ use App\Configuration;
 use App\Exceptions\AppException;
 use App\Exceptions\DatabaseException;
 use App\Exceptions\Exception;
+use App\Models\Base\IFromModel;
 use App\Utils\AbortTrait;
 use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\DateTimer;
@@ -32,6 +33,8 @@ abstract class ModelRepository
      * @var Model|mixed
      */
     protected $model;
+
+    protected $modelByUnique = false;
 
     private $with;
     private $withTrashed = false;
@@ -62,13 +65,19 @@ abstract class ModelRepository
     public abstract function modelClass();
 
     /**
-     * @return Model|mixed
+     * @return Model|IFromModel|mixed
      */
     public function newModel()
     {
         $modelClass = $this->modelClass;
         $this->model = new $modelClass();
         return $this->model;
+    }
+
+    public function setModelByUnique($modelByUnique = true)
+    {
+        $this->modelByUnique = $modelByUnique;
+        return $this;
     }
 
     /**
@@ -80,12 +89,14 @@ abstract class ModelRepository
     {
         if (!is_null($id)) {
             if ($id instanceof Model) {
-                if (get_class($id) != $this->modelClass) {
+                $modelClass = get_class($id);
+                $matchedClass = $modelClass == $this->modelClass;
+                if (!$matchedClass && !is_subclass_of($this->modelClass, $modelClass)) {
                     throw new AppException('Model does not match the class');
                 }
-                $this->model = $id;
+                $this->model = $matchedClass ? $id : $this->newModel()->fromModel($id);
             } else {
-                $this->model = $this->getById($id);
+                $this->model = $this->modelByUnique ? $this->getUniquely($id) : $this->getById($id);
             }
         }
         return $this->model;
@@ -141,14 +152,16 @@ abstract class ModelRepository
     }
 
     /**
-     * @param Collection|array $ids
+     * @param Collection|Model[]|array $ids
      * @return mixed
      */
     public function retrieveIds($ids)
     {
         return $ids instanceof Collection ? $ids->map(function (Model $model) {
             return $model->getKey();
-        })->all() : $ids;
+        })->all() : collect($ids)->map(function ($id) {
+            return $id instanceof Model ? $id->getKey() : $id;
+        });
     }
 
     /**
@@ -283,7 +296,7 @@ abstract class ModelRepository
     public function sort($sortBy = null, $sortOrder = 'asc')
     {
         if ($sortBy) {
-            $this->sorts[$sortBy] = $sortOrder;
+            $this->sorts[] = ['by' => $sortBy, 'order' => $sortOrder];
         }
         return $this;
     }
@@ -319,9 +332,9 @@ abstract class ModelRepository
         if (!empty($this->sorts)) {
             $sortsAllowed = array_merge($this->sortsAllowed, $this->sortsAllowedDefault);
             $noNeedToCheckSortsAllowed = empty($sortsAllowed);
-            foreach (array_merge($this->sorts, $this->sortsDefault) as $sortBy => $sortOrder) {
-                if ($noNeedToCheckSortsAllowed || in_array($sortBy, $sortsAllowed)) {
-                    $query->orderBy($sortBy, $sortOrder ? $sortOrder : 'asc');
+            foreach (array_merge($this->sorts, $this->sortsDefault) as $sort) {
+                if ($noNeedToCheckSortsAllowed || in_array($sort['by'], $sortsAllowed)) {
+                    $query->orderBy($sort['by'], $sort['order'] ? $sort['order'] : 'asc');
                 }
             }
             $this->sorts()->sortsAllowed();

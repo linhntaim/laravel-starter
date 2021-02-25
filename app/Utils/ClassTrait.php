@@ -13,14 +13,16 @@ use Illuminate\Support\Str;
 trait ClassTrait
 {
     protected static $__transNamespace = '';
+    protected static $__transNamespaceFallback = false;
 
     protected $__friendlyClassBaseName;
 
     protected static $__snakyClassBaseName;
 
-    protected static function setTransNamespace($transNamespace)
+    protected static function setTransNamespace($transNamespace, $fallback = false)
     {
         static::$__transNamespace = $transNamespace . '::';
+        static::$__transNamespaceFallback = $fallback;
     }
 
     protected static function __class()
@@ -49,21 +51,54 @@ trait ClassTrait
         return $this->__friendlyClassBaseName;
     }
 
+    protected static function __transWithTemporaryNamespace($transNamespace, callable $transCallback, $fallback = false)
+    {
+        $origin = static::$__transNamespace;
+        $originFallback = static::$__transNamespaceFallback;
+        static::setTransNamespace($transNamespace, $fallback);
+        $trans = $transCallback();
+        static::setTransNamespace($origin, $originFallback);
+        return $trans;
+    }
+
     protected static function __transCurrentModule()
     {
         return null;
     }
 
-    protected static function __trans($key = null, $replace = [], $locale = null)
+    protected static function __hasTrans($key, $locale = null, $fallback = true)
     {
         $key = sprintf('%s%s', static::$__transNamespace, $key);
-        return trans(empty($key) ? null : $key, $replace, $locale);
+        return Lang::has($key, $locale, $fallback);
+    }
+
+    protected static function __hasTransWithoutNamespace($key, $locale = null, $fallback = true)
+    {
+        return Lang::has($key, $locale, $fallback);
+    }
+
+    protected static function __trans($key, $replace = [], $locale = null)
+    {
+        if (static::$__transNamespace && static::$__transNamespaceFallback) {
+            if (static::__hasTransWithoutNamespace($namespacedKey = sprintf('%s%s', static::$__transNamespace, $key), $locale)) {
+                $key = $namespacedKey;
+            }
+        } else {
+            $key = sprintf('%s%s', static::$__transNamespace, $key);
+        }
+        return trans($key, $replace, $locale);
     }
 
     protected static function __transChoice($key, $number, $replace = [], $locale = null)
     {
-        $key = sprintf('%s%s', static::$__transNamespace, $key);
-        return trans_choice(empty($key) ? null : $key, $number, $replace, $locale);
+        if (static::$__transNamespace && static::$__transNamespaceFallback) {
+            if (static::__hasTransWithoutNamespace($namespacedKey = sprintf('%s%s', static::$__transNamespace, $key), $locale)) {
+                $key = $namespacedKey;
+            }
+        } else {
+            $key = sprintf('%s%s', static::$__transNamespace, $key);
+        }
+        return trans_choice($key, $number, $replace, $locale);
     }
 
     protected static function __hasTransWithCurrentModule($name, $locale = null, $fallback = true)
@@ -78,12 +113,12 @@ trait ClassTrait
 
     protected static function __hasTransWithSpecificModule($name, $module, $locale = null, $fallback = true)
     {
-        return Lang::has(static::__transPathWithModule($name, $module, true), $locale, $fallback);
+        return static::__hasTrans(static::__transPathWithModule($name, $module, true), $locale, $fallback);
     }
 
     protected static function __transWithSpecificModule($name, $module, $replace = [], $locale = null)
     {
-        return trans(static::__transPathWithModule($name, $module, true), $replace, $locale);
+        return static::__trans(static::__transPathWithModule($name, $module, true), $replace, $locale);
     }
 
     protected static function __hasTransErrorWithModule($error, $locale = null, $fallback = true)
@@ -108,12 +143,12 @@ trait ClassTrait
 
     protected static function __hasTransWithModule($name, $module, $locale = null, $fallback = true)
     {
-        return Lang::has(static::__transPathWithModule($name, $module), $locale, $fallback);
+        return static::__hasTrans(static::__transPathWithModule($name, $module), $locale, $fallback);
     }
 
     protected static function __transWithModule($name, $module, $replace = [], $locale = null)
     {
-        return trans(static::__transPathWithModule($name, $module), $replace, $locale);
+        return static::__trans(static::__transPathWithModule($name, $module), $replace, $locale);
     }
 
     protected static function __transPathWithModule($name, $module, $specific = false)
@@ -128,8 +163,7 @@ trait ClassTrait
                 return implode('.', $classNames);
             })(static::class);
         return sprintf(
-            '%s%s.%s.%s',
-            static::$__transNamespace,
+            '%s.%s.%s',
             $module,
             $classNameKey,
             $name
@@ -138,11 +172,11 @@ trait ClassTrait
 
     protected static function __transError($error, $replace = [], $locale = null)
     {
-        return trans(static::__transErrorPath($error), $replace, $locale);
+        return static::__trans(static::__transErrorPath($error), $replace, $locale);
     }
 
     protected static function __transErrorPath($error)
     {
-        return sprintf('%s%s.%s', static::$__transNamespace, 'error', $error);
+        return sprintf('%s.%s', 'error', $error);
     }
 }

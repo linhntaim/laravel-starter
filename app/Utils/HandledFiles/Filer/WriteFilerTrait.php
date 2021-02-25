@@ -64,6 +64,7 @@ trait WriteFilerTrait
     protected function fAfterWriting($contents)
     {
         $this->fNotWritten = false;
+        $this->fNewly = false;
     }
 
     /**

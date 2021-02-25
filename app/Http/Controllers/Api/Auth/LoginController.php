@@ -85,4 +85,10 @@ abstract class LoginController extends AccessTokenController
             $this->convertResponse($e->generateHttpResponse(new Psr7Response))
         );
     }
+
+    public function convertResponse($psrResponse)
+    {
+        return parent::convertResponse($psrResponse)
+            ->setStatusCode(ConfigHelper::getApiResponseStatus($psrResponse->getStatusCode()));
+    }
 }

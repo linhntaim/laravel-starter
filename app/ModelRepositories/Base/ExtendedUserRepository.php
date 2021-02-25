@@ -50,9 +50,23 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
             });
     }
 
+    /**
+     * @param array $attributes
+     * @param array $userAttributes
+     * @param array $userSocialAttributes
+     * @return ExtendedUserModel
+     * @throws
+     */
     public function createWithAttributes(array $attributes = [], array $userAttributes = [], array $userSocialAttributes = [])
     {
         $attributes['user_id'] = (new UserRepository())->createWithAttributes($userAttributes, $userSocialAttributes)->id;
+        parent::createWithAttributes($attributes);
+        return $this->afterCreated();
+    }
+
+    public function createWithUser($user, array $attributes = [])
+    {
+        $attributes['user_id'] = $this->retrieveId($user);
         parent::createWithAttributes($attributes);
         return $this->afterCreated();
     }
@@ -72,14 +86,19 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
         return $this->afterCreated();
     }
 
+    /**
+     * @return ExtendedUserModel
+     */
     protected function afterCreated()
     {
         return $this->model;
     }
 
-    public function updateWithAttributes(array $attributes = [], array $userAttributes = [])
+    public function updateWithAttributes(array $attributes = [], array $userAttributes = [], array $userSocialAttributes = [])
     {
-        (new UserRepository())->withModel($this->model->user)->updateWithAttributes($userAttributes);
+        if (!empty($userAttributes) || !empty($userSocialAttributes)) {
+            (new UserRepository())->withModel($this->model->user)->updateWithAttributes($userAttributes, $userSocialAttributes);
+        }
         return parent::updateWithAttributes($attributes);
     }
 

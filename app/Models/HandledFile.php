@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Collection;
  * Class HandledFile
  * @package App\Models
  * @property int $id
+ * @property string $title
  * @property string $name
  * @property string $mime
  * @property string $url

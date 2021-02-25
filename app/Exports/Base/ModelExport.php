@@ -18,7 +18,36 @@ abstract class ModelExport extends Export implements ICsvExport
      */
     protected $modelRepository;
 
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->modelRepository = $this->modelRepository();
+        if ($modelResourceClass = $this->modelResourceClass()) {
+            $this->setFixedModelResourceClass($modelResourceClass, $this->modelRepository->modelClass());
+        }
+    }
+
     protected abstract function query();
+
+    /**
+     * @return string
+     */
+    protected abstract function modelRepositoryClass();
+
+    /**
+     * @return ModelRepository|null
+     */
+    private function modelRepository()
+    {
+        $modelRepositoryClass = $this->modelRepositoryClass();
+        return $modelRepositoryClass ? new $modelRepositoryClass() : null;
+    }
+
+    protected function modelResourceClass()
+    {
+        return null;
+    }
 
     public function export()
     {

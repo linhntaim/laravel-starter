@@ -99,4 +99,23 @@ class Helper
     {
         return UploadedFile::getMaxFilesize();
     }
+
+    public static function copy($source, $destination, $context = null)
+    {
+        if (is_file($source)) {
+            return copy($source, $destination, $context);
+        }
+
+        $dir = opendir($source);
+        @mkdir($destination);
+        while (false !== ($file = readdir($dir))) {
+            if ($file != '.' && $file != '..') {
+                if (false === static::copy($source . DIRECTORY_SEPARATOR . $file, $destination . DIRECTORY_SEPARATOR . $file, $context)) {
+                    return false;
+                }
+            }
+        }
+        closedir($dir);
+        return true;
+    }
 }

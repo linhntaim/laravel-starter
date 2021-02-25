@@ -12,6 +12,8 @@ namespace App\Models\Base;
  */
 interface IUser extends IContactable
 {
+    public function getId();
+
     public function preferredAvatarUrl();
 
     public function preferredLocale();

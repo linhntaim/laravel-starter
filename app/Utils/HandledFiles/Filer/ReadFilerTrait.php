@@ -7,7 +7,7 @@
 namespace App\Utils\HandledFiles\Filer;
 
 use App\Exceptions\AppException;
-use Exception;
+use App\Exceptions\Exception;
 
 trait ReadFilerTrait
 {
@@ -114,9 +114,22 @@ trait ReadFilerTrait
         return $read;
     }
 
+    protected function fReadThrowExceptionMessage()
+    {
+        return static::__transErrorWithModule('read_count', ['count' => $this->fReadCounter]);
+    }
+
     protected function fReadThrowException()
     {
-        throw new AppException(static::__transErrorWithModule('read_count', ['count' => $this->fReadCounter]));
+        throw new AppException($this->fReadThrowExceptionMessage());
+    }
+
+    protected function fReadTransformExceptionMessage($message)
+    {
+        return static::__transErrorWithModule('read', [
+            'message' => $message,
+            'count' => $this->fReadCounter,
+        ]);
     }
 
     public function fReadAll(callable $callback = null, callable $afterCallback = null)
@@ -145,9 +158,12 @@ trait ReadFilerTrait
                 ++$this->fReadCounter;
                 try {
                     $data = $callback($data, $this->fReadCounter);
-                } catch (Exception $exception) {
+                } catch (\Exception $exception) {
                     if ($this->fIsExcludedException($exception)) {
-                        throw $exception;
+                        throw ($exception instanceof Exception ? $exception : AppException::from($exception))
+                            ->transformMessage(function ($message) {
+                                return $this->fReadTransformExceptionMessage($message);
+                            });
                     }
                     $this->fReadThrowException();
                 }

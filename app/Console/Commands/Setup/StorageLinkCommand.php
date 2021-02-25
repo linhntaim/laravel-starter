@@ -6,6 +6,8 @@
 
 namespace App\Console\Commands\Setup;
 
+use App\Utils\HandledFiles\Helper;
+
 class StorageLinkCommand extends Command
 {
     protected $signature = 'setup:storage:link {--u} {--f}';
@@ -29,8 +31,10 @@ class StorageLinkCommand extends Command
             // Sometimes, symlinks cannot be created on Windows, so we should create them as directories
             foreach ($links as $link => $target) {
                 if (!file_exists($link)) {
-                    if (false === @mkdir($link, 0777)) {
+                    if (false === @mkdir($link)) {
                         $this->error(sprintf('Cannot create [%s] link.', $link));
+                    } else {
+                        Helper::copy($target, $link);
                     }
                 }
             }

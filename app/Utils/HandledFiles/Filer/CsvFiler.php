@@ -58,12 +58,17 @@ class CsvFiler extends Filer
         return $r;
     }
 
-    /**
-     * @throws AppException
-     */
-    protected function fReadThrowException()
+    protected function fReadThrowExceptionMessage()
     {
-        throw new AppException(static::__transErrorWithModule('read_line', ['line' => $this->fReadCounter]));
+        return static::__transErrorWithModule('read_line', ['line' => $this->fReadCounter]);
+    }
+
+    protected function fReadTransformExceptionMessage($message)
+    {
+        return static::__transErrorWithModule('read', [
+            'message' => $message,
+            'line' => $this->fReadCounter,
+        ]);
     }
 
     /**
@@ -102,8 +107,9 @@ class CsvFiler extends Filer
     public function fWrite($contents, $delimiter = ',', $enclosure = '"', $escapeChar = '\\')
     {
         return $this->fWriting($contents, function ($contents) use ($delimiter, $enclosure, $escapeChar) {
-            if ($this->fNotWritten) {
+            if ($this->fNewly) {
                 fputs($this->fResource, $bom = (chr(0xEF) . chr(0xBB) . chr(0xBF)));
+                $this->fNewly = false;
             }
             fputcsv($this->fResource, $contents, $delimiter, $enclosure, $escapeChar);
         });

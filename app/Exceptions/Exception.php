@@ -81,6 +81,15 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
         return [];
     }
 
+    public function transformMessage(callable $transformCallback)
+    {
+        $this->message = $transformCallback($this->message);
+        foreach ($this->messages as &$message) {
+            $message = $transformCallback($message);
+        }
+        return $this;
+    }
+
     public function setEmptyMessage()
     {
         $this->message = null;

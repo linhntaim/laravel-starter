@@ -6,8 +6,15 @@
 
 namespace App\Exports\Base;
 
+use App\ModelRepositories\HandledFileRepository;
+use App\Models\HandledFile;
 use App\Utils\HandledFiles\Filer\CsvFiler;
 
+/**
+ * Trait CsvExportTrait
+ * @package App\Exports\Base
+ * @property HandledFileRepository $handledFileRepository
+ */
 trait CsvExportTrait
 {
     /**
@@ -51,11 +58,14 @@ trait CsvExportTrait
         return $this;
     }
 
+    /**
+     * @return HandledFile
+     */
     public function csvExport()
     {
         $this->csvBeforeExporting()
             ->csvExporting()
             ->csvAfterExporting();
-        return $this->handledFileRepository->createWithFiler($this->csvFiler);
+        return $this->handledFileRepository->usePublic()->createWithFiler($this->csvFiler);
     }
 }

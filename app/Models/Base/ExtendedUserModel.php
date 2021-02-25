@@ -68,6 +68,11 @@ abstract class ExtendedUserModel extends Model implements IUser
         return $this->preferredEmail();
     }
 
+    public function getId()
+    {
+        return $this->getKey();
+    }
+
     public function preferredName()
     {
         return $this->user->preferredName();

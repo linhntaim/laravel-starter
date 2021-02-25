@@ -9,6 +9,7 @@ namespace App\Models;
 use App\Configuration;
 use App\ModelResources\UserResource;
 use App\Models\Base\IActivityLog;
+use App\Models\Base\IFromModel;
 use App\Models\Base\IProtected;
 use App\Models\Base\IResource;
 use App\Models\Base\IUser;
@@ -40,7 +41,7 @@ use Laravel\Passport\HasApiTokens;
  * @property bool $hasPassword
  * @property PasswordReset $passwordReset
  */
-class User extends Authenticatable implements HasLocalePreference, IUser, IResource, IActivityLog, IProtected
+class User extends Authenticatable implements HasLocalePreference, IUser, IResource, IActivityLog, IProtected, IFromModel
 {
     use HasFactory, Notifiable, NotificationTrait {
         NotificationTrait::notifications insteadof Notifiable;
@@ -175,6 +176,11 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
     }
 
     #endregion
+
+    public function getId()
+    {
+        return $this->getKey();
+    }
 
     public function preferredEmail()
     {

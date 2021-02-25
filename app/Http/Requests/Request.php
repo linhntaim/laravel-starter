@@ -11,7 +11,7 @@ use Illuminate\Http\Request as BaseRequest;
 
 class Request extends BaseRequest
 {
-    use AdminRequestTrait, ImpersonateRequestTrait;
+    use AdminRequestTrait, ImpersonateRequestTrait, MemberRequestTrait;
 
     public function input($key = null, $default = null)
     {
@@ -25,6 +25,17 @@ class Request extends BaseRequest
     {
         $input = parent::input($key);
         return !is_null($input);
+    }
+
+    public function ifInputNotEmpty($key, &$input)
+    {
+        return $this->ifInput($key, $input) && !empty($input);
+    }
+
+    public function ifFile($key, &$file)
+    {
+        $file = parent::file($key);
+        return !is_null($file);
     }
 
     public function ajax()

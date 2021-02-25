@@ -16,30 +16,27 @@ class ModelCast implements CastsAttributes
 
     public function __construct($modelRepository)
     {
-        $this->modelRepository = $modelRepository instanceof ModelRepository ? $modelRepository : new $modelRepository();
+        $this->modelRepository = ($modelRepository instanceof ModelRepository ? $modelRepository : new $modelRepository())
+            ->setModelByUnique();
     }
 
-    protected function getModel($value)
+    /**
+     * @param Model|mixed|null $value
+     * @return Model|mixed|null
+     * @throws
+     */
+    protected function getValueModel($value)
     {
-        return $this->modelRepository->notStrict()->getUniquely($value);
+        return $this->modelRepository->notStrict()->model($value);
     }
 
     public function set($model, string $key, $value, array $attributes)
     {
-        if ($value instanceof Model) {
-            if (get_class($value) == $this->modelRepository->modelClass()) {
-                return $value->getKey();
-            }
-            throw new AppException('Model does not match');
-        }
-        if ($value = $this->getModel($value)) {
-            return $value->getKey();
-        }
-        return null;
+        return ($model = $this->getValueModel($value)) ? $model->getKey() : null;
     }
 
     public function get($model, string $key, $value, array $attributes)
     {
-        return $this->getModel($value);
+        return $this->getValueModel($value);
     }
 }

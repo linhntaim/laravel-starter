@@ -47,7 +47,7 @@ class CallbacksCast implements CastsAttributes
     public function set($model, string $key, $value, array $attributes)
     {
         if ($setCallback = $this->getSetCallback()) {
-            return $setCallback($value);
+            return $setCallback($model, $key, $value, $attributes);
         }
         return null;
     }
@@ -55,7 +55,7 @@ class CallbacksCast implements CastsAttributes
     public function get($model, string $key, $value, array $attributes)
     {
         if ($getCallback = $this->getGetCallback()) {
-            return $getCallback($value);
+            return $getCallback($model, $key, $value, $attributes);
         }
         return null;
     }

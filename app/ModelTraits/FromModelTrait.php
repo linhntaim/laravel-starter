@@ -25,6 +25,8 @@ trait FromModelTrait
      */
     public function fromModel($model)
     {
-        return $this->setRawAttributes($model->getAttributes(), true);
+        return $this->setRawAttributes($model->getAttributes(), true)
+            ->setRelations($model->getRelations())
+            ->setTouchedRelations($model->getTouchedRelations());
     }
 }

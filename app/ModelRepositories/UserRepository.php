@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Utils\ClientSettings\DateTimer;
 use App\Utils\SocialLogin;
 use App\Utils\StringHelper;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class UserRepository
@@ -50,7 +51,7 @@ class UserRepository extends ModelRepository implements IProtectedRepository, IU
     {
         return parent::queryUniquely($query, $unique)
             ->orWhere('email', $unique)
-            ->orWhere('username', $unique);
+            ->orWhere(DB::raw('BINARY username'), $unique);
     }
 
     /**

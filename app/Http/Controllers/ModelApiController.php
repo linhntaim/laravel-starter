@@ -41,7 +41,10 @@ abstract class ModelApiController extends ApiController
             return $this->load($request);
         }
 
-        return $this->responseModel($this->indexExecute($request));
+        return $this->responseModel(
+            $request->has('_all') ?
+                $this->indexAllExecute($request) : $this->indexExecute($request)
+        );
     }
 
     protected function indexExecute(Request $request)
@@ -50,6 +53,14 @@ abstract class ModelApiController extends ApiController
             $this->search($request),
             $this->paging(),
             $this->itemsPerPage()
+        );
+    }
+
+    protected function indexAllExecute(Request $request)
+    {
+        return $this->sortExecute()->search(
+            $this->search($request),
+            Configuration::FETCH_PAGING_NO,
         );
     }
 
@@ -120,7 +131,7 @@ abstract class ModelApiController extends ApiController
         }
 
         $currentUser = $request->user();
-        (new DataExportRepository())->createWithAttributesAndExport(
+        return (new DataExportRepository())->createWithAttributesAndExport(
             [
                 'created_by' => $currentUser ? $currentUser->id : null,
             ],
@@ -130,8 +141,7 @@ abstract class ModelApiController extends ApiController
 
     protected function export(Request $request)
     {
-        $this->exportExecute($request);
-        return $this->responseSuccess();
+        return $this->responseModel($this->exportExecute($request));
     }
     #endregion
 
