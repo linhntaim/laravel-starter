@@ -32,6 +32,7 @@ class Handler extends ExceptionHandler
      * @var array
      */
     protected $dontFlash = [
+        'current_password',
         'password',
         'password_confirmation',
     ];
@@ -43,7 +44,9 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        //
+        $this->reportable(function (Throwable $e) {
+            //
+        });
     }
 
     public function render($request, Throwable $e)
@@ -58,7 +61,7 @@ class Handler extends ExceptionHandler
         return new JsonResponse(
             $this->convertExceptionToArray($e),
             ConfigHelper::getApiResponseStatus($this->isHttpException($e) ? $e->getStatusCode() : 500),
-            $this->isHttpException($e) ? $e->getHeaders() : [],
+            array_merge($this->isHttpException($e) ? $e->getHeaders() : [], ConfigHelper::getApiResponseHeaders()),
             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
         );
     }

@@ -26,8 +26,8 @@ use App\Utils\ClientSettings\Facade;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Passport\HasApiTokens;
 
@@ -68,8 +68,8 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
      * @var array
      */
     protected $fillable = [
-        'email',
         'username',
+        'email',
         'password',
         'password_changed_at',
         'last_accessed_at',
