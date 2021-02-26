@@ -11,4 +11,9 @@ use App\Utils\Theme\ThemeResponseTrait;
 class WebController extends Controller
 {
     use ThemeResponseTrait;
+
+    public function __construct()
+    {
+        $this->setValidationThrown(false);
+    }
 }

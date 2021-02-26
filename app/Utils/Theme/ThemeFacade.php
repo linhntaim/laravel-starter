@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string getDisplayName()
  * @method static array share()
  * @method static \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory view($view, $data = [], $mergeData = [])
+ * @method static string asset($path, $secure = null)
  */
 class ThemeFacade extends Facade
 {

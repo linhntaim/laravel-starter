@@ -35,4 +35,14 @@ abstract class Theme
     {
         return view(sprintf('themes.%s.pages.%s', $this->getName(), $view), $data, $mergeData);
     }
+
+    /**
+     * @param string $path
+     * @param bool|null $secure
+     * @return string
+     */
+    public function asset($path, $secure = null)
+    {
+        return asset(sprintf('themes/%s/%s', $this->getName(), $path), $secure);
+    }
 }

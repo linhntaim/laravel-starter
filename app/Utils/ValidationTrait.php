@@ -17,12 +17,22 @@ use Illuminate\Support\Facades\Validator;
  */
 trait ValidationTrait
 {
+    protected $validationThrown = true;
+
+    /**
+     * @param bool $validationThrown
+     */
+    public function setValidationThrown(bool $validationThrown)
+    {
+        $this->validationThrown = $validationThrown;
+    }
+
     /**
      * @param array $data
      * @param array $rules
      * @param array $messages
      * @param array $customAttributes
-     * @return bool
+     * @return bool|\Illuminate\Contracts\Validation\Validator
      * @throws
      */
     protected function validatedData(array $data, array $rules, array $messages = [], array $customAttributes = [])
@@ -34,7 +44,10 @@ trait ValidationTrait
             $customAttributes
         );
         if ($validator->fails()) {
-            throw (new UserException($validator->errors()->all()))->setAttachedData($validator->errors()->toArray());
+            if ($this->validationThrown) {
+                throw (new UserException($validator->errors()->all()))->setAttachedData($validator->errors()->toArray());
+            }
+            return $validator;
         }
         return true;
     }
