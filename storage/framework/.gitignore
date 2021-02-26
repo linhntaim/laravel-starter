@@ -2,7 +2,6 @@ compiled.php
 config.php
 down
 events.scanned.php
-limit*
 maintenance.php
 routes.php
 routes.scanned.php
