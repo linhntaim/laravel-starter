@@ -34,5 +34,8 @@ class ThemeServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        view()->share([
+            'theme' => ThemeFacade::share(),
+        ]);
     }
 }

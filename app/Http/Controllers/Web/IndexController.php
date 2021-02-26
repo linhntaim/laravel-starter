@@ -1,13 +1,17 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http\Controllers\Web;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\WebController;
 use App\Http\Requests\Request;
 use App\Utils\ConfigHelper;
 use Illuminate\Support\Str;
 
-class IndexController extends Controller
+class IndexController extends WebController
 {
     public function index(Request $request, $path = null)
     {
@@ -19,7 +23,7 @@ class IndexController extends Controller
                     return $this->responseFile($htmlIndexFile);
                 }
             }
-            return view('welcome');
+            return $this->defaultView();
         };
         if ($path) {
             $htmlIndexFolderNames = ConfigHelper::get('app.html_index.folder_names');
@@ -30,5 +34,10 @@ class IndexController extends Controller
             }
         }
         return $welcome();
+    }
+
+    protected function defaultView()
+    {
+        return $this->view('welcome');
     }
 }
