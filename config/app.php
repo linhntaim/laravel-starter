@@ -167,6 +167,7 @@ return [
          * Package Service Providers...
          */
         App\Vendors\Laravel\Passport\PassportServiceProvider::class,
+        App\Utils\Theme\ThemeServiceProvider::class,
 
         /*
          * Application Service Providers...
