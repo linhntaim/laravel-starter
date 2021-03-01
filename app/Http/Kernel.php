@@ -92,8 +92,6 @@ class Kernel extends HttpKernel
 
         'japanese_time' => JapaneseTime::class,
         'header.decrypt' => HeaderDecrypt::class,
-        'device' => Device::class,
-        'web.device' => WebDevice::class,
         'authenticated.passport.cookie' => AuthenticatedByPassportViaCookie::class,
         'authenticated.passport.header' => AuthenticatedByPassportViaHeader::class,
         'authenticated.passport.request' => AuthenticatedByPassportViaRequest::class,
