@@ -17,6 +17,9 @@ use App\Http\Middleware\Impersonate;
 use App\Http\Middleware\JapaneseTime;
 use App\Http\Middleware\OverrideAuthorizationHeader;
 use App\Http\Middleware\Screen;
+use App\Http\Middleware\Settings;
+use App\Http\Middleware\Web\Device as WebDevice;
+use App\Http\Middleware\Web\Settings as WebSettings;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Laravel\Passport\Http\Middleware\CheckClientCredentials;
 
@@ -54,11 +57,14 @@ class Kernel extends HttpKernel
             //\Illuminate\View\Middleware\ShareErrorsFromSession::class,
             //\App\Http\Middleware\VerifyCsrfToken::class,
             //\Illuminate\Routing\Middleware\SubstituteBindings::class,
+            //WebSettings::class,
+            //WebDevice::class,
         ],
 
         'api' => [
             'throttle:api',
             OverrideAuthorizationHeader::class,
+            Settings::class,
             Screen::class,
             Device::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
@@ -86,7 +92,6 @@ class Kernel extends HttpKernel
 
         'japanese_time' => JapaneseTime::class,
         'header.decrypt' => HeaderDecrypt::class,
-        'device' => Device::class,
         'authenticated.passport.cookie' => AuthenticatedByPassportViaCookie::class,
         'authenticated.passport.header' => AuthenticatedByPassportViaHeader::class,
         'authenticated.passport.request' => AuthenticatedByPassportViaRequest::class,
@@ -104,8 +109,11 @@ class Kernel extends HttpKernel
         JapaneseTime::class,
         OverrideAuthorizationHeader::class,
         HeaderDecrypt::class,
+        Settings::class,
+        WebSettings::class,
         Screen::class,
         Device::class,
+        WebDevice::class,
 
         \Illuminate\Session\Middleware\AuthenticateSession::class,
 

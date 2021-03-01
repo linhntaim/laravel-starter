@@ -13,6 +13,8 @@ use App\ModelTraits\ArrayValuedAttributesTrait;
  * Class Device
  * @package App\Models
  * @property int $id
+ * @property string $provider
+ * @property string $secret
  */
 class Device extends Model
 {
