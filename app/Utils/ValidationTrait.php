@@ -19,12 +19,10 @@ trait ValidationTrait
 {
     protected $validationThrown = true;
 
-    /**
-     * @param bool $validationThrown
-     */
     public function setValidationThrown(bool $validationThrown)
     {
         $this->validationThrown = $validationThrown;
+        return $this;
     }
 
     /**
