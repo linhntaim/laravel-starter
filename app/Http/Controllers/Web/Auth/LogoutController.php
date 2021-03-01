@@ -16,6 +16,11 @@ class LogoutController extends WebController
 
         $request->session()->regenerateToken();
 
+        return $this->afterLogout();
+    }
+
+    protected function afterLogout()
+    {
         return redirect('/');
     }
 }

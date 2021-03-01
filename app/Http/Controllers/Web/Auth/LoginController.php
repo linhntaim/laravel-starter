@@ -31,15 +31,22 @@ class LoginController extends WebController
             'email' => 'required|string',
             'password' => 'required|string',
         ]);
+
         if ($validator !== true) {
             return redirect()->route('login')
                 ->withErrors($validator)
                 ->withInput();
         }
+
         $this->authenticate($request);
 
         $request->session()->regenerate();
 
+        return $this->afterLogin();
+    }
+
+    protected function afterLogin()
+    {
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 
@@ -47,23 +54,40 @@ class LoginController extends WebController
     {
         $this->ensureIsNotRateLimited($request);
 
-        if (!Auth::attempt([
-            'email' => $request->input('email'),
-            'password' => $request->input('password'),
-        ], $request->filled('remember'))) {
-            if (!Auth::attempt([
-                'username' => $request->input('email'),
-                'password' => $request->input('password'),
-            ], $request->filled('remember'))) {
-                RateLimiter::hit($this->throttleKey($request));
-
-                throw ValidationException::withMessages([
-                    'email' => __('auth.failed'),
-                ]);
+        foreach ($this->authentications($request) as $authentication) {
+            if ($this->tryToAuthenticate($request, $authentication)) {
+                RateLimiter::clear($this->throttleKey($request));
+                return true;
             }
         }
 
-        RateLimiter::clear($this->throttleKey($request));
+        RateLimiter::hit($this->throttleKey($request));
+
+        throw ValidationException::withMessages([
+            'email' => __('auth.failed'),
+        ]);
+    }
+
+    protected function authentications(Request $request)
+    {
+        return [
+            [
+                'email' => $request->input('email'), // try to authenticate with email
+                'password' => $request->input('password'),
+            ],
+            [
+                'username' => $request->input('email'), // try to authenticate with username
+                'password' => $request->input('password'),
+            ],
+        ];
+    }
+
+    protected function tryToAuthenticate(Request $request, $authentication)
+    {
+        if (is_array($authentication)) {
+            return Auth::attempt($authentication, $request->filled('remember'));
+        }
+        return false;
     }
 
     protected function ensureIsNotRateLimited(Request $request)
