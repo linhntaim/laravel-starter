@@ -1,10 +1,15 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http\Controllers\Web\Auth;
 
 use App\Http\Controllers\WebController;
 use App\Http\Requests\Request;
 use App\Providers\RouteServiceProvider;
+use App\Utils\ClientSettings\Facade;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -41,6 +46,8 @@ class LoginController extends WebController
         $this->authenticate($request);
 
         $request->session()->regenerate();
+
+        Facade::fetchFromUser($request->user())->storeCookie();
 
         return $this->afterLogin();
     }

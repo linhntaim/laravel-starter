@@ -8,6 +8,13 @@
 
 // TODO
 
+use App\Http\Controllers\Web\Home\Auth\LoginController as HomeLoginController;
+use App\Http\Controllers\Web\Home\Auth\LogoutController as HomeLogoutController;
+
+// TODO:
+
+// TODO
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -30,10 +37,10 @@ Route::group([
     Route::group([
         'prefix' => 'auth',
     ], function () {
-        Route::get('login', [\App\Http\Controllers\Web\Auth\LoginController::class, 'index'])
+        Route::get('login', [HomeLoginController::class, 'index'])
             ->middleware('guest')
             ->name('login');
-        Route::post('login', [\App\Http\Controllers\Web\Auth\LoginController::class, 'store'])
+        Route::post('login', [HomeLoginController::class, 'store'])
             ->middleware('guest');
 
         // TODO:
@@ -49,20 +56,8 @@ Route::group([
         Route::group([
             'prefix' => 'auth',
         ], function () {
-            Route::post('logout', [\App\Http\Controllers\Web\Auth\LogoutController::class, 'logout'])
+            Route::post('logout', [HomeLogoutController::class, 'logout'])
                 ->name('logout');
-
-            // TODO:
-
-            // TODO
-        });
-
-        // Account
-        Route::group([
-            'prefix' => 'account',
-        ], function () {
-            Route::get('/', [HomeAccountController::class, 'index']);
-            Route::post('/', [HomeAccountController::class, 'store']);
 
             // TODO:
 

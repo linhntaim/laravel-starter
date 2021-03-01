@@ -71,6 +71,7 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
         'username',
         'email',
         'password',
+        'remember_token',
         'password_changed_at',
         'last_accessed_at',
     ];
@@ -96,7 +97,8 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     protected $resourceClass = UserResource::class;

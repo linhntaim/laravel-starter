@@ -161,6 +161,10 @@ return [
     'header_encrypt_excepts' => array_filter(explode(',', env('HEADER_ENCRYPT_EXCEPTS', '')), function ($header) {
         return !empty($header);
     }),
+    'web_cookies' => [
+        'settings' => env('WEB_COOKIE_SETTINGS_NAME'),
+        'device' => env('WEB_COOKIE_DEVICE_NAME'),
+    ],
 
     'localization' => [
         'country' => 'US',
