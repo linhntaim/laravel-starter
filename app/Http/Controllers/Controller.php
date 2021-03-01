@@ -14,6 +14,7 @@ use App\Utils\ActivityLogTrait;
 use App\Utils\ClassTrait;
 use App\Utils\TransactionTrait;
 use App\Utils\ValidationTrait;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -29,7 +30,7 @@ class Controller extends BaseController
      * @param array $rules
      * @param array $messages
      * @param array $customAttributes
-     * @return bool
+     * @return bool|Validator
      * @throws
      */
     protected function validated(Request $request, array $rules, array $messages = [], array $customAttributes = [])
