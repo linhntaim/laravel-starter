@@ -38,6 +38,6 @@ class IndexController extends WebController
 
     protected function defaultView()
     {
-        return view('welcome');
+        return $this->view('welcome');
     }
 }
