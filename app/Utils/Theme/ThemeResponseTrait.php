@@ -11,7 +11,7 @@ trait ThemeResponseTrait
         $this->viewBase = $viewBase;
     }
 
-    protected function view($view = 'index', $data = [], $mergeData = [])
+    protected function themeView($view = 'index', $data = [], $mergeData = [])
     {
         return ThemeFacade::view($this->viewBase ? $this->viewBase . '.' . $view : $view, $data, $mergeData);
     }
