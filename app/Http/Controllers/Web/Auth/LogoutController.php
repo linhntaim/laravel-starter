@@ -25,6 +25,6 @@ class LogoutController extends WebController
 
     protected function afterLogout()
     {
-        return redirect('/');
+        return $this->redirect('/');
     }
 }

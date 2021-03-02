@@ -38,7 +38,7 @@ class LoginController extends WebController
         ]);
 
         if ($validator !== true) {
-            return redirect()->route('login')
+            return $this->redirectRoute('login')
                 ->withErrors($validator)
                 ->withInput();
         }
@@ -54,7 +54,7 @@ class LoginController extends WebController
 
     protected function afterLogin()
     {
-        return redirect()->intended(RouteServiceProvider::HOME);
+        return $this->redirect()->intended(RouteServiceProvider::HOME);
     }
 
     protected function authenticate(Request $request)
