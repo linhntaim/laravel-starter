@@ -40,6 +40,7 @@ class Controller extends BaseController
 
     protected function responseFile($file, array $headers = [])
     {
+        $this->transactionComplete();
         if ($file instanceof HandledFile) {
             return $file->responseFile($headers);
         }
@@ -48,6 +49,7 @@ class Controller extends BaseController
 
     protected function responseDownload($file, $name = null, array $headers = [])
     {
+        $this->transactionComplete();
         if ($file instanceof HandledFile) {
             return $file->responseDownload($name, $headers);
         }
