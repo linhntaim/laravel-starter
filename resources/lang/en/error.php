@@ -103,6 +103,9 @@ return [
             'authenticate' => [
                 'unauthenticated' => 'The user credentials were incorrect',
             ],
+            'authorized_with_admin' => [
+                'must_be_admin' => 'The user must be an admin',
+            ],
             // TODO:
 
             // TODO

@@ -143,6 +143,17 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
         return $this->relativePath;
     }
 
+    public function setContent($content)
+    {
+        $this->disk->put($this->relativePath, $content);
+        return $this;
+    }
+
+    public function getContent()
+    {
+        return $this->disk->get($this->relativePath);
+    }
+
     public function getSize()
     {
         return $this->disk->getSize($this->relativePath);
@@ -151,11 +162,6 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
     public function getMime()
     {
         return $this->disk->getMimetype($this->relativePath);
-    }
-
-    public function getContent()
-    {
-        return $this->disk->get($this->relativePath);
     }
 
     public function getUrl()

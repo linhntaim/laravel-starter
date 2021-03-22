@@ -13,6 +13,8 @@ abstract class ModelExport extends Export implements ICsvExport
 {
     use ModelTransformTrait, CsvExportTrait;
 
+    protected $readBatch = 1000;
+
     /**
      * @var ModelRepository
      */
@@ -56,7 +58,7 @@ abstract class ModelExport extends Export implements ICsvExport
 
     protected function csvExporting()
     {
-        $this->modelRepository->batchReadStart($this->query());
+        $this->modelRepository->batchReadStart($this->query(), $this->readBatch);
         while (($models = $this->modelRepository->batchRead($length, $shouldEnd)) && $length > 0) {
             $this->csvStore($this->modelTransform($models));
             if ($shouldEnd) {

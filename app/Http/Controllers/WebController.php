@@ -25,7 +25,7 @@ class WebController extends Controller
         return redirect()->route($route, $parameters, $status, $headers);
     }
 
-    protected function view($view = null, $data = [], $mergeData = [])
+    protected function view($view = 'index', $data = [], $mergeData = [])
     {
         $this->transactionComplete();
         return view($view, $data, $mergeData);

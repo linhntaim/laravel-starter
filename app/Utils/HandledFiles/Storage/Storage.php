@@ -22,4 +22,8 @@ abstract class Storage
     public abstract function setData($data);
 
     public abstract function getData();
+
+    public abstract function setContent($content);
+
+    public abstract function getContent();
 }
