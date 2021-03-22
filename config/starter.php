@@ -86,9 +86,9 @@ return [
     'clients' => [
         env('APP_ID', 'base') => [
             'admin' => [
-                'name' => env('CLIENT_ADMIN_NAME'),
-                'key' => env('CLIENT_ADMIN_KEY'),
-                'url' => env('CLIENT_ADMIN_URL'),
+                'app_name' => env('CLIENT_ADMIN_NAME'),
+                'app_key' => env('CLIENT_ADMIN_KEY'),
+                'app_url' => env('CLIENT_ADMIN_URL'),
                 'locale' => 'ja',
                 'country' => 'JP',
                 'timezone' => 'Asia/Tokyo',
@@ -106,9 +106,9 @@ return [
                 ],
             ],
             'home' => [
-                'name' => env('CLIENT_HOME_NAME'),
-                'key' => env('CLIENT_HOME_KEY'),
-                'url' => env('CLIENT_HOME_URL'),
+                'app_name' => env('CLIENT_HOME_NAME'),
+                'app_key' => env('CLIENT_HOME_KEY'),
+                'app_url' => env('CLIENT_HOME_URL'),
                 'locale' => 'ja',
                 'country' => 'JP',
                 'timezone' => 'Asia/Tokyo',
@@ -126,9 +126,9 @@ return [
                 ],
             ],
             'common' => [
-                'name' => env('CLIENT_COMMON_NAME'),
-                'key' => env('CLIENT_COMMON_KEY'),
-                'url' => env('CLIENT_COMMON_URL'),
+                'app_name' => env('CLIENT_COMMON_NAME'),
+                'app_key' => env('CLIENT_COMMON_KEY'),
+                'app_url' => env('CLIENT_COMMON_URL'),
                 'locale' => 'ja',
                 'country' => 'JP',
                 'timezone' => 'Asia/Tokyo',

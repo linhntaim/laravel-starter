@@ -6,6 +6,7 @@ abstract class Theme
 {
     const NAME = 'theme';
     const DISPLAY_NAME = 'Theme';
+    const APP_TYPE = 'home';
 
     public function getName()
     {
@@ -17,11 +18,15 @@ abstract class Theme
         return static::DISPLAY_NAME;
     }
 
+    public function getAppType()
+    {
+        return static::APP_TYPE;
+    }
+
     public function share()
     {
         return [
-            'name' => $this->getName(),
-            'display_name' => $this->getDisplayName(),
+            'theme' => $this,
         ];
     }
 
@@ -33,7 +38,38 @@ abstract class Theme
      */
     public function view($view, $data = [], $mergeData = [])
     {
-        return view(sprintf('themes.%s.pages.%s', $this->getName(), $view), $data, $mergeData);
+        return view($this->viewPath($view), $data, $mergeData);
+    }
+
+    public function viewPath($view)
+    {
+        return sprintf('themes.%s.%s', $this->getName(), $view);
+    }
+
+    public function viewExists($view)
+    {
+        return view()->exists($this->viewPath($view));
+    }
+
+    /**
+     * @param string $view
+     * @param array $data
+     * @param array $mergeData
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
+     */
+    public function pageView($view, $data = [], $mergeData = [])
+    {
+        return view($this->pageViewPath($view), $data, $mergeData);
+    }
+
+    public function pageViewPath($view)
+    {
+        return sprintf('themes.%s.pages.%s', $this->getName(), $view);
+    }
+
+    public function pageViewExists($view)
+    {
+        return view()->exists($this->pageViewPath($view));
     }
 
     /**

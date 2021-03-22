@@ -7,12 +7,16 @@
 namespace App\Exceptions;
 
 use App\Http\Controllers\ApiController;
+use App\Http\Middleware\Web\ViewShare;
 use App\Utils\ConfigHelper;
+use App\Utils\Theme\ThemeFacade;
 use App\Utils\TransactionHelper;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\ViewErrorBag;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -54,6 +58,31 @@ class Handler extends ExceptionHandler
         TransactionHelper::getInstance()->stop();
 
         return parent::render($request, $e);
+    }
+
+    protected function renderHttpException(HttpExceptionInterface $e)
+    {
+        $this->renderViewShare();
+
+        $errorView = "errors.{$e->getStatusCode()}";
+        if (ThemeFacade::viewExists($errorView)) {
+            return response()->view(
+                ThemeFacade::viewPath($errorView),
+                [
+                    'errors' => new ViewErrorBag,
+                    'exception' => $e,
+                ],
+                $e->getStatusCode(),
+                $e->getHeaders()
+            );
+        }
+
+        return parent::renderHttpException($e);
+    }
+
+    protected function renderViewShare()
+    {
+        (new ViewShare())->share(request());
     }
 
     protected function prepareJsonResponse($request, Throwable $e)

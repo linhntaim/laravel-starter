@@ -13,6 +13,6 @@ trait ThemeResponseTrait
 
     protected function themeView($view = 'index', $data = [], $mergeData = [])
     {
-        return ThemeFacade::view($this->viewBase ? $this->viewBase . '.' . $view : $view, $data, $mergeData);
+        return ThemeFacade::pageView($this->viewBase ? $this->viewBase . '.' . $view : $view, $data, $mergeData);
     }
 }

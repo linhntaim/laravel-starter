@@ -7,7 +7,8 @@
 namespace App\Http\Controllers\Web\Auth;
 
 use App\Http\Controllers\WebController;
-use Illuminate\Http\Request;
+use App\Http\Requests\Request;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Auth;
 
 class LogoutController extends WebController
@@ -20,11 +21,11 @@ class LogoutController extends WebController
 
         $request->session()->regenerateToken();
 
-        return $this->afterLogout();
+        return $this->afterLogout($request);
     }
 
-    protected function afterLogout()
+    protected function afterLogout(Request $request)
     {
-        return $this->redirect('/');
+        return $this->redirect(RouteServiceProvider::HOME);
     }
 }

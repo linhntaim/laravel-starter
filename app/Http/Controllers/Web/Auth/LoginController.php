@@ -30,14 +30,21 @@ class LoginController extends WebController
         return $this->view('login');
     }
 
-    public function store(Request $request)
+    /**
+     * @param Request $request
+     * @return bool|\Illuminate\Contracts\Validation\Validator
+     */
+    protected function makeValidated(Request $request)
     {
-        $validator = $this->validated($request, [
+        return $this->validated($request, [
             'email' => 'required|string',
             'password' => 'required|string',
         ]);
+    }
 
-        if ($validator !== true) {
+    public function store(Request $request)
+    {
+        if (($validator = $this->makeValidated($request)) !== true) {
             return $this->redirectRoute('login')
                 ->withErrors($validator)
                 ->withInput();
@@ -49,10 +56,10 @@ class LoginController extends WebController
 
         Facade::fetchFromUser($request->user())->storeCookie();
 
-        return $this->afterLogin();
+        return $this->afterLogin($request);
     }
 
-    protected function afterLogin()
+    protected function afterLogin(Request $request)
     {
         return $this->redirect()->intended(RouteServiceProvider::HOME);
     }
@@ -71,8 +78,18 @@ class LoginController extends WebController
         RateLimiter::hit($this->throttleKey($request));
 
         throw ValidationException::withMessages([
-            'email' => __('auth.failed'),
+            $this->authenticateErrorMessageField() => $this->authenticateErrorMessage(),
         ]);
+    }
+
+    protected function authenticateErrorMessageField()
+    {
+        return 'email';
+    }
+
+    protected function authenticateErrorMessage()
+    {
+        return __('auth.failed');
     }
 
     protected function authentications(Request $request)

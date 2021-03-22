@@ -36,6 +36,7 @@ Route::group([
     #region Authentication
     Route::group([
         'prefix' => 'auth',
+        'middleware' => ['guest'],
     ], function () {
         Route::get('login', [HomeLoginController::class, 'index'])
             ->middleware('guest')

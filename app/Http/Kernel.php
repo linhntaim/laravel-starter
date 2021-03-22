@@ -20,6 +20,7 @@ use App\Http\Middleware\Screen;
 use App\Http\Middleware\Settings;
 use App\Http\Middleware\Web\Device as WebDevice;
 use App\Http\Middleware\Web\Settings as WebSettings;
+use App\Http\Middleware\Web\ViewShare;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Laravel\Passport\Http\Middleware\CheckClientCredentials;
 
@@ -59,6 +60,7 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             WebSettings::class,
             WebDevice::class,
+            ViewShare::class,
         ],
 
         'api' => [
@@ -128,5 +130,7 @@ class Kernel extends HttpKernel
         AuthorizedWithAdminPermissions::class,
 
         \Illuminate\Auth\Middleware\Authorize::class,
+
+        ViewShare::class,
     ];
 }
