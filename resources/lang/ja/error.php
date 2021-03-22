@@ -103,6 +103,9 @@ return [
             'authenticate' => [
                 'unauthenticated' => 'メールアドレス、もしくはパスワードが異なります。',
             ],
+            'authorized_with_admin' => [
+                'must_be_admin' => 'The user must be an admin',
+            ],
             // TODO:
 
             // TODO

@@ -30,12 +30,13 @@ class Controller extends BaseController
      * @param array $rules
      * @param array $messages
      * @param array $customAttributes
+     * @param callable|null $hook
      * @return bool|Validator
      * @throws
      */
-    protected function validated(Request $request, array $rules, array $messages = [], array $customAttributes = [])
+    protected function validated(Request $request, array $rules, array $messages = [], array $customAttributes = [], callable $hook = null)
     {
-        return $this->validatedData($request->all(), $rules, $messages, $customAttributes);
+        return $this->validatedData($request->all(), $rules, $messages, $customAttributes, $hook);
     }
 
     protected function responseFile($file, array $headers = [])

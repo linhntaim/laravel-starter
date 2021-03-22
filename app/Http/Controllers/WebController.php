@@ -29,7 +29,7 @@ class WebController extends Controller
         return redirect()->route($route, $parameters, $status, $headers);
     }
 
-    protected function view($view = null, $data = [], $mergeData = [], $withTheme = true)
+    protected function view($view = 'index', $data = [], $mergeData = [], $withTheme = true)
     {
         $this->transactionComplete();
         return $withTheme ? $this->themeView($view, $data, $mergeData) : view($view, $data, $mergeData);

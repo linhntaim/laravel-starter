@@ -6,6 +6,8 @@
 
 namespace App\Utils\HandledFiles\Storage;
 
+use App\Exceptions\AppException;
+
 class ExternalStorage extends Storage implements IUrlStorage, IResponseStorage
 {
     const NAME = 'external';
@@ -33,6 +35,16 @@ class ExternalStorage extends Storage implements IUrlStorage, IResponseStorage
         return $this->url;
     }
 
+    public function setContent($content)
+    {
+        throw new AppException('Cannot set content');
+    }
+
+    public function getContent()
+    {
+        return file_get_contents($this->url);
+    }
+
     public function getUrl()
     {
         return $this->url;
@@ -41,7 +53,7 @@ class ExternalStorage extends Storage implements IUrlStorage, IResponseStorage
     public function responseFile($mime, $headers = [])
     {
         return response()->streamDownload(function () {
-            echo file_get_contents($this->url);
+            echo $this->getContent();
         }, null, $mime ? array_merge([
             'Content-Type' => $mime,
         ], $headers) : $headers, 'inline');
@@ -50,7 +62,7 @@ class ExternalStorage extends Storage implements IUrlStorage, IResponseStorage
     public function responseDownload($name, $mime, $headers = [])
     {
         return response()->streamDownload(function () {
-            echo file_get_contents($this->url);
+            echo $this->getContent();
         }, $name, $mime ? array_merge([
             'Content-Type' => $mime,
         ], $headers) : $headers);
