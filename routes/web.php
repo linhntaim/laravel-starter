@@ -39,10 +39,8 @@ Route::group([
         'middleware' => ['guest'],
     ], function () {
         Route::get('login', [HomeLoginController::class, 'index'])
-            ->middleware('guest')
             ->name('login');
-        Route::post('login', [HomeLoginController::class, 'store'])
-            ->middleware('guest');
+        Route::post('login', [HomeLoginController::class, 'store']);
 
         // TODO:
 
@@ -57,7 +55,7 @@ Route::group([
         Route::group([
             'prefix' => 'auth',
         ], function () {
-            Route::post('logout', [HomeLogoutController::class, 'logout'])
+            Route::match(['get', 'post'], 'logout', [HomeLogoutController::class, 'logout'])
                 ->name('logout');
 
             // TODO:
