@@ -13,6 +13,7 @@ use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage as StorageFacade;
+use Illuminate\Support\Str;
 
 abstract class HandledStorage extends Storage implements IFileStorage, IResponseStorage
 {
@@ -102,7 +103,7 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
     }
 
     /**
-     * @param UploadedFile|File|string $file
+     * @param HandledStorage|UploadedFile|File|string $file
      * @param string $toDirectory
      * @param bool|string|array $keepOriginalName
      * @return $this
@@ -110,18 +111,33 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
     public function from($file, $toDirectory = '', $keepOriginalName = true)
     {
         if ($keepOriginalName === true) {
-            if ($file instanceof UploadedFile) {
+            if ($file instanceof HandledStorage) {
+                $originalName = basename($file->getRelativePath());
+            } elseif ($file instanceof UploadedFile) {
                 $originalName = $file->getClientOriginalName();
             } elseif ($file instanceof File) {
                 $originalName = $file->getBasename();
             } else {
                 $originalName = basename($file);
             }
-            $this->relativePath = Helper::changeToPath($this->disk->putFileAs(Helper::noWrappedSlashes($toDirectory), $file, $originalName, 'public'));
+            if ($file instanceof HandledStorage) {
+                $path = trim(Helper::noWrappedSlashes($toDirectory) . '/' . $originalName, '/');
+                $this->disk->put($path, $file->getContent(), 'public');
+                $this->relativePath = $path;
+            } else {
+                $this->relativePath = Helper::changeToPath($this->disk->putFileAs(Helper::noWrappedSlashes($toDirectory), $file, $originalName, 'public'));
+            }
             return $this;
         }
 
-        $this->relativePath = Helper::changeToPath($this->disk->putFile(Helper::noWrappedSlashes($toDirectory), $file, 'public'));
+        if ($file instanceof HandledStorage) {
+            $extension = pathinfo($file->getRelativePath(), PATHINFO_EXTENSION);
+            $path = trim(Helper::noWrappedSlashes($toDirectory) . '/' . Str::random(40) . ($extension ? '.' . $extension : ''), '/');
+            $this->disk->put($path, $file->getContent(), 'public');
+            $this->relativePath = $path;
+        } else {
+            $this->relativePath = Helper::changeToPath($this->disk->putFile(Helper::noWrappedSlashes($toDirectory), $file, 'public'));
+        }
         if ($keepOriginalName !== false) {
             $this->changeFilename($keepOriginalName);
         }
@@ -151,7 +167,12 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
 
     public function getContent()
     {
-        return $this->disk->get($this->relativePath);
+        return $this->getContentRelativePath();
+    }
+
+    public function getContentRelativePath($relativePath = null)
+    {
+        return $this->disk->get($relativePath ? $relativePath : $this->getRelativePath());
     }
 
     public function getSize()
@@ -271,7 +292,7 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
 
     public function deleteRelativePath($relativePath = null)
     {
-        $this->disk->delete($relativePath ? $relativePath : $this->relativePath);
+        $this->disk->delete($relativePath ? $relativePath : $this->getRelativePath());
         return $this;
     }
 

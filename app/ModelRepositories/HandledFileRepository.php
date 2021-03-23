@@ -13,7 +13,9 @@ use App\Utils\ConfigHelper;
 use App\Utils\HandledFiles\Filer\Filer;
 use App\Utils\HandledFiles\Filer\ImageFiler;
 use App\Utils\HandledFiles\Storage\LocalStorage;
+use App\Utils\HandledFiles\Storage\ScanStorage;
 use App\Utils\HandledFiles\Storage\Storage;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 
 /**
@@ -23,12 +25,19 @@ use Illuminate\Http\UploadedFile;
  */
 class HandledFileRepository extends ModelRepository
 {
+    protected $scan = false;
     protected $public = false;
     protected $inline = false;
 
     public function modelClass()
     {
         return HandledFile::class;
+    }
+
+    public function useScan($scan = true)
+    {
+        $this->scan = $scan;
+        return $this;
     }
 
     public function usePublic($public = true)
@@ -41,6 +50,21 @@ class HandledFileRepository extends ModelRepository
     {
         $this->inline = $inline;
         return $this;
+    }
+
+    /**
+     * @return HandledFile[]|Collection
+     * @throws
+     */
+    public function getForScanning()
+    {
+        return $this->catch(function () {
+            return $this->query()
+                ->whereHas('handledFileStores', function ($query) {
+                    $query->where('store', 'scan');
+                })
+                ->get();
+        });
     }
 
     /**
@@ -68,24 +92,6 @@ class HandledFileRepository extends ModelRepository
     }
 
     /**
-     * @param Filer $filer
-     * @param array $options
-     * @return Filer
-     */
-    protected function handleFilerWithOptions(Filer $filer, $options = [])
-    {
-        if (isset($options['inline']) && $options['inline']) {
-            $filer->moveToInline();
-        } elseif (isset($options['public']) && $options['public']) {
-            $filer->moveToPublic();
-            if (ConfigHelper::get('handled_file.cloud.enabled')) {
-                $filer->moveToCloud(null, true, ConfigHelper::get('handled_file.cloud.only'));
-            }
-        }
-        return $filer;
-    }
-
-    /**
      * @param ImageFiler $imageFiler
      * @param array $options
      * @param int|null|bool $imageMaxWidth
@@ -110,8 +116,32 @@ class HandledFileRepository extends ModelRepository
         return $this->createWithFiler($imageFiler, $options);
     }
 
+    /**
+     * @param Filer $filer
+     * @param array $options
+     * @return Filer
+     */
+    protected function handleFilerWithOptions(Filer $filer, $options = [])
+    {
+        if (isset($options['scan']) && $options['scan']) {
+            $filer->moveToScan();
+        } elseif (isset($options['inline']) && $options['inline']) {
+            $filer->moveToInline();
+        } elseif (isset($options['public']) && $options['public']) {
+            $filer->moveToPublic();
+            if (ConfigHelper::get('handled_file.cloud.enabled')) {
+                $filer->moveToCloud(null, true, ConfigHelper::get('handled_file.cloud.only'));
+            }
+        }
+        return $filer;
+    }
+
     public function createWithFiler(Filer $filer, $options = [])
     {
+        if ($this->scan) {
+            $options['scan'] = true;
+            $this->scan = false;
+        }
         if ($this->public) {
             $options['public'] = true;
             $this->public = false;
@@ -167,18 +197,12 @@ class HandledFileRepository extends ModelRepository
     public function handledWithFiler(Filer $filer)
     {
         if (!$this->model->ready) {
-            $filer = $this->handleFilerWithOptions($filer, $this->model->options_array_value);
+            $this->updateStoresWithFiler(
+                $this->handleFilerWithOptions($filer, $this->model->options_array_value)
+            );
             $this->updateWithAttributes([
                 'handling' => HandledFile::HANDLING_NO,
             ]);
-            $this->model->handledFileStores()->delete();
-            $filer->eachStorage(function ($name, Storage $storage, $origin) {
-                $this->model->handledFileStores()->create([
-                    'origin' => $origin ? HandledFileStore::ORIGIN_YES : HandledFileStore::ORIGIN_NO,
-                    'store' => $name,
-                    'data' => $storage->getData(),
-                ]);
-            });
         }
         return $this->model;
     }
@@ -191,6 +215,38 @@ class HandledFileRepository extends ModelRepository
             if (!$this->model->ready) {
                 $this->updateWithAttributes([
                     'handling' => HandledFile::HANDLING_NO,
+                ]);
+            }
+        }
+        return $this->model;
+    }
+
+    public function updateStoresWithFiler(Filer $filer)
+    {
+        $this->model->handledFileStores()->delete();
+        $filer->eachStorage(function ($name, Storage $storage, $origin) {
+            $this->model->handledFileStores()->create([
+                'origin' => $origin ? HandledFileStore::ORIGIN_YES : HandledFileStore::ORIGIN_NO,
+                'store' => $name,
+                'data' => $storage->getData(),
+            ]);
+        });
+        return $this->model;
+    }
+
+    public function scan()
+    {
+        if (($originStorage = $this->model->originStorage) && $originStorage instanceof ScanStorage) {
+            if ($originStorage->scan()) {
+                $options = (function ($options) {
+                    unset($options['scan']);
+                    return $options;
+                })($this->model->options_array_value);
+                $this->updateStoresWithFiler(
+                    $this->handleFilerWithOptions((new Filer())->fromStorage($originStorage), $options)
+                );
+                $this->updateWithAttributes([
+                    'options_overridden_array_value' => $options,
                 ]);
             }
         }

@@ -34,7 +34,11 @@ trait ArrayValuedAttributesTrait
         if (!$key) {
             return null;
         }
-        if (Str::endsWith($key, '_array_value')) {
+        if (Str::endsWith($key, '_overridden_array_value')) {
+            $key = Str::before($key, '_overridden_array_value');
+            $this->attributes[$key] = json_encode(empty($value) ? [] : $value);
+            return $this;
+        } elseif (Str::endsWith($key, '_array_value')) {
             $storedValue = $this->getAttribute($key);
             if (!empty($value)) {
                 foreach ($value as $name => $data) {
@@ -44,10 +48,6 @@ trait ArrayValuedAttributesTrait
 
             $key = Str::before($key, '_array_value');
             $this->attributes[$key] = json_encode(empty($storedValue) ? [] : $storedValue);
-            return $this;
-        } elseif (Str::endsWith($key, '_overridden_array_value')) {
-            $key = Str::before($key, '_overridden_array_value');
-            $this->attributes[$key] = json_encode(empty($value) ? [] : $value);
             return $this;
         }
 

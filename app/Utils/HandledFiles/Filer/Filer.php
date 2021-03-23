@@ -18,6 +18,7 @@ use App\Utils\HandledFiles\Storage\InlineStorage;
 use App\Utils\HandledFiles\Storage\LocalStorage;
 use App\Utils\HandledFiles\Storage\PrivateStorage;
 use App\Utils\HandledFiles\Storage\PublicStorage;
+use App\Utils\HandledFiles\Storage\ScanStorage;
 use App\Utils\HandledFiles\Storage\Storage;
 use App\Utils\HandledFiles\StorageManager\StorageManager;
 use App\Utils\HandledFiles\StorageManager\StrictStorageManager;
@@ -214,13 +215,13 @@ class Filer
         return $this;
     }
 
-    protected function moveToHandledStorage(HandledStorage $toStorage, callable $conditionCallback = null, $toDirectory = null, $keepOriginalName = true, $markOriginal = true)
+    public function moveToHandledStorage(HandledStorage $toStorage, callable $conditionCallback = null, $toDirectory = null, $keepOriginalName = true, $markOriginal = true)
     {
         if (($originStorage = $this->handled())) {
             if (is_null($conditionCallback) || $conditionCallback($originStorage)) {
                 if (!$this->storageManager->exists($toStorage->getName())) {
                     $toStorage->from(
-                        $originStorage->getRealPath(),
+                        $originStorage instanceof ScanStorage ? $originStorage : $originStorage->getRealPath(),
                         $this->parseToDirectory($toDirectory, $originStorage->getRelativeDirectory()),
                         $keepOriginalName
                     );
@@ -235,12 +236,24 @@ class Filer
         return $this;
     }
 
+    public function moveToScan($toDirectory = null, $keepOriginalName = true)
+    {
+        return $this->moveToHandledStorage(
+            new ScanStorage(),
+            function ($originStorage) {
+                return $originStorage instanceof PrivateStorage;
+            },
+            $toDirectory, $keepOriginalName
+        );
+    }
+
     public function moveToPublic($toDirectory = null, $keepOriginalName = true, $markOriginal = true)
     {
         return $this->moveToHandledStorage(
             new PublicStorage(),
             function ($originStorage) {
-                return $originStorage instanceof PrivateStorage;
+                return $originStorage instanceof PrivateStorage
+                    || $originStorage instanceof ScanStorage;
             },
             $toDirectory, $keepOriginalName, $markOriginal
         );
@@ -256,7 +269,8 @@ class Filer
         return $this->moveToHandledStorage(
             new PrivateStorage(),
             function ($originStorage) {
-                return $originStorage instanceof PublicStorage;
+                return $originStorage instanceof PublicStorage
+                    || $originStorage instanceof ScanStorage;
             },
             $toDirectory, $keepOriginalName, $markOriginal
         );
@@ -273,7 +287,8 @@ class Filer
             return $this->moveToHandledStorage(
                 new CloudStorage(),
                 function ($originStorage) {
-                    return $originStorage instanceof LocalStorage;
+                    return $originStorage instanceof LocalStorage
+                        || $originStorage instanceof ScanStorage;
                 },
                 $toDirectory, $keepOriginalName, $markOriginal
             );

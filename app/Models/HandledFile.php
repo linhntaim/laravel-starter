@@ -17,6 +17,7 @@ use App\Utils\HandledFiles\Storage\IResponseStorage;
 use App\Utils\HandledFiles\Storage\IUrlStorage;
 use App\Utils\HandledFiles\Storage\PrivateStorage;
 use App\Utils\HandledFiles\Storage\PublicStorage;
+use App\Utils\HandledFiles\Storage\ScanStorage;
 use App\Utils\HandledFiles\Storage\Storage;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -49,6 +50,7 @@ class HandledFile extends Model
         'size',
         'options',
         'options_array_value',
+        'options_overridden_array_value',
         'handling',
     ];
 
@@ -81,6 +83,8 @@ class HandledFile extends Model
             $originStorage = (new InlineStorage())->setData($handledFileStore->data);
         } elseif ($handledFileStore->store === ExternalStorage::NAME) {
             $originStorage = (new ExternalStorage())->setData($handledFileStore->data);
+        } elseif ($handledFileStore->store === ScanStorage::NAME) {
+            $originStorage = (new ScanStorage())->setData($handledFileStore->data);
         } else {
             $originStorage = ConfigHelper::get('handled_file.cloud.enabled') ? new CloudStorage() : null;
             if ($originStorage && $handledFileStore->store === $originStorage->getName()) {
@@ -163,6 +167,7 @@ class HandledFile extends Model
             return false;
         };
         $storagePriorities = [
+            new ScanStorage(),
             new ExternalStorage(),
             new InlineStorage(),
             ConfigHelper::get('handled_file.cloud.enabled') ?

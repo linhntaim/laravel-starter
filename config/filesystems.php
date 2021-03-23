@@ -30,6 +30,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Default Scan Filesystem Disk
+    |--------------------------------------------------------------------------
+    |
+    | For scanning viruses.
+    |
+    */
+
+    'scan' => env('FILESYSTEM_SCAN', 'sftp'),
+    'scanner' => App\Utils\HandledFiles\Storage\Scanners\FSecureScanner::class,
+
+    /*
+    |--------------------------------------------------------------------------
     | Filesystem Disks
     |--------------------------------------------------------------------------
     |
@@ -78,6 +90,16 @@ return [
             'container' => env('AZURE_STORAGE_CONTAINER'),
             'url' => env('AZURE_STORAGE_URL'),
             'prefix' => null,
+        ],
+
+        'sftp' => [
+            'driver' => 'sftp',
+            'host' => env('SFTP_HOST'),
+            'username' => env('SFTP_USERNAME'),
+            'privateKey' => env('SFTP_PRIVATE_KEY_PATH'),
+            'port' => (int)env('SFTP_PORT', 22),
+            'root' => env('SFTP_ROOT', ''),
+            'timeout' => (int)env('SFTP_TIMEOUT', 30),
         ],
     ],
 

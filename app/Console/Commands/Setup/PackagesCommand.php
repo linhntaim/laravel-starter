@@ -12,6 +12,7 @@ class PackagesCommand extends Command
 {
     const PACKAGE_AWS = 'aws/aws-sdk-php';
     const PACKAGE_AWS_S3 = 'league/flysystem-aws-s3-v3';
+    const PACKAGE_SFTP = 'league/flysystem-sftp';
     const PACKAGE_AZURE_BLOB = 'matthewbdaly/laravel-azure-storage';
 
     protected $signature = 'setup:packages {--u} {--f}';
@@ -55,6 +56,10 @@ class PackagesCommand extends Command
             static::PACKAGE_AWS_S3
         );
         $checkPackage(
+            config('filesystems.disks.sftp.host'),
+            static::PACKAGE_SFTP
+        );
+        $checkPackage(
             ConfigHelper::get('handled_file.cloud.service.azure'),
             static::PACKAGE_AZURE_BLOB
         );
@@ -72,16 +77,28 @@ class PackagesCommand extends Command
         $this->fetchComposer();
 
         $removedPackages = [];
-        if (ConfigHelper::get('handled_file.cloud.service.s3')) {
-            if ($this->existed(static::PACKAGE_AWS_S3)) {
-                $removedPackages[] = static::PACKAGE_AWS_S3;
+        $checkPackage = function ($check, $package) use (&$removedPackages) {
+            if ($check && $this->existed($package)) {
+                $removedPackages[] = $package;
             }
-        }
-        if (ConfigHelper::get('handled_file.cloud.service.azure')) {
-            if ($this->existed(static::PACKAGE_AZURE_BLOB)) {
-                $removedPackages[] = static::PACKAGE_AZURE_BLOB;
-            }
-        }
+        };
+
+        $checkPackage(
+            config('services.ses.key') && config('services.ses.secret'),
+            static::PACKAGE_AWS
+        );
+        $checkPackage(
+            ConfigHelper::get('handled_file.cloud.service.s3'),
+            static::PACKAGE_AWS_S3
+        );
+        $checkPackage(
+            config('filesystems.disks.sftp.host'),
+            static::PACKAGE_SFTP
+        );
+        $checkPackage(
+            ConfigHelper::get('handled_file.cloud.service.azure'),
+            static::PACKAGE_AZURE_BLOB
+        );
 
         if (!empty($removedPackages)) {
             $this->goShell('composer remove ' . implode(' ', $removedPackages));
