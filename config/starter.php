@@ -61,6 +61,9 @@ return [
     ],
     'force_common_exception' => (bool)env('FORCE_COMMON_EXCEPTION', false),
     'handled_file' => [
+        'encryption' => [
+            'enabled' => (bool)env('HANDLED_FILE_ENCRYPTION_ENABLED', false),
+        ],
         'scan' => [
             'enabled' => (bool)env('HANDLED_FILE_SCAN_ENABLED', false),
             'disk' => env('HANDLED_FILE_SCAN_DISK', 'sftp'),

@@ -14,6 +14,7 @@ class PackagesCommand extends Command
     const PACKAGE_AWS_S3 = 'league/flysystem-aws-s3-v3';
     const PACKAGE_SFTP = 'league/flysystem-sftp';
     const PACKAGE_AZURE_BLOB = 'matthewbdaly/laravel-azure-storage';
+    const PACKAGE_FILE_VAULT = 'soarecostin/file-vault';
 
     protected $signature = 'setup:packages {--u} {--f}';
 
@@ -63,12 +64,16 @@ class PackagesCommand extends Command
             ConfigHelper::get('handled_file.cloud.service.azure'),
             static::PACKAGE_AZURE_BLOB
         );
+        $checkPackage(
+            ConfigHelper::get('handled_file.encryption.enabled'),
+            static::PACKAGE_FILE_VAULT
+        );
 
         if (!empty($removedPackages)) {
             $this->goShell('composer remove ' . implode(' ', $removedPackages));
         }
         if (!empty($requiredPackages)) {
-            $this->goShell('composer require ' . implode(' ', $requiredPackages));
+            $this->goShell('composer require ' . implode(' ', $requiredPackages) . ' --with-all-dependencies');
         }
     }
 
@@ -98,6 +103,10 @@ class PackagesCommand extends Command
         $checkPackage(
             ConfigHelper::get('handled_file.cloud.service.azure'),
             static::PACKAGE_AZURE_BLOB
+        );
+        $checkPackage(
+            ConfigHelper::get('handled_file.encryption.enabled'),
+            static::PACKAGE_FILE_VAULT
         );
 
         if (!empty($removedPackages)) {
