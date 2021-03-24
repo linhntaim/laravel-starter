@@ -37,8 +37,8 @@ class HandledFileController extends ModelApiController
         return $this->modelRepository->createWithUploadedFile(
             $request->file('file'),
             [
+                'scan' => $request->input('scan') == 1,
                 'public' => $request->input('public') == 1,
-                'has_post_processed' => $request->input('has_post_processed') == 1,
             ],
         );
     }
@@ -78,8 +78,8 @@ class HandledFileController extends ModelApiController
         return $this->modelRepository->createWithUploadedImageFile(
             $request->file('file'),
             [
+                'scan' => $request->input('scan') == 1,
                 'public' => $request->input('public', 1) == 1,
-                'has_post_processed' => $request->input('has_post_processed') == 1,
             ],
         );
     }
@@ -111,9 +111,10 @@ class HandledFileController extends ModelApiController
             $this->modelRepository->createWithFiler(
                 (new ChunkedFiler())->fromChunksIdCompleted($request->input('chunks_id')),
                 [
+                    'scan' => $request->input('scan') == 1,
                     'public' => $request->input('public') == 1,
-                    'has_post_processed' => $request->input('has_post_processed') == 1,
-                ]
+                ],
+                $request->input('name')
             )
         );
     }
@@ -187,25 +188,5 @@ class HandledFileController extends ModelApiController
             $attributes['name'] = $request->input('name');
         }
         return $this->modelRepository->updateWithAttributes($attributes);
-    }
-
-    public function update(Request $request, $id)
-    {
-        if ($request->has('_handle')) {
-            return $this->handle($request, $id);
-        }
-        return parent::update($request, $id);
-    }
-
-    protected function handle(Request $request, $id)
-    {
-        return $this->responseModel(
-            $this->modelRepository->withModel($id)
-                ->handlePostProcessed(function ($model) {
-                    // TODO: Handle something
-
-                    // TODO
-                })
-        );
     }
 }

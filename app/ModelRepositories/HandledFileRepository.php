@@ -70,12 +70,17 @@ class HandledFileRepository extends ModelRepository
     /**
      * @param UploadedFile $uploadedFile
      * @param array $options
+     * @param string $name
      * @return HandledFile
      * @throws
      */
-    public function createWithUploadedFile(UploadedFile $uploadedFile, $options = [])
+    public function createWithUploadedFile(UploadedFile $uploadedFile, $options = [], $name = null)
     {
-        return $this->createWithFiler((new Filer())->fromExisted($uploadedFile, false, false), $options);
+        return $this->createWithFiler(
+            (new Filer())->fromExisted($uploadedFile, false, false),
+            $options,
+            $name
+        );
     }
 
     /**
@@ -83,12 +88,19 @@ class HandledFileRepository extends ModelRepository
      * @param array $options
      * @param int|null|bool $imageMaxWidth
      * @param int|null|bool $imageMaxHeight
+     * @param string|null $name
      * @return HandledFile
      * @throws
      */
-    public function createWithUploadedImageFile(UploadedFile $uploadedFile, $options = [], $imageMaxWidth = null, $imageMaxHeight = null)
+    public function createWithUploadedImageFile(UploadedFile $uploadedFile, $options = [], $imageMaxWidth = null, $imageMaxHeight = null, $name = null)
     {
-        return $this->createWithImageFiler((new ImageFiler())->fromExisted($uploadedFile, false, false), $options, $imageMaxWidth, $imageMaxHeight);
+        return $this->createWithImageFiler(
+            (new ImageFiler())->fromExisted($uploadedFile, false, false),
+            $options,
+            $imageMaxWidth,
+            $imageMaxHeight,
+            $name
+        );
     }
 
     /**
@@ -98,7 +110,7 @@ class HandledFileRepository extends ModelRepository
      * @param int|null|bool $imageMaxHeight
      * @return HandledFile
      */
-    public function createWithImageFiler(ImageFiler $imageFiler, $options = [], $imageMaxWidth = null, $imageMaxHeight = null)
+    public function createWithImageFiler(ImageFiler $imageFiler, $options = [], $imageMaxWidth = null, $imageMaxHeight = null, $name = null)
     {
         if ($imageMaxWidth !== false && empty($imageMaxWidth)) {
             $imageMaxWidth = ConfigHelper::get('handled_file.image.max_width');
@@ -113,7 +125,7 @@ class HandledFileRepository extends ModelRepository
         if (ConfigHelper::get('handled_file.image.inline') && !isset($options['inline'])) {
             $options['inline'] = true;
         }
-        return $this->createWithFiler($imageFiler, $options);
+        return $this->createWithFiler($imageFiler, $options, $name);
     }
 
     /**
@@ -136,10 +148,12 @@ class HandledFileRepository extends ModelRepository
         return $filer;
     }
 
-    public function createWithFiler(Filer $filer, $options = [])
+    public function createWithFiler(Filer $filer, $options = [], $name = null)
     {
         if ($this->scan) {
-            $options['scan'] = true;
+            if (ConfigHelper::get('handled_file.scan.enabled')) {
+                $options['scan'] = true;
+            }
             $this->scan = false;
         }
         if ($this->public) {
@@ -151,10 +165,7 @@ class HandledFileRepository extends ModelRepository
             $this->inline = false;
         }
 
-        $hasPostProcessed = isset($options['has_post_processed']) && $options['has_post_processed'];
-        if (!$hasPostProcessed) {
-            $filer = $this->handleFilerWithOptions($filer, $options);
-        }
+        $filer = $this->handleFilerWithOptions($filer, $options)->setName($name);
 
         $this->createWithAttributes([
             'title' => (function ($name) {
@@ -169,7 +180,9 @@ class HandledFileRepository extends ModelRepository
             'mime' => $filer->getMime(),
             'size' => $filer->getSize(),
             'options_array_value' => $options,
-            'handling' => $hasPostProcessed ? HandledFile::HANDLING_YES : HandledFile::HANDLING_NO,
+            'handling' => $options['scan'] ?
+                HandledFile::HANDLING_SCAN
+                : HandledFile::HANDLING_NO,
         ]);
 
         $filer->eachStorage(function ($name, Storage $storage, $origin) {
@@ -194,33 +207,6 @@ class HandledFileRepository extends ModelRepository
         return parent::updateWithAttributes($attributes);
     }
 
-    public function handledWithFiler(Filer $filer)
-    {
-        if (!$this->model->ready) {
-            $this->updateStoresWithFiler(
-                $this->handleFilerWithOptions($filer, $this->model->options_array_value)
-            );
-            $this->updateWithAttributes([
-                'handling' => HandledFile::HANDLING_NO,
-            ]);
-        }
-        return $this->model;
-    }
-
-    public function handlePostProcessed(callable $postProcessedCallback)
-    {
-        if (($originStorage = $this->model->originStorage) && $originStorage instanceof LocalStorage) {
-            $postProcessedCallback($this->model);
-        } else {
-            if (!$this->model->ready) {
-                $this->updateWithAttributes([
-                    'handling' => HandledFile::HANDLING_NO,
-                ]);
-            }
-        }
-        return $this->model;
-    }
-
     public function updateStoresWithFiler(Filer $filer)
     {
         $this->model->handledFileStores()->delete();
@@ -234,20 +220,34 @@ class HandledFileRepository extends ModelRepository
         return $this->model;
     }
 
+    public function handledWithFiler(Filer $filer, $options = null)
+    {
+        if (!$this->model->ready) {
+            $options = is_null($options) ? $this->model->options_array_value : $options;
+            $this->updateStoresWithFiler(
+                $this->handleFilerWithOptions($filer, $options)
+            );
+            $this->updateWithAttributes([
+                'handling' => HandledFile::HANDLING_NO,
+                'options_overridden_array_value' => $options,
+            ]);
+        }
+        return $this->model;
+    }
+
     public function scan()
     {
-        if (($originStorage = $this->model->originStorage) && $originStorage instanceof ScanStorage) {
-            if ($originStorage->scan()) {
-                $options = (function ($options) {
-                    unset($options['scan']);
-                    return $options;
-                })($this->model->options_array_value);
-                $this->updateStoresWithFiler(
-                    $this->handleFilerWithOptions((new Filer())->fromStorage($originStorage), $options)
-                );
-                $this->updateWithAttributes([
-                    'options_overridden_array_value' => $options,
-                ]);
+        if ($this->model->handling == HandledFile::HANDLING_SCAN) {
+            if (($originStorage = $this->model->originStorage) && $originStorage instanceof ScanStorage) {
+                if ($originStorage->scan()) {
+                    $this->handledWithFiler(
+                        (new Filer())->fromStorage($originStorage),
+                        (function ($options) {
+                            unset($options['scan']);
+                            return $options;
+                        })($this->model->options_array_value)
+                    );
+                }
             }
         }
         return $this->model;

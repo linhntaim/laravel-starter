@@ -45,6 +45,14 @@ class Filer
         $this->storageManager = new StrictStorageManager();
     }
 
+    public function setName($name)
+    {
+        if ($name) {
+            $this->name = $name;
+        }
+        return $this;
+    }
+
     public function getName()
     {
         return $this->name;

@@ -2,6 +2,7 @@
 
 namespace App\Utils\HandledFiles\Storage;
 
+use App\Utils\ConfigHelper;
 use App\Utils\HandledFiles\Storage\Scanners\Scanner;
 
 class ScanStorage extends HandledStorage
@@ -15,14 +16,14 @@ class ScanStorage extends HandledStorage
 
     public function __construct($scanner = null)
     {
-        parent::__construct(config('filesystems.scan'));
+        parent::__construct(ConfigHelper::get('handled_file.scan.disk'));
 
         $this->scanner = $scanner ? $scanner : $this->getDefaultScanner();
     }
 
     public function getDefaultScanner()
     {
-        $scannerClass = config('filesystems.scanner');
+        $scannerClass = ConfigHelper::get('handled_file.scan.scanner');
         return $scannerClass ? new $scannerClass : null;
     }
 

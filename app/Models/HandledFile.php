@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Collection;
  * Class HandledFile
  * @package App\Models
  * @property int $id
+ * @property int $handling
  * @property string $title
  * @property string $name
  * @property string $mime
@@ -40,6 +41,7 @@ class HandledFile extends Model
 
     const HANDLING_YES = 1;
     const HANDLING_NO = 2;
+    const HANDLING_SCAN = 3;
 
     protected $table = 'handled_files';
 
