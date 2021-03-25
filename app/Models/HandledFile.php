@@ -12,6 +12,7 @@ use App\Utils\ConfigHelper;
 use App\Utils\HandledFiles\Storage\CloudStorage;
 use App\Utils\HandledFiles\Storage\ExternalStorage;
 use App\Utils\HandledFiles\Storage\HandledStorage;
+use App\Utils\HandledFiles\Storage\IEncryptionStorage;
 use App\Utils\HandledFiles\Storage\InlineStorage;
 use App\Utils\HandledFiles\Storage\IResponseStorage;
 use App\Utils\HandledFiles\Storage\IUrlStorage;
@@ -31,6 +32,9 @@ use Illuminate\Database\Eloquent\Collection;
  * @property string $mime
  * @property string $url
  * @property bool $ready
+ * @property bool $encrypted
+ * @property bool $public
+ * @property bool $inline
  * @property array $options_array_value
  * @property Collection $handledFileStores
  * @property Storage $originStorage
@@ -96,10 +100,31 @@ class HandledFile extends Model
         return $originStorage;
     }
 
+    public function getEncryptedAttribute()
+    {
+        return isset($this->options_array_value['encrypt']) && $this->options_array_value['encrypt'];
+    }
+
+    public function getPublicAttribute()
+    {
+        return isset($this->options_array_value['public']) && $this->options_array_value['public'];
+    }
+
+    public function getInlineAttribute()
+    {
+        return isset($this->options_array_value['inline']) && $this->options_array_value['inline'];
+    }
+
     public function getUrlAttribute()
     {
         if (!$this->getReadyAttribute()) {
             return null;
+        }
+        if (!$this->public) {
+            return route('account.handled_file.show', ['id' => $this->id]) . '?_inline=1';
+        }
+        if ($this->encrypted || $this->inline) {
+            return route('handled_file.show', ['id' => $this->id]) . '?_inline=1';
         }
         return $this->tryStorage(
             function (Storage $storage, HandledFileStore $store) {
@@ -139,6 +164,9 @@ class HandledFile extends Model
 
         return $this->tryStorage(
             function (Storage $storage, HandledFileStore $store) use ($name, $headers) {
+                if ($storage instanceof IEncryptionStorage) {
+                    $storage->setEncrypted();
+                }
                 return $storage->setData($store->data)->responseDownload($name, $this->mime, $headers);
             },
             function (Storage $storage) {
@@ -151,6 +179,9 @@ class HandledFile extends Model
     {
         return $this->tryStorage(
             function (Storage $storage, HandledFileStore $store) use ($headers) {
+                if ($storage instanceof IEncryptionStorage) {
+                    $storage->setEncrypted();
+                }
                 return $storage->setData($store->data)->responseFile($this->mime, $headers);
             },
             function (Storage $storage) {

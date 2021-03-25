@@ -9,6 +9,8 @@ class ScanStorage extends HandledStorage
 {
     const NAME = 'scan';
 
+    protected $scanDiskName;
+
     /**
      * @var Scanner
      */
@@ -16,9 +18,15 @@ class ScanStorage extends HandledStorage
 
     public function __construct($scanner = null)
     {
-        parent::__construct(ConfigHelper::get('handled_file.scan.disk'));
+        $this->scanDiskName = ConfigHelper::get('handled_file.scan.disk');
+        parent::__construct($this->scanDiskName);
 
         $this->scanner = $scanner ? $scanner : $this->getDefaultScanner();
+    }
+
+    public function getDiskName()
+    {
+        return $this->scanDiskName;
     }
 
     public function getDefaultScanner()

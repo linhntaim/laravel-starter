@@ -63,6 +63,7 @@ return [
     'handled_file' => [
         'encryption' => [
             'enabled' => (bool)env('HANDLED_FILE_ENCRYPTION_ENABLED', false),
+            'encrypter' => null,
         ],
         'scan' => [
             'enabled' => (bool)env('HANDLED_FILE_SCAN_ENABLED', false),

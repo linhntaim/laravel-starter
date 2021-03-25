@@ -14,6 +14,7 @@ use App\Utils\HandledFiles\Helper;
 use App\Utils\HandledFiles\Storage\CloudStorage;
 use App\Utils\HandledFiles\Storage\ExternalStorage;
 use App\Utils\HandledFiles\Storage\HandledStorage;
+use App\Utils\HandledFiles\Storage\IEncryptionStorage;
 use App\Utils\HandledFiles\Storage\InlineStorage;
 use App\Utils\HandledFiles\Storage\LocalStorage;
 use App\Utils\HandledFiles\Storage\PrivateStorage;
@@ -223,15 +224,34 @@ class Filer
         return $this;
     }
 
-    public function moveToHandledStorage(HandledStorage $toStorage, callable $conditionCallback = null, $toDirectory = null, $keepOriginalName = true, $markOriginal = true)
+    public function encrypt()
+    {
+        if (ConfigHelper::get('handled_file.encryption.enabled')) {
+            $this->eachStorage(function ($name, Storage $storage) {
+                if ($storage instanceof IEncryptionStorage) {
+                    $storage->encrypt();
+                }
+            });
+        }
+        return $this;
+    }
+
+    public function moveToHandledStorage(HandledStorage $toStorage, callable $conditionCallback = null, $toDirectory = null, $keepOriginalName = true, $markOriginal = true, $visibility = 'public')
     {
         if (($originStorage = $this->handled())) {
             if (is_null($conditionCallback) || $conditionCallback($originStorage)) {
                 if (!$this->storageManager->exists($toStorage->getName())) {
+                    $toCloudFromPrivate = $toStorage instanceof CloudStorage && $originStorage instanceof PrivateStorage;
+                    $toDirectory = $this->parseToDirectory($toDirectory, $originStorage->getRelativeDirectory());
+                    if ($toCloudFromPrivate) {
+                        $visibility = 'private';
+                        $toDirectory = 'private' . ($toDirectory ? DIRECTORY_SEPARATOR . $toDirectory : '');
+                    }
                     $toStorage->from(
                         $originStorage instanceof ScanStorage ? $originStorage : $originStorage->getRealPath(),
-                        $this->parseToDirectory($toDirectory, $originStorage->getRelativeDirectory()),
-                        $keepOriginalName
+                        $toDirectory,
+                        $keepOriginalName,
+                        $visibility
                     );
                     if ($markOriginal) {
                         $originStorage->delete();
@@ -246,13 +266,16 @@ class Filer
 
     public function moveToScan($toDirectory = null, $keepOriginalName = true)
     {
-        return $this->moveToHandledStorage(
-            new ScanStorage(),
-            function ($originStorage) {
-                return $originStorage instanceof PrivateStorage;
-            },
-            $toDirectory, $keepOriginalName
-        );
+        if (ConfigHelper::get('handled_file.scan.enabled')) {
+            return $this->moveToHandledStorage(
+                new ScanStorage(),
+                function ($originStorage) {
+                    return $originStorage instanceof PrivateStorage;
+                },
+                $toDirectory, $keepOriginalName
+            );
+        }
+        return $this;
     }
 
     public function moveToPublic($toDirectory = null, $keepOriginalName = true, $markOriginal = true)
