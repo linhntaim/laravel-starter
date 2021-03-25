@@ -12,6 +12,7 @@ use App\Models\HandledFileStore;
 use App\Utils\ConfigHelper;
 use App\Utils\HandledFiles\Filer\Filer;
 use App\Utils\HandledFiles\Filer\ImageFiler;
+use App\Utils\HandledFiles\Storage\Scanners\Scanner;
 use App\Utils\HandledFiles\Storage\ScanStorage;
 use App\Utils\HandledFiles\Storage\Storage;
 use Illuminate\Database\Eloquent\Collection;
@@ -259,14 +260,25 @@ class HandledFileRepository extends ModelRepository
     {
         if ($this->model->handling == HandledFile::HANDLING_SCAN) {
             if (($originStorage = $this->model->originStorage) && $originStorage instanceof ScanStorage) {
-                if ($originStorage->scan()) {
+                if (($scanned = $originStorage->scan()) === Scanner::SCAN_TRUE) {
                     $this->handledWithFiler(
                         (new Filer())->fromStorage($originStorage),
                         (function ($options) {
                             unset($options['scan']);
+                            $options['scanned'] = true;
                             return $options;
                         })($this->model->options_array_value)
                     );
+                } elseif ($scanned === Scanner::SCAN_FALSE) {
+                    $originStorage->delete();
+                    $this->updateWithAttributes([
+                        'handling' => HandledFile::HANDLING_NO,
+                        'options_overridden_array_value' => (function ($options) {
+                            unset($options['scan']);
+                            $options['scanned'] = false;
+                            return $options;
+                        })($this->model->options_array_value),
+                    ]);
                 }
             }
         }

@@ -40,7 +40,7 @@ class ScanStorage extends HandledStorage
         if ($this->scanner) {
             return $this->scanner->scan($this);
         }
-        return false;
+        return Scanner::SCAN_TRUE;
     }
 
     public function delete()
