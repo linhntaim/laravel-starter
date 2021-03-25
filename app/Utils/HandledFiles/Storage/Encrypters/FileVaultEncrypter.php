@@ -2,7 +2,9 @@
 
 namespace App\Utils\HandledFiles\Storage\Encrypters;
 
+use App\Utils\HandledFiles\Storage\CloudStorage;
 use App\Utils\HandledFiles\Storage\HandledStorage;
+use App\Utils\HandledFiles\Storage\PrivateStorage;
 use SoareCostin\FileVault\Facades\FileVault;
 
 class FileVaultEncrypter extends Encrypter
@@ -27,6 +29,14 @@ class FileVaultEncrypter extends Encrypter
 
     public function streamDecrypt(HandledStorage $storage)
     {
+        if ($storage instanceof CloudStorage) {
+            $relativeDirectory = $storage->getRelativeDirectory();
+            $storage = (new PrivateStorage())->from(
+                $storage,
+                $relativeDirectory ?
+                    $storage->getDiskName() . DIRECTORY_SEPARATOR . $relativeDirectory : $storage->getDiskName()
+            );
+        }
         FileVault::disk($storage->getDiskName())
             ->streamDecrypt($storage->getRelativePath());
     }

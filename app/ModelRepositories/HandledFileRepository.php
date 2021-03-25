@@ -155,13 +155,14 @@ class HandledFileRepository extends ModelRepository
         if (isset($options['inline']) && $options['inline']) {
             return $filer->moveToInline();
         }
+        $filer->encrypt(isset($options['encrypt']) && $options['encrypt']);
         if (isset($options['public']) && $options['public']) {
             $filer->moveToPublic();
             $filer->moveToCloud(null, true, ConfigHelper::get('handled_file.cloud.only'));
         } elseif (isset($options['cloud']) && $options['cloud']) {
             $filer->moveToCloud(null, true, ConfigHelper::get('handled_file.cloud.only'));
         }
-        return $filer->encrypt(isset($options['encrypt']) && $options['encrypt']);
+        return $filer;
     }
 
     public function createWithFiler(Filer $filer, $options = [], $name = null)
