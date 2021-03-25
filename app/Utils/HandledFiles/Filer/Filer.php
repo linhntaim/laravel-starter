@@ -41,6 +41,10 @@ class Filer
 
     protected $name;
 
+    protected $mime;
+
+    protected $size;
+
     public function __construct()
     {
         $this->storageManager = new StrictStorageManager();
@@ -59,14 +63,20 @@ class Filer
         return $this->name;
     }
 
-    public function getSize()
-    {
-        return $this->storageManager->originSize();
-    }
-
     public function getMime()
     {
-        return $this->storageManager->originMime();
+        if (is_null($this->mime)) {
+            $this->mime = $this->storageManager->originMime();
+        }
+        return $this->mime;
+    }
+
+    public function getSize()
+    {
+        if (is_null($this->size)) {
+            $this->size = $this->storageManager->originSize();
+        }
+        return $this->size;
     }
 
     public function eachStorage(callable $callback)
@@ -224,9 +234,13 @@ class Filer
         return $this;
     }
 
-    public function encrypt()
+    public function encrypt($encrypted = true)
     {
-        if (ConfigHelper::get('handled_file.encryption.enabled')) {
+        if ($encrypted && ConfigHelper::get('handled_file.encryption.enabled')) {
+            // cache before encrypting
+            $this->getSize(); // cache before encrypting
+            $this->getMime();
+            // encrypting
             $this->eachStorage(function ($name, Storage $storage) {
                 if ($storage instanceof IEncryptionStorage) {
                     $storage->encrypt();

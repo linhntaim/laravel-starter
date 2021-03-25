@@ -21,6 +21,7 @@ use Illuminate\Http\UploadedFile;
  * Class HandledFileRepository
  * @package App\ModelRepositories
  * @property HandledFile $model
+ * @method  HandledFile model($id = null)
  */
 class HandledFileRepository extends ModelRepository
 {
@@ -154,17 +155,13 @@ class HandledFileRepository extends ModelRepository
         if (isset($options['inline']) && $options['inline']) {
             return $filer->moveToInline();
         }
-        if (isset($options['encrypt']) && $options['encrypt']) {
-            $filer->encrypt();
-        }
         if (isset($options['public']) && $options['public']) {
             $filer->moveToPublic();
-            return $filer->moveToCloud(null, true, ConfigHelper::get('handled_file.cloud.only'));
+            $filer->moveToCloud(null, true, ConfigHelper::get('handled_file.cloud.only'));
+        } elseif (isset($options['cloud']) && $options['cloud']) {
+            $filer->moveToCloud(null, true, ConfigHelper::get('handled_file.cloud.only'));
         }
-        if (isset($options['cloud']) && $options['cloud']) {
-            return $filer->moveToCloud(null, true, ConfigHelper::get('handled_file.cloud.only'));
-        }
-        return $filer;
+        return $filer->encrypt(isset($options['encrypt']) && $options['encrypt']);
     }
 
     public function createWithFiler(Filer $filer, $options = [], $name = null)

@@ -92,6 +92,6 @@ class InlineStorage extends Storage implements IFileStorage, IUrlStorage, IRespo
             echo $this->getContent();
         }, $name, array_merge([
             'Content-Type' => $mime,
-        ]));
+        ], $headers));
     }
 }

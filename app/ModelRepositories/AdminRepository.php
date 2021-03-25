@@ -28,6 +28,7 @@ class AdminRepository extends ExtendedUserRepository
     {
         return $this->updateWithAttributes([
             'avatar_id' => (new HandledFileRepository())
+                ->useEncrypt()
                 ->usePublic()
                 ->createWithUploadedImageFile($imageFile, [], null, null, $imageName)
                 ->id,

@@ -336,7 +336,9 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
         if ($this->encrypted()) {
             return response()->streamDownload(function () {
                 $this->streamDecrypt();
-            }, null, $headers, 'inline');
+            }, null, array_merge([
+                'Content-Type' => $mime,
+            ], $headers), 'inline');
         }
         return $this->disk->response($this->relativePath, null, $headers);
     }
@@ -346,7 +348,9 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
         if ($this->encrypted()) {
             return response()->streamDownload(function () {
                 $this->streamDecrypt();
-            }, $name, $headers);
+            }, $name, array_merge([
+                'Content-Type' => $mime,
+            ], $headers));
         }
         return $this->disk->download($this->relativePath, $name, $headers);
     }

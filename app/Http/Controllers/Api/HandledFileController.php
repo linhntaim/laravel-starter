@@ -167,7 +167,11 @@ class HandledFileController extends ModelApiController
 
     public function getInlineFile(Request $request, $id)
     {
-        return $this->modelRepository->model($id)->responseFile();
+        $handledFile = $this->modelRepository->model($id);
+        if (!$handledFile->public && !$request->user()) {
+            $this->abort404();
+        }
+        return $handledFile->responseFile();
     }
 
     protected function updateValidatedRules(Request $request)
