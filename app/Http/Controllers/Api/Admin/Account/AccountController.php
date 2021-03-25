@@ -61,7 +61,7 @@ class AccountController extends BaseAccountController
         ]);
 
         return $this->responseModel(
-            $this->modelRepository->updateAvatar($request->file('image'))
+            $this->modelRepository->updateAvatar($request->file('image'), $request->input('name'))
         );
     }
 

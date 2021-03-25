@@ -8,6 +8,7 @@ namespace App\ModelRepositories;
 
 use App\ModelRepositories\Base\ExtendedUserRepository;
 use App\Models\Admin;
+use Illuminate\Http\UploadedFile;
 
 /**
  * Class UserRepository
@@ -23,12 +24,12 @@ class AdminRepository extends ExtendedUserRepository
         return Admin::class;
     }
 
-    public function updateAvatar($imageFile)
+    public function updateAvatar(UploadedFile $imageFile, $imageName = null)
     {
         return $this->updateWithAttributes([
             'avatar_id' => (new HandledFileRepository())
                 ->usePublic()
-                ->createWithUploadedImageFile($imageFile)
+                ->createWithUploadedImageFile($imageFile, [], null, null, $imageName)
                 ->id,
         ]);
     }

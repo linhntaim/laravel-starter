@@ -61,6 +61,15 @@ return [
     ],
     'force_common_exception' => (bool)env('FORCE_COMMON_EXCEPTION', false),
     'handled_file' => [
+        'encryption' => [
+            'enabled' => (bool)env('HANDLED_FILE_ENCRYPTION_ENABLED', false),
+            'encrypter' => null,
+        ],
+        'scan' => [
+            'enabled' => (bool)env('HANDLED_FILE_SCAN_ENABLED', false),
+            'disk' => env('HANDLED_FILE_SCAN_DISK', 'sftp'),
+            'scanner' => App\Utils\HandledFiles\Storage\Scanners\FSecureScanner::class,
+        ],
         'cloud' => [
             'enabled' => (bool)env('HANDLED_FILE_CLOUD_ENABLED', false),
             'only' => (bool)env('HANDLED_FILE_CLOUD_ONLY', false),

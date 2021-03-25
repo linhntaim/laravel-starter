@@ -34,5 +34,6 @@ class CloudStorage extends HandledStorage implements IUrlStorage
     public function setDisk($disk = null)
     {
         $this->disk = Storage::cloud();
+        return $this;
     }
 }

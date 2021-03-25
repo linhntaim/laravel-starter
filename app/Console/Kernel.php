@@ -7,6 +7,7 @@
 namespace App\Console;
 
 use App\Console\Schedules\Base\Schedule as AppSchedule;
+use App\Console\Schedules\ScanHandleFilesSchedule;
 use App\Console\Schedules\TestCommandSchedule;
 use App\Console\Schedules\TestShellSchedule;
 use Illuminate\Console\Scheduling\Schedule;
@@ -31,6 +32,7 @@ class Kernel extends ConsoleKernel
             'schedules' => [
                 TestCommandSchedule::class,
                 TestShellSchedule::class,
+                ScanHandleFilesSchedule::class,
             ],
         ],
     ];
