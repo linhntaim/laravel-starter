@@ -268,7 +268,7 @@ class HandledFileRepository extends ModelRepository
             if (($originStorage = $this->model->originStorage) && $originStorage instanceof ScanStorage) {
                 if (($scanned = $originStorage->scan()) === Scanner::SCAN_TRUE) {
                     $this->handledWithFiler(
-                        (new Filer())->fromStorage($originStorage),
+                        (new Filer())->fromStorage($originStorage)->moveToPrivate(),
                         (function ($options) {
                             unset($options['scan']);
                             $options['scanned'] = true;
