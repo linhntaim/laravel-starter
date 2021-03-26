@@ -169,11 +169,15 @@ class HandledFileRepository extends ModelRepository
     public function createWithFiler(Filer $filer, $options = [], $name = null)
     {
         if ($this->scan) {
-            $options['scan'] = true;
+            if (ConfigHelper::get('handled_file.scan.enabled')) {
+                $options['scan'] = true;
+            }
             $this->scan = false;
         }
         if ($this->encrypt) {
-            $options['encrypt'] = true;
+            if (ConfigHelper::get('handled_file.encryption.enabled')) {
+                $options['encrypt'] = true;
+            }
             $this->encrypt = false;
         }
         if ($this->public) {
@@ -181,7 +185,9 @@ class HandledFileRepository extends ModelRepository
             $this->public = false;
         }
         if ($this->cloud) {
-            $options['cloud'] = true;
+            if (ConfigHelper::get('handled_file.cloud.enabled')) {
+                $options['cloud'] = true;
+            }
             $this->cloud = false;
         }
         if ($this->inline) {

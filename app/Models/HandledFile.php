@@ -200,7 +200,8 @@ class HandledFile extends Model
             return false;
         };
         $storagePriorities = [
-            new ScanStorage(),
+            ConfigHelper::get('handled_file.scan.enabled') ?
+                new ScanStorage() : null,
             new ExternalStorage(),
             new InlineStorage(),
             ConfigHelper::get('handled_file.cloud.enabled') ?

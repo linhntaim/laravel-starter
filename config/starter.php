@@ -63,7 +63,7 @@ return [
     'handled_file' => [
         'encryption' => [
             'enabled' => (bool)env('HANDLED_FILE_ENCRYPTION_ENABLED', false),
-            'encrypter' => null,
+            'encrypter' => App\Utils\HandledFiles\Storage\Encrypters\FileVaultEncrypter::class,
         ],
         'scan' => [
             'enabled' => (bool)env('HANDLED_FILE_SCAN_ENABLED', false),
