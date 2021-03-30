@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\Collection;
  * @property string $url
  * @property bool $ready
  * @property bool $encrypted
+ * @property bool $scanned
  * @property bool $public
  * @property bool $inline
  * @property array $options_array_value
@@ -105,6 +106,12 @@ class HandledFile extends Model
         return isset($this->options_array_value['encrypt']) && $this->options_array_value['encrypt'];
     }
 
+    public function getScannedAttribute()
+    {
+        return (!isset($this->options_array_value['scan']) || $this->options_array_value['scan'] == false)
+            && (!isset($this->options_array_value['scanned']) || $this->options_array_value['scanned']);
+    }
+
     public function getPublicAttribute()
     {
         return isset($this->options_array_value['public']) && $this->options_array_value['public'];
@@ -117,7 +124,7 @@ class HandledFile extends Model
 
     public function getUrlAttribute()
     {
-        if (!$this->getReadyAttribute()) {
+        if (!$this->ready || !$this->scanned) {
             return null;
         }
         if (!$this->public) {
@@ -164,7 +171,7 @@ class HandledFile extends Model
 
         return $this->tryStorage(
             function (Storage $storage, HandledFileStore $store) use ($name, $headers) {
-                if (ConfigHelper::get('handled_file.scan.enabled')) {
+                if (ConfigHelper::get('handled_file.encryption.enabled')) {
                     if ($storage instanceof IEncryptionStorage) {
                         $storage->setEncrypted($this->encrypted);
                     }
@@ -181,7 +188,7 @@ class HandledFile extends Model
     {
         return $this->tryStorage(
             function (Storage $storage, HandledFileStore $store) use ($headers) {
-                if (ConfigHelper::get('handled_file.scan.enabled')) {
+                if (ConfigHelper::get('handled_file.encryption.enabled')) {
                     if ($storage instanceof IEncryptionStorage) {
                         $storage->setEncrypted($this->encrypted);
                     }
