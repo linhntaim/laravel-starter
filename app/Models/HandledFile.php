@@ -171,7 +171,7 @@ class HandledFile extends Model
 
         return $this->tryStorage(
             function (Storage $storage, HandledFileStore $store) use ($name, $headers) {
-                if (ConfigHelper::get('handled_file.scan.enabled')) {
+                if (ConfigHelper::get('handled_file.encryption.enabled')) {
                     if ($storage instanceof IEncryptionStorage) {
                         $storage->setEncrypted($this->encrypted);
                     }
@@ -188,7 +188,7 @@ class HandledFile extends Model
     {
         return $this->tryStorage(
             function (Storage $storage, HandledFileStore $store) use ($headers) {
-                if (ConfigHelper::get('handled_file.scan.enabled')) {
+                if (ConfigHelper::get('handled_file.encryption.enabled')) {
                     if ($storage instanceof IEncryptionStorage) {
                         $storage->setEncrypted($this->encrypted);
                     }
