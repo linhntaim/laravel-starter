@@ -12,6 +12,7 @@ use App\Models\HandledFileStore;
 use App\Utils\ConfigHelper;
 use App\Utils\HandledFiles\Filer\Filer;
 use App\Utils\HandledFiles\Filer\ImageFiler;
+use App\Utils\HandledFiles\Storage\Scanners\Scanner;
 use App\Utils\HandledFiles\Storage\ScanStorage;
 use App\Utils\HandledFiles\Storage\Storage;
 use Illuminate\Database\Eloquent\Collection;
@@ -168,11 +169,15 @@ class HandledFileRepository extends ModelRepository
     public function createWithFiler(Filer $filer, $options = [], $name = null)
     {
         if ($this->scan) {
-            $options['scan'] = true;
+            if (ConfigHelper::get('handled_file.scan.enabled')) {
+                $options['scan'] = true;
+            }
             $this->scan = false;
         }
         if ($this->encrypt) {
-            $options['encrypt'] = true;
+            if (ConfigHelper::get('handled_file.encryption.enabled')) {
+                $options['encrypt'] = true;
+            }
             $this->encrypt = false;
         }
         if ($this->public) {
@@ -180,7 +185,9 @@ class HandledFileRepository extends ModelRepository
             $this->public = false;
         }
         if ($this->cloud) {
-            $options['cloud'] = true;
+            if (ConfigHelper::get('handled_file.cloud.enabled')) {
+                $options['cloud'] = true;
+            }
             $this->cloud = false;
         }
         if ($this->inline) {
@@ -259,14 +266,25 @@ class HandledFileRepository extends ModelRepository
     {
         if ($this->model->handling == HandledFile::HANDLING_SCAN) {
             if (($originStorage = $this->model->originStorage) && $originStorage instanceof ScanStorage) {
-                if ($originStorage->scan()) {
+                if (($scanned = $originStorage->scan()) === Scanner::SCAN_TRUE) {
                     $this->handledWithFiler(
-                        (new Filer())->fromStorage($originStorage),
+                        (new Filer())->fromStorage($originStorage)->moveToPrivate(),
                         (function ($options) {
                             unset($options['scan']);
+                            $options['scanned'] = true;
                             return $options;
                         })($this->model->options_array_value)
                     );
+                } elseif ($scanned === Scanner::SCAN_FALSE) {
+                    $originStorage->delete();
+                    $this->updateWithAttributes([
+                        'handling' => HandledFile::HANDLING_NO,
+                        'options_overridden_array_value' => (function ($options) {
+                            unset($options['scan']);
+                            $options['scanned'] = false;
+                            return $options;
+                        })($this->model->options_array_value),
+                    ]);
                 }
             }
         }

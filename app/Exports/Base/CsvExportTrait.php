@@ -41,7 +41,7 @@ trait CsvExportTrait
 
     protected function csvAfterExporting()
     {
-        $this->csvFiler->moveToPublic();
+        $this->csvFiler->moveToPublic(false);
         return $this;
     }
 

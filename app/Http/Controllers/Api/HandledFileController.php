@@ -39,6 +39,7 @@ class HandledFileController extends ModelApiController
             [
                 'scan' => $request->input('scan') == 1,
                 'public' => $request->input('public') == 1,
+                'encrypt' => $request->input('encrypt') == 1,
             ],
         );
     }
@@ -80,6 +81,7 @@ class HandledFileController extends ModelApiController
             [
                 'scan' => $request->input('scan') == 1,
                 'public' => $request->input('public', 1) == 1,
+                'encrypt' => $request->input('encrypt') == 1,
             ],
         );
     }
@@ -113,6 +115,7 @@ class HandledFileController extends ModelApiController
                 [
                     'scan' => $request->input('scan') == 1,
                     'public' => $request->input('public') == 1,
+                    'encrypt' => $request->input('encrypt') == 1,
                 ],
                 $request->input('name')
             )
@@ -149,8 +152,12 @@ class HandledFileController extends ModelApiController
             'upload' => 'required|image',
         ]);
 
-        $handledFile = $this->modelRepository->usePublic()
-            ->createWithUploadedImageFile($request->file('upload'));
+        $handledFile = $this->modelRepository
+            ->createWithUploadedImageFile($request->file('upload'), [
+                'scan' => $request->input('scan') == 1,
+                'public' => true,
+                'encrypt' => $request->input('encrypt') == 1,
+            ]);
         return response()->json([
             'url' => $handledFile->url,
         ]);
