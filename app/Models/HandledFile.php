@@ -164,8 +164,10 @@ class HandledFile extends Model
 
         return $this->tryStorage(
             function (Storage $storage, HandledFileStore $store) use ($name, $headers) {
-                if ($storage instanceof IEncryptionStorage) {
-                    $storage->setEncrypted();
+                if (ConfigHelper::get('handled_file.scan.enabled')) {
+                    if ($storage instanceof IEncryptionStorage) {
+                        $storage->setEncrypted($this->encrypted);
+                    }
                 }
                 return $storage->setData($store->data)->responseDownload($name, $this->mime, $headers);
             },
@@ -179,8 +181,10 @@ class HandledFile extends Model
     {
         return $this->tryStorage(
             function (Storage $storage, HandledFileStore $store) use ($headers) {
-                if ($storage instanceof IEncryptionStorage) {
-                    $storage->setEncrypted();
+                if (ConfigHelper::get('handled_file.scan.enabled')) {
+                    if ($storage instanceof IEncryptionStorage) {
+                        $storage->setEncrypted($this->encrypted);
+                    }
                 }
                 return $storage->setData($store->data)->responseFile($this->mime, $headers);
             },
