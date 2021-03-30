@@ -75,6 +75,7 @@ class DefaultSeeder extends Seeder
         $systemId = User::query()->updateOrCreate([
             'email' => $this->systemEmail,
         ], [
+            'username' => strtok($this->systemEmail, '@'),
             'password' => StringHelper::hash($systemPassword),
         ])->id;
         Admin::query()->updateOrCreate([
@@ -89,6 +90,7 @@ class DefaultSeeder extends Seeder
         $superAdminId = User::query()->updateOrCreate([
             'email' => $this->superAdminEmail,
         ], [
+            'username' => strtok($this->superAdminEmail, '@'),
             'password' => StringHelper::hash($superAdminPassword),
         ])->id;
         Admin::query()->updateOrCreate([
@@ -140,6 +142,7 @@ class DefaultSeeder extends Seeder
         $adminId = User::query()->updateOrCreate([
             'email' => $this->administratorEmail,
         ], [
+            'username' => strtok($this->administratorEmail, '@'),
             'password' => StringHelper::hash($adminPassword),
         ])->id;
         Admin::query()->updateOrCreate([

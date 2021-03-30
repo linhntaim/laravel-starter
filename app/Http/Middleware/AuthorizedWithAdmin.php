@@ -18,7 +18,10 @@ class AuthorizedWithAdmin
     {
         $admin = $this->getAdmin($request);
         if (empty($admin)) {
-            return abort(403, static::__transErrorWithModule('must_be_admin'));
+            if ($request->has('_login')) {
+                abort(401, trans('passport.invalid_credentials'));
+            }
+            abort(403, static::__transErrorWithModule('must_be_admin'));
         }
 
         return $next($request);

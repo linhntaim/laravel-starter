@@ -27,6 +27,17 @@ class Request extends BaseRequest
         return !is_null($input);
     }
 
+    public function ifInputNotEmpty($key, &$input)
+    {
+        return $this->ifInput($key, $input) && !empty($input);
+    }
+
+    public function ifFile($key, &$file)
+    {
+        $file = parent::file($key);
+        return !is_null($file);
+    }
+
     public function ajax()
     {
         return parent::ajax() || in_array(

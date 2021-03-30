@@ -12,4 +12,8 @@ use App\Http\Controllers\Api\Admin\AdminAccountTrait;
 class NotificationController extends BaseNotificationController
 {
     use AdminAccountTrait;
+
+    // TODO:
+
+    // TODO
 }

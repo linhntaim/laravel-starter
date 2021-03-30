@@ -16,11 +16,13 @@ use App\Models\User;
 use App\Utils\ClientSettings\DateTimer;
 use App\Utils\SocialLogin;
 use App\Utils\StringHelper;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class UserRepository
  * @package App\ModelRepositories
  * @property User|IProtected $model
+ * @method User|null getUniquely($unique)
  */
 class UserRepository extends ModelRepository implements IProtectedRepository, IUserRepository
 {
@@ -45,18 +47,11 @@ class UserRepository extends ModelRepository implements IProtectedRepository, IU
         return parent::searchOn($query, $search);
     }
 
-    /**
-     * @param string $unique
-     * @return User
-     * @throws
-     */
-    public function getUniquely($unique)
+    public function queryUniquely($query, $unique)
     {
-        return $this->first(
-            $this->query()
-                ->where('id', $unique)
-                ->orWhere('email', $unique)
-        );
+        return parent::queryUniquely($query, $unique)
+            ->orWhere('email', $unique)
+            ->orWhere(DB::raw('BINARY username'), $unique);
     }
 
     /**
@@ -73,6 +68,18 @@ class UserRepository extends ModelRepository implements IProtectedRepository, IU
                     ->where('provider_id', $providerId);
             })
         ) : null;
+    }
+
+    /**
+     * @param string $username
+     * @return User
+     * @throws
+     */
+    public function getByUsername($username)
+    {
+        return $this->first(
+            $this->query()->where('username', $username)
+        );
     }
 
     /**
@@ -131,19 +138,27 @@ class UserRepository extends ModelRepository implements IProtectedRepository, IU
         }
         parent::createWithAttributes($attributes);
         if ($socialLogin->enabled() && !empty($userSocialAttributes)) {
-            $this->model->socials()->create($userSocialAttributes);
+            $userSocialAttributes['user_id'] = $this->model->id;
+            (new UserSocialRepository())->createWithAttributes($userSocialAttributes);
         }
         return $this->model;
     }
 
     /**
      * @param array $attributes
+     * @param array $userSocialAttributes
      * @return User
      * @throws
      */
-    public function updateWithAttributes(array $attributes = [])
+    public function updateWithAttributes(array $attributes = [], array $userSocialAttributes = [])
     {
         $this->validateProtected('Cannot edit this protected user');
+
+        $socialLogin = SocialLogin::getInstance();
+        if (!empty($userSocialAttributes) && isset($attributes['email'])
+            && !$socialLogin->checkEmailDomain($attributes['email'])) {
+            throw new AppException(static::__transErrorWithModule('email.not_allowed'));
+        }
 
         if (!empty($attributes['password'])) {
             $attributes['password'] = StringHelper::hash($attributes['password']);
@@ -154,7 +169,12 @@ class UserRepository extends ModelRepository implements IProtectedRepository, IU
         if (empty($attributes['email'])) {
             unset($attributes['email']);
         }
-        return parent::updateWithAttributes($attributes);
+        parent::updateWithAttributes($attributes);
+        if ($socialLogin->enabled() && !empty($userSocialAttributes)) {
+            $userSocialAttributes['user_id'] = $this->model->id;
+            (new UserSocialRepository())->updateOrCreateWithAttributes($userSocialAttributes);
+        }
+        return $this->model;
     }
 
     public function updateLastAccessedAt()
@@ -177,7 +197,7 @@ class UserRepository extends ModelRepository implements IProtectedRepository, IU
             ->notStrict()
             ->pinModel()
             ->getByEmail($email);
-        return $this->restore();
+        return $this->hasModel() ? $this->restore() : null;
     }
 
     // TODO: Extra methods

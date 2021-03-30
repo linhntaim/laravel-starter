@@ -13,35 +13,36 @@ use App\ModelResources\AdminAccountResource;
 
 class RegisterController extends BaseRegisterController
 {
-    public function __construct()
+    protected function getUserRepositoryClass()
     {
-        parent::__construct();
-
-        $this->modelRepository = new AdminRepository();
-        $this->setFixedModelResourceClass(
-            AdminAccountResource::class,
-            $this->modelRepository->modelClass()
-        );
+        return AdminRepository::class;
     }
 
-    public function registerSocially(Request $request)
+    protected function getUserResourceClass()
     {
-        $this->validated($request, [
-            'email' => 'nullable|sometimes|max:255',
+        return AdminAccountResource::class;
+    }
+
+    protected function registerSociallyValidatedRules()
+    {
+        return array_merge(parent::registerSociallyValidatedRules(), [
             'display_name' => 'nullable|sometimes|max:255',
-            'provider' => 'required|max:255',
-            'provider_id' => 'required|max:255',
         ]);
-
-        return $this->responseModel(
-            $this->modelRepository->createWithAttributesFromSocial([
-                'display_name' => $request->input('display_name'),
-            ], [
-                'email' => $request->input('email'),
-            ], [
-                'provider' => $request->input('provider'),
-                'provider_id' => $request->input('provider_id'),
-            ])
-        );
     }
+
+    public function registerSociallyExecuted(Request $request)
+    {
+        return $this->modelRepository->createWithAttributesFromSocial([
+            'display_name' => $request->input('display_name'),
+        ], [
+            'email' => $request->input('email'),
+        ], [
+            'provider' => $request->input('provider'),
+            'provider_id' => $request->input('provider_id'),
+        ]);
+    }
+
+    // TODO:
+
+    // TODO
 }

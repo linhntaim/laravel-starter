@@ -7,8 +7,10 @@
 namespace App\Utils\ClientSettings;
 
 use App\Exceptions\AppException;
+use App\Http\Requests\Request;
 use App\Models\Base\IUser;
 use App\Utils\ConfigHelper;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Str;
 
 class Manager
@@ -38,20 +40,31 @@ class Manager
         return clone $this->settings;
     }
 
-    public function autoFetch()
+    public function fetchFromRequestHeaders(Request $request)
     {
-        return $this->fetchFromRequestHeaders()
-            ->fetchFromCurrentUser();
-    }
-
-    public function fetchFromRequestHeaders()
-    {
-        $requestHeaders = request()->headers;
+        $requestHeaders = $request->headers;
         $settingsHeader = ConfigHelper::get('headers.settings');
         if (!empty($settingsHeader) && $requestHeaders->has($settingsHeader)
             && ($settings = json_decode($requestHeaders->get($settingsHeader), true)) !== false) {
             return $this->update($settings);
         }
+        return $this;
+    }
+
+    public function fetchFromRequestCookie(Request $request)
+    {
+        $requestCookies = $request->cookies;
+        $settingsCookieName = ConfigHelper::get('web_cookies.settings');
+        if (!empty($settingsCookieName) && $requestCookies->has($settingsCookieName)
+            && ($settings = json_decode($requestCookies->get($settingsCookieName), true)) !== false) {
+            return $this->update($settings);
+        }
+        return $this->storeCookie();
+    }
+
+    public function storeCookie()
+    {
+        Cookie::queue(ConfigHelper::get('web_cookies.settings'), $this->capture()->toJson(), 2628000); // 5 years = forever
         return $this;
     }
 

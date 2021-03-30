@@ -8,8 +8,14 @@ namespace App\ModelResources;
 
 use App\ModelResources\Base\ModelResource;
 use App\ModelResources\Base\ModelTransformTrait;
+use App\Models\User;
 use App\Utils\SocialLogin;
 
+/**
+ * Class UserResource
+ * @package App\ModelResources
+ * @mixin User
+ */
 class UserResource extends ModelResource
 {
     use ModelTransformTrait;

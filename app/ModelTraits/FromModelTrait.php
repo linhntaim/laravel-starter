@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\ModelTraits;
 
 use Illuminate\Database\Eloquent\Model;
@@ -21,6 +25,8 @@ trait FromModelTrait
      */
     public function fromModel($model)
     {
-        return $this->setRawAttributes($model->getAttributes(), true);
+        return $this->setRawAttributes($model->getAttributes(), true)
+            ->setRelations($model->getRelations())
+            ->setTouchedRelations($model->getTouchedRelations());
     }
 }

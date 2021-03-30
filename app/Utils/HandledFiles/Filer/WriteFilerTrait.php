@@ -15,7 +15,7 @@ trait WriteFilerTrait
      */
     public function fStartWriting()
     {
-        return $this->fOpen(Filer::MODE_WRITE);
+        return $this->fOpen();
     }
 
     /**
@@ -64,6 +64,7 @@ trait WriteFilerTrait
     protected function fAfterWriting($contents)
     {
         $this->fNotWritten = false;
+        $this->fNewly = false;
     }
 
     /**

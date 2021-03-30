@@ -14,6 +14,7 @@ use App\Utils\ActivityLogTrait;
 use App\Utils\ClassTrait;
 use App\Utils\TransactionTrait;
 use App\Utils\ValidationTrait;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -29,16 +30,18 @@ class Controller extends BaseController
      * @param array $rules
      * @param array $messages
      * @param array $customAttributes
-     * @return bool
+     * @param callable|null $hook
+     * @return bool|Validator
      * @throws
      */
-    protected function validated(Request $request, array $rules, array $messages = [], array $customAttributes = [])
+    protected function validated(Request $request, array $rules, array $messages = [], array $customAttributes = [], callable $hook = null)
     {
-        return $this->validatedData($request->all(), $rules, $messages, $customAttributes);
+        return $this->validatedData($request->all(), $rules, $messages, $customAttributes, $hook);
     }
 
     protected function responseFile($file, array $headers = [])
     {
+        $this->transactionComplete();
         if ($file instanceof HandledFile) {
             return $file->responseFile($headers);
         }
@@ -47,6 +50,7 @@ class Controller extends BaseController
 
     protected function responseDownload($file, $name = null, array $headers = [])
     {
+        $this->transactionComplete();
         if ($file instanceof HandledFile) {
             return $file->responseDownload($name, $headers);
         }

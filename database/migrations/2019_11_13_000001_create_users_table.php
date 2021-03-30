@@ -4,7 +4,6 @@
  * Base - Any modification needs to be approved, except the space inside the block of TODO
  */
 
-use App\Utils\SocialLogin;
 use App\Vendors\Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Migrations\Migration;
@@ -23,18 +22,17 @@ class CreateUsersTable extends Migration
             $table->rowFormat = 'DYNAMIC';
 
             $table->increments('id');
-            if (SocialLogin::getInstance()->enabled()) {
-                $table->string('email')->nullable();
-            } else {
-                $table->string('email');
-            }
+            $table->string('email')->nullable();
+            $table->string('username')->nullable();
             $table->string('password')->nullable();
+            $table->rememberToken();
             $table->timestamp('password_changed_at')->nullable();
             $table->timestamp('last_accessed_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
-            $table->unique('email');
+            $table->index('email');
+            $table->index('username');
             $table->index('password_changed_at');
             $table->index('last_accessed_at');
             $table->index('created_at');

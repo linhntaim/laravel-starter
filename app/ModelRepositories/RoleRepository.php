@@ -31,6 +31,12 @@ class RoleRepository extends ModelRepository implements IProtectedRepository
         return parent::query()->with('permissions');
     }
 
+    public function queryUniquely($query, $unique)
+    {
+        return parent::queryUniquely($query, $unique)
+            ->orWhere('name', $unique);
+    }
+
     /**
      * @param string $name
      * @return Role

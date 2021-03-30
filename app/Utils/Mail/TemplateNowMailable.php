@@ -31,18 +31,35 @@ class TemplateNowMailable extends Mailable
 
     protected $templateLocalized;
 
-    public function __construct($templateName, array $templateParams = [], $templateLocalized = true)
+    protected $templateNamespace;
+
+    public function __construct($templateName, array $templateParams = [], $templateLocalized = true, $templateLocale = null, $templateNamespace = null)
     {
         $this->templateName = $templateName;
         $this->templateParams = $templateParams;
         $this->templateLocalized = $templateLocalized;
+        $this->templateNamespace = $templateNamespace;
 
         $this->settingsCapture();
+
+        if ($templateLocale) {
+            $this->locale = $templateLocale;
+        }
+    }
+
+    public function setLocale(string $locale)
+    {
+        $this->locale = $locale;
+        return $this;
     }
 
     protected function getTemplatePath()
     {
-        return 'emails.' . $this->templateName . ($this->templateLocalized ? '.' . $this->locale : '');
+        return sprintf('%semails.%s%s',
+            $this->templateNamespace ? $this->templateNamespace . '::' : '',
+            $this->templateName,
+            ($this->templateLocalized ? '.' . $this->locale : '')
+        );
     }
 
     public function build()

@@ -12,6 +12,7 @@ use App\Utils\HandledFiles\Storage\LocalStorage;
 trait ResourceFilerTrait
 {
     protected $fResource = null;
+    protected $fNewly = true;
 
     protected $fReadAndWriteEnabled = false;
     protected $fBinaryEnabled = false;
@@ -66,7 +67,10 @@ trait ResourceFilerTrait
     public function fOpen($mode = Filer::MODE_WRITE)
     {
         if (($originStorage = $this->fHandled()) && !is_resource($this->fResource)) {
-            $this->fResource = fopen($originStorage->getRealPath(), implode('', [
+            $filePath = $originStorage->getRealPath();
+            clearstatcache(); // clear cache before calling filesize
+            $this->fNewly = !file_exists($filePath) || filesize($filePath) == 0;
+            $this->fResource = fopen($filePath, implode('', [
                 $mode,
                 $this->fReadAndWriteEnabled ? '+' : '',
                 $this->fBinaryEnabled ? 'b' : '',

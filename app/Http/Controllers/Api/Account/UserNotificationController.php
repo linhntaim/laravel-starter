@@ -10,4 +10,7 @@ use App\Http\Controllers\Api\Account\NotificationController as BaseNotificationC
 
 abstract class UserNotificationController extends BaseNotificationController
 {
+    // TODO:
+
+    // TODO
 }

@@ -309,6 +309,9 @@ abstract class NowNotification extends BaseNotification
         return true;
     }
 
+    /**
+     * @return Collection|Model[]|array|Model|null
+     */
     protected function getNotifiables()
     {
         return null;
@@ -321,11 +324,17 @@ abstract class NowNotification extends BaseNotification
             || !$this->shouldSomething();
     }
 
+    /**
+     * @param Collection|Model[]|array|Model|null $notifiables
+     * @return bool
+     */
     public function send($notifiables = null)
     {
         $notifiables = $notifiables ? $notifiables : $this->getNotifiables();
 
-        if ($notifiables instanceof Model) {
+        if ($notifiables instanceof Collection) {
+            $notifiables = $notifiables->toArray();
+        } elseif ($notifiables instanceof Model) {
             $notifiables = [$notifiables];
         }
 

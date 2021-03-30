@@ -22,7 +22,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/home';
+    public const HOME = '/';
 
     /**
      * The controller namespace for the application.
@@ -31,7 +31,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string|null
      */
-//    protected $namespace = 'App\\Http\\Controllers';
+    // protected $namespace = 'App\\Http\\Controllers';
 
     /**
      * Define your route model bindings, pattern filters, etc.
@@ -64,10 +64,8 @@ class RouteServiceProvider extends ServiceProvider
         RateLimiter::for('api', function (Request $request) {
             $maxAttempts = ConfigHelper::get('throttle_request.max_attempts');
             $decayMinutes = ConfigHelper::get('throttle_request.decay_minutes');
-            if ($decayMinutes == 1) {
-                return Limit::perMinute($maxAttempts);
-            }
-            return new Limit('', $maxAttempts, $decayMinutes);
+            return ($decayMinutes == 1 ? Limit::perMinute($maxAttempts) : new Limit('', $maxAttempts, $decayMinutes))
+                ->by(optional($request->user())->id ?: $request->ip());
         });
     }
 }

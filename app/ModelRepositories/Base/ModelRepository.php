@@ -10,6 +10,7 @@ use App\Configuration;
 use App\Exceptions\AppException;
 use App\Exceptions\DatabaseException;
 use App\Exceptions\Exception;
+use App\Models\Base\IFromModel;
 use App\Utils\AbortTrait;
 use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\DateTimer;
@@ -33,6 +34,8 @@ abstract class ModelRepository
      */
     protected $model;
 
+    protected $modelByUnique = false;
+
     private $with;
     private $withTrashed = false;
     private $lock;
@@ -45,6 +48,8 @@ abstract class ModelRepository
     private $sortsAllowedDefault = [];
     private $force = false;
     private $pinned = false;
+    private $rawQuery = null;
+    private $fixedRawQuery = null;
 
     /**
      * @var array|null
@@ -60,11 +65,176 @@ abstract class ModelRepository
     public abstract function modelClass();
 
     /**
+     * @return Model|IFromModel|mixed
+     */
+    public function newModel()
+    {
+        $modelClass = $this->modelClass;
+        $this->model = new $modelClass();
+        return $this->model;
+    }
+
+    public function setModelByUnique($modelByUnique = true)
+    {
+        $this->modelByUnique = $modelByUnique;
+        return $this;
+    }
+
+    /**
+     * @param Model|mixed|null $id
+     * @return Model|mixed|null
+     * @throws
+     */
+    public function model($id = null)
+    {
+        if (!is_null($id)) {
+            if ($id instanceof Model) {
+                $modelClass = get_class($id);
+                $matchedClass = $modelClass == $this->modelClass;
+                if (!$matchedClass && !is_subclass_of($this->modelClass, $modelClass)) {
+                    throw new AppException('Model does not match the class');
+                }
+                $this->model = $matchedClass ? $id : $this->newModel()->fromModel($id);
+            } else {
+                $this->model = $this->modelByUnique ? $this->getUniquely($id) : $this->getById($id);
+            }
+        }
+        return $this->model;
+    }
+
+    public function withModel($id = null)
+    {
+        $this->model($id);
+        return $this;
+    }
+
+    public function doesntHaveModel()
+    {
+        return empty($this->model);
+    }
+
+    public function hasModel()
+    {
+        return !$this->doesntHaveModel();
+    }
+
+    public function forgetModel()
+    {
+        $this->model = null;
+        return $this;
+    }
+
+    public function load($relations)
+    {
+        if ($this->hasModel()) {
+            $this->model->load($relations);
+        }
+        return $this;
+    }
+
+    public function getIdKey()
+    {
+        return $this->newModel()->getKeyName();
+    }
+
+    public function getId()
+    {
+        return empty($this->model) ? null : $this->model->getKey();
+    }
+
+    /**
+     * @param Model|mixed $id
+     * @return mixed
+     */
+    public function retrieveId($id)
+    {
+        return $id instanceof Model ? $id->getKey() : $id;
+    }
+
+    /**
+     * @param Collection|Model[]|array $ids
+     * @return mixed
+     */
+    public function retrieveIds($ids)
+    {
+        return $ids instanceof Collection ? $ids->map(function (Model $model) {
+            return $model->getKey();
+        })->all() : collect($ids)->map(function ($id) {
+            return $id instanceof Model ? $id->getKey() : $id;
+        });
+    }
+
+    /**
      * @return Builder
      */
     public function rawQuery()
     {
+        if ($this->rawQuery) {
+            $rawQuery = $this->rawQuery;
+            $this->rawQuery = null;
+            return $rawQuery;
+        }
+        if ($this->fixedRawQuery) {
+            return $this->fixedRawQuery;
+        }
         return call_user_func($this->modelClass . '::query');
+    }
+
+    /**
+     * @param Model|callable|null $model
+     * @param callable|null $callback
+     * @return Builder
+     * @throws
+     */
+    public function modelQuery($model = null, $callback = null)
+    {
+        if (is_null($model)) {
+            $model = $this->newModel();
+        } elseif (is_callable($model)) {
+            $model = $model($this->newModel());
+        }
+        if (is_callable($callback)) {
+            $model = $callback($model);
+        }
+        if (get_class($model) != $this->modelClass) {
+            throw new AppException('Model does not match the class');
+        }
+        return $model->newQuery();
+    }
+
+    /**
+     * @param Model|callable|null $model
+     * @param callable|null $callback
+     * @return ModelRepository
+     * @throws
+     */
+    public function useModelQuery($model = null, $callback = null)
+    {
+        $this->rawQuery = $this->modelQuery($model, $callback);
+        return $this;
+    }
+
+    /**
+     * @param Model|callable|null $model
+     * @param callable|null $callback
+     * @return ModelRepository
+     * @throws
+     */
+    public function useModelQueryAsFixed($model = null, $callback = null)
+    {
+        $this->fixedRawQuery = $this->modelQuery($model, $callback);
+        return $this;
+    }
+
+    /**
+     * @return ModelRepository
+     * @throws
+     */
+    public function clearUsingModelQuery()
+    {
+        $this->rawQuery = null;
+        $this->fixedRawQuery = null;
+        return $this;
     }
 
     public function withTrashed()
@@ -126,7 +296,7 @@ abstract class ModelRepository
     public function sort($sortBy = null, $sortOrder = 'asc')
     {
         if ($sortBy) {
-            $this->sorts[$sortBy] = $sortOrder;
+            $this->sorts[] = ['by' => $sortBy, 'order' => $sortOrder];
         }
         return $this;
     }
@@ -162,9 +332,9 @@ abstract class ModelRepository
         if (!empty($this->sorts)) {
             $sortsAllowed = array_merge($this->sortsAllowed, $this->sortsAllowedDefault);
             $noNeedToCheckSortsAllowed = empty($sortsAllowed);
-            foreach (array_merge($this->sorts, $this->sortsDefault) as $sortBy => $sortOrder) {
-                if ($noNeedToCheckSortsAllowed || in_array($sortBy, $sortsAllowed)) {
-                    $query->orderBy($sortBy, $sortOrder ? $sortOrder : 'asc');
+            foreach (array_merge($this->sorts, $this->sortsDefault) as $sort) {
+                if ($noNeedToCheckSortsAllowed || in_array($sort['by'], $sortsAllowed)) {
+                    $query->orderBy($sort['by'], $sort['order'] ? $sort['order'] : 'asc');
                 }
             }
             $this->sorts()->sortsAllowed();
@@ -190,7 +360,7 @@ abstract class ModelRepository
 
     /**
      * @param Builder $query
-     * @return Model|mixed
+     * @return Model|mixed|null
      * @throws
      */
     public function first($query)
@@ -207,88 +377,9 @@ abstract class ModelRepository
     }
 
     /**
-     * @return Model|mixed
-     */
-    public function newModel()
-    {
-        $modelClass = $this->modelClass;
-        $this->model = new $modelClass();
-        return $this->model;
-    }
-
-    /**
-     * @param Model|mixed|null $id
-     * @return Model|mixed|null
-     * @throws
-     */
-    public function model($id = null)
-    {
-        if (!is_null($id)) {
-            if ($id instanceof Model) {
-                if (get_class($id) != $this->modelClass) {
-                    throw new AppException('Model does not match the class');
-                }
-                $this->model = $id;
-            } else {
-                $this->model = $this->getById($id);
-            }
-        }
-        return $this->model;
-    }
-
-    public function withModel($id = null)
-    {
-        $this->model($id);
-        return $this;
-    }
-
-    public function doesntHaveModel()
-    {
-        return empty($this->model);
-    }
-
-    public function hasModel()
-    {
-        return !$this->doesntHaveModel();
-    }
-
-    public function forgetModel()
-    {
-        $this->model = null;
-        return $this;
-    }
-
-    public function load($relations)
-    {
-        if ($this->hasModel()) {
-            $this->model->load($relations);
-        }
-        return $this;
-    }
-
-    public function getIdKey()
-    {
-        return $this->newModel()->getKeyName();
-    }
-
-    public function getId()
-    {
-        return empty($this->model) ? null : $this->model->getKey();
-    }
-
-    /**
-     * @param Model|int|mixed $id
-     * @return mixed
-     */
-    public function retrieveId($id)
-    {
-        return $id instanceof Model ? $id->getKey() : $id;
-    }
-
-    /**
      * @param callable $callback
-     * @param callable $catchCallback
-     * @return mixed
+     * @param callable|null $catchCallback
+     * @return Model|Collection|boolean|mixed|null|void
      * @throws Exception
      */
     protected function catch(callable $callback, callable $catchCallback = null)
@@ -304,6 +395,17 @@ abstract class ModelRepository
         }
     }
 
+    public function queryById($id)
+    {
+        return $this->query()->where($this->getIdKey(), $id);
+    }
+
+    /**
+     * @param mixed $id
+     * @param callable|null $callback
+     * @return Model|mixed|null
+     * @throws
+     */
     public function getById($id, callable $callback = null)
     {
         if (empty($callback)) {
@@ -314,39 +416,55 @@ abstract class ModelRepository
         });
     }
 
-    public function queryById($id)
-    {
-        return $this->query()->where($this->getIdKey(), $id);
-    }
-
-    /**
-     * @param array $ids
-     * @param callable|null $callback
-     * @return Collection
-     * @throws Exception
-     */
-    public function getByIds(array $ids, callable $callback = null)
-    {
-        return $this->catch(function () use ($ids, $callback) {
-            return empty($callback) ? $this->queryByIds($ids)->get() : $callback($this->queryByIds($ids));
-        });
-
-    }
-
     public function queryByIds(array $ids)
     {
         return $this->query()->whereIn($this->getIdKey(), $ids);
     }
 
     /**
+     * @param array $ids
+     * @param callable|null $callback
      * @return Collection
-     * @throws Exception
+     * @throws
+     */
+    public function getByIds(array $ids, callable $callback = null)
+    {
+        return $this->catch(function () use ($ids, $callback) {
+            return empty($callback) ? $this->queryByIds($ids)->get() : $callback($this->queryByIds($ids));
+        });
+    }
+
+    /**
+     * @param Builder $query
+     * @param string|mixed $unique
+     * @return Builder
+     */
+    public function queryUniquely($query, $unique)
+    {
+        return $query->orWhere($this->getIdKey(), $unique);
+    }
+
+    /**
+     * @param string|mixed $unique
+     * @return Model|mixed|null
+     * @throws
+     */
+    public function getUniquely($unique)
+    {
+        return $this->first(
+            $this->query()->where(function ($query) use ($unique) {
+                return $this->queryUniquely($query, $unique);
+            })
+        );
+    }
+
+    /**
+     * @return Collection
+     * @throws
      */
     public function getAll()
     {
-        return $this->catch(function () {
-            return $this->search([], Configuration::FETCH_PAGING_NO, 0);
-        });
+        return $this->search([], Configuration::FETCH_PAGING_NO, 0);
     }
 
     /**
@@ -408,7 +526,7 @@ abstract class ModelRepository
     /**
      * @param array $attributes
      * @return Model|mixed
-     * @throws Exception
+     * @throws
      */
     public function createWithAttributes(array $attributes = [])
     {
@@ -421,7 +539,7 @@ abstract class ModelRepository
     /**
      * @param array $attributes
      * @return Model|mixed
-     * @throws Exception
+     * @throws
      */
     public function updateWithAttributes(array $attributes = [])
     {
@@ -457,7 +575,7 @@ abstract class ModelRepository
 
     /**
      * @param array $ids
-     * @return bool
+     * @return boolean
      */
     public function deleteWithIds(array $ids)
     {
@@ -466,7 +584,7 @@ abstract class ModelRepository
 
     /**
      * @param Builder $query
-     * @return bool
+     * @return boolean
      * @throws
      */
     protected function queryDelete($query)
@@ -483,16 +601,20 @@ abstract class ModelRepository
     }
 
     /**
-     * @return bool
+     * @return boolean
      */
     public function delete()
     {
         return $this->queryDelete($this->model);
     }
 
+    /**
+     * @return Model|mixed
+     * @throws
+     */
     public function restore()
     {
-        if ($this->model && $this->model->trashed()) {
+        if ($this->model->trashed()) {
             return $this->catch(function () {
                 $this->model->restore();
                 return $this->model;
@@ -519,6 +641,7 @@ abstract class ModelRepository
     {
         $this->batch['run'] = 0;
         $this->batch['values'] = [];
+        return $this;
     }
 
     public function batchInsert($attributes)
@@ -541,6 +664,7 @@ abstract class ModelRepository
             $attributes['updated_at'] = $now;
         }
         $this->batch['values'][] = $attributes;
+        return $this;
     }
 
     protected function batchInsertTryToSave()
@@ -553,6 +677,7 @@ abstract class ModelRepository
         } else {
             $this->batch['inserted'] = false;
         }
+        return $this;
     }
 
     protected function batchInsertSave()
@@ -566,6 +691,7 @@ abstract class ModelRepository
                 }
             });
         }
+        return $this;
     }
 
     public function batchInsertEnd()
@@ -573,6 +699,7 @@ abstract class ModelRepository
         $this->batchInsertSave();
         $this->model = null;
         $this->batch = null;
+        return $this;
     }
 
     public function batchReadStart($query, $batch = 1000)
@@ -605,5 +732,6 @@ abstract class ModelRepository
     public function batchReadEnd()
     {
         $this->batch = null;
+        return $this;
     }
 }

@@ -4,6 +4,8 @@
  * Base - Any modification needs to be approved, except the space inside the block of TODO
  */
 
+use App\Http\Controllers\Api\HandledFileController;
+
 // Common common
 use App\Http\Controllers\Api\Common\DeviceController as CommonDeviceController;
 use App\Http\Controllers\Api\Common\PrerequisiteController as CommonPrerequisiteController;
@@ -73,8 +75,18 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group([
-    // API
+    // TODO:
+
+    // TODO
 ], function () {
+    Route::get('handled-file/{id}', [HandledFileController::class, 'show'])->name('handled_file.show');
+
+    Route::group([
+        'prefix' => 'account',
+        'middleware' => ['authenticated.passport.request', 'auth:api'],
+    ], function () {
+        Route::get('handled-file/{id}', [HandledFileController::class, 'show'])->name('account.handled_file.show');
+    });
 
     #region Home
     Route::group([
@@ -85,8 +97,6 @@ Route::group([
         Route::get('prerequisite', [HomePrerequisiteController::class, 'index']);
 
         Route::post('device/current', [HomeDeviceController::class, 'currentStore']);
-
-        Route::get('handled-file/{id}', [HomeHandledFileController::class, 'show'])->name('handled_file.show');
 
         // TODO:
 
@@ -127,6 +137,8 @@ Route::group([
                 Route::get('/', [HomeAccountController::class, 'index']);
                 Route::post('/', [HomeAccountController::class, 'store']);
 
+                Route::get('handled-file/{id}', [HomeHandledFileController::class, 'show'])->name('account.handled_file.show');
+
                 // TODO:
 
                 // TODO
@@ -149,8 +161,6 @@ Route::group([
         Route::get('prerequisite', [AdminPrerequisiteController::class, 'index']);
 
         Route::post('device/current', [AdminDeviceController::class, 'currentStore']);
-
-        Route::get('handled-file/{id}', [AdminHandledFileController::class, 'show'])->name('handled_file.show');
 
         // TODO:
 

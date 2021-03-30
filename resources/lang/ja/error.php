@@ -103,6 +103,9 @@ return [
             'authenticate' => [
                 'unauthenticated' => 'メールアドレス、もしくはパスワードが異なります。',
             ],
+            'authorized_with_admin' => [
+                'must_be_admin' => 'The user must be an admin',
+            ],
             // TODO:
 
             // TODO
@@ -135,6 +138,11 @@ return [
             'filer' => [
                 'csv_filer' => [
                     'read_line' => ':line行目に入力データに誤りがあります。',
+                    'read' => ':message (:line行)',
+                ],
+                'filer' => [
+                    'read_count' => 'Error at count :count',
+                    'read' => ':message (Count :count)',
                 ],
             ],
         ],

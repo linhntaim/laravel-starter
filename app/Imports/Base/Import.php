@@ -21,6 +21,8 @@ abstract class Import
 
     protected $deleteAfterImporting = true;
 
+    protected $imported = 0;
+
     public function __construct($file)
     {
         $this->toFiler($file);
@@ -29,6 +31,17 @@ abstract class Import
     protected function getFilerClass()
     {
         return Filer::class;
+    }
+
+    protected function imported()
+    {
+        ++$this->imported;
+        return $this;
+    }
+
+    public function count()
+    {
+        return $this->imported;
     }
 
     /**
@@ -45,10 +58,14 @@ abstract class Import
         $this->filer = $this->getFiler()->fromExisted($file);
     }
 
+    public abstract function importing();
+
     public function import()
     {
+        $this->importing();
         if ($this->deleteAfterImporting) {
             $this->filer->delete();
         }
+        return $this;
     }
 }

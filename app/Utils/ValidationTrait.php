@@ -17,15 +17,24 @@ use Illuminate\Support\Facades\Validator;
  */
 trait ValidationTrait
 {
+    protected $validationThrown = true;
+
+    public function setValidationThrown(bool $validationThrown)
+    {
+        $this->validationThrown = $validationThrown;
+        return $this;
+    }
+
     /**
      * @param array $data
      * @param array $rules
      * @param array $messages
      * @param array $customAttributes
-     * @return bool
+     * @param callable|null $hook
+     * @return bool|\Illuminate\Contracts\Validation\Validator
      * @throws
      */
-    protected function validatedData(array $data, array $rules, array $messages = [], array $customAttributes = [])
+    protected function validatedData(array $data, array $rules, array $messages = [], array $customAttributes = [], callable $hook = null)
     {
         $validator = Validator::make(
             $data,
@@ -33,8 +42,14 @@ trait ValidationTrait
             array_merge($this->validatedMessages($rules), $messages),
             $customAttributes
         );
+        if ($hook) {
+            $validator->after($hook);
+        }
         if ($validator->fails()) {
-            throw (new UserException($validator->errors()->all()))->setAttachedData($validator->errors()->toArray());
+            if ($this->validationThrown) {
+                throw (new UserException($validator->errors()->all()))->setAttachedData($validator->errors()->toArray());
+            }
+            return $validator;
         }
         return true;
     }

@@ -25,7 +25,6 @@ use App\Notifications\AdminResetPasswordNotification;
 class Admin extends ExtendedUserModel
 {
     const MAX_AVATAR_SIZE = 512;
-    const MIN_PASSWORD_LENGTH = 8;
 
     protected $table = 'admins';
 
@@ -56,11 +55,7 @@ class Admin extends ExtendedUserModel
     public function getRoleAttribute()
     {
         return $this->remind('role', function () {
-            $role = $this->role()->first();
-            if (!empty($role)) {
-                $role->load('permissions');
-            }
-            return $role;
+            return $this->role()->with('permissions')->first();
         }, function ($memorizedRole) {
             return $memorizedRole->id == $this->attributes['role_id'];
         });

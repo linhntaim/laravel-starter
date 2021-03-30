@@ -9,7 +9,7 @@ namespace App\ModelResources;
 use App\Models\ActivityLog;
 
 /**
- * Class ActivityLogOfAdminResource
+ * Class ActivityLogAdminResource
  * @package App\ModelResources
  * @mixin ActivityLog
  */

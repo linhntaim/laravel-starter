@@ -4,6 +4,10 @@
  * Base - Any modification needs to be approved, except the space inside the block of TODO
  */
 
+// TODO:
+
+// TODO
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,6 +21,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::group([
+    // TODO:
+
+    // TODO
+], function () {
+    // TODO:
+
+    // TODO
 });

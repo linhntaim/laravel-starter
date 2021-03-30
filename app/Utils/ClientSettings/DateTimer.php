@@ -279,39 +279,44 @@ class DateTimer
         return trans($this->transShortTime, $bags, $this->locale);
     }
 
-    public function compound($func1 = DateTimer::SHORT_DATE_FUNCTION, $separation = ' ', $func2 = DateTimer::SHORT_TIME_FUNCTION, $time = 'now')
+    public function compound($func1 = DateTimer::SHORT_DATE_FUNCTION, $separation = ' ', $func2 = DateTimer::SHORT_TIME_FUNCTION, $time = 'now', $start = DateTimer::DAY_TYPE_NONE)
     {
         $allowedFunctions = [static::LONG_DATE_FUNCTION, static::LONG_TIME_FUNCTION, static::SHORT_DATE_FUNCTION, static::SHORT_TIME_FUNCTION];
         if (!in_array($func1, $allowedFunctions) || !in_array($func2, $allowedFunctions)) {
             return null;
         }
-        $bags = $this->getBags($time);
+        $bags = $this->getBags($time, $start);
         return sprintf('%s%s%s', call_user_func([$this, $func1 . 'FromBags'], $bags), $separation, call_user_func([$this, $func2 . 'FromBags'], $bags));
     }
 
-    public function longDate($time = 'now')
+    public function longDate($time = 'now', $start = DateTimer::DAY_TYPE_NONE)
     {
-        return $this->longDateFromBags($this->getBags($time));
+        return $this->longDateFromBags($this->getBags($time, $start));
     }
 
-    public function shortDate($time = 'now')
+    public function shortDate($time = 'now', $start = DateTimer::DAY_TYPE_NONE)
     {
-        return $this->shortDateFromBags($this->getBags($time));
+        return $this->shortDateFromBags($this->getBags($time, $start));
     }
 
-    public function shortMonth($time = 'now')
+    public function shortMonth($time = 'now', $start = DateTimer::DAY_TYPE_NONE)
     {
-        return $this->shortMonthFromBags($this->getBags($time));
+        return $this->shortMonthFromBags($this->getBags($time, $start));
     }
 
-    public function longTime($time = 'now')
+    public function longTime($time = 'now', $start = DateTimer::DAY_TYPE_NONE)
     {
-        return $this->longTimeFromBags($this->getBags($time));
+        return $this->longTimeFromBags($this->getBags($time, $start));
     }
 
-    public function shortTime($time = 'now')
+    public function shortTime($time = 'now', $start = DateTimer::DAY_TYPE_NONE)
     {
-        return $this->shortTimeFromBags($this->getBags($time));
+        return $this->shortTimeFromBags($this->getBags($time, $start));
+    }
+
+    public function custom($name, $time = 'now', $start = DateTimer::DAY_TYPE_NONE)
+    {
+        return trans('datetime.custom_formats.' . $name, $this->getBags($time, $start), $this->locale);
     }
 
     public function compoundFormat($func1, $separation, $func2)

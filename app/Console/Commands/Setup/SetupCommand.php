@@ -8,42 +8,49 @@ namespace App\Console\Commands\Setup;
 
 class SetupCommand extends Command
 {
-    protected $signature = 'setup {--u} {--f} {--seed-dummy} {--seed-test} {--skip=*}';
+    protected $signature = 'setup {--u} {--f} {--seed-dummy} {--seed-test} {--skip=*} {--only=*}';
 
     protected function skipped()
     {
         return $this->option('skip');
     }
 
+    protected function only()
+    {
+        return $this->option('only');
+    }
+
     protected function goInstalling()
     {
         $skipped = $this->skipped();
+        $only = $this->only();
+        $hasOnly = count($only) > 0;
         $forced = $this->forced();
-        if (!in_array('web-server', $skipped)) {
+        if (!in_array('web-server', $skipped) && (!$hasOnly || in_array('web-server', $only))) {
             $this->call('setup:web-server', $forced ? [
                 '--f' => true,
             ] : []);
             $this->lineBreak();
         }
-        if (!in_array('packages', $skipped)) {
+        if (!in_array('packages', $skipped) && (!$hasOnly || in_array('packages', $only))) {
             $this->call('setup:packages', $forced ? [
                 '--f' => true,
             ] : []);
             $this->lineBreak();
         }
-        if (!in_array('key:generate', $skipped)) {
+        if (!in_array('key:generate', $skipped) && (!$hasOnly || in_array('key:generate', $only))) {
             $this->call('setup:key:generate', $forced ? [
                 '--f' => true,
             ] : []);
             $this->lineBreak();
         }
-        if (!in_array('storage:link', $skipped)) {
+        if (!in_array('storage:link', $skipped) && (!$hasOnly || in_array('storage:link', $only))) {
             $this->call('setup:storage:link', $forced ? [
                 '--f' => true,
             ] : []);
             $this->lineBreak();
         }
-        if (!in_array('migrate', $skipped)) {
+        if (!in_array('migrate', $skipped) && (!$hasOnly || in_array('migrate', $only))) {
             $this->call('setup:migrate', $forced ? [
                 '--f' => true,
             ] : []);

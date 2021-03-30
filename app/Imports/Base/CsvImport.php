@@ -29,6 +29,11 @@ class CsvImport extends Import
         return [];
     }
 
+    protected function csvExtraHeaders()
+    {
+        return [];
+    }
+
     protected function csvBeforeImporting($reads)
     {
     }
@@ -42,10 +47,9 @@ class CsvImport extends Import
         return $read;
     }
 
-    public function import()
+    public function importing()
     {
         $this->csvImport();
-        parent::import();
     }
 
     protected function csvImport()
@@ -54,7 +58,7 @@ class CsvImport extends Import
             $this->filer->fReadDisableCustomException($this->excludedCustomExceptions);
         }
         if (!empty($headers = $this->csvHeaders())) {
-            $this->filer->fReadSetMatchedHeaders($headers);
+            $this->filer->fReadSetMatchedHeaders($headers, $this->csvExtraHeaders());
         }
         $this->filer->fReadSkipHeader($this->headerSkipped)
             ->fStartReading()

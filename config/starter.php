@@ -4,6 +4,15 @@ return [
     'app' => [
         'id' => env('APP_ID', 'base'),
         'version' => env('APP_VERSION', '1.0.0'),
+        'html_index' => [
+            'file_names' => [
+                'index.html',
+                'index.htm',
+            ],
+            'folder_names' => [
+                'admin',
+            ],
+        ],
     ],
     'public_path' => env('PUBLIC_PATH'),
     'passport' => [
@@ -52,6 +61,15 @@ return [
     ],
     'force_common_exception' => (bool)env('FORCE_COMMON_EXCEPTION', false),
     'handled_file' => [
+        'encryption' => [
+            'enabled' => (bool)env('HANDLED_FILE_ENCRYPTION_ENABLED', false),
+            'encrypter' => App\Utils\HandledFiles\Storage\Encrypters\FileVaultEncrypter::class,
+        ],
+        'scan' => [
+            'enabled' => (bool)env('HANDLED_FILE_SCAN_ENABLED', false),
+            'disk' => env('HANDLED_FILE_SCAN_DISK', 'sftp'),
+            'scanner' => App\Utils\HandledFiles\Storage\Scanners\FSecureScanner::class,
+        ],
         'cloud' => [
             'enabled' => (bool)env('HANDLED_FILE_CLOUD_ENABLED', false),
             'only' => (bool)env('HANDLED_FILE_CLOUD_ONLY', false),
@@ -77,9 +95,9 @@ return [
     'clients' => [
         env('APP_ID', 'base') => [
             'admin' => [
-                'name' => env('CLIENT_ADMIN_NAME'),
-                'key' => env('CLIENT_ADMIN_KEY'),
-                'url' => env('CLIENT_ADMIN_URL'),
+                'app_name' => env('CLIENT_ADMIN_NAME'),
+                'app_key' => env('CLIENT_ADMIN_KEY'),
+                'app_url' => env('CLIENT_ADMIN_URL'),
                 'locale' => 'ja',
                 'country' => 'JP',
                 'timezone' => 'Asia/Tokyo',
@@ -97,9 +115,9 @@ return [
                 ],
             ],
             'home' => [
-                'name' => env('CLIENT_HOME_NAME'),
-                'key' => env('CLIENT_HOME_KEY'),
-                'url' => env('CLIENT_HOME_URL'),
+                'app_name' => env('CLIENT_HOME_NAME'),
+                'app_key' => env('CLIENT_HOME_KEY'),
+                'app_url' => env('CLIENT_HOME_URL'),
                 'locale' => 'ja',
                 'country' => 'JP',
                 'timezone' => 'Asia/Tokyo',
@@ -117,9 +135,9 @@ return [
                 ],
             ],
             'common' => [
-                'name' => env('CLIENT_COMMON_NAME'),
-                'key' => env('CLIENT_COMMON_KEY'),
-                'url' => env('CLIENT_COMMON_URL'),
+                'app_name' => env('CLIENT_COMMON_NAME'),
+                'app_key' => env('CLIENT_COMMON_KEY'),
+                'app_url' => env('CLIENT_COMMON_URL'),
                 'locale' => 'ja',
                 'country' => 'JP',
                 'timezone' => 'Asia/Tokyo',

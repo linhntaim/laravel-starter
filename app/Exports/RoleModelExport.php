@@ -15,17 +15,14 @@ class RoleModelExport extends ModelExport
 {
     const NAME = 'role';
 
-    protected $search;
-
-    public function __construct()
+    protected function modelRepositoryClass()
     {
-        parent::__construct();
+        return RoleRepository::class;
+    }
 
-        $this->modelRepository = new RoleRepository();
-        $this->setTemporaryModelResourceClass(
-            ExportedRoleResource::class,
-            $this->modelRepository->modelClass()
-        );
+    protected function modelResourceClass()
+    {
+        return ExportedRoleResource::class;
     }
 
     public function csvHeaders()

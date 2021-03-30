@@ -29,11 +29,10 @@ abstract class ByTypeRepository extends ModelRepository
         return parent::batchInsert($attributes);
     }
 
-    public function batchInsertWithIgnore($attributes)
+    protected function batchInsertAdd($attributes)
     {
         $attributes['type'] = $this->type;
-
-        return parent::batchInsertWithIgnore($attributes);
+        return parent::batchInsertAdd($attributes);
     }
 
     public function createWithAttributes(array $attributes = [])

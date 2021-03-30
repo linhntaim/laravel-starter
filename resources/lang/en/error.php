@@ -103,6 +103,9 @@ return [
             'authenticate' => [
                 'unauthenticated' => 'The user credentials were incorrect',
             ],
+            'authorized_with_admin' => [
+                'must_be_admin' => 'The user must be an admin',
+            ],
             // TODO:
 
             // TODO
@@ -135,6 +138,11 @@ return [
             'filer' => [
                 'csv_filer' => [
                     'read_line' => 'Error at line :line',
+                    'read' => ':message (Line :line)',
+                ],
+                'filer' => [
+                    'read_count' => 'Error at count :count',
+                    'read' => ':message (Count :count)',
                 ],
             ],
         ],

@@ -13,12 +13,43 @@ abstract class ModelExport extends Export implements ICsvExport
 {
     use ModelTransformTrait, CsvExportTrait;
 
+    protected $readBatch = 1000;
+
     /**
      * @var ModelRepository
      */
     protected $modelRepository;
 
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->modelRepository = $this->modelRepository();
+        if ($modelResourceClass = $this->modelResourceClass()) {
+            $this->setFixedModelResourceClass($modelResourceClass, $this->modelRepository->modelClass());
+        }
+    }
+
     protected abstract function query();
+
+    /**
+     * @return string
+     */
+    protected abstract function modelRepositoryClass();
+
+    /**
+     * @return ModelRepository|null
+     */
+    private function modelRepository()
+    {
+        $modelRepositoryClass = $this->modelRepositoryClass();
+        return $modelRepositoryClass ? new $modelRepositoryClass() : null;
+    }
+
+    protected function modelResourceClass()
+    {
+        return null;
+    }
 
     public function export()
     {
@@ -27,7 +58,7 @@ abstract class ModelExport extends Export implements ICsvExport
 
     protected function csvExporting()
     {
-        $this->modelRepository->batchReadStart($this->query());
+        $this->modelRepository->batchReadStart($this->query(), $this->readBatch);
         while (($models = $this->modelRepository->batchRead($length, $shouldEnd)) && $length > 0) {
             $this->csvStore($this->modelTransform($models));
             if ($shouldEnd) {

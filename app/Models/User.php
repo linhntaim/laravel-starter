@@ -6,8 +6,10 @@
 
 namespace App\Models;
 
+use App\Configuration;
 use App\ModelResources\UserResource;
 use App\Models\Base\IActivityLog;
+use App\Models\Base\IFromModel;
 use App\Models\Base\IProtected;
 use App\Models\Base\IResource;
 use App\Models\Base\IUser;
@@ -21,12 +23,11 @@ use App\ModelTraits\PassportTrait;
 use App\ModelTraits\ProtectedTrait;
 use App\ModelTraits\ResourceTrait;
 use App\Utils\ClientSettings\Facade;
-use Carbon\Carbon;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Passport\HasApiTokens;
 
@@ -34,12 +35,13 @@ use Laravel\Passport\HasApiTokens;
  * Class User
  * @package App\Models
  * @property int $id
- * @property string $display_name
+ * @property string $username
  * @property string $email
+ * @property string $password
  * @property bool $hasPassword
  * @property PasswordReset $passwordReset
  */
-class User extends Authenticatable implements HasLocalePreference, IUser, IResource, IActivityLog, IProtected
+class User extends Authenticatable implements HasLocalePreference, IUser, IResource, IActivityLog, IProtected, IFromModel
 {
     use HasFactory, Notifiable, NotificationTrait {
         NotificationTrait::notifications insteadof Notifiable;
@@ -66,8 +68,10 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
      * @var array
      */
     protected $fillable = [
+        'username',
         'email',
         'password',
+        'remember_token',
         'password_changed_at',
         'last_accessed_at',
     ];
@@ -75,6 +79,7 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
     protected $visible = [
         'id',
         'email',
+        'username',
         'has_password',
         'ts_last_accessed_at',
         'sd_st_last_accessed_at',
@@ -92,12 +97,15 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
-    public function getResourceClass()
+    protected $resourceClass = UserResource::class;
+
+    public function getPasswordMinLength()
     {
-        return UserResource::class;
+        return Configuration::PASSWORD_MIN_LENGTH;
     }
 
     public static function getProtectedKey()
@@ -171,6 +179,11 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
 
     #endregion
 
+    public function getId()
+    {
+        return $this->getKey();
+    }
+
     public function preferredEmail()
     {
         return $this->email;
@@ -178,7 +191,9 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
 
     public function preferredName()
     {
-        return Str::before($this->preferredEmail(), '@');
+        return isset($this->attributes['username']) ?
+            $this->attributes['username']
+            : Str::before($this->preferredEmail(), '@');
     }
 
     public function preferredAvatarUrl()

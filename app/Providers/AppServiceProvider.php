@@ -64,8 +64,6 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        Facade::autoFetch();
-
         mb_detect_order([
             'UTF-8',
             'UTF-7',

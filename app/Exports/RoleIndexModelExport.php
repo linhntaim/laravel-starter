@@ -14,17 +14,14 @@ class RoleIndexModelExport extends IndexModelExport
 {
     const NAME = 'role';
 
-    protected $search;
-
-    public function __construct($search = [], $sortBy = null, $sortOrder = 'asc')
+    protected function modelRepositoryClass()
     {
-        parent::__construct($search, $sortBy, $sortOrder);
+        return RoleRepository::class;
+    }
 
-        $this->modelRepository = new RoleRepository();
-        $this->setTemporaryModelResourceClass(
-            ExportedRoleResource::class,
-            $this->modelRepository->modelClass()
-        );
+    protected function modelResourceClass()
+    {
+        return ExportedRoleResource::class;
     }
 
     public function csvHeaders()

@@ -10,5 +10,7 @@ use App\Http\Controllers\Api\Auth\LogoutController as BaseLogoutController;
 
 class LogoutController extends BaseLogoutController
 {
+    // TODO:
 
+    // TODO
 }

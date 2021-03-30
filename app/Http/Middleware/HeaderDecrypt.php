@@ -21,7 +21,7 @@ class HeaderDecrypt
             if (isset($clientConfig['header_encrypt_excepts'])) {
                 $headerEncryptExcepts = array_merge($headerEncryptExcepts, $clientConfig['header_encrypt_excepts']);
             }
-            $secret = $clientConfig['key'];
+            $secret = $clientConfig['app_key'];
             foreach ($headers as $header) {
                 if ($request->hasHeader($header)
                     && !in_array($header, $headerEncryptExcepts)

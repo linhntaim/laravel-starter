@@ -33,9 +33,7 @@ class InlineStorage extends Storage implements IFileStorage, IUrlStorage, IRespo
             $content = $file->getContent();
         }
 
-        $this->inline = base64_encode($content);
-
-        return $this;
+        return $this->setContent($content);
     }
 
     /**
@@ -63,6 +61,12 @@ class InlineStorage extends Storage implements IFileStorage, IUrlStorage, IRespo
         return $this->mime;
     }
 
+    public function setContent($content)
+    {
+        $this->inline = base64_encode($content);
+        return $this;
+    }
+
     public function getContent()
     {
         return base64_decode($this->inline);
@@ -88,6 +92,6 @@ class InlineStorage extends Storage implements IFileStorage, IUrlStorage, IRespo
             echo $this->getContent();
         }, $name, array_merge([
             'Content-Type' => $mime,
-        ]));
+        ], $headers));
     }
 }
