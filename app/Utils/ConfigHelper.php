@@ -48,6 +48,12 @@ class ConfigHelper
         return static::get('emails.tested');
     }
 
+    public static function getWebResponseStatus($defaultStatus = Configuration::HTTP_RESPONSE_STATUS_OK)
+    {
+        return static::get('web_response_ok') ?
+            Configuration::HTTP_RESPONSE_STATUS_OK : $defaultStatus;
+    }
+
     public static function getApiResponseStatus($defaultStatus = Configuration::HTTP_RESPONSE_STATUS_OK)
     {
         return static::get('api_response_ok') ?

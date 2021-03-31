@@ -55,6 +55,7 @@ return [
         'max_attempts' => (int)env('THROTTLE_REQUEST_MAX_ATTEMPTS', 60),
         'decay_minutes' => (int)env('THROTTLE_REQUEST_DECAY_MINUTES', 1),
     ],
+    'web_response_ok' => (bool)env('WEB_RESPONSE_OK', env('RESPONSE_OK', false)),
     'api_response_ok' => (bool)env('API_RESPONSE_OK', env('RESPONSE_OK', false)),
     'api_response_headers' => [
         'Content-Type' => 'application/json; charset=utf-8',

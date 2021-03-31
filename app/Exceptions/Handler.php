@@ -72,12 +72,26 @@ class Handler extends ExceptionHandler
                     'errors' => new ViewErrorBag,
                     'exception' => $e,
                 ],
-                $e->getStatusCode(),
+                ConfigHelper::getWebResponseStatus($e->getStatusCode()),
                 $e->getHeaders()
             );
         }
 
-        return parent::renderHttpException($e);
+        $this->registerErrorViewPaths();
+
+        if (view()->exists($view = $this->getHttpExceptionView($e))) {
+            return response()->view(
+                $view,
+                [
+                    'errors' => new ViewErrorBag,
+                    'exception' => $e,
+                ],
+                ConfigHelper::getWebResponseStatus($e->getStatusCode()),
+                $e->getHeaders()
+            );
+        }
+
+        return $this->convertExceptionToResponse($e);
     }
 
     protected function renderViewShare()
