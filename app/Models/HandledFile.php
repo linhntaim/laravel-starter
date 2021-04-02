@@ -127,10 +127,10 @@ class HandledFile extends Model
         if (!$this->ready || !$this->scanned) {
             return null;
         }
-        if (!$this->public) {
+        if (!$this->public || $this->encrypted) {
             return route('account.handled_file.show', ['id' => $this->id]) . '?_inline=1';
         }
-        if ($this->encrypted || $this->inline) {
+        if ($this->inline) {
             return route('handled_file.show', ['id' => $this->id]) . '?_inline=1';
         }
         return $this->tryStorage(

@@ -48,6 +48,18 @@ class Controller extends BaseController
         return response()->file($file, $headers);
     }
 
+    protected function responseFileStream($file, array $headers = [])
+    {
+        $this->transactionComplete();
+        if ($file instanceof HandledFile) {
+            return $file->responseFile($headers);
+        }
+        $headers['Content-Type'] = mime_content_type($file);
+        return response()->stream(function () use ($file) {
+            echo file_get_contents($file);
+        }, 200, $headers);
+    }
+
     protected function responseDownload($file, $name = null, array $headers = [])
     {
         $this->transactionComplete();
