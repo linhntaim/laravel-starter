@@ -42,7 +42,7 @@ class StringHelper
 
     public static function toUtf8($text)
     {
-        if (empty($text)) return '';
+        if (trim($text) === '') return '';
 
         $utf8Encoding = 'UTF-8';
         $currentEncoding = mb_detect_encoding($text);

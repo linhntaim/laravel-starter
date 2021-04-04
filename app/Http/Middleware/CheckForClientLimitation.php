@@ -18,7 +18,8 @@ class CheckForClientLimitation
      * @var array
      */
     protected $except = [
-        '/api/prerequisite',
+        '/api/*/prerequisite',
+        '/api/*/device/current',
     ];
 
     public function handle(Request $request, Closure $next)
