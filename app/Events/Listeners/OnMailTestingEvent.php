@@ -17,6 +17,6 @@ class OnMailTestingEvent extends NowListener
      */
     public function go($event)
     {
-        MailHelper::sendTestMailNow($event->getSubject());
+        MailHelper::sendTestMailNow($event->getSubject(), $event->getTemplatePath());
     }
 }

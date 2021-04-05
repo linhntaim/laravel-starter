@@ -10,9 +10,12 @@ class MailTestingEvent extends Event
 {
     protected $subject;
 
-    public function __construct($subject = 'Tested')
+    protected $templatePath;
+
+    public function __construct($subject = 'Tested', $templatePath = 'test')
     {
         $this->subject = $subject;
+        $this->templatePath = $templatePath;
     }
 
     /**
@@ -21,5 +24,13 @@ class MailTestingEvent extends Event
     public function getSubject()
     {
         return $this->subject;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTemplatePath()
+    {
+        return $this->templatePath;
     }
 }

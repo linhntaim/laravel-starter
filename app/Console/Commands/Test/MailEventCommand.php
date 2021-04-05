@@ -11,10 +11,10 @@ use App\Events\MailTestingEvent;
 
 class MailEventCommand extends Command
 {
-    protected $signature = 'test:mail-event {--subject=Tested}';
+    protected $signature = 'test:mail-event {--subject=Tested} {--template_path=test}';
 
     protected function go()
     {
-        event(new MailTestingEvent($this->option('subject')));
+        event(new MailTestingEvent($this->option('subject'), $this->option('template_path')));
     }
 }

@@ -58,13 +58,13 @@ class MailHelper
         return static::send(new TemplateNowMailable($templatePath, $templateParams, $templateLocalized));
     }
 
-    public static function sendTestMail()
+    public static function sendTestMail($subject = 'Tested', $templatePath = 'test')
     {
         $emailTested = ConfigHelper::getTestedMail();
         return static::sendWithTemplate(
-            'test',
+            $templatePath,
             [
-                TemplateMailable::EMAIL_SUBJECT => 'Tested',
+                TemplateMailable::EMAIL_SUBJECT => $subject,
                 TemplateMailable::EMAIL_TO => $emailTested['address'],
                 TemplateMailable::EMAIL_TO_NAME => $emailTested['name'],
             ],
@@ -72,11 +72,11 @@ class MailHelper
         );
     }
 
-    public static function sendTestMailNow($subject = 'Tested')
+    public static function sendTestMailNow($subject = 'Tested', $templatePath = 'test')
     {
         $emailTested = ConfigHelper::getTestedMail();
         return static::sendNowWithTemplate(
-            'test',
+            $templatePath,
             [
                 TemplateMailable::EMAIL_SUBJECT => $subject,
                 TemplateMailable::EMAIL_TO => $emailTested['address'],

@@ -14,6 +14,7 @@ use App\Utils\ClientSettings\Facade;
 use App\Utils\LogHelper;
 use App\Utils\RateLimiterTrait;
 use Illuminate\Mail\Mailable;
+use Swift_DependencyContainer;
 
 class TemplateNowMailable extends Mailable
 {
@@ -52,15 +53,16 @@ class TemplateNowMailable extends Mailable
         }
     }
 
-    protected function notDefaultCharset()
+    protected function usingDefaultCharset()
     {
-        return $this->charset != TemplateNowMailable::DEFAULT_CHARSET;
+        return $this->charset == TemplateNowMailable::DEFAULT_CHARSET;
     }
 
     protected function convertCharset($text)
     {
-        return !is_null($text) && $this->notDefaultCharset() ?
-            mb_convert_encoding($text, $this->charset, TemplateNowMailable::DEFAULT_CHARSET) : $text;
+        return $text;
+//        return !is_null($text) && $this->notDefaultCharset() ?
+//            mb_convert_encoding($text, $this->charset, TemplateNowMailable::DEFAULT_CHARSET) : $text;
     }
 
     public function subject($subject)
@@ -87,6 +89,21 @@ class TemplateNowMailable extends Mailable
 
     public function build()
     {
+        if ($this->usingDefaultCharset()) {
+            Swift_DependencyContainer::getInstance()
+                ->register('mime.qpheaderencoder')
+                ->asNewInstanceOf('Swift_Mime_HeaderEncoder_QpHeaderEncoder')
+                ->withDependencies(['mime.charstream']);
+        } else {
+            Swift_DependencyContainer::getInstance()
+                ->register('mime.qpheaderencoder')
+                ->asAliasOf('mime.base64headerencoder');
+            $this->callbacks[] = function (\Swift_Message $message) {
+                $message->setCharset($this->charset);
+                $message->getHeaders()->setCharset($this->charset);
+            };
+        }
+
         if (isset($this->templateParams[static::EMAIL_FROM])) {
             if (empty($this->templateParams[static::EMAIL_FROM])) {
                 throw new AppException('From email has been not set');
@@ -119,12 +136,6 @@ class TemplateNowMailable extends Mailable
             } else {
                 $this->to($this->templateParams[static::EMAIL_TO]);
             }
-        }
-
-        if ($this->notDefaultCharset()) {
-            $this->callbacks[] = function ($message) {
-                $message->setCharset($this->charset);
-            };
         }
 
         $this->subject(
