@@ -52,6 +52,22 @@ class TemplateNowMailable extends Mailable
         }
     }
 
+    protected function notDefaultCharset()
+    {
+        return $this->charset != TemplateNowMailable::DEFAULT_CHARSET;
+    }
+
+    protected function convertCharset($text)
+    {
+        return !is_null($text) && $this->notDefaultCharset() ?
+            mb_convert_encoding($text, $this->charset, TemplateNowMailable::DEFAULT_CHARSET) : $text;
+    }
+
+    public function subject($subject)
+    {
+        return parent::subject($this->convertCharset($subject));
+    }
+
     protected function getTemplatePath()
     {
         return sprintf('%semails.%s%s',
@@ -76,7 +92,7 @@ class TemplateNowMailable extends Mailable
                 throw new AppException('From email has been not set');
             }
             if (isset($this->templateParams[static::EMAIL_FROM_NAME])) {
-                $this->from($this->templateParams[static::EMAIL_FROM], $this->templateParams[static::EMAIL_FROM_NAME]);
+                $this->from($this->templateParams[static::EMAIL_FROM], $this->convertCharset($this->templateParams[static::EMAIL_FROM_NAME]));
             } else {
                 $this->from($this->templateParams[static::EMAIL_FROM]);
             }
@@ -85,7 +101,7 @@ class TemplateNowMailable extends Mailable
             if (empty($noReplyMail['address'])) {
                 throw new AppException('No-reply email has been not set');
             }
-            $this->from($noReplyMail['address'], $noReplyMail['name']);
+            $this->from($noReplyMail['address'], $this->convertCharset($noReplyMail['name']));
         }
 
         $emailTested = ConfigHelper::getTestedMail();
@@ -93,13 +109,13 @@ class TemplateNowMailable extends Mailable
             if (empty($emailTested['address'])) {
                 throw new AppException('Tested email has been not set');
             }
-            $this->to($emailTested['address'], $emailTested['name']);
+            $this->to($emailTested['address'], $this->convertCharset($emailTested['name']));
         } else {
             if (empty($this->templateParams[static::EMAIL_TO])) {
                 throw new AppException('To email has been not set');
             }
             if (isset($this->templateParams[static::EMAIL_TO_NAME])) {
-                $this->to($this->templateParams[static::EMAIL_TO], $this->templateParams[static::EMAIL_TO_NAME]);
+                $this->to($this->templateParams[static::EMAIL_TO], $this->convertCharset($this->templateParams[static::EMAIL_TO_NAME]));
             } else {
                 $this->to($this->templateParams[static::EMAIL_TO]);
             }
@@ -118,22 +134,6 @@ class TemplateNowMailable extends Mailable
         );
 
         $this->view($this->getTemplatePath(), $this->getTemplateParams());
-    }
-
-    protected function notDefaultCharset()
-    {
-        return $this->charset != TemplateNowMailable::DEFAULT_CHARSET;
-    }
-
-    protected function convertCharset($text)
-    {
-        return $this->notDefaultCharset() ?
-            mb_convert_encoding($text, $this->charset, TemplateNowMailable::DEFAULT_CHARSET) : $text;
-    }
-
-    public function subject($subject)
-    {
-        return parent::subject($this->convertCharset($subject));
     }
 
     public function send($mailer)
