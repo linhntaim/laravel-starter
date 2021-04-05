@@ -19,11 +19,15 @@ class TemplateNowMailable extends Mailable
 {
     use ClassTrait, RateLimiterTrait, Capture;
 
+    const DEFAULT_CHARSET = 'utf-8';
+
     const EMAIL_FROM = 'x_email_from';
     const EMAIL_FROM_NAME = 'x_email_from_name';
     const EMAIL_TO = 'x_email_to';
     const EMAIL_TO_NAME = 'x_email_to_name';
     const EMAIL_SUBJECT = 'x_email_subject';
+
+    protected $charset;
 
     protected $templateName;
 
@@ -33,8 +37,9 @@ class TemplateNowMailable extends Mailable
 
     protected $templateNamespace;
 
-    public function __construct($templateName, array $templateParams = [], $templateLocalized = true, $templateLocale = null, $templateNamespace = null)
+    public function __construct($templateName, array $templateParams = [], $templateLocalized = true, $templateLocale = null, $templateNamespace = null, $charset = TemplateNowMailable::DEFAULT_CHARSET)
     {
+        $this->charset = is_null($charset) ? ConfigHelper::get('emails.send_charset') : $charset;
         $this->templateName = $templateName;
         $this->templateParams = $templateParams;
         $this->templateLocalized = $templateLocalized;
@@ -98,6 +103,12 @@ class TemplateNowMailable extends Mailable
             }
         }
 
+        if ($this->notDefaultCharset()) {
+            $this->callbacks[] = function ($message) {
+                $message->setCharset($this->charset);
+            };
+        }
+
         $this->subject(
             isset($this->templateParams[static::EMAIL_SUBJECT]) ?
                 $this->templateParams[static::EMAIL_SUBJECT]
@@ -105,6 +116,22 @@ class TemplateNowMailable extends Mailable
         );
 
         $this->view($this->getTemplatePath(), $this->templateParams);
+    }
+
+    protected function notDefaultCharset()
+    {
+        return $this->charset != TemplateNowMailable::DEFAULT_CHARSET;
+    }
+
+    protected function convertCharset($text)
+    {
+        return $this->notDefaultCharset() ?
+            mb_convert_encoding($text, $this->charset, TemplateNowMailable::DEFAULT_CHARSET) : $text;
+    }
+
+    public function subject($subject)
+    {
+        return parent::subject($this->convertCharset($subject));
     }
 
     public function send($mailer)
