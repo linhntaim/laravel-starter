@@ -173,12 +173,20 @@ class HandledFileRepository extends ModelRepository
                 $options['scan'] = true;
             }
             $this->scan = false;
+        } else {
+            if (!ConfigHelper::get('handled_file.scan.enabled')) {
+                unset($options['scan']);
+            }
         }
         if ($this->encrypt) {
             if (ConfigHelper::get('handled_file.encryption.enabled')) {
                 $options['encrypt'] = true;
             }
             $this->encrypt = false;
+        } else {
+            if (!ConfigHelper::get('handled_file.encryption.enabled')) {
+                unset($options['encrypt']);
+            }
         }
         if ($this->public) {
             $options['public'] = true;
@@ -189,6 +197,10 @@ class HandledFileRepository extends ModelRepository
                 $options['cloud'] = true;
             }
             $this->cloud = false;
+        } else {
+            if (!ConfigHelper::get('handled_file.cloud.enabled')) {
+                unset($options['cloud']);
+            }
         }
         if ($this->inline) {
             $options['inline'] = true;
