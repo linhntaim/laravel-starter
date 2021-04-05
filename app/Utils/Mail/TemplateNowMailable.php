@@ -48,14 +48,8 @@ class TemplateNowMailable extends Mailable
         $this->settingsCapture();
 
         if ($templateLocale) {
-            $this->locale = $templateLocale;
+            $this->setLocale($templateLocale);
         }
-    }
-
-    public function setLocale(string $locale)
-    {
-        $this->locale = $locale;
-        return $this;
     }
 
     protected function getTemplatePath()
@@ -65,6 +59,14 @@ class TemplateNowMailable extends Mailable
             $this->templateName,
             ($this->templateLocalized ? '.' . $this->locale : '')
         );
+    }
+
+    protected function getTemplateParams()
+    {
+        return array_merge($this->templateParams, [
+            'locale' => $this->locale,
+            'charset' => $this->charset,
+        ]);
     }
 
     public function build()
@@ -115,7 +117,7 @@ class TemplateNowMailable extends Mailable
                 : $this->__transWithModule('default_subject', 'label', ['app_name' => Facade::getAppName()])
         );
 
-        $this->view($this->getTemplatePath(), $this->templateParams);
+        $this->view($this->getTemplatePath(), $this->getTemplateParams());
     }
 
     protected function notDefaultCharset()
