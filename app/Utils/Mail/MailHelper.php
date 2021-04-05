@@ -72,13 +72,13 @@ class MailHelper
         );
     }
 
-    public static function sendTestMailNow()
+    public static function sendTestMailNow($subject = 'Tested')
     {
         $emailTested = ConfigHelper::getTestedMail();
         return static::sendNowWithTemplate(
             'test',
             [
-                TemplateMailable::EMAIL_SUBJECT => 'Tested',
+                TemplateMailable::EMAIL_SUBJECT => $subject,
                 TemplateMailable::EMAIL_TO => $emailTested['address'],
                 TemplateMailable::EMAIL_TO_NAME => $emailTested['name'],
             ],
