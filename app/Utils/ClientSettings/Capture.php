@@ -26,4 +26,10 @@ trait Capture
         }
         return $callback();
     }
+
+    public function setLocale(string $locale)
+    {
+        $this->locale = $locale;
+        return $this;
+    }
 }

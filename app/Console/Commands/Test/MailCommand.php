@@ -11,10 +11,10 @@ use App\Utils\Mail\MailHelper;
 
 class MailCommand extends Command
 {
-    protected $signature = 'test:mail';
+    protected $signature = 'test:mail {--subject=Tested} {--template_path=test}';
 
     protected function go()
     {
-        MailHelper::sendTestMailNow();
+        MailHelper::sendTestMailNow($this->option('subject'), $this->option('template_path'));
     }
 }
