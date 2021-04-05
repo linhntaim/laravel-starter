@@ -171,6 +171,8 @@ class HandledFileRepository extends ModelRepository
         if ($this->scan) {
             if (ConfigHelper::get('handled_file.scan.enabled')) {
                 $options['scan'] = true;
+            } else {
+                unset($options['scan']);
             }
             $this->scan = false;
         } else {
@@ -181,12 +183,18 @@ class HandledFileRepository extends ModelRepository
         if ($this->encrypt) {
             if (ConfigHelper::get('handled_file.encryption.enabled')) {
                 $options['encrypt'] = true;
+            } else {
+                unset($options['encrypt']);
             }
             $this->encrypt = false;
         } else {
             if (!ConfigHelper::get('handled_file.encryption.enabled')) {
                 unset($options['encrypt']);
             }
+        }
+        if ($this->inline) {
+            $options['inline'] = true;
+            $this->inline = false;
         }
         if ($this->public) {
             $options['public'] = true;
@@ -195,16 +203,14 @@ class HandledFileRepository extends ModelRepository
         if ($this->cloud) {
             if (ConfigHelper::get('handled_file.cloud.enabled')) {
                 $options['cloud'] = true;
+            } else {
+                unset($options['cloud']);
             }
             $this->cloud = false;
         } else {
             if (!ConfigHelper::get('handled_file.cloud.enabled')) {
                 unset($options['cloud']);
             }
-        }
-        if ($this->inline) {
-            $options['inline'] = true;
-            $this->inline = false;
         }
 
         $filer = $this->handleFilerWithOptions($filer, $options)->setName($name);
