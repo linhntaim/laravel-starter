@@ -2,9 +2,11 @@
 
 namespace App\Http\Middleware;
 
+use App\Exceptions\AppException;
 use App\Http\Requests\Request;
 use App\Utils\ConfigHelper;
 use App\Utils\CryptoJs\AES;
+use App\Utils\LogHelper;
 use Closure;
 
 class HeaderDecrypt
@@ -21,12 +23,22 @@ class HeaderDecrypt
             if (isset($clientConfig['header_encrypt_excepts'])) {
                 $headerEncryptExcepts = array_merge($headerEncryptExcepts, $clientConfig['header_encrypt_excepts']);
             }
-            $secret = $clientConfig['app_key'];
+            $secret = (function ($secret) {
+                $break64 = mb_strlen('base64:');
+                if (mb_substr($secret, 0, $break64) == 'base64:') {
+                    return utf8_encode(base64_decode(mb_substr($secret, $break64)));
+                }
+                return $secret;
+            })($clientConfig['app_key']);
             foreach ($headers as $header) {
                 if ($request->hasHeader($header)
                     && !in_array($header, $headerEncryptExcepts)
                     && !empty($headerValue = $request->header($header))) {
-                    $request->headers->set($header, AES::decrypt($headerValue, $secret));
+                    if ($headerValue = AES::decrypt(base64_decode($headerValue), $secret)) {
+                        $request->headers->set($header, $headerValue);
+                    } else {
+                        LogHelper::error(new AppException(sprintf('Header [%s] cannot be decrypted.', $header)));
+                    }
                 }
             }
         }

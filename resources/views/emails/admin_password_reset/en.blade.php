@@ -1,7 +1,7 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ $locale }}">
 <head>
-    <meta charset="utf-8">
+    <meta charset="{{ $charset }}">
     <title></title>
 </head>
 <body>

@@ -11,7 +11,6 @@ use App\Utils\ClientSettings\Manager as ClientSettingsManager;
 use App\Utils\ConfigHelper;
 use App\Utils\ExtraActions\FilterAction;
 use App\Utils\ExtraActions\HookAction;
-use App\Utils\ClientSettings\Facade;
 use App\Utils\ExtraActions\ReplaceAction;
 use App\Vendors\Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Facades\URL;
@@ -73,7 +72,7 @@ class AppServiceProvider extends ServiceProvider
             'eucJP-win',
             'SJIS-win',
             'JIS',
-            'ISO-2022-JP'
+            'ISO-2022-JP',
         ]);
     }
 }

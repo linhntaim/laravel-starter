@@ -43,7 +43,12 @@ abstract class LoginController extends AccessTokenController
             $parsedToken = $this->jwt->parse(
                 json_decode($response->getContent(), true)['_data']['access_token']
             );
-            $accessTokenId = $parsedToken->getClaim('jti');
+            $accessTokenId = null;
+            if (method_exists($parsedToken, 'getClaim')) { // support lcobucci/jwt@3.x
+                $accessTokenId = $parsedToken->getClaim('jti');
+            } elseif (method_exists($parsedToken, 'claims')) { // support lcobucci/jwt@4.x
+                $accessTokenId = $parsedToken->claims()->get('jti');;
+            }
             $oAuthImpersonateRepository = new OAuthImpersonateRepository();
             $oAuthImpersonateRepository->pinModel()->getByImpersonateToken($impersonateToken);
             $oAuthImpersonateRepository->updateWithAttributes([

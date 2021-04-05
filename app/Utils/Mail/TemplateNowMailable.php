@@ -14,16 +14,21 @@ use App\Utils\ClientSettings\Facade;
 use App\Utils\LogHelper;
 use App\Utils\RateLimiterTrait;
 use Illuminate\Mail\Mailable;
+use Swift_DependencyContainer;
 
 class TemplateNowMailable extends Mailable
 {
     use ClassTrait, RateLimiterTrait, Capture;
+
+    const DEFAULT_CHARSET = 'utf-8';
 
     const EMAIL_FROM = 'x_email_from';
     const EMAIL_FROM_NAME = 'x_email_from_name';
     const EMAIL_TO = 'x_email_to';
     const EMAIL_TO_NAME = 'x_email_to_name';
     const EMAIL_SUBJECT = 'x_email_subject';
+
+    protected $charset;
 
     protected $templateName;
 
@@ -33,8 +38,9 @@ class TemplateNowMailable extends Mailable
 
     protected $templateNamespace;
 
-    public function __construct($templateName, array $templateParams = [], $templateLocalized = true, $templateLocale = null, $templateNamespace = null)
+    public function __construct($templateName, array $templateParams = [], $templateLocalized = true, $templateLocale = null, $templateNamespace = null, $charset = null)
     {
+        $this->charset = is_null($charset) ? ConfigHelper::get('emails.send_charset') : $charset;
         $this->templateName = $templateName;
         $this->templateParams = $templateParams;
         $this->templateLocalized = $templateLocalized;
@@ -43,14 +49,13 @@ class TemplateNowMailable extends Mailable
         $this->settingsCapture();
 
         if ($templateLocale) {
-            $this->locale = $templateLocale;
+            $this->setLocale($templateLocale);
         }
     }
 
-    public function setLocale(string $locale)
+    protected function usingDefaultCharset()
     {
-        $this->locale = $locale;
-        return $this;
+        return $this->charset == TemplateNowMailable::DEFAULT_CHARSET;
     }
 
     protected function getTemplatePath()
@@ -62,8 +67,31 @@ class TemplateNowMailable extends Mailable
         );
     }
 
+    protected function getTemplateParams()
+    {
+        return array_merge($this->templateParams, [
+            'locale' => $this->locale,
+            'charset' => $this->charset,
+        ]);
+    }
+
     public function build()
     {
+        if ($this->usingDefaultCharset()) {
+            Swift_DependencyContainer::getInstance()
+                ->register('mime.qpheaderencoder')
+                ->asNewInstanceOf('Swift_Mime_HeaderEncoder_QpHeaderEncoder')
+                ->withDependencies(['mime.charstream']);
+        } else {
+            Swift_DependencyContainer::getInstance()
+                ->register('mime.qpheaderencoder')
+                ->asAliasOf('mime.base64headerencoder');
+            $this->callbacks[] = function (\Swift_Message $message) {
+                $message->setCharset($this->charset);
+                $message->getHeaders()->setCharset($this->charset);
+            };
+        }
+
         if (isset($this->templateParams[static::EMAIL_FROM])) {
             if (empty($this->templateParams[static::EMAIL_FROM])) {
                 throw new AppException('From email has been not set');
@@ -104,7 +132,7 @@ class TemplateNowMailable extends Mailable
                 : $this->__transWithModule('default_subject', 'label', ['app_name' => Facade::getAppName()])
         );
 
-        $this->view($this->getTemplatePath(), $this->templateParams);
+        $this->view($this->getTemplatePath(), $this->getTemplateParams());
     }
 
     public function send($mailer)
