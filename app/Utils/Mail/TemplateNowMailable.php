@@ -37,7 +37,7 @@ class TemplateNowMailable extends Mailable
 
     protected $templateNamespace;
 
-    public function __construct($templateName, array $templateParams = [], $templateLocalized = true, $templateLocale = null, $templateNamespace = null, $charset = TemplateNowMailable::DEFAULT_CHARSET)
+    public function __construct($templateName, array $templateParams = [], $templateLocalized = true, $templateLocale = null, $templateNamespace = null, $charset = null)
     {
         $this->charset = is_null($charset) ? ConfigHelper::get('emails.send_charset') : $charset;
         $this->templateName = $templateName;
