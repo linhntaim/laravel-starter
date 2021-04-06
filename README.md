@@ -416,6 +416,7 @@ MAIL_TESTED_TO_NAME=
         - `MAIL_SEND_CHARSET_HEADER=UTF-8,ja:ISO-2022-JP`
         - `MAIL_SEND_CHARSET_HEADER=UTF-8,ja:SJIS`
     - The setting above for Japanese emails is applied only when the current locale of the application is `ja`.
+    - The value of character encoding can be referred [here](https://www.php.net/manual/en/mbstring.supported-encodings.php).
 - **`MAIL_NO_REPLY_*`**: If there is no `from` header set when sending email, the no-reply email account
   (**`MAIL_NO_REPLY_FROM_ADDRESS`** as email address and **`MAIL_NO_REPLY_FROM_NAME`** as name) will be set as
   default `from` header.
