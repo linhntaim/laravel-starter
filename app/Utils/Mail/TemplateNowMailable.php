@@ -20,7 +20,21 @@ class TemplateNowMailable extends Mailable
 {
     use ClassTrait, RateLimiterTrait, Capture;
 
-    const DEFAULT_CHARSET = 'utf-8';
+    const DEFAULT_CHARSET = 'UTF-8';
+
+    const HTML_CHARSETS = [
+        'sjis' => 'SHIFT_JS',
+        'sjis-win' => 'SHIFT_JS',
+        'sjis-mac' => 'SHIFT_JS',
+        'macjapanese' => 'SHIFT_JS',
+        'sjis-mobile#docomo' => 'SHIFT_JS',
+        'sjis-mobile#kddi' => 'SHIFT_JS',
+        'sjis-mobile#softbank' => 'SHIFT_JS',
+        'jis' => 'ISO-2022-JP',
+        'jis-win' => 'ISO-2022-JP',
+        'iso-2022-jp-ms' => 'ISO-2022-JP',
+        'iso-2022-jp-mobile#kddi' => 'ISO-2022-JP',
+    ];
 
     const EMAIL_FROM = 'x_email_from';
     const EMAIL_FROM_NAME = 'x_email_from_name';
@@ -28,7 +42,12 @@ class TemplateNowMailable extends Mailable
     const EMAIL_TO_NAME = 'x_email_to_name';
     const EMAIL_SUBJECT = 'x_email_subject';
 
+    /**
+     * @var string|array
+     */
     protected $charset;
+
+    protected $htmlCharset;
 
     protected $templateName;
 
@@ -55,7 +74,32 @@ class TemplateNowMailable extends Mailable
 
     protected function usingDefaultCharset()
     {
-        return $this->charset == TemplateNowMailable::DEFAULT_CHARSET;
+        return (is_string($this->charset) && strtolower($this->charset) == strtolower(TemplateNowMailable::DEFAULT_CHARSET))
+            || (is_array($this->charset)
+                && strtolower($this->charset['header']) == strtolower(TemplateNowMailable::DEFAULT_CHARSET)
+                && strtolower($this->charset['body']) == strtolower(TemplateNowMailable::DEFAULT_CHARSET));
+    }
+
+    protected function headerCharset()
+    {
+        return is_string($this->charset) ? $this->charset : $this->charset['header'];
+    }
+
+    protected function bodyCharset()
+    {
+        return is_string($this->charset) ? $this->charset : $this->charset['body'];
+    }
+
+    protected function htmlCharset()
+    {
+        if (is_null($this->htmlCharset)) {
+            $this->htmlCharset = (function () {
+                $bodyCharset = $this->bodyCharset();
+                $lowerBodyCharset = strtolower($bodyCharset);
+                return isset(static::HTML_CHARSETS[$lowerBodyCharset]) ? static::HTML_CHARSETS[$lowerBodyCharset] : $bodyCharset;
+            })();
+        }
+        return $this->htmlCharset;
     }
 
     protected function getTemplatePath()
@@ -71,7 +115,7 @@ class TemplateNowMailable extends Mailable
     {
         return array_merge($this->templateParams, [
             'locale' => $this->locale,
-            'charset' => $this->charset,
+            'charset' => $this->htmlCharset(),
         ]);
     }
 
@@ -87,8 +131,8 @@ class TemplateNowMailable extends Mailable
                 ->register('mime.qpheaderencoder')
                 ->asAliasOf('mime.base64headerencoder');
             $this->callbacks[] = function (\Swift_Message $message) {
-                $message->setCharset($this->charset);
-                $message->getHeaders()->setCharset($this->charset);
+                $message->setCharset($this->bodyCharset());
+                $message->getHeaders()->setCharset($this->headerCharset());
             };
         }
 
