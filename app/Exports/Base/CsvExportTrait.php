@@ -66,6 +66,6 @@ trait CsvExportTrait
         $this->csvBeforeExporting()
             ->csvExporting()
             ->csvAfterExporting();
-        return $this->handledFileRepository->usePublic()->createWithFiler($this->csvFiler);
+        return $this->handledFileRepository->createWithFiler($this->csvFiler);
     }
 }
