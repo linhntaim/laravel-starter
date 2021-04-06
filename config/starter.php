@@ -26,7 +26,9 @@ return [
         'send_rate_key' => env('MAIL_SEND_RATE_KEY', 'mailing'),
         'send_rate_per_second' => (int)env('MAIL_SEND_RATE_PER_SECOND', 0),
         'send_rate_wait_for_seconds' => (int)env('MAIL_SEND_RATE_WAIT_FOR_SECONDS', 1),
-        'send_charset' => strtolower(env('MAIL_SEND_CHARSET', 'utf-8')),
+        'send_charset' => env('MAIL_SEND_CHARSET',
+            env('MAIL_SEND_CHARSET_HEADER') || env('MAIL_SEND_CHARSET_BODY') ?
+                ['header' => env('MAIL_SEND_CHARSET_HEADER', 'UTF-8'), 'body' => env('MAIL_SEND_CHARSET_BODY', 'UTF-8')] : 'UTF-8'),
         'no_reply' => [
             'name' => env('MAIL_NO_REPLY_FROM_NAME'),
             'address' => env('MAIL_NO_REPLY_FROM_ADDRESS'),
