@@ -43,7 +43,7 @@ class TemplateNowMailable extends Mailable
     const EMAIL_SUBJECT = 'x_email_subject';
 
     /**
-     * @var string|array
+     * @var array
      */
     protected $charset;
 
@@ -59,7 +59,8 @@ class TemplateNowMailable extends Mailable
 
     public function __construct($templateName, array $templateParams = [], $templateLocalized = true, $templateLocale = null, $templateNamespace = null, $charset = null)
     {
-        $this->charset = is_null($charset) ? ConfigHelper::get('emails.send_charset') : $charset;
+        $this->parseCharset(is_null($charset) ? ConfigHelper::get('emails.send_charset') : $charset);
+
         $this->templateName = $templateName;
         $this->templateParams = $templateParams;
         $this->templateLocalized = $templateLocalized;
@@ -72,22 +73,80 @@ class TemplateNowMailable extends Mailable
         }
     }
 
+    /**
+     * @param string|array $charset
+     */
+    protected function parseCharset($charset)
+    {
+        if (is_string($charset)) {
+            $this->charset = $this->parseCharsetString($charset);
+        } elseif (is_array($charset)) {
+            $this->charset = [
+                'header' => isset($charset['header']) ?
+                    $this->parseCharsetString($charset['header']) : $this->defaultCharset(),
+                'body' => isset($charset['body']) ?
+                    $this->parseCharsetString($charset['body']) : $this->defaultCharset(),
+            ];
+        } else {
+            $this->charset = $this->defaultCharset();
+        }
+    }
+
+    protected function defaultCharset()
+    {
+        return [
+            'default' => static::DEFAULT_CHARSET,
+            'locales' => [],
+        ];
+    }
+
+    /**
+     * @param string $charsetString Sample: "UTF-8,ja:ISO-2022-JP"
+     * @return array
+     */
+    protected function parseCharsetString($charsetString)
+    {
+        $charset = $this->defaultCharset();
+        foreach (explode(',', $charsetString) as $localeCharset) {
+            $localeCharsets = explode(':', $localeCharset, 2);
+            if (!isset($localeCharsets[1])) {
+                if (!empty($localeCharsets[0])) {
+                    $charset['default'] = $localeCharsets[0];
+                }
+            } else {
+                $charset['locales'][$localeCharsets[0]] = $localeCharsets[1];
+            }
+        }
+        return $charset;
+    }
+
     protected function usingDefaultCharset()
     {
-        return (is_string($this->charset) && strtolower($this->charset) == strtolower(TemplateNowMailable::DEFAULT_CHARSET))
-            || (is_array($this->charset)
-                && strtolower($this->charset['header']) == strtolower(TemplateNowMailable::DEFAULT_CHARSET)
-                && strtolower($this->charset['body']) == strtolower(TemplateNowMailable::DEFAULT_CHARSET));
+        return ($this->usingOneCharset()
+                && strtolower($this->getCharset($this->charset)) == strtolower(TemplateNowMailable::DEFAULT_CHARSET))
+            || (!$this->usingOneCharset()
+                && strtolower($this->getCharset($this->charset['header'])) == strtolower(TemplateNowMailable::DEFAULT_CHARSET)
+                && strtolower($this->getCharset($this->charset['body'])) == strtolower(TemplateNowMailable::DEFAULT_CHARSET));
+    }
+
+    protected function usingOneCharset()
+    {
+        return isset($this->charset['default']);
+    }
+
+    protected function getCharset($charset)
+    {
+        return isset($charset['locales'][$this->locale]) ? $charset['locales'][$this->locale] : $charset['default'];
     }
 
     protected function headerCharset()
     {
-        return is_string($this->charset) ? $this->charset : $this->charset['header'];
+        return $this->getCharset($this->usingOneCharset() ? $this->charset : $this->charset['header']);
     }
 
     protected function bodyCharset()
     {
-        return is_string($this->charset) ? $this->charset : $this->charset['body'];
+        return $this->getCharset($this->usingOneCharset() ? $this->charset : $this->charset['body']);
     }
 
     protected function htmlCharset()
