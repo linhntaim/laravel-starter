@@ -39,11 +39,6 @@ class IndexController extends WebController
     protected function defaultView($path = null)
     {
         if (!is_null($path)) $this->abort404();
-        return $this->home();
-    }
-
-    protected function home()
-    {
-        return $this->view('welcome');
+        return $this->viewHome();
     }
 }

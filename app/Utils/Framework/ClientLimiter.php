@@ -10,32 +10,23 @@ use App\Http\Requests\Request;
 use App\ModelRepositories\AppOptionRepository;
 use App\Utils\ClientSettings\DateTimer;
 use App\Utils\ConfigHelper;
-use App\Utils\Helper;
 use App\Utils\AppOptionHelper;
+use App\Utils\IpLimiterTrait;
 
 class ClientLimiter extends FrameworkHandler
 {
+    use IpLimiterTrait;
+
     const NAME = 'limit';
 
     const APP_OPTION_KEY = 'client_limit';
 
-    protected $allowed;
-    protected $denied;
+    /**
+     * @var bool
+     */
     protected $admin;
 
-    public function setAllowed(array $allowed = [])
-    {
-        $this->allowed = $allowed;
-        return $this;
-    }
-
-    public function setDenied(array $denied = [])
-    {
-        $this->denied = $denied;
-        return $this;
-    }
-
-    public function setAdmin(bool $admin = true)
+    public function setAdmin($admin = true)
     {
         $this->admin = $admin;
         return $this;
@@ -81,25 +72,12 @@ class ClientLimiter extends FrameworkHandler
 
     public function canAccess(Request $request, $excepts = [])
     {
-        return ($this->admin && !$request->is('api/admin/*'))
-            || ((empty($this->allowed) || Helper::matchedIps($request->ips(), $this->allowed))
-                && (empty($this->denied) || !Helper::matchedIps($request->ips(), $this->denied)))
-            || $this->except($request, $excepts);
+        return $this->passAdmin($request) || $this->passRule($request, $excepts);
     }
 
-    protected function except(Request $request, $excepts)
+    protected function passAdmin(Request $request)
     {
-        foreach ($excepts as $except) {
-            if ($except !== '/') {
-                $except = trim($except, '/');
-            }
-
-            if ($request->is($except) || $request->routeIs($except) || $request->fullUrlIs($except)) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->admin && !$request->is('api/admin/*');
     }
 
     public function save()

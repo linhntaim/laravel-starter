@@ -49,25 +49,26 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
         if (is_array($message)) {
             $this->messages = $message;
             $message = array_values($this->messages)[0];
-        } elseif (!empty($message)) {
+        } elseif (!$withoutMessage) {
             $message = $this->formatMessage($message);
-            $this->messages = [$message];
         }
 
         parent::__construct($message, $code ? $code : static::CODE, $previous);
 
+        if ($withoutMessage) {
+            if (!config('app.debug') && ConfigHelper::get('force_common_exception')) {
+                $this->message = trans('error.exceptions.default_exception.level_failed');
+            } elseif ($previous) {
+                $this->message = $this->formatMessage(static::getThrowableMessage($previous));
+            } else {
+                $this->message = $this->formatMessage();
+            }
+        }
+        $this->messages = [$this->message];
+
         if ($previous) {
             $this->line = $previous->getLine();
             $this->file = $previous->getFile();
-            if (empty($message)) {
-                $this->message = $this->formatMessage(static::getThrowableMessage($previous));
-                $this->messages = [$this->message];
-            }
-        }
-
-        if (!config('app.debug') && ConfigHelper::get('force_common_exception') && $withoutMessage) {
-            $this->message = trans('error.exceptions.default_exception.level_failed');
-            $this->messages = [$this->message];
         }
     }
 
