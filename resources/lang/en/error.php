@@ -19,6 +19,10 @@ return [
     ],
 
     'exceptions' => [
+        'handler' => [
+            'method_not_allowed' => 'The :method method is not supported for this route. Supported methods: :allow.',
+            'throttle_requests' => 'Too Many Attempts.',
+        ],
         'app_exception' => [
             'level_failed' => 'Something went wrong with application',
             'level' => ':message',
@@ -32,6 +36,10 @@ return [
         ],
         'exception' => [
             'level_failed' => 'Something went wrong',
+            'level' => ':message',
+        ],
+        'ip_limit_exception' => [
+            'level_failed' => 'Your IP is not allowed',
             'level' => ':message',
         ],
         'unhandled_exception' => [

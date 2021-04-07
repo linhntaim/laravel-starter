@@ -94,11 +94,11 @@ trait ApiResponseTrait
         ]);
     }
 
-    public static function successPayload($data = null, $message = null)
+    public static function successPayload($data = null, $message = null, $statusCode = Configuration::HTTP_RESPONSE_STATUS_OK)
     {
         return array_merge(static::payload($data, $message), [
             '_status' => true,
-            '_code' => Configuration::HTTP_RESPONSE_STATUS_OK,
+            '_code' => $statusCode,
         ]);
     }
 
@@ -134,12 +134,21 @@ trait ApiResponseTrait
      * @param array|null $data
      * @param array|string|null $message
      * @param array $headers
+     * @param int $statusCode
      * @return JsonResponse
      */
-    protected function responseSuccess($data = null, $message = null, $headers = [])
+    protected function responseSuccess($data = null, $message = null, $headers = [], $statusCode = Configuration::HTTP_RESPONSE_STATUS_OK)
     {
         $this->transactionComplete();
-        return $this->response(static::successPayload($data, $message), Configuration::HTTP_RESPONSE_STATUS_OK, $headers);
+        return $this->response(
+            static::successPayload(
+                $data,
+                $message,
+                $statusCode
+            ),
+            $statusCode,
+            $headers
+        );
     }
 
     /**

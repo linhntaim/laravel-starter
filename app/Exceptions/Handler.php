@@ -8,19 +8,24 @@ namespace App\Exceptions;
 
 use App\Http\Controllers\ApiController;
 use App\Http\Middleware\Web\ViewShare;
+use App\Utils\ClassTrait;
 use App\Utils\ConfigHelper;
 use App\Utils\Theme\ThemeFacade;
 use App\Utils\TransactionHelper;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
 {
+    use ClassTrait;
+
     /**
      * A list of the exception types that are not reported.
      *
@@ -58,6 +63,20 @@ class Handler extends ExceptionHandler
         TransactionHelper::getInstance()->stop();
 
         return parent::render($request, $e);
+    }
+
+    protected function prepareException(Throwable $e)
+    {
+        if ($e instanceof ThrottleRequestsException) {
+            return new AppException(static::__transErrorWithModule('throttle_requests'), 429);
+        }
+        if ($e instanceof MethodNotAllowedHttpException) {
+            return new AppException(static::__transErrorWithModule('method_not_allowed', [
+                'method' => request()->getMethod(),
+                'allow' => $e->getHeaders()['Allow'],
+            ]), 405);
+        }
+        return parent::prepareException($e);
     }
 
     protected function renderHttpException(HttpExceptionInterface $e)

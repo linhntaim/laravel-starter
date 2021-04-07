@@ -53,7 +53,14 @@ class Request extends BaseRequest
 
     public function expectsJson()
     {
-        return parent::expectsJson() || $this->is('api/*');
+        return parent::expectsJson() || $this->is('api') || $this->is('api/*');
+    }
+
+    public function possiblyIs(...$patterns)
+    {
+        return $this->is(...$patterns)
+            || $this->routeIs(...$patterns)
+            || $this->fullUrlIs(...$patterns);
     }
 
     public static function normalizeQueryStringWithoutSorting($qs)

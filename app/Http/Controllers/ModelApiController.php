@@ -170,11 +170,17 @@ abstract class ModelApiController extends ApiController
         $this->storeValidated($request);
 
         $this->transactionStart();
-        return $this->responseModel($this->storeExecute($request));
+        return $this->storeResponse($this->storeExecute($request));
+    }
+
+    protected function storeResponse($model)
+    {
+        return $this->responseModel($model);
     }
 
     #endregion
 
+    #region Show
     public function showExecute(Request $request, $id)
     {
         return $this->modelRepository->model($id);
@@ -182,10 +188,16 @@ abstract class ModelApiController extends ApiController
 
     public function show(Request $request, $id)
     {
-        return $this->responseModel(
+        return $this->showResponse(
             $this->showExecute($request, $id)
         );
     }
+
+    protected function showResponse($model)
+    {
+        return $this->responseModel($model);
+    }
+    #endregion
 
     #region Update
     protected function updateValidatedRules(Request $request)
@@ -214,7 +226,12 @@ abstract class ModelApiController extends ApiController
         $this->updateValidated($request);
 
         $this->transactionStart();
-        return $this->responseModel($this->updateExecute($request));
+        return $this->updateResponse($this->updateExecute($request));
+    }
+
+    protected function updateResponse($model)
+    {
+        return $this->responseModel($model);
     }
     #endregion
 
@@ -231,17 +248,27 @@ abstract class ModelApiController extends ApiController
         $this->validated($request, $this->bulkDestroyValidatedRules($request));
     }
 
+    protected function bulkDestroyExecute(Request $request, $ids)
+    {
+        $this->modelRepository->deleteWithIds($ids);
+    }
+
     public function bulkDestroy(Request $request)
     {
         $this->bulkDestroyValidated($request);
         $this->transactionStart();
         $this->bulkDestroyExecute($request, $request->input('ids'));
+        return $this->bulkDestroyResponse();
+    }
+
+    protected function bulkDestroyResponse()
+    {
         return $this->responseSuccess();
     }
 
-    protected function bulkDestroyExecute(Request $request, $ids)
+    protected function destroyExecute(Request $request)
     {
-        $this->modelRepository->deleteWithIds($ids);
+        $this->modelRepository->delete();
     }
 
     public function destroy(Request $request, $id)
@@ -249,12 +276,12 @@ abstract class ModelApiController extends ApiController
         $this->modelRepository->model($id);
         $this->transactionStart();
         $this->destroyExecute($request);
-        return $this->responseSuccess();
+        return $this->destroyResponse();
     }
 
-    protected function destroyExecute(Request $request)
+    protected function destroyResponse()
     {
-        $this->modelRepository->delete();
+        return $this->responseSuccess();
     }
     #endregion
 
@@ -277,10 +304,12 @@ abstract class ModelApiController extends ApiController
      * @param Model|Collection|LengthAwarePaginator|array $model
      * @param array $extra
      * @param array $headers
+     * @param int $statusCode
+     * @param string|null $message
      * @return JsonResponse
      */
-    protected function responseModel($model, $extra = [], $headers = [])
+    protected function responseModel($model, $extra = [], $headers = [], $statusCode = Configuration::HTTP_RESPONSE_STATUS_OK, $message = null)
     {
-        return $this->responseSuccess(array_merge($this->getRespondedModel($model), $extra), $headers);
+        return $this->responseSuccess(array_merge($this->getRespondedModel($model), $extra), $message, $headers, $statusCode);
     }
 }

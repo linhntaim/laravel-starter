@@ -19,27 +19,35 @@ return [
     ],
 
     'exceptions' => [
+        'handler' => [
+            'method_not_allowed' => 'このメソッドはサポートされていません。サポートされているメソッド：:allow。',
+            'throttle_requests' => 'クセスしようとしたページは表示できませんでした。',
+        ],
         'app_exception' => [
             'level_failed' => 'システムエラーが発生しました。しばらくしてからもう一度お試しください。',
             'level' => ':message',
         ],
         'database_exception' => [
-            'level_failed' => 'データベースに問題が発生しました',
+            'level_failed' => 'データベースに問題が発生しました。',
             'level' => ':message',
         ],
         'default_exception' => [
             'level_failed' => 'システムエラーが発生しました。しばらくしてからもう一度お試しください。',
         ],
         'exception' => [
-            'level_failed' => '問題が発生しました',
+            'level_failed' => '問題が発生しました。',
+            'level' => ':message',
+        ],
+        'ip_limit_exception' => [
+            'level_failed' => 'アクセスするには認証が必要です。',
             'level' => ':message',
         ],
         'unhandled_exception' => [
-            'level_failed' => '問題が発生しました',
+            'level_failed' => '問題が発生しました。',
             'level' => ':message',
         ],
         'user_exception' => [
-            'level_failed' => 'ユーザーアクションに問題が発生しました',
+            'level_failed' => 'ユーザーアクションに問題が発生しました。',
             'level' => ':message',
         ],
         // TODO:

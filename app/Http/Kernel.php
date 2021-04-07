@@ -14,6 +14,7 @@ use App\Http\Middleware\AuthorizedWithAdminPermissions;
 use App\Http\Middleware\Device;
 use App\Http\Middleware\HeaderDecrypt;
 use App\Http\Middleware\Impersonate;
+use App\Http\Middleware\IpLimitation;
 use App\Http\Middleware\JapaneseTime;
 use App\Http\Middleware\OverrideAuthorizationHeader;
 use App\Http\Middleware\Screen;
@@ -100,9 +101,16 @@ class Kernel extends HttpKernel
         'authorized.admin' => AuthorizedWithAdmin::class,
         'authorized.admin.permissions' => AuthorizedWithAdminPermissions::class,
         'impersonate' => Impersonate::class,
+        'ip.limit' => IpLimitation::class,
+
+        // TODO:
+
+        // TODO
     ];
 
     protected $middlewarePriority = [
+        IpLimitation::class,
+
         \Illuminate\Session\Middleware\StartSession::class,
         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
         \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
