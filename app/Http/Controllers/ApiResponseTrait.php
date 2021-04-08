@@ -6,7 +6,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Configuration;
 use App\Exceptions\Exception;
 use App\Exceptions\UnhandledException;
 use App\Exceptions\UserException;
@@ -17,6 +16,7 @@ use App\Utils\LogHelper;
 use Closure;
 use Illuminate\Http\JsonResponse;
 use League\OAuth2\Server\Exception\OAuthServerException;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
@@ -86,7 +86,7 @@ trait ApiResponseTrait
         ];
     }
 
-    public static function failPayload($data = null, $message = null, $statusCode = Configuration::HTTP_RESPONSE_STATUS_ERROR)
+    public static function failPayload($data = null, $message = null, $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR)
     {
         return array_merge(static::payload($data, $message), [
             '_status' => false,
@@ -94,7 +94,7 @@ trait ApiResponseTrait
         ]);
     }
 
-    public static function successPayload($data = null, $message = null, $statusCode = Configuration::HTTP_RESPONSE_STATUS_OK)
+    public static function successPayload($data = null, $message = null, $statusCode = Response::HTTP_OK)
     {
         return array_merge(static::payload($data, $message), [
             '_status' => true,
@@ -120,7 +120,7 @@ trait ApiResponseTrait
      * @param array $headers
      * @return JsonResponse
      */
-    protected function response($payload, $status = Configuration::HTTP_RESPONSE_STATUS_OK, $headers = [])
+    protected function response($payload, $status = Response::HTTP_OK, $headers = [])
     {
         return response()->json(
             $payload,
@@ -137,7 +137,7 @@ trait ApiResponseTrait
      * @param int $statusCode
      * @return JsonResponse
      */
-    protected function responseSuccess($data = null, $message = null, $headers = [], $statusCode = Configuration::HTTP_RESPONSE_STATUS_OK)
+    protected function responseSuccess($data = null, $message = null, $headers = [], $statusCode = Response::HTTP_OK)
     {
         $this->transactionComplete();
         return $this->response(
@@ -158,7 +158,7 @@ trait ApiResponseTrait
      * @param array $headers
      * @return JsonResponse
      */
-    protected function responseFail($message = null, $data = null, $statusCode = Configuration::HTTP_RESPONSE_STATUS_ERROR, $headers = [])
+    protected function responseFail($message = null, $data = null, $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR, $headers = [])
     {
         $this->transactionStop();
         if ($message instanceof \Exception) {

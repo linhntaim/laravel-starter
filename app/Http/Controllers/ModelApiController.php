@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
+use Symfony\Component\HttpFoundation\Response;
 
 abstract class ModelApiController extends ApiController
 {
@@ -308,7 +309,7 @@ abstract class ModelApiController extends ApiController
      * @param string|null $message
      * @return JsonResponse
      */
-    protected function responseModel($model, $extra = [], $headers = [], $statusCode = Configuration::HTTP_RESPONSE_STATUS_OK, $message = null)
+    protected function responseModel($model, $extra = [], $headers = [], $statusCode = Response::HTTP_OK, $message = null)
     {
         return $this->responseSuccess(array_merge($this->getRespondedModel($model), $extra), $message, $headers, $statusCode);
     }

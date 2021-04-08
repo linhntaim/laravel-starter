@@ -11,6 +11,7 @@ use App\Http\Middleware\AuthenticatedByPassportViaHeader;
 use App\Http\Middleware\AuthenticatedByPassportViaRequest;
 use App\Http\Middleware\AuthorizedWithAdmin;
 use App\Http\Middleware\AuthorizedWithAdminPermissions;
+use App\Http\Middleware\CustomTimezone;
 use App\Http\Middleware\Device;
 use App\Http\Middleware\HeaderDecrypt;
 use App\Http\Middleware\Impersonate;
@@ -93,6 +94,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'client' => CheckClientCredentials::class,
 
+        'custom_timezone' => CustomTimezone::class,
         'japanese_time' => JapaneseTime::class,
         'header.decrypt' => HeaderDecrypt::class,
         'authenticated.passport.cookie' => AuthenticatedByPassportViaCookie::class,
@@ -116,6 +118,7 @@ class Kernel extends HttpKernel
         \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
         \Illuminate\Routing\Middleware\ThrottleRequests::class,
 
+        CustomTimezone::class,
         JapaneseTime::class,
         OverrideAuthorizationHeader::class,
         HeaderDecrypt::class,
