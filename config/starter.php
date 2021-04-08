@@ -14,7 +14,6 @@ return [
             ],
         ],
     ],
-    'public_path' => env('PUBLIC_PATH'),
     'ip_limit' => [
         'api' => [
             'allowed' => array_filter(explode(',', env('IP_LIMIT_API_ALLOWED', '')), function ($ip) {
@@ -25,6 +24,8 @@ return [
             }),
         ],
     ],
+    'custom_timezone' => env('CUSTOM_TIMEZONE'),
+    'public_path' => env('PUBLIC_PATH'),
     'passport' => [
         'password' => [
             'client_id' => env('PASSPORT_PASSWORD_CLIENT_ID'),
