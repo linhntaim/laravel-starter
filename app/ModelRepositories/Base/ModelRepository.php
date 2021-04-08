@@ -18,6 +18,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use PDOException;
 
 abstract class ModelRepository
@@ -72,6 +73,11 @@ abstract class ModelRepository
         $modelClass = $this->modelClass;
         $this->model = new $modelClass();
         return $this->model;
+    }
+
+    public function getTable()
+    {
+        return $this->newModel()->getTable();
     }
 
     public function setModelByUnique($modelByUnique = true)
@@ -393,6 +399,18 @@ abstract class ModelRepository
                 throw DatabaseException::from($exception);
             }
         }
+    }
+
+    public function lockTable($type = 'write')
+    {
+        DB::unprepared(sprintf('lock tables %s %s', $this->getTable(), $type));
+        return $this;
+    }
+
+    public function unlockTable()
+    {
+        DB::unprepared('unlock tables');
+        return $this;
     }
 
     public function queryById($id)
