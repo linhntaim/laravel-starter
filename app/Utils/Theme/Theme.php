@@ -26,7 +26,7 @@ abstract class Theme
     public function share()
     {
         return [
-            'theme' => $this,
+            '_object' => $this,
         ];
     }
 
@@ -49,6 +49,17 @@ abstract class Theme
     public function viewExists($view)
     {
         return view()->exists($this->viewPath($view));
+    }
+
+    /**
+     * @param array $data
+     * @param array $mergeData
+     * @param string $view
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|mixed
+     */
+    public function pageHome($data = [], $mergeData = [], $view = 'welcome')
+    {
+        return $this->pageView($view, $data, $mergeData);
     }
 
     /**

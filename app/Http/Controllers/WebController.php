@@ -35,9 +35,9 @@ class WebController extends Controller
         return $withTheme ? $this->themeView($view, $data, $mergeData) : view($view, $data, $mergeData);
     }
 
-    protected function viewHome($data = [], $mergeData = [], $view = 'welcome')
+    protected function viewHome($data = [], $mergeData = [], $view = 'welcome', $withTheme = true)
     {
         $this->transactionComplete();
-        return view($view, $data, $mergeData);
+        return $withTheme ? $this->themeHome($data, $mergeData, $view) : view($view, $data, $mergeData);
     }
 }

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static array share()
  * @method static \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory view($view, $data = [], $mergeData = [])
  * @method static \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory pageView($view, $data = [], $mergeData = [])
+ * @method static \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|mixed pageHome($data = [], $mergeData = [], $view = 'welcome')
  * @method static string pageViewPath($view)
  * @method static string viewPath($view)
  * @method static boolean viewExists($view)

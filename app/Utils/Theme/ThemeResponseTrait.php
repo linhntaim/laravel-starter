@@ -15,4 +15,9 @@ trait ThemeResponseTrait
     {
         return ThemeFacade::pageView($this->viewBase ? $this->viewBase . '.' . $view : $view, $data, $mergeData);
     }
+
+    protected function themeHome($data = [], $mergeData = [], $view = 'welcome')
+    {
+        return ThemeFacade::pageHome($data, $mergeData, $view);
+    }
 }
