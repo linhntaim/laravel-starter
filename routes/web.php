@@ -30,9 +30,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
     // TODO:
-    'middleware' => ['custom_timezone'],
-    // TODO
-    // TODO:
 
     // TODO
 ], function () {

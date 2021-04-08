@@ -16,7 +16,9 @@ class Settings
 {
     public function handle(Request $request, Closure $next)
     {
-        Facade::fetchFromRequestCookie($request)->update(ConfigHelper::getClient(ThemeFacade::getAppType()));
+        // Apply the default but still prefer to get settings from client
+        Facade::update(ConfigHelper::getClient(ThemeFacade::getAppType()))
+            ->fetchFromRequestCookie($request);
         return $next($request);
     }
 }
