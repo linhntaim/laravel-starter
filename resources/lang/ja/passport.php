@@ -5,7 +5,7 @@
  */
 
 return [
-    'invalid_client' => 'ClientApp authentication failed',
+    'invalid_client' => 'Client authentication failed',
     'invalid_credentials' => 'メールアドレス、もしくはパスワードが異なります。',
     'invalid_grant' => 'メールアドレス、もしくはパスワードが異なります。',
     'invalid_scope' => 'The requested scope is invalid, unknown, or malformed',

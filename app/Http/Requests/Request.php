@@ -19,18 +19,42 @@ class Request extends BaseRequest
         return !is_null($header);
     }
 
+    public function ifHeaderJson($key, &$header)
+    {
+        if ($this->ifHeader($key, $header)) {
+            $header = json_decode($header, true);
+            return !empty($header);
+        }
+        return false;
+    }
+
+    public function ifCookie($key, &$cookie)
+    {
+        $cookie = is_null($key) ? null : parent::cookie($key);
+        return !is_null($cookie);
+    }
+
+    public function ifCookieJson($key, &$cookie)
+    {
+        if ($this->ifCookie($key, $cookie)) {
+            $cookie = json_decode($cookie, true);
+            return !empty($cookie);
+        }
+        return false;
+    }
+
+    public function ifInput($key, &$input)
+    {
+        $input = is_null($key) ? null : parent::input($key);
+        return !is_null($input);
+    }
+
     public function input($key = null, $default = null)
     {
         if (is_null($key)) {
             return parent::input($key);
         }
         return Helper::default(parent::input($key), $default);
-    }
-
-    public function ifInput($key, &$input)
-    {
-        $input = parent::input($key);
-        return !is_null($input);
     }
 
     public function ifInputNotEmpty($key, &$input)

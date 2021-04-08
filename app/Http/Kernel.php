@@ -6,23 +6,23 @@
 
 namespace App\Http;
 
-use App\Http\Middleware\Api\ClientApp as ApiClientApp;
+use App\Http\Middleware\Api\Client as ClientApi;
+use App\Http\Middleware\Api\ClientAuthorizationHeader;
+use App\Http\Middleware\Api\Device as DeviceApi;
+use App\Http\Middleware\Api\Screen as ScreenApi;
+use App\Http\Middleware\Api\Settings as SettingsApi;
 use App\Http\Middleware\AuthenticatedByPassportViaCookie;
 use App\Http\Middleware\AuthenticatedByPassportViaHeader;
 use App\Http\Middleware\AuthenticatedByPassportViaRequest;
 use App\Http\Middleware\AuthorizedWithAdmin;
 use App\Http\Middleware\AuthorizedWithAdminPermissions;
-use App\Http\Middleware\ClientApp;
 use App\Http\Middleware\CustomTimezone;
-use App\Http\Middleware\Device;
 use App\Http\Middleware\Impersonate;
 use App\Http\Middleware\IpLimitation;
 use App\Http\Middleware\JapaneseTime;
-use App\Http\Middleware\ClientAuthorizationHeader;
-use App\Http\Middleware\Screen;
-use App\Http\Middleware\Settings;
-use App\Http\Middleware\Web\Device as WebDevice;
-use App\Http\Middleware\Web\Settings as WebSettings;
+use App\Http\Middleware\Web\Client as ClientWeb;
+use App\Http\Middleware\Web\Device as DeviceWeb;
+use App\Http\Middleware\Web\Settings as SettingsWeb;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Laravel\Passport\Http\Middleware\CheckClientCredentials;
 
@@ -60,19 +60,19 @@ class Kernel extends HttpKernel
             //\Illuminate\View\Middleware\ShareErrorsFromSession::class,
             //\App\Http\Middleware\VerifyCsrfToken::class,
             //\Illuminate\Routing\Middleware\SubstituteBindings::class,
-            //ClientApp::class,
-            //WebSettings::class,
-            //WebDevice::class,
+            //ClientAppWeb::class,
+            //SettingsWeb::class,
+            //DeviceWeb::class,
         ],
 
         'api' => [
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            ApiClientApp::class,
+            ClientApi::class,
             ClientAuthorizationHeader::class,
-            Settings::class,
-            Device::class,
-            Screen::class,
+            SettingsApi::class,
+            DeviceApi::class,
+            ScreenApi::class,
         ],
     ];
 
@@ -118,16 +118,16 @@ class Kernel extends HttpKernel
         \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
         \Illuminate\Routing\Middleware\ThrottleRequests::class,
 
-        ClientApp::class,
-        ApiClientApp::class,
+        ClientApi::class,
+        ClientWeb::class,
         ClientAuthorizationHeader::class,
-        Settings::class,
-        WebSettings::class,
+        SettingsApi::class,
+        SettingsWeb::class,
         CustomTimezone::class,
         JapaneseTime::class,
-        Device::class,
-        WebDevice::class,
-        Screen::class,
+        DeviceApi::class,
+        DeviceWeb::class,
+        ScreenApi::class,
 
         \Illuminate\Session\Middleware\AuthenticateSession::class,
 

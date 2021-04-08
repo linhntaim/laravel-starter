@@ -12,6 +12,10 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Str;
 
+/**
+ * Class Settings
+ * @package App\Utils\ClientSettings
+ */
 class Settings implements ISettings, Arrayable, Jsonable
 {
     protected $appId;
@@ -32,8 +36,9 @@ class Settings implements ISettings, Arrayable, Jsonable
     protected $longTimeFormat;
     protected $shortTimeFormat;
 
-    protected $headers;
     protected $cookies;
+
+    protected $paths;
 
     protected $changes;
 
@@ -58,8 +63,9 @@ class Settings implements ISettings, Arrayable, Jsonable
         $this->longTimeFormat = $defaultLocalization['long_time_format'];
         $this->shortTimeFormat = $defaultLocalization['short_time_format'];
 
-        $this->headers = [];
         $this->cookies = [];
+
+        $this->paths = [];
 
         $this->clearChanges();
     }
@@ -249,20 +255,6 @@ class Settings implements ISettings, Arrayable, Jsonable
         return $this->shortTimeFormat;
     }
 
-    public function setHeaders(array $headers)
-    {
-        $this->headers = $headers;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getHeaders()
-    {
-        return $this->headers;
-    }
-
     public function setCookies(array $cookies)
     {
         $this->cookies = $cookies;
@@ -275,6 +267,38 @@ class Settings implements ISettings, Arrayable, Jsonable
     public function getCookies()
     {
         return $this->cookies;
+    }
+
+    /**
+     * @param string $key
+     * @return string
+     */
+    public function getCookie($key)
+    {
+        return isset($this->cookies[$key]) ? $this->cookies[$key] : null;
+    }
+
+    public function setPaths(array $paths)
+    {
+        $this->paths = $paths;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPaths()
+    {
+        return $this->paths;
+    }
+
+    /**
+     * @param string $key
+     * @return string
+     */
+    public function getPath($key)
+    {
+        return isset($this->paths[$key]) ? $this->paths[$key] : null;
     }
 
     public function merge($settings)

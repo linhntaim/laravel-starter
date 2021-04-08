@@ -12,7 +12,7 @@ trait HomeSettingsHandleTrait
 {
     public function handle()
     {
-        Facade::temporaryFromClientType(Configuration::CLIENT_APP_HOME, function () {
+        Facade::temporaryFromClient(Configuration::CLIENT_APP_HOME, function () {
             parent::handle();
         });
     }

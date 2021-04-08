@@ -18,7 +18,7 @@ class AuthenticatedByPassportViaCookie
     public function handle(Request $request, Closure $next, $clientType = 'admin')
     {
         if (!auth()->check()) {
-            $clientConfig = ConfigHelper::getClientApp($clientType);
+            $clientConfig = ConfigHelper::getClient($clientType);
             if (!empty($clientConfig) && isset($clientConfig['cookie'])) {
                 $clientCookieConfig = $clientConfig['cookie'];
                 $defaultCookieName = $clientCookieConfig['names']['default'];

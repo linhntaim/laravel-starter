@@ -116,8 +116,8 @@ class ConfigHelper
      * @param string|null $id
      * @return array
      */
-    public static function getClientApp($id = null)
+    public static function getClient($id = null)
     {
-        return is_null($id) ? static::get('client.apps') : static::get(sprintf('client.apps.%s', $id));
+        return is_null($id) ? static::get('client.ids') : static::get(sprintf('client.ids.%s', $id));
     }
 }

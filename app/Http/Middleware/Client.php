@@ -6,11 +6,16 @@ use App\Http\Requests\Request;
 use App\Utils\ClientSettings\Facade;
 use Closure;
 
-class ClientHeaderDecrypt
+abstract class Client
 {
     public function handle(Request $request, Closure $next)
     {
-        Facade::decryptHeaders($request);
+        $this->setClient($request);
         return $next($request);
+    }
+
+    protected function setClient(Request $request)
+    {
+        return Facade::setClientFromRequestRoute($request);
     }
 }

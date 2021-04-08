@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Middleware\Web;
+namespace App\Http\Middleware\Api;
 
 use App\Http\Middleware\Settings as BaseSettings;
 use App\Http\Requests\Request;
@@ -10,6 +10,6 @@ class Settings extends BaseSettings
 {
     protected function fetch(Request $request)
     {
-        Facade::fetchFromRequestCookie($request);
+        Facade::fetchFromRequestHeader($request);
     }
 }

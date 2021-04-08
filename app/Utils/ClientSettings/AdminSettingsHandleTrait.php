@@ -12,7 +12,7 @@ trait AdminSettingsHandleTrait
 {
     public function handle()
     {
-        Facade::temporaryFromClientType(Configuration::CLIENT_APP_ADMIN, function () {
+        Facade::temporaryFromClient(Configuration::CLIENT_APP_ADMIN, function () {
             parent::handle();
         });
     }

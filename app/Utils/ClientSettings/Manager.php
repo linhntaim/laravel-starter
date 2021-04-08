@@ -15,9 +15,23 @@ use App\Utils\LogHelper;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Str;
 
+/**
+ * Class Manager
+ * @package App\Utils\ClientSettings
+ * @method string getAppId()
+ * @method string getAppKey()
+ * @method string getAppName()
+ * @method string getAppUrl()
+ * @method string getLocale()
+ * @method string getCookie($key)
+ * @method string getPath($key)
+ */
 class Manager
 {
-    protected $possibleClientApps = [];
+    /**
+     * @var array
+     */
+    protected $possibleClientIds;
 
     /**
      * @var Settings
@@ -36,7 +50,7 @@ class Manager
 
     public function __construct()
     {
-        $this->possibleClientApps = array_keys(ConfigHelper::getClientApp());
+        $this->possibleClientIds = array_keys(ConfigHelper::getClient());
         $this->set(new Settings());
     }
 
@@ -45,35 +59,73 @@ class Manager
         return clone $this->settings;
     }
 
-    public function setClientApp($clientAppId, $force = false)
+    /**
+     * @param array|Settings $settings
+     * @return Manager
+     */
+    public function set($settings)
     {
-        if (($force || $clientAppId != $this->settings->getAppId()) && in_array($clientAppId, $this->possibleClientApps)) {
-            $clientSettings = ConfigHelper::getClientApp($clientAppId);
-            $clientSettings['app_id'] = $clientAppId;
-            return $this->update($clientSettings);
+        $this->settings = $settings;
+        return $this->apply();
+    }
+
+    /**
+     * @param array|Settings $settings
+     * @return Manager
+     */
+    public function update($settings)
+    {
+        $this->settings->merge($settings);
+        return $this->apply();
+    }
+
+    public function apply()
+    {
+        ConfigHelper::setCurrentLocale($this->settings->getLocale());
+        $this->dateTimer = new DateTimer($this->settings);
+        $this->numberFormatter = new NumberFormatter($this->settings);
+        return $this;
+    }
+
+    public function dateTimer()
+    {
+        return $this->dateTimer;
+    }
+
+    public function numberFormatter()
+    {
+        return $this->numberFormatter;
+    }
+
+    public function setClient($clientId, $force = false)
+    {
+        if (($force || $clientId != $this->settings->getAppId()) && in_array($clientId, $this->possibleClientIds)) {
+            $settings = ConfigHelper::getClient($clientId);
+            $settings['app_id'] = $clientId;
+            return $this->update($settings);
         }
         return $this;
     }
 
-    public function setClientAppFromRequestRoute(Request $request)
+    public function setClientFromRequestRoute(Request $request)
     {
-        $routeBasesClientAppIds = ConfigHelper::get('client.app_id_maps.routes', []);
-        $appliedClientAppId = null;
-        foreach ($routeBasesClientAppIds as $routeMatch => $clientAppId) {
+        $routeBasesClientIds = ConfigHelper::get('client.id_maps.routes', []);
+        $appliedClientId = null;
+        foreach ($routeBasesClientIds as $routeMatch => $clientId) {
             if ($request->possiblyIs($routeMatch)) {
-                $appliedClientAppId = $clientAppId;
+                $appliedClientId = $clientId;
             }
         }
-        if (!is_null($appliedClientAppId)) {
-            return $this->setClientApp($appliedClientAppId, true);
+        if (!is_null($appliedClientId)) {
+            return $this->setClient($appliedClientId, true);
         }
         return $this;
     }
 
-    public function setClientAppFromRequestHeader(Request $request)
+    public function setClientFromRequestHeader(Request $request)
     {
         if ($request->ifHeader(ConfigHelper::get('client.header_client_id'), $headerValue)) {
-            return $this->setClientApp($headerValue, true);
+            return $this->setClient($headerValue, true);
         }
         return $this;
     }
@@ -82,10 +134,8 @@ class Manager
     {
         if ($secret = (function ($secret) {
             $break64 = mb_strlen('base64:');
-            if (mb_substr($secret, 0, $break64) == 'base64:') {
-                return utf8_encode(base64_decode(mb_substr($secret, $break64)));
-            }
-            return $secret;
+            return mb_substr($secret, 0, $break64) == 'base64:' ?
+                utf8_encode(base64_decode(mb_substr($secret, $break64))) : $secret;
         })($this->settings->getAppKey())) {
             $headers = ConfigHelper::get('client.headers');
             $headerEncryptExcepts = ConfigHelper::get('client.header_encrypt_excepts');
@@ -103,30 +153,29 @@ class Manager
         return $this;
     }
 
-    public function fetchFromRequestHeaders(Request $request)
+    public function fetchFromRequestHeader(Request $request)
     {
-        if ($request->ifHeader(ConfigHelper::get('headers.settings'), $headerValue)) {
-            if (is_array($settings = json_decode($headerValue, true))) {
-                return $this->update($settings);
-            }
+        if ($request->ifHeaderJson(ConfigHelper::get('client.headers.settings'), $headerValue)) {
+            return $this->update($headerValue);
         }
         return $this;
     }
 
     public function fetchFromRequestCookie(Request $request)
     {
-        $requestCookies = $request->cookies;
-        $settingsCookieName = ConfigHelper::get('web_cookies.settings');
-        if (!empty($settingsCookieName) && $requestCookies->has($settingsCookieName)
-            && ($settings = json_decode($requestCookies->get($settingsCookieName), true)) !== false) {
-            return $this->update($settings);
+        if ($request->ifCookieJson($this->settings->getCookie('settings'), $cookieValue)) {
+            return $this->update($cookieValue);
         }
         return $this->storeCookie();
     }
 
     public function storeCookie()
     {
-        Cookie::queue(ConfigHelper::get('web_cookies.settings'), $this->capture()->toJson(), 2628000); // 5 years = forever
+        Cookie::queue(
+            $this->settings->getCookie('settings'),
+            $this->capture()->toJson(),
+            2628000
+        ); // 5 years = forever
         return $this;
     }
 
@@ -147,27 +196,30 @@ class Manager
     }
 
     /**
-     * @param mixed $user
+     * @param string $clientId
      * @param callable $callback
-     * @return $this|mixed
+     * @return mixed
+     */
+    public function temporaryFromClient($clientId, callable $callback)
+    {
+        if (in_array($clientId, $this->possibleClientIds)
+            && ($settings = ConfigHelper::getClient($clientId))
+            && !empty($settings)) {
+            $settings['app_id'] = $clientId;
+            return $this->temporary($settings, $callback);
+        }
+        return $callback();
+    }
+
+    /**
+     * @param IUser $user
+     * @param callable $callback
+     * @return mixed
      */
     public function temporaryFromUser($user, callable $callback)
     {
         if ($user instanceof IUser) {
             return $this->temporary($user->preferredSettings(), $callback);
-        }
-        return $this;
-    }
-
-    /**
-     * @param string $clientType
-     * @param callable $callback
-     * @return mixed
-     */
-    public function temporaryFromClientType($clientType, callable $callback)
-    {
-        if (($settings = ConfigHelper::getClientApp($clientType)) && !empty($settings)) {
-            return $this->temporary($settings, $callback);
         }
         return $callback();
     }
@@ -187,44 +239,6 @@ class Manager
         } finally {
             $this->set($original);
         }
-    }
-
-    /**
-     * @param array|Settings $settings
-     * @return Manager
-     */
-    public function update($settings)
-    {
-        $this->settings->merge($settings);
-        return $this->apply();
-    }
-
-    /**
-     * @param array|Settings $settings
-     * @return Manager
-     */
-    public function set($settings)
-    {
-        $this->settings = $settings;
-        return $this->apply();
-    }
-
-    public function apply()
-    {
-        ConfigHelper::setCurrentLocale($this->settings->getLocale());
-        $this->dateTimer = new DateTimer($this->settings);
-        $this->numberFormatter = new NumberFormatter($this->settings);
-        return $this;
-    }
-
-    public function dateTimer()
-    {
-        return $this->dateTimer;
-    }
-
-    public function numberFormatter()
-    {
-        return $this->numberFormatter;
     }
 
     public function __call($name, $arguments)

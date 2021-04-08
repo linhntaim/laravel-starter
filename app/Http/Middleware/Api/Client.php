@@ -2,15 +2,15 @@
 
 namespace App\Http\Middleware\Api;
 
-use App\Http\Middleware\ClientApp as BaseClientApp;
+use App\Http\Middleware\Client as BaseClientApp;
 use App\Http\Requests\Request;
 
-class ClientApp extends BaseClientApp
+class Client extends BaseClientApp
 {
     protected function setClient(Request $request)
     {
         return parent::setClient($request)
-            ->setClientAppFromRequestHeader($request)
+            ->setClientFromRequestHeader($request)
             ->decryptHeaders($request);
     }
 }

@@ -6,9 +6,9 @@
 
 namespace App\Console\Commands\Base;
 
-use App\Utils\ClientSettings\AdminSettingsHandleTrait;
+use App\Utils\ClientSettings\AdminClientTrait;
 
 abstract class AdminCommand extends Command
 {
-    use AdminSettingsHandleTrait;
+    use AdminClientTrait;
 }

@@ -13,7 +13,7 @@ trait AdminListenerTrait
 {
     public function handle($event)
     {
-        Facade::temporaryFromClientType(Configuration::CLIENT_APP_ADMIN, function () use ($event) {
+        Facade::temporaryFromClient(Configuration::CLIENT_APP_ADMIN, function () use ($event) {
             parent::handle($event);
         });
     }

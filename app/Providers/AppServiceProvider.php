@@ -9,9 +9,11 @@ namespace App\Providers;
 use App\Http\Requests\Request;
 use App\Utils\ClientSettings\Manager as ClientSettingsManager;
 use App\Utils\ConfigHelper;
+use App\Utils\Device\Manager as DeviceManager;
 use App\Utils\ExtraActions\FilterAction;
 use App\Utils\ExtraActions\HookAction;
 use App\Utils\ExtraActions\ReplaceAction;
+use App\Utils\Screen\Manager as ScreenManager;
 use App\Vendors\Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -33,6 +35,12 @@ class AppServiceProvider extends ServiceProvider
         });
         $this->app->singleton(ClientSettingsManager::class, function () {
             return new ClientSettingsManager();
+        });
+        $this->app->singleton(DeviceManager::class, function () {
+            return new DeviceManager();
+        });
+        $this->app->singleton(ScreenManager::class, function () {
+            return new ScreenManager();
         });
         $this->app->singleton(HookAction::class, function () {
             return new HookAction();

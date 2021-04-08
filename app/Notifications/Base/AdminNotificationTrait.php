@@ -14,7 +14,7 @@ trait AdminNotificationTrait
 {
     protected function resolveData($via, IUser $notifiable, $dataCallback)
     {
-        return Facade::temporaryFromClientType(
+        return Facade::temporaryFromClient(
             Configuration::CLIENT_APP_ADMIN,
             function () use ($via, $notifiable, $dataCallback) {
                 return parent::resolveData($via, $notifiable, $dataCallback);

@@ -107,7 +107,7 @@ return [
     'variables' => json_decode(env('VARIABLES'), true),
     'client_limit_timeout' => (int)env('CLIENT_LIMIT_TIMEOUT'),
     'client' => [
-        'apps' => [
+        'ids' => [
             'admin' => [
                 'app_name' => env('CLIENT_ADMIN_NAME'),
                 'app_key' => env('CLIENT_ADMIN_KEY'),
@@ -116,17 +116,6 @@ return [
                 'country' => 'JP',
                 'timezone' => 'Asia/Tokyo',
                 'currency' => 'JPY',
-                'number_format' => 'point_comma',
-                'first_day_of_week' => 0,
-                'long_date_format' => 0,
-                'short_date_format' => 0,
-                'long_time_format' => 0,
-                'short_time_format' => 0,
-                'cookie' => [
-                    'names' => [
-                        'default' => env('CLIENT_ADMIN_COOKIE_DEFAULT_NAME', ''),
-                    ],
-                ],
             ],
             'home' => [
                 'app_name' => env('CLIENT_HOME_NAME'),
@@ -136,17 +125,6 @@ return [
                 'country' => 'JP',
                 'timezone' => 'Asia/Tokyo',
                 'currency' => 'JPY',
-                'number_format' => 'point_comma',
-                'first_day_of_week' => 0,
-                'long_date_format' => 0,
-                'short_date_format' => 0,
-                'long_time_format' => 0,
-                'short_time_format' => 0,
-                'cookie' => [
-                    'names' => [
-                        'default' => env('CLIENT_HOME_COOKIE_DEFAULT_NAME', ''),
-                    ],
-                ],
             ],
             'common' => [
                 'app_name' => env('CLIENT_COMMON_NAME'),
@@ -155,21 +133,9 @@ return [
                 'locale' => 'ja',
                 'country' => 'JP',
                 'timezone' => 'Asia/Tokyo',
-                'currency' => 'JPY',
-                'number_format' => 'point_comma',
-                'first_day_of_week' => 0,
-                'long_date_format' => 0,
-                'short_date_format' => 0,
-                'long_time_format' => 0,
-                'short_time_format' => 0,
-                'cookie' => [
-                    'names' => [
-                        'default' => env('CLIENT_COMMON_COOKIE_DEFAULT_NAME', ''),
-                    ],
-                ],
             ],
         ],
-        'app_id_maps' => [
+        'id_maps' => [
             'routes' => [
                 '*' => 'common',
                 'api/home' => 'home',
@@ -212,7 +178,6 @@ return [
 
     'currencies' => [
         'USD' => ['symbol' => '$'],
-        'VND' => ['symbol' => '₫'],
         'JPY' => ['symbol' => '¥'],
     ],
 

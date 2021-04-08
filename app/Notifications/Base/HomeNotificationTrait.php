@@ -14,7 +14,7 @@ trait HomeNotificationTrait
 {
     protected function resolveData($via, IUser $notifiable, $dataCallback)
     {
-        return Facade::temporaryFromClientType(
+        return Facade::temporaryFromClient(
             Configuration::CLIENT_APP_HOME,
             function () use ($via, $notifiable, $dataCallback) {
                 return parent::resolveData($via, $notifiable, $dataCallback);

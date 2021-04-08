@@ -15,8 +15,7 @@ trait Capture
     public function settingsCapture()
     {
         $this->settings = Facade::capture();
-        $this->locale = $this->settings->getLocale();
-        return $this;
+        return $this->setLocale($this->settings->getLocale());
     }
 
     public function settingsTemporary(callable $callback)

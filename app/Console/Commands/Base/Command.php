@@ -6,16 +6,18 @@
 
 namespace App\Console\Commands\Base;
 
+use App\Console\Commands\Middleware\Client;
 use App\Exceptions\Exception;
 use App\Utils\ClassTrait;
 use App\Utils\LogHelper;
+use App\Utils\SelfMiddleware\SelfMiddlewareTrait;
 use App\Utils\ShellTrait;
 use Illuminate\Console\Command as BaseCommand;
 use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class Command extends BaseCommand
 {
-    use ClassTrait, ShellTrait;
+    use ClassTrait, ShellTrait, SelfMiddlewareTrait;
 
     protected $__friendlyName;
 
@@ -28,6 +30,15 @@ abstract class Command extends BaseCommand
     }
 
     protected $noInformation = false;
+
+    protected $selfMiddlewares = [
+        Client::class,
+    ];
+
+    public function getClientId()
+    {
+        return null;
+    }
 
     /**
      * @return Command
@@ -86,6 +97,7 @@ abstract class Command extends BaseCommand
         LogHelper::info(sprintf('%s executing...', static::class));
         try {
             $this->before();
+            $this->selfMiddleware();
             $this->go();
             $this->after();
         } catch (\Exception $exception) {
