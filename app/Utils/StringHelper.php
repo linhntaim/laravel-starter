@@ -67,4 +67,9 @@ class StringHelper
         }
         return null;
     }
+
+    public static function lines($text)
+    {
+        return preg_split('/\r*\n|\r/', $text);
+    }
 }
