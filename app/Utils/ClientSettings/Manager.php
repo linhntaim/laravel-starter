@@ -10,11 +10,15 @@ use App\Exceptions\AppException;
 use App\Http\Requests\Request;
 use App\Models\Base\IUser;
 use App\Utils\ConfigHelper;
+use App\Utils\CryptoJs\AES;
+use App\Utils\LogHelper;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Str;
 
 class Manager
 {
+    protected $possibleClientApps = [];
+
     /**
      * @var Settings
      */
@@ -32,6 +36,7 @@ class Manager
 
     public function __construct()
     {
+        $this->possibleClientApps = array_keys(ConfigHelper::getClientApp());
         $this->set(new Settings());
     }
 
@@ -40,13 +45,70 @@ class Manager
         return clone $this->settings;
     }
 
+    public function setClientApp($clientAppId, $force = false)
+    {
+        if (($force || $clientAppId != $this->settings->getAppId()) && in_array($clientAppId, $this->possibleClientApps)) {
+            $clientSettings = ConfigHelper::getClientApp($clientAppId);
+            $clientSettings['app_id'] = $clientAppId;
+            return $this->update($clientSettings);
+        }
+        return $this;
+    }
+
+    public function setClientAppFromRequestRoute(Request $request)
+    {
+        $routeBasesClientAppIds = ConfigHelper::get('client.app_id_maps.routes', []);
+        $appliedClientAppId = null;
+        foreach ($routeBasesClientAppIds as $routeMatch => $clientAppId) {
+            if ($request->possiblyIs($routeMatch)) {
+                $appliedClientAppId = $clientAppId;
+            }
+        }
+        if (!is_null($appliedClientAppId)) {
+            return $this->setClientApp($appliedClientAppId, true);
+        }
+        return $this;
+    }
+
+    public function setClientAppFromRequestHeader(Request $request)
+    {
+        if ($request->ifHeader(ConfigHelper::get('client.header_client_id'), $headerValue)) {
+            return $this->setClientApp($headerValue, true);
+        }
+        return $this;
+    }
+
+    public function decryptHeaders(Request $request)
+    {
+        if ($secret = (function ($secret) {
+            $break64 = mb_strlen('base64:');
+            if (mb_substr($secret, 0, $break64) == 'base64:') {
+                return utf8_encode(base64_decode(mb_substr($secret, $break64)));
+            }
+            return $secret;
+        })($this->settings->getAppKey())) {
+            $headers = ConfigHelper::get('client.headers');
+            $headerEncryptExcepts = ConfigHelper::get('client.header_encrypt_excepts');
+            foreach ($headers as $header) {
+                if (!in_array($header, $headerEncryptExcepts)
+                    && $request->ifHeader($header, $headerValue)) {
+                    if ($headerValue = AES::decrypt(base64_decode($headerValue), $secret)) {
+                        $request->headers->set($header, $headerValue);
+                    } else {
+                        LogHelper::error(new AppException(sprintf('Header [%s] cannot be decrypted.', $header)));
+                    }
+                }
+            }
+        }
+        return $this;
+    }
+
     public function fetchFromRequestHeaders(Request $request)
     {
-        $requestHeaders = $request->headers;
-        $settingsHeader = ConfigHelper::get('headers.settings');
-        if (!empty($settingsHeader) && $requestHeaders->has($settingsHeader)
-            && ($settings = json_decode($requestHeaders->get($settingsHeader), true)) !== false) {
-            return $this->update($settings);
+        if ($request->ifHeader(ConfigHelper::get('headers.settings'), $headerValue)) {
+            if (is_array($settings = json_decode($headerValue, true))) {
+                return $this->update($settings);
+            }
         }
         return $this;
     }
@@ -104,7 +166,7 @@ class Manager
      */
     public function temporaryFromClientType($clientType, callable $callback)
     {
-        if (($settings = ConfigHelper::getClient($clientType)) && !empty($settings)) {
+        if (($settings = ConfigHelper::getClientApp($clientType)) && !empty($settings)) {
             return $this->temporary($settings, $callback);
         }
         return $callback();

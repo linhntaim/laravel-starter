@@ -15,8 +15,11 @@ use Illuminate\Support\Str;
 class Settings implements ISettings, Arrayable, Jsonable
 {
     protected $appId;
+    protected $appKey;
     protected $appName;
     protected $appUrl;
+
+    protected $stateful;
 
     protected $locale;
     protected $country;
@@ -29,24 +32,34 @@ class Settings implements ISettings, Arrayable, Jsonable
     protected $longTimeFormat;
     protected $shortTimeFormat;
 
+    protected $headers;
+    protected $cookies;
+
     protected $changes;
 
     public function __construct()
     {
-        $this->appId = ConfigHelper::get('app.id');
+        $this->appKey = config('app.key');
         $this->appName = config('app.name');
         $this->appUrl = config('app.url');
 
+        $this->stateful = false;
+
+        $defaultLocalization = ConfigHelper::get('default_localization');
+
         $this->locale = config('app.locale');
-        $this->country = ConfigHelper::get('localization.country');
+        $this->country = $defaultLocalization['country'];
         $this->timezone = config('app.timezone');
-        $this->currency = ConfigHelper::get('localization.currency');
-        $this->numberFormat = ConfigHelper::get('localization.number_format');
-        $this->firstDayOfWeek = ConfigHelper::get('localization.first_day_of_week');
-        $this->longDateFormat = ConfigHelper::get('localization.long_date_format');
-        $this->shortDateFormat = ConfigHelper::get('localization.short_date_format');
-        $this->longTimeFormat = ConfigHelper::get('localization.long_time_format');
-        $this->shortTimeFormat = ConfigHelper::get('localization.short_time_format');
+        $this->currency = $defaultLocalization['currency'];
+        $this->numberFormat = $defaultLocalization['number_format'];
+        $this->firstDayOfWeek = $defaultLocalization['first_day_of_week'];
+        $this->longDateFormat = $defaultLocalization['long_date_format'];
+        $this->shortDateFormat = $defaultLocalization['short_date_format'];
+        $this->longTimeFormat = $defaultLocalization['long_time_format'];
+        $this->shortTimeFormat = $defaultLocalization['short_time_format'];
+
+        $this->headers = [];
+        $this->cookies = [];
 
         $this->clearChanges();
     }
@@ -60,6 +73,17 @@ class Settings implements ISettings, Arrayable, Jsonable
     public function getAppId()
     {
         return $this->appId;
+    }
+
+    public function setAppKey($appKey)
+    {
+        $this->appKey = $appKey;
+        return $this;
+    }
+
+    public function getAppKey()
+    {
+        return $this->appKey;
     }
 
     public function setAppName($appName)
@@ -82,6 +106,17 @@ class Settings implements ISettings, Arrayable, Jsonable
     public function getAppUrl()
     {
         return $this->appUrl;
+    }
+
+    public function setStateful(bool $stateful)
+    {
+        $this->stateful = $stateful;
+        return $this;
+    }
+
+    public function getStateful()
+    {
+        return $this->stateful;
     }
 
     public function setLocale($locale)
@@ -212,6 +247,34 @@ class Settings implements ISettings, Arrayable, Jsonable
     public function getShortTimeFormat()
     {
         return $this->shortTimeFormat;
+    }
+
+    public function setHeaders(array $headers)
+    {
+        $this->headers = $headers;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+
+    public function setCookies(array $cookies)
+    {
+        $this->cookies = $cookies;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCookies()
+    {
+        return $this->cookies;
     }
 
     public function merge($settings)

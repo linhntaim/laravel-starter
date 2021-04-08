@@ -12,7 +12,10 @@ use Illuminate\Support\Facades\Facade as BaseFacade;
 /**
  * Class ClientSettings
  * @package App\Utils\Facades
- * @method static Manager autoFetch()
+ * @method static Manager setClientApp($clientId, $force = false)
+ * @method static Manager setClientAppFromRequestRoute(Request $request)
+ * @method static Manager setClientAppFromRequestHeader(Request $request)
+ * @method static Manager decryptHeaders(Request $request)
  * @method static Manager fetchFromRequestHeaders(Request $request)
  * @method static Manager fetchFromRequestCookie(Request $request)
  * @method static Manager storeCookie()
@@ -29,6 +32,8 @@ use Illuminate\Support\Facades\Facade as BaseFacade;
  * @method static string getAppName()
  * @method static string getAppUrl()
  * @method static string getLocale()
+ *
+ * @see Manager
  */
 class Facade extends BaseFacade
 {

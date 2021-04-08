@@ -25,7 +25,7 @@ class CheckForClientLimitation
     public function handle(Request $request, Closure $next)
     {
         if (($clientLimiter = (new ClientLimiter())->retrieve()) && !$clientLimiter->canAccess($request, $this->except)) {
-            abort(403, 'Client limitation');
+            abort(403, 'ClientApp limitation');
         }
 
         return $next($request);

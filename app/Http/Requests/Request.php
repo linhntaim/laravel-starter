@@ -13,6 +13,12 @@ class Request extends BaseRequest
 {
     use AdminRequestTrait, ImpersonateRequestTrait;
 
+    public function ifHeader($key, &$header)
+    {
+        $header = is_null($key) ? null : parent::header($key);
+        return !is_null($header);
+    }
+
     public function input($key = null, $default = null)
     {
         if (is_null($key)) {

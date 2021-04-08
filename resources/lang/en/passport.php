@@ -5,7 +5,7 @@
  */
 
 return [
-    'invalid_client' => 'Client authentication failed',
+    'invalid_client' => 'ClientApp authentication failed',
     'invalid_credentials' => 'The user credentials were incorrect',
     'invalid_grant' => 'The provided authorization grant is invalid, expired, revoked, does not match the redirection URI used in the authorization request, or was issued to another client',
     'invalid_scope' => 'The requested scope is invalid, unknown, or malformed',

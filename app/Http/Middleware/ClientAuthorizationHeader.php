@@ -10,13 +10,12 @@ use App\Http\Requests\Request;
 use App\Utils\ConfigHelper;
 use Closure;
 
-class OverrideAuthorizationHeader
+class ClientAuthorizationHeader
 {
     public function handle(Request $request, Closure $next)
     {
-        $tokenAuthorizationHeader = ConfigHelper::get('header_token_authorization');
-        if (!empty($tokenAuthorizationHeader) && $request->headers->has($tokenAuthorizationHeader)) {
-            $request->headers->set('Authorization', $request->headers->get($tokenAuthorizationHeader));
+        if ($request->ifHeader(ConfigHelper::get('client.header_token_authorization'), $headerValue)) {
+            $request->headers->set('Authorization', $headerValue);
         }
         return $next($request);
     }

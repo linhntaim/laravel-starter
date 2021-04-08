@@ -106,8 +106,8 @@ return [
     ],
     'variables' => json_decode(env('VARIABLES'), true),
     'client_limit_timeout' => (int)env('CLIENT_LIMIT_TIMEOUT'),
-    'clients' => [
-        env('APP_ID', 'base') => [
+    'client' => [
+        'apps' => [
             'admin' => [
                 'app_name' => env('CLIENT_ADMIN_NAME'),
                 'app_key' => env('CLIENT_ADMIN_KEY'),
@@ -169,23 +169,30 @@ return [
                 ],
             ],
         ],
+        'app_id_maps' => [
+            'routes' => [
+                '*' => 'common',
+                'api/home' => 'home',
+                'api/home/*' => 'home',
+                'api/admin' => 'admin',
+                'api/admin/*' => 'admin',
+                'admin' => 'admin',
+                'admin/*' => 'admin',
+            ],
+        ],
+        'header_client_id' => env('HEADER_CLIENT_ID_NAME'),
+        'header_token_authorization' => env('HEADER_TOKEN_AUTHORIZATION_NAME'),
+        'headers' => [
+            'screen' => env('HEADER_SCREEN_NAME'),
+            'settings' => env('HEADER_SETTINGS_NAME'),
+            'device' => env('HEADER_DEVICE_NAME'),
+        ],
+        'header_encrypt_excepts' => array_filter(explode(',', env('HEADER_ENCRYPT_EXCEPTS', '')), function ($header) {
+            return !empty($header);
+        }),
     ],
-    'client_aliases' => [
-        env('APP_ID', 'base') . '_admin' => env('APP_ID', 'base'),
-        env('APP_ID', 'base') . '_home' => env('APP_ID', 'base'),
-        env('APP_ID', 'base') . '_common' => env('APP_ID', 'base'),
-    ],
-    'header_token_authorization' => env('HEADER_TOKEN_AUTHORIZATION_NAME'),
-    'headers' => [
-        'screen' => env('HEADER_SCREEN_NAME'),
-        'settings' => env('HEADER_SETTINGS_NAME'),
-        'device' => env('HEADER_DEVICE_NAME'),
-    ],
-    'header_encrypt_excepts' => array_filter(explode(',', env('HEADER_ENCRYPT_EXCEPTS', '')), function ($header) {
-        return !empty($header);
-    }),
 
-    'localization' => [
+    'default_localization' => [
         'country' => 'US',
         'currency' => 'USD',
         'number_format' => 'point_comma',
@@ -206,6 +213,7 @@ return [
     'currencies' => [
         'USD' => ['symbol' => '$'],
         'VND' => ['symbol' => '₫'],
+        'JPY' => ['symbol' => '¥'],
     ],
 
     'locales' => array_filter(explode(',', env('APP_LOCALE_SUPPORTED', 'en,ja')), function ($locale) {
