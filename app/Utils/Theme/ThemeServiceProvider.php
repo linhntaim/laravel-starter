@@ -20,7 +20,7 @@ class ThemeServiceProvider extends ServiceProvider
                 }
             } elseif (!empty($routeBasedThemes)) {
                 foreach ($routeBasedThemes as $routeMatch => $themeName) {
-                    if ($request->is($routeMatch)) {
+                    if ($request->possiblyIs($routeMatch)) {
                         if (isset($themes[$themeName])) {
                             $themeClass = $themes[$themeName];
                         }
