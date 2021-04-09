@@ -6,27 +6,22 @@
 
 namespace App\Console\Schedules\Base;
 
-use App\Console\Schedules\Middleware\Client;
+use App\Utils\ClientSettings\Traits\ConsoleClientTrait;
 use App\Utils\LogHelper;
-use App\Utils\SelfMiddleware\SelfMiddlewareTrait;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 abstract class Schedule
 {
-    use SelfMiddlewareTrait;
+    use ConsoleClientTrait;
 
     /**
      * @var ConsoleKernel
      */
     protected $kernel;
 
-    protected $selfMiddlewares = [
-        Client::class,
-    ];
-
-    public function getClientId()
+    public function __construct()
     {
-        return null;
+        $this->consoleClientApply();
     }
 
     public function withKernel(ConsoleKernel $kernel)
@@ -38,7 +33,6 @@ abstract class Schedule
     public function handle()
     {
         try {
-            $this->selfMiddleware();
             $this->go();
         } catch (\Exception $exception) {
             LogHelper::error($exception);

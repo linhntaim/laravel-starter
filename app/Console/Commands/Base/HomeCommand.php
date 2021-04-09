@@ -6,9 +6,9 @@
 
 namespace App\Console\Commands\Base;
 
-use App\Utils\ClientSettings\HomeClientTrait;
+use App\Utils\ClientSettings\Traits\HomeConsoleClientTrait;
 
 abstract class HomeCommand extends Command
 {
-    use HomeClientTrait;
+    use HomeConsoleClientTrait;
 }

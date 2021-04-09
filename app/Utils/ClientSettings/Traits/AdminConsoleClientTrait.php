@@ -4,11 +4,9 @@
  * Base - Any modification needs to be approved, except the space inside the block of TODO
  */
 
-namespace App\Jobs\Base;
+namespace App\Utils\ClientSettings\Traits;
 
-use App\Utils\ClientSettings\Traits\AdminIndependentClientTrait;
-
-abstract class AdminNowJob extends NowJob
+trait AdminConsoleClientTrait
 {
     use AdminIndependentClientTrait;
 }

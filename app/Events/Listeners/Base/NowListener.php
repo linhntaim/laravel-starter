@@ -7,10 +7,11 @@
 namespace App\Events\Listeners\Base;
 
 use App\Utils\ClassTrait;
+use App\Utils\ClientSettings\Traits\IndependentClientTrait;
 
 abstract class NowListener
 {
-    use ClassTrait;
+    use ClassTrait, IndependentClientTrait;
 
     protected static function __transCurrentModule()
     {
@@ -19,6 +20,7 @@ abstract class NowListener
 
     public function handle($event)
     {
+        $this->independentClientApply();
         $this->go($event);
     }
 

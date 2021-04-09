@@ -7,7 +7,6 @@
 namespace App\Console\Commands;
 
 use App\Console\Commands\Base\Command;
-use Illuminate\Foundation\Application;
 
 class AboutCommand extends Command
 {
@@ -15,6 +14,6 @@ class AboutCommand extends Command
 
     protected function go()
     {
-        $this->warn('Laravel: v' . Application::VERSION);
+        $this->warn('Laravel: v' . $this->laravel->version());
     }
 }

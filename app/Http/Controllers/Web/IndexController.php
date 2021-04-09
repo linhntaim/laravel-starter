@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\WebController;
 use App\Http\Requests\Request;
 use App\Utils\ConfigHelper;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 
 class IndexController extends WebController
@@ -38,6 +39,7 @@ class IndexController extends WebController
 
     protected function defaultView($path = null)
     {
+        Artisan::call('about');
         if (!is_null($path)) $this->abort404();
         return $this->viewHome();
     }

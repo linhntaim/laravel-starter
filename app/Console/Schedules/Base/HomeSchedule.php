@@ -6,9 +6,9 @@
 
 namespace App\Console\Schedules\Base;
 
-use App\Utils\ClientSettings\HomeClientTrait;
+use App\Utils\ClientSettings\Traits\HomeConsoleClientTrait;
 
 abstract class HomeSchedule extends Schedule
 {
-    use HomeClientTrait;
+    use HomeConsoleClientTrait;
 }
