@@ -341,8 +341,20 @@ class Settings implements ISettings, Arrayable, Jsonable
     {
         $data = [];
         foreach (array_keys(get_class_vars(static::class)) as $propertyName) {
-            if ($propertyName == 'changes') continue;
-            $data[Str::snake($propertyName)] = $this->{$propertyName};
+            if (in_array($propertyName, [
+                'locale',
+                'country',
+                'timezone',
+                'currency',
+                'numberFormat',
+                'firstDayOfWeek',
+                'longDateFormat',
+                'shortDateFormat',
+                'longTimeFormat',
+                'shortTimeFormat',
+            ])) {
+                $data[Str::snake($propertyName)] = $this->{$propertyName};
+            }
         }
         return $data;
     }

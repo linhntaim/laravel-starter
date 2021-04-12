@@ -12,9 +12,9 @@ use App\ModelTraits\OnlyAttributesToArrayTrait;
 use App\ModelTraits\ResourceTrait;
 use Illuminate\Database\Eloquent\Model as BaseModel;
 
-abstract class Model extends BaseModel implements IResource, IActivityLog, IFromModel
+abstract class Model extends BaseModel implements IResource, IActivityLog, IFromModel, IModel
 {
-    use OnlyAttributesToArrayTrait, ResourceTrait, ActivityLogTrait, FromModelTrait;
+    use ModelTrait, OnlyAttributesToArrayTrait, ResourceTrait, FromModelTrait, ActivityLogTrait;
 
     protected $resourceClass;
 }

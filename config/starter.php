@@ -133,6 +133,7 @@ return [
                 'locale' => 'ja',
                 'country' => 'JP',
                 'timezone' => 'Asia/Tokyo',
+                'currency' => 'JPY',
             ],
         ],
         'id_maps' => [
@@ -146,9 +147,9 @@ return [
                 'admin/*' => 'admin',
             ],
         ],
-        'header_client_id' => env('HEADER_CLIENT_ID_NAME'),
         'header_token_authorization' => env('HEADER_TOKEN_AUTHORIZATION_NAME'),
         'headers' => [
+            'client_id' => env('HEADER_CLIENT_ID_NAME'),
             'screen' => env('HEADER_SCREEN_NAME'),
             'settings' => env('HEADER_SETTINGS_NAME'),
             'device' => env('HEADER_DEVICE_NAME'),
@@ -159,7 +160,9 @@ return [
     ],
 
     'default_localization' => [
+        'locale' => 'en',
         'country' => 'US',
+        'timezone' => 'UTC',
         'currency' => 'USD',
         'number_format' => 'point_comma',
         'first_day_of_week' => 0,

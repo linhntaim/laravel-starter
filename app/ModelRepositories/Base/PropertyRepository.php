@@ -13,13 +13,13 @@ use App\Models\Base\PropertyModel;
 /**
  * Class PropertyRepository
  * @package App\ModelRepositories\Base
- * @method PropertyModel newModel()
+ * @method PropertyModel newModel(bool $pinned = true)
  */
 abstract class PropertyRepository extends ModelRepository
 {
     public function getPropertyDefinition()
     {
-        return $this->newModel()->getPropertyDefinition();
+        return $this->newModel(false)->getPropertyDefinition();
     }
 
     /**
@@ -32,7 +32,7 @@ abstract class PropertyRepository extends ModelRepository
      */
     public function save(string $name, $value, $hasPropertyModel, $extraAttributes = [])
     {
-        $newModel = $this->newModel();
+        $newModel = $this->newModel(false);
         $newModel->name = $name;
         $newModel->applyCasters();
         $hasPropertyModelForeignKey = $newModel->getHasPropertyModelForeignKey();

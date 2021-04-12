@@ -10,7 +10,7 @@ class Client extends BaseClientApp
     protected function setClient(Request $request)
     {
         return parent::setClient($request)
-            ->setClientFromRequestHeader($request)
-            ->decryptHeaders($request);
+            ->decryptHeaders($request)
+            ->setClientFromRequestHeader($request);
     }
 }

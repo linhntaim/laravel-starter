@@ -107,7 +107,7 @@ class Manager
         return $this;
     }
 
-    public function setClientFromRequestRoute(Request $request)
+    public function setClientFromRequestRoute(Request $request, $force = false)
     {
         $routeBasesClientIds = ConfigHelper::get('client.id_maps.routes', []);
         $appliedClientId = null;
@@ -117,15 +117,15 @@ class Manager
             }
         }
         if (!is_null($appliedClientId)) {
-            return $this->setClient($appliedClientId, true);
+            return $this->setClient($appliedClientId, $force);
         }
         return $this;
     }
 
-    public function setClientFromRequestHeader(Request $request)
+    public function setClientFromRequestHeader(Request $request, $force = false)
     {
-        if ($request->ifHeader(ConfigHelper::get('client.header_client_id'), $headerValue)) {
-            return $this->setClient($headerValue, true);
+        if ($request->ifHeader(ConfigHelper::get('client.headers.client_id'), $headerValue)) {
+            return $this->setClient($headerValue, $force);
         }
         return $this;
     }

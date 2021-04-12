@@ -68,8 +68,8 @@ class Kernel extends HttpKernel
         'api' => [
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            ClientApi::class,
             ClientAuthorizationHeader::class,
+            ClientApi::class,
             SettingsApi::class,
             DeviceApi::class,
             ScreenApi::class,
@@ -118,9 +118,9 @@ class Kernel extends HttpKernel
         \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
         \Illuminate\Routing\Middleware\ThrottleRequests::class,
 
+        ClientAuthorizationHeader::class,
         ClientApi::class,
         ClientWeb::class,
-        ClientAuthorizationHeader::class,
         SettingsApi::class,
         SettingsWeb::class,
         CustomTimezone::class,

@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Console\Commands\Base\Command;
 use App\ModelRepositories\HandledFileRepository;
 use App\Models\HandledFile;
-use App\Utils\TransactionTrait;
+use App\Utils\Database\Transaction\TransactionTrait;
 
 class ScanHandledFilesCommand extends Command
 {

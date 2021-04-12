@@ -16,6 +16,6 @@ abstract class Client
 
     protected function setClient(Request $request)
     {
-        return Facade::setClientFromRequestRoute($request);
+        return Facade::setClientFromRequestRoute($request, true);
     }
 }

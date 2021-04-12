@@ -13,8 +13,8 @@ use Illuminate\Support\Facades\Facade as BaseFacade;
  * Class ClientSettings
  * @package App\Utils\Facades
  * @method static Manager setClient($clientId, $force = false)
- * @method static Manager setClientFromRequestRoute(Request $request)
- * @method static Manager setClientFromRequestHeader(Request $request)
+ * @method static Manager setClientFromRequestRoute(Request $request, $force = false)
+ * @method static Manager setClientFromRequestHeader(Request $request, $force = false)
  * @method static Manager decryptHeaders(Request $request)
  * @method static Manager fetchFromRequestHeader(Request $request)
  * @method static Manager fetchFromRequestCookie(Request $request)
