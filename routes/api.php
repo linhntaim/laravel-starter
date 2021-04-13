@@ -91,7 +91,6 @@ Route::group([
     #region Home
     Route::group([
         'prefix' => 'home',
-        'middleware' => ['header.decrypt:home'],
     ], function () {
         #region Common
         Route::get('prerequisite', [HomePrerequisiteController::class, 'index']);
@@ -155,7 +154,6 @@ Route::group([
     #region Admin
     Route::group([
         'prefix' => 'admin',
-        'middleware' => ['header.decrypt:admin'],
     ], function () {
         #region Common
         Route::get('prerequisite', [AdminPrerequisiteController::class, 'index']);
@@ -285,7 +283,6 @@ Route::group([
     #region Common
     Route::group([
         'prefix' => 'common',
-        'middleware' => ['header.decrypt:common'],
     ], function () {
         #region Common
         Route::get('prerequisite', [CommonPrerequisiteController::class, 'index']);

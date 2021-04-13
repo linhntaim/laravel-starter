@@ -9,6 +9,7 @@ namespace App\Notifications\Base;
 use App\Models\Base\IUser;
 use App\Utils\ClientSettings\Capture;
 use Illuminate\Bus\Queueable;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
@@ -19,10 +20,20 @@ abstract class Notification extends NowNotification implements ShouldQueue
 
     const NAME = 'notification';
 
+    public function __construct(IUser $notifier = null)
+    {
+        parent::__construct($notifier);
+
+        $this->settingsCapture();
+    }
+
     protected function resolveData($via, IUser $notifiable, $dataCallback)
     {
-        return $this->settingsTemporary(function () use ($via, $notifiable, $dataCallback) {
-            return parent::resolveData($via, $notifiable, $dataCallback);
-        });
+        if ((app()->runningInConsole() || app()->runningUnitTests()) && !$this->independentClientId()) {
+            return $this->settingsTemporary(function () use ($via, $notifiable, $dataCallback) {
+                return parent::resolveData($via, $notifiable, $dataCallback);
+            });
+        }
+        return parent::resolveData($via, $notifiable, $dataCallback);
     }
 }

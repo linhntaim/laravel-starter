@@ -25,6 +25,8 @@ class ExportJob extends Job
 
     public function __construct(DataExport $dataExport, Export $export)
     {
+        parent::__construct();
+
         $this->dataExport = $dataExport;
         $this->export = $export;
     }

@@ -11,6 +11,7 @@ use App\Exceptions\AppException;
 use App\Exceptions\DatabaseException;
 use App\Exceptions\Exception;
 use App\Models\Base\IFromModel;
+use App\Models\Base\IModel;
 use App\Utils\AbortTrait;
 use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\DateTimer;
@@ -18,7 +19,6 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use PDOException;
 
 abstract class ModelRepository
@@ -66,18 +66,22 @@ abstract class ModelRepository
     public abstract function modelClass();
 
     /**
-     * @return Model|IFromModel|mixed
+     * @param bool $pinned
+     * @return Model|IFromModel|IModel|mixed
      */
-    public function newModel()
+    public function newModel($pinned = true)
     {
         $modelClass = $this->modelClass;
-        $this->model = new $modelClass();
-        return $this->model;
+        if ($pinned) {
+            $this->model = new $modelClass();
+            return $this->model;
+        }
+        return new $modelClass();
     }
 
     public function getTable()
     {
-        return $this->newModel()->getTable();
+        return $this->newModel(false)->getTable();
     }
 
     public function setModelByUnique($modelByUnique = true)
@@ -140,7 +144,7 @@ abstract class ModelRepository
 
     public function getIdKey()
     {
-        return $this->newModel()->getKeyName();
+        return $this->newModel(false)->getKeyName();
     }
 
     public function getId()
@@ -195,9 +199,9 @@ abstract class ModelRepository
     public function modelQuery($model = null, $callback = null)
     {
         if (is_null($model)) {
-            $model = $this->newModel();
+            $model = $this->newModel(false);
         } elseif (is_callable($model)) {
-            $model = $model($this->newModel());
+            $model = $model($this->newModel(false));
         }
         if (is_callable($callback)) {
             $model = $callback($model);
@@ -401,15 +405,24 @@ abstract class ModelRepository
         }
     }
 
-    public function lockTable($type = 'write')
+    protected function getLockTableQuery($lock, $connection = null)
     {
-        DB::unprepared(sprintf('lock tables %s %s', $this->getTable(), $type));
+        return null;
+    }
+
+    /**
+     * @param array $options
+     * @return ModelRepository
+     */
+    public function lockTable($options = [])
+    {
+        $this->newModel(false)->lockTable($options);
         return $this;
     }
 
     public function unlockTable()
     {
-        DB::unprepared('unlock tables');
+        $this->newModel(false)->unlockTable();
         return $this;
     }
 

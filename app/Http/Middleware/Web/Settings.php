@@ -2,15 +2,14 @@
 
 namespace App\Http\Middleware\Web;
 
+use App\Http\Middleware\Settings as BaseSettings;
 use App\Http\Requests\Request;
 use App\Utils\ClientSettings\Facade;
-use Closure;
 
-class Settings
+class Settings extends BaseSettings
 {
-    public function handle(Request $request, Closure $next)
+    protected function fetch(Request $request)
     {
         Facade::fetchFromRequestCookie($request);
-        return $next($request);
     }
 }

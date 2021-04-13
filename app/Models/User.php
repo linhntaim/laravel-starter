@@ -14,6 +14,7 @@ use App\Models\Base\IProtected;
 use App\Models\Base\IResource;
 use App\Models\Base\IUser;
 use App\Models\Base\IUserHasSettings;
+use App\Models\Base\ModelTrait;
 use App\ModelTraits\ActivityLogTrait;
 use App\ModelTraits\FromModelTrait;
 use App\ModelTraits\OnlyAttributesToArrayTrait;
@@ -46,7 +47,8 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
     use HasFactory, Notifiable, NotificationTrait {
         NotificationTrait::notifications insteadof Notifiable;
     }
-    use OnlyAttributesToArrayTrait, PassportTrait, HasApiTokens, MemorizeTrait, ResourceTrait, SoftDeletes, ActivityLogTrait, FromModelTrait, ProtectedTrait;
+    use PassportTrait, HasApiTokens, MemorizeTrait, SoftDeletes, ProtectedTrait;
+    use ModelTrait, OnlyAttributesToArrayTrait, ResourceTrait, FromModelTrait, ActivityLogTrait;
 
     const MIN_PASSWORD_LENGTH = 8;
 

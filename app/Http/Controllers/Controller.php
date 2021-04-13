@@ -12,7 +12,7 @@ use App\Models\HandledFile;
 use App\Utils\AbortTrait;
 use App\Utils\ActivityLogTrait;
 use App\Utils\ClassTrait;
-use App\Utils\TransactionTrait;
+use App\Utils\Database\Transaction\TransactionTrait;
 use App\Utils\ValidationTrait;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;

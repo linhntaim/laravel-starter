@@ -112,13 +112,12 @@ class ConfigHelper
         return !empty($callback) ? $callback($blockKey) : $blockKey;
     }
 
-    public static function getClient($type = null, $id = null)
+    /**
+     * @param string|null $id
+     * @return array
+     */
+    public static function getClient($id = null)
     {
-        if (empty($id)) {
-            $id = Facade::getAppId();
-            $clientAliases = static::get('client_aliases');
-            if (isset($clientAliases[$id])) $id = $clientAliases[$id];
-        }
-        return empty($type) ? static::get('clients.' . $id) : static::get(sprintf('clients.%s.%s', $id, $type));
+        return is_null($id) ? static::get('client.ids') : static::get(sprintf('client.ids.%s', $id));
     }
 }

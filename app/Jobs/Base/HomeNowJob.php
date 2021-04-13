@@ -6,9 +6,9 @@
 
 namespace App\Jobs\Base;
 
-use App\Utils\ClientSettings\HomeSettingsHandleTrait;
+use App\Utils\ClientSettings\Traits\HomeIndependentClientTrait;
 
 abstract class HomeNowJob extends NowJob
 {
-    use HomeSettingsHandleTrait;
+    use HomeIndependentClientTrait;
 }
