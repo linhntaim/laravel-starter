@@ -6,16 +6,23 @@
 
 namespace App\Console\Schedules\Base;
 
+use App\Utils\ClientSettings\Traits\ConsoleClientTrait;
 use App\Utils\LogHelper;
-
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 abstract class Schedule
 {
+    use ConsoleClientTrait;
+
     /**
      * @var ConsoleKernel
      */
     protected $kernel;
+
+    public function __construct()
+    {
+        $this->consoleClientApply();
+    }
 
     public function withKernel(ConsoleKernel $kernel)
     {

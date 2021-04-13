@@ -8,7 +8,7 @@ namespace App\Imports\Base;
 
 use App\ModelRepositories\Base\ModelRepository;
 use App\Models\Base\Model;
-use App\Utils\TransactionTrait;
+use App\Utils\Database\Transaction\TransactionTrait;
 
 /**
  * Class ModelCsvImport

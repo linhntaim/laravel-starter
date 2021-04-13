@@ -8,7 +8,6 @@ namespace App\Utils\Mail;
 
 use App\Exceptions\AppException;
 use App\Utils\ClassTrait;
-use App\Utils\ClientSettings\Capture;
 use App\Utils\ConfigHelper;
 use App\Utils\ClientSettings\Facade;
 use App\Utils\LogHelper;
@@ -18,7 +17,7 @@ use Swift_DependencyContainer;
 
 class TemplateNowMailable extends Mailable
 {
-    use ClassTrait, RateLimiterTrait, Capture;
+    use ClassTrait, RateLimiterTrait;
 
     const DEFAULT_CHARSET = 'UTF-8';
 
@@ -59,18 +58,13 @@ class TemplateNowMailable extends Mailable
 
     public function __construct($templateName, array $templateParams = [], $templateLocalized = true, $templateLocale = null, $templateNamespace = null, $charset = null)
     {
-        $this->parseCharset(is_null($charset) ? ConfigHelper::get('emails.send_charset') : $charset);
-
         $this->templateName = $templateName;
         $this->templateParams = $templateParams;
         $this->templateLocalized = $templateLocalized;
         $this->templateNamespace = $templateNamespace;
 
-        $this->settingsCapture();
-
-        if ($templateLocale) {
-            $this->setLocale($templateLocale);
-        }
+        $this->locale = $templateLocale ? $templateLocale : Facade::getLocale();
+        $this->parseCharset(is_null($charset) ? ConfigHelper::get('emails.send_charset') : $charset);
     }
 
     /**

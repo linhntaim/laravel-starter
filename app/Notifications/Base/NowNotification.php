@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\DateTimer;
 use App\Utils\ClientSettings\Facade;
+use App\Utils\ClientSettings\Traits\IndependentClientTrait;
 use App\Utils\ConfigHelper;
 use App\Utils\Mail\TemplateMailable;
 use App\Utils\Mail\TemplateNowMailable;
@@ -24,7 +25,7 @@ use Illuminate\Support\Facades\Notification;
 
 abstract class NowNotification extends BaseNotification
 {
-    use ClassTrait;
+    use ClassTrait, IndependentClientTrait;
 
     const VIA_DATABASE = 'database';
     const VIA_BROADCAST = 'broadcast';
@@ -133,6 +134,7 @@ abstract class NowNotification extends BaseNotification
 
     protected function resolveData($via, IUser $notifiable, $dataCallback)
     {
+        $this->independentClientApply();
         return Facade::temporaryFromUser($notifiable, function () use ($via, $notifiable, $dataCallback) {
             return $dataCallback($notifiable);
         });

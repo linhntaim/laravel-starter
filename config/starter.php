@@ -107,8 +107,8 @@ return [
     ],
     'variables' => json_decode(env('VARIABLES'), true),
     'client_limit_timeout' => (int)env('CLIENT_LIMIT_TIMEOUT'),
-    'clients' => [
-        env('APP_ID', 'base') => [
+    'client' => [
+        'ids' => [
             'admin' => [
                 'app_name' => env('CLIENT_ADMIN_NAME'),
                 'app_key' => env('CLIENT_ADMIN_KEY'),
@@ -117,17 +117,6 @@ return [
                 'country' => 'JP',
                 'timezone' => 'Asia/Tokyo',
                 'currency' => 'JPY',
-                'number_format' => 'point_comma',
-                'first_day_of_week' => 0,
-                'long_date_format' => 0,
-                'short_date_format' => 0,
-                'long_time_format' => 0,
-                'short_time_format' => 0,
-                'cookie' => [
-                    'names' => [
-                        'default' => env('CLIENT_ADMIN_COOKIE_DEFAULT_NAME', ''),
-                    ],
-                ],
             ],
             'home' => [
                 'app_name' => env('CLIENT_HOME_NAME'),
@@ -137,17 +126,6 @@ return [
                 'country' => 'JP',
                 'timezone' => 'Asia/Tokyo',
                 'currency' => 'JPY',
-                'number_format' => 'point_comma',
-                'first_day_of_week' => 0,
-                'long_date_format' => 0,
-                'short_date_format' => 0,
-                'long_time_format' => 0,
-                'short_time_format' => 0,
-                'cookie' => [
-                    'names' => [
-                        'default' => env('CLIENT_HOME_COOKIE_DEFAULT_NAME', ''),
-                    ],
-                ],
             ],
             'common' => [
                 'app_name' => env('CLIENT_COMMON_NAME'),
@@ -157,41 +135,39 @@ return [
                 'country' => 'JP',
                 'timezone' => 'Asia/Tokyo',
                 'currency' => 'JPY',
-                'number_format' => 'point_comma',
-                'first_day_of_week' => 0,
-                'long_date_format' => 0,
-                'short_date_format' => 0,
-                'long_time_format' => 0,
-                'short_time_format' => 0,
-                'cookie' => [
-                    'names' => [
-                        'default' => env('CLIENT_COMMON_COOKIE_DEFAULT_NAME', ''),
-                    ],
-                ],
             ],
         ],
+        'id_maps' => [
+            'routes' => [
+                '*' => 'common',
+                'api/home' => 'home',
+                'api/home/*' => 'home',
+                'api/admin' => 'admin',
+                'api/admin/*' => 'admin',
+                'admin' => 'admin',
+                'admin/*' => 'admin',
+            ],
+        ],
+        'header_token_authorization' => env('HEADER_TOKEN_AUTHORIZATION_NAME'),
+        'headers' => [
+            'client_id' => env('HEADER_CLIENT_ID_NAME'),
+            'screen' => env('HEADER_SCREEN_NAME'),
+            'settings' => env('HEADER_SETTINGS_NAME'),
+            'device' => env('HEADER_DEVICE_NAME'),
+        ],
+        'header_encrypt_excepts' => array_filter(explode(',', env('HEADER_ENCRYPT_EXCEPTS', '')), function ($header) {
+            return !empty($header);
+        }),
     ],
-    'client_aliases' => [
-        env('APP_ID', 'base') . '_admin' => env('APP_ID', 'base'),
-        env('APP_ID', 'base') . '_home' => env('APP_ID', 'base'),
-        env('APP_ID', 'base') . '_common' => env('APP_ID', 'base'),
-    ],
-    'header_token_authorization' => env('HEADER_TOKEN_AUTHORIZATION_NAME'),
-    'headers' => [
-        'screen' => env('HEADER_SCREEN_NAME'),
-        'settings' => env('HEADER_SETTINGS_NAME'),
-        'device' => env('HEADER_DEVICE_NAME'),
-    ],
-    'header_encrypt_excepts' => array_filter(explode(',', env('HEADER_ENCRYPT_EXCEPTS', '')), function ($header) {
-        return !empty($header);
-    }),
     'web_cookies' => [
         'settings' => env('WEB_COOKIE_SETTINGS_NAME'),
         'device' => env('WEB_COOKIE_DEVICE_NAME'),
     ],
 
-    'localization' => [
+    'default_localization' => [
+        'locale' => 'en',
         'country' => 'US',
+        'timezone' => 'UTC',
         'currency' => 'USD',
         'number_format' => 'point_comma',
         'first_day_of_week' => 0,
@@ -210,7 +186,7 @@ return [
 
     'currencies' => [
         'USD' => ['symbol' => '$'],
-        'VND' => ['symbol' => '₫'],
+        'JPY' => ['symbol' => '¥'],
     ],
 
     'locales' => array_filter(explode(',', env('APP_LOCALE_SUPPORTED', 'en,ja')), function ($locale) {

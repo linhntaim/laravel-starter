@@ -6,19 +6,14 @@
 
 namespace App\Http\Middleware\Web;
 
+use App\Http\Middleware\Settings as BaseSettings;
 use App\Http\Requests\Request;
 use App\Utils\ClientSettings\Facade;
-use App\Utils\ConfigHelper;
-use App\Utils\Theme\ThemeFacade;
-use Closure;
 
-class Settings
+class Settings extends BaseSettings
 {
-    public function handle(Request $request, Closure $next)
+    protected function fetch(Request $request)
     {
-        // Apply the default but still prefer to get settings from client
-        Facade::update(ConfigHelper::getClient(ThemeFacade::getAppType()))
-            ->fetchFromRequestCookie($request);
-        return $next($request);
+        Facade::fetchFromRequestCookie($request);
     }
 }

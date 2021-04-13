@@ -10,8 +10,8 @@ use App\Http\Controllers\ApiController;
 use App\Http\Middleware\Web\ViewShare;
 use App\Utils\ClassTrait;
 use App\Utils\ConfigHelper;
+use App\Utils\Database\Transaction\TransactionManager;
 use App\Utils\Theme\ThemeFacade;
-use App\Utils\TransactionHelper;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
@@ -60,7 +60,7 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $e)
     {
-        TransactionHelper::getInstance()->stop();
+        TransactionManager::getInstance()->stop();
 
         return parent::render($request, $e);
     }

@@ -6,7 +6,9 @@
 
 namespace App\Notifications\Base;
 
-class AdminNotification extends Notification
+use App\Utils\ClientSettings\Traits\AdminIndependentClientTrait;
+
+abstract class AdminNotification extends Notification
 {
-    use AdminNotificationTrait;
+    use AdminIndependentClientTrait;
 }

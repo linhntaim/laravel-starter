@@ -6,9 +6,9 @@
 
 namespace App\Console\Schedules\Base;
 
-use App\Utils\ClientSettings\AdminSettingsHandleTrait;
+use App\Utils\ClientSettings\Traits\AdminConsoleClientTrait;
 
 abstract class AdminSchedule extends Schedule
 {
-    use AdminSettingsHandleTrait;
+    use AdminConsoleClientTrait;
 }

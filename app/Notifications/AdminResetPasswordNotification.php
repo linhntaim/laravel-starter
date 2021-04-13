@@ -7,9 +7,9 @@
 namespace App\Notifications;
 
 use App\Models\Base\IUser;
-use App\Notifications\Base\AdminNowNotification;
+use App\Notifications\Base\NowNotification;
 
-class AdminResetPasswordNotification extends AdminNowNotification
+class AdminResetPasswordNotification extends NowNotification
 {
     use UserResetPasswordNotificationTrait;
 

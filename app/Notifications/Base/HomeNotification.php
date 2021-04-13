@@ -6,7 +6,9 @@
 
 namespace App\Notifications\Base;
 
-class HomeNotification extends Notification
+use App\Utils\ClientSettings\Traits\HomeIndependentClientTrait;
+
+abstract class HomeNotification extends Notification
 {
-    use HomeNotificationTrait;
+    use HomeIndependentClientTrait;
 }

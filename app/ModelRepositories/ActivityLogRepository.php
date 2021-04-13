@@ -8,9 +8,10 @@ namespace App\ModelRepositories;
 
 use App\ModelRepositories\Base\ModelRepository;
 use App\Models\ActivityLog;
+use App\Utils\ClientSettings\Facade;
 use App\Utils\ConfigHelper;
-use App\Utils\CurrentDevice;
-use App\Utils\CurrentScreen;
+use App\Utils\Device\Facade as DeviceFacade;
+use App\Utils\Screen\Facade as ScreenFacade;
 
 /**
  * Class ActivityLogRepository
@@ -70,11 +71,11 @@ class ActivityLogRepository extends ModelRepository
     {
         return $this->createWithAttributes([
             'user_id' => $this->retrieveId($actedBy),
-            'device_id' => CurrentDevice::getId(),
-            'client' => CurrentScreen::getClient(),
-            'screen' => CurrentScreen::getName(),
+            'device_id' => DeviceFacade::getId(),
+            'client' => Facade::getAppId(),
+            'screen' => ScreenFacade::getScreenName(),
             'action' => $action,
-            'screens_array_value' => CurrentScreen::getAsStack(),
+            'screens_array_value' => ScreenFacade::getScreens(),
             'payload_array_value' => $payload,
         ]);
     }

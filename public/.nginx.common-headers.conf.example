@@ -1,6 +1,6 @@
 ### Enable cross-domain accessing
 add_header Access-Control-Allow-Origin "*" always;
-add_header Access-Control-Allow-Headers "Accept, Authorization, Content-Type, Origin, Referer, User-Agent, X-Authorization, X-Device, X-Requested-With, X-Settings, X-Screen";
+add_header Access-Control-Allow-Headers "Accept, Authorization, Content-Type, Origin, Referer, User-Agent, X-Authorization, X-Client-Id, X-Device, X-Requested-With, X-Settings, X-Screen";
 add_header Access-Control-Allow-Methods "OPTIONS, GET, POST, PUT, DELETE";
 add_header Access-Control-Max-Age 86400;
 

@@ -8,6 +8,7 @@ namespace App\Console\Commands\Base;
 
 use App\Exceptions\Exception;
 use App\Utils\ClassTrait;
+use App\Utils\ClientSettings\Traits\ConsoleClientTrait;
 use App\Utils\LogHelper;
 use App\Utils\ShellTrait;
 use Illuminate\Console\Command as BaseCommand;
@@ -15,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class Command extends BaseCommand
 {
-    use ClassTrait, ShellTrait;
+    use ClassTrait, ShellTrait, ConsoleClientTrait;
 
     protected $__friendlyName;
 
@@ -28,6 +29,13 @@ abstract class Command extends BaseCommand
     }
 
     protected $noInformation = false;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->consoleClientApply();
+    }
 
     /**
      * @return Command
