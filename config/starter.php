@@ -136,10 +136,24 @@ return [
                 'timezone' => 'Asia/Tokyo',
                 'currency' => 'JPY',
             ],
+            'web' => [
+                'app_name' => env('APP_NAME'),
+                'app_key' => env('APP_KEY'),
+                'app_url' => env('APP_URL'),
+                'locale' => 'ja',
+                'country' => 'JP',
+                'timezone' => 'Asia/Tokyo',
+                'currency' => 'JPY',
+                'stateful' => true,
+                'cookies' => [
+                    'settings' => env('APP_COOKIE_SETTINGS_NAME'),
+                    'device' => env('APP_COOKIE_DEVICE_NAME'),
+                ],
+            ],
         ],
         'id_maps' => [
             'routes' => [
-                '*' => 'common',
+                '*' => 'web',
                 'api/home' => 'home',
                 'api/home/*' => 'home',
                 'api/admin' => 'admin',
@@ -158,10 +172,6 @@ return [
         'header_encrypt_excepts' => array_filter(explode(',', env('HEADER_ENCRYPT_EXCEPTS', '')), function ($header) {
             return !empty($header);
         }),
-    ],
-    'web_cookies' => [
-        'settings' => env('WEB_COOKIE_SETTINGS_NAME'),
-        'device' => env('WEB_COOKIE_DEVICE_NAME'),
     ],
 
     'default_localization' => [

@@ -244,7 +244,7 @@ class Manager
     public function __call($name, $arguments)
     {
         if (Str::startsWith($name, 'get')) {
-            return $this->settings->{$name}();
+            return $this->settings->{$name}(...$arguments);
         }
 
         throw new AppException('Invalid method');
