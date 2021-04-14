@@ -49,6 +49,7 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
+            "app/Utils/Helpers/helpers.php",
             "app/Utils/Theme/functions.php"
         ]
     },

@@ -13,7 +13,9 @@
 #    # Ignore: IPs (JPN - Office)
 #    Require ip 124.36.26.238
 #    # Ignore: Images
-#    Require expr %{REQUEST_URI} =~ m#^.+\.(jpg|jpeg|png|gif|svg|ico)$#
+#    Require expr %{REQUEST_URI} =~ m#\.(jpg|jpeg|png|gif|svg|ico)$#
+#    # Ignore: 200.html
+#    Require expr %{REQUEST_URI} =~ m#200\.html$#
 #    # Other must fill username and password
 #    Require valid-user
 # </RequireAny>

@@ -8,6 +8,7 @@ namespace App\Notifications\Base;
 
 use App\Models\Base\IUser;
 use App\Utils\ClientSettings\Capture;
+use App\Vendors\Illuminate\Support\Facades\App;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -29,7 +30,7 @@ abstract class Notification extends NowNotification implements ShouldQueue
 
     protected function resolveData($via, IUser $notifiable, $dataCallback)
     {
-        if ((app()->runningInConsole() || app()->runningUnitTests()) && !$this->independentClientId()) {
+        if (App::notRunningFromRequest() && !$this->independentClientId()) {
             return $this->settingsTemporary(function () use ($via, $notifiable, $dataCallback) {
                 return parent::resolveData($via, $notifiable, $dataCallback);
             });

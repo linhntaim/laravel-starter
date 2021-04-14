@@ -7,7 +7,6 @@
 namespace App\Utils;
 
 use App\Configuration;
-use App\Utils\ClientSettings\Facade;
 use Symfony\Component\HttpFoundation\Response;
 
 class ConfigHelper

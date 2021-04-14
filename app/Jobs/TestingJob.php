@@ -7,17 +7,17 @@
 namespace App\Jobs;
 
 use App\Jobs\Base\Job;
-use App\Utils\LogHelper;
+use Illuminate\Support\Facades\Log;
 
 class TestingJob extends Job
 {
     public function go()
     {
-        LogHelper::info(sprintf('%s executed', static::class));
+        Log::info(sprintf('%s executed', static::class));
     }
 
     public function failed()
     {
-        LogHelper::info(sprintf('%s failed', static::class));
+        Log::info(sprintf('%s failed', static::class));
     }
 }

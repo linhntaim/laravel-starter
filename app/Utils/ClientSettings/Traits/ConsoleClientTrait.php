@@ -6,6 +6,8 @@
 
 namespace App\Utils\ClientSettings\Traits;
 
+use App\Vendors\Illuminate\Support\Facades\App;
+
 trait ConsoleClientTrait
 {
     use IndependentClientTrait;
@@ -17,7 +19,7 @@ trait ConsoleClientTrait
 
     public function consoleClientApply()
     {
-        if (app()->runningInConsole() || app()->runningUnitTests()) {
+        if (App::notRunningFromRequest()) {
             $this->independentClientApply($this->consoleClientId());
         }
     }

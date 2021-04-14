@@ -11,9 +11,9 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use App\Utils\ConfigHelper;
-use App\Utils\Helper;
 use App\Utils\PasswordGenerator;
-use App\Utils\StringHelper;
+use App\Vendors\Illuminate\Support\Facades\App;
+use App\Vendors\Illuminate\Support\Str;
 
 class DefaultSeeder extends Seeder
 {
@@ -71,12 +71,12 @@ class DefaultSeeder extends Seeder
             ]);
         }
 
-        $systemPassword = Helper::runInProductionMode() ? PasswordGenerator::random() : $this->systemPassword;
+        $systemPassword = App::runningInProduction() ? PasswordGenerator::random() : $this->systemPassword;
         $systemId = User::query()->updateOrCreate([
             'email' => $this->systemEmail,
         ], [
             'username' => strtok($this->systemEmail, '@'),
-            'password' => StringHelper::hash($systemPassword),
+            'password' => Str::hash($systemPassword),
         ])->id;
         Admin::query()->updateOrCreate([
             'user_id' => $systemId,
@@ -86,12 +86,12 @@ class DefaultSeeder extends Seeder
         ]);
         $this->output()->writeln(sprintf('System: %s / %s', $this->systemEmail, $systemPassword));
 
-        $superAdminPassword = Helper::runInProductionMode() ? PasswordGenerator::random() : $this->superAdminPassword;
+        $superAdminPassword = App::runningInProduction() ? PasswordGenerator::random() : $this->superAdminPassword;
         $superAdminId = User::query()->updateOrCreate([
             'email' => $this->superAdminEmail,
         ], [
             'username' => strtok($this->superAdminEmail, '@'),
-            'password' => StringHelper::hash($superAdminPassword),
+            'password' => Str::hash($superAdminPassword),
         ])->id;
         Admin::query()->updateOrCreate([
             'user_id' => $superAdminId,
@@ -138,12 +138,12 @@ class DefaultSeeder extends Seeder
             ]);
         }
 
-        $adminPassword = Helper::runInProductionMode() ? PasswordGenerator::random() : $this->administratorPassword;
+        $adminPassword = App::runningInProduction() ? PasswordGenerator::random() : $this->administratorPassword;
         $adminId = User::query()->updateOrCreate([
             'email' => $this->administratorEmail,
         ], [
             'username' => strtok($this->administratorEmail, '@'),
-            'password' => StringHelper::hash($adminPassword),
+            'password' => Str::hash($adminPassword),
         ])->id;
         Admin::query()->updateOrCreate([
             'user_id' => $adminId,

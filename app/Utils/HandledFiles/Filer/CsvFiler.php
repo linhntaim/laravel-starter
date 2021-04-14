@@ -7,7 +7,7 @@
 namespace App\Utils\HandledFiles\Filer;
 
 use App\Exceptions\AppException;
-use App\Utils\StringHelper;
+use App\Vendors\Illuminate\Support\Str;
 
 class CsvFiler extends Filer
 {
@@ -99,7 +99,7 @@ class CsvFiler extends Filer
                 $item = ltrim($item, chr(0xEF) . chr(0xBB) . chr(0xBF));
                 $this->fHasTrimBomCharacters = true;
             }
-            $item = StringHelper::toUtf8($item);
+            $item = Str::toUtf8($item);
         });
         return $this->fReadMatchesHeaders($read);
     }

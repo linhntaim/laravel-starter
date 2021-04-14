@@ -9,7 +9,7 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Http\Controllers\ApiResponseTrait;
 use App\ModelRepositories\OAuthImpersonateRepository;
 use App\Utils\ConfigHelper;
-use App\Utils\Helper;
+use App\Vendors\Illuminate\Support\Str;
 use Illuminate\Http\Response;
 use Laravel\Passport\Exceptions\OAuthServerException;
 use Laravel\Passport\Http\Controllers\AccessTokenController;
@@ -62,7 +62,7 @@ abstract class LoginController extends AccessTokenController
     {
         $parsedBody = $request->getParsedBody();
         if (isset($parsedBody['client_id'])) {
-            if (!Helper::isUnsignedInteger($parsedBody['client_id'])) {
+            if (!Str::isUnsignedInteger($parsedBody['client_id'])) {
                 return $this->throwException(LeagueException::invalidClient($request));
             }
         }

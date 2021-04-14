@@ -15,12 +15,18 @@ use App\Utils\ExtraActions\HookAction;
 use App\Utils\ExtraActions\ReplaceAction;
 use App\Utils\Screen\Manager as ScreenManager;
 use App\Vendors\Illuminate\Database\Connectors\ConnectionFactory;
+use App\Vendors\Illuminate\Log\LogManager;
+use App\Vendors\Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 
 class AppServiceProvider extends ServiceProvider
 {
+    protected function generateAppId()
+    {
+        $this->app['id'] = Str::uuid();
+    }
+
     /**
      * Register any application services.
      *
@@ -28,10 +34,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->generateAppId();
+
         $this->app->alias('request', Request::class);
 
         $this->app->singleton('db.factory', function ($app) {
             return new ConnectionFactory($app);
+        });
+        $this->app->singleton('log', function ($app) {
+            return new LogManager($app);
         });
         $this->app->singleton(ClientSettingsManager::class, function () {
             return new ClientSettingsManager();

@@ -10,9 +10,9 @@ use App\Exceptions\AppException;
 use App\Utils\ClassTrait;
 use App\Utils\ConfigHelper;
 use App\Utils\ClientSettings\Facade;
-use App\Utils\LogHelper;
 use App\Utils\RateLimiterTrait;
 use Illuminate\Mail\Mailable;
+use Illuminate\Support\Facades\Log;
 use Swift_DependencyContainer;
 
 class TemplateNowMailable extends Mailable
@@ -240,7 +240,7 @@ class TemplateNowMailable extends Mailable
 
             $key = ConfigHelper::get('emails.send_rate_key');
             if ($this->limiter->tooManyAttempts($key, $maxAttempts)) {
-                LogHelper::info(sprintf('Delay mailing: %s - %s - %s', static::class, $this->templateName, json_encode($this->templateParams)));
+                Log::info(sprintf('Delay mailing: %s - %s - %s', static::class, $this->templateName, json_encode($this->templateParams)));
                 sleep(ConfigHelper::get('emails.send_rate_wait_for_seconds'));
                 $this->send($mailer);
                 return;

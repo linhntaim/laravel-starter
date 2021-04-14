@@ -6,7 +6,7 @@
 
 namespace App\ModelTraits;
 
-use Ramsey\Uuid\Uuid;
+use App\Vendors\Illuminate\Support\Str;
 
 trait UuidTrait
 {
@@ -17,7 +17,7 @@ trait UuidTrait
         static::creating(function ($model) {
             if (!empty($model->uuids)) {
                 foreach ((array)$model->uuids as $uuidKey) {
-                    $model->{$uuidKey} = Uuid::uuid1();
+                    $model->{$uuidKey} = Str::uuid();
                 }
             }
         });

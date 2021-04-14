@@ -6,7 +6,7 @@
 
 namespace App\Utils\Regex\RegexBasedStringGenerator;
 
-use App\Utils\StringHelper;
+use App\Vendors\Illuminate\Support\Str;
 
 abstract class GeneratorNode
 {
@@ -236,7 +236,7 @@ abstract class GeneratorNode
 
     public function drawId()
     {
-        return '#' . StringHelper::fillFollow($this->id, static::$count, '0');
+        return '#' . Str::fillFollow($this->id, static::$count, '0');
     }
 
     public function getFactor()

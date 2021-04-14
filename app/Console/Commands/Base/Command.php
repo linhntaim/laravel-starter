@@ -9,9 +9,9 @@ namespace App\Console\Commands\Base;
 use App\Exceptions\Exception;
 use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\Traits\ConsoleClientTrait;
-use App\Utils\LogHelper;
 use App\Utils\ShellTrait;
 use Illuminate\Console\Command as BaseCommand;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class Command extends BaseCommand
@@ -91,7 +91,7 @@ abstract class Command extends BaseCommand
 
     public function handle()
     {
-        LogHelper::info(sprintf('%s executing...', static::class));
+        Log::info(sprintf('%s executing...', static::class));
         try {
             $this->before();
             $this->go();
@@ -99,12 +99,12 @@ abstract class Command extends BaseCommand
         } catch (\Exception $exception) {
             $this->handleException($exception);
         }
-        LogHelper::info(sprintf('%s executed!', static::class));
+        Log::info(sprintf('%s executed!', static::class));
     }
 
     protected function handleException(\Exception $exception)
     {
-        LogHelper::error($exception);
+        Log::error($exception);
 
         $this->error('EXCEPTION:');
         $this->warn('- Code: ' . $exception->getCode());
@@ -142,7 +142,7 @@ abstract class Command extends BaseCommand
             $this->info('Exit code: ' . $exitCode) : $this->error('Exit code: ' . $exitCode);
         $this->info(sprintf('SHELL %s!!!', $this->shellSuccess() ? 'EXECUTED' : 'FAILED'));
 
-        LogHelper::info(sprintf(
+        Log::info(sprintf(
             'Shell %s:' . PHP_EOL
             . '%s' . PHP_EOL
             . '--------' . PHP_EOL

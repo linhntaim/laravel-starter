@@ -11,9 +11,11 @@ use App\Http\Requests\Request;
 use App\Models\Base\IUser;
 use App\Utils\ConfigHelper;
 use App\Utils\CryptoJs\AES;
-use App\Utils\LogHelper;
+use App\Vendors\Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Jenssegers\Agent\Agent;
 
 /**
  * Class Manager
@@ -52,6 +54,27 @@ class Manager
     {
         $this->possibleClientIds = array_keys(ConfigHelper::getClient());
         $this->set(new Settings());
+    }
+
+    public function getInformation()
+    {
+        $agent = new Agent();
+        return [
+            'device' => $agent->device(),
+            'platform' => [
+                'name' => $agent->platform(),
+                'version' => $agent->version($agent->platform()),
+            ],
+            'browser' => [
+                'name' => $agent->browser(),
+                'version' => $agent->version($agent->browser()),
+            ],
+        ];
+    }
+
+    public function getUserAgent()
+    {
+        return request()->userAgent();
     }
 
     public function capture()
@@ -145,7 +168,7 @@ class Manager
                     if ($headerValue = AES::decrypt(base64_decode($headerValue), $secret)) {
                         $request->headers->set($header, $headerValue);
                     } else {
-                        LogHelper::error(new AppException(sprintf('Header [%s] cannot be decrypted.', $header)));
+                        Log::error(new AppException(sprintf('Header [%s] cannot be decrypted.', $header)));
                     }
                 }
             }

@@ -8,8 +8,8 @@ namespace App\ModelRepositories;
 
 use App\ModelRepositories\Base\ModelRepository;
 use App\Models\Device;
-use App\Utils\ClientHelper;
-use App\Utils\StringHelper;
+use App\Utils\ClientSettings\Facade;
+use App\Vendors\Illuminate\Support\Str;
 
 /**
  * Class DeviceRepository
@@ -55,9 +55,9 @@ class DeviceRepository extends ModelRepository
     protected function trySecretWithProvider($provider, $maxTry = 100)
     {
         $try = 0;
-        while (($secret = StringHelper::uuid()) && $this->hasProviderAndSecret($provider, $secret) && ++$try) {
+        while (($secret = Str::uuid()) && $this->hasProviderAndSecret($provider, $secret) && ++$try) {
             if ($try == $maxTry) {
-                return $this->abort403();
+                $this->abort403();
             }
         }
         return $secret;
@@ -86,15 +86,15 @@ class DeviceRepository extends ModelRepository
             'provider' => $provider,
             'secret' => empty($secret) ? $this->trySecretWithProvider($provider) : $secret,
             'client_ips' => $clientIps,
-            'client_agent' => ClientHelper::userAgent(),
+            'client_agent' => Facade::getUserAgent(),
             'meta_array_value' => [
-                'client_info' => ClientHelper::information(),
+                'client_info' => Facade::getInformation(),
             ],
         ]) : $this->updateWithAttributes([
             'client_ips' => $clientIps,
-            'client_agent' => ClientHelper::userAgent(),
+            'client_agent' => Facade::getUserAgent(),
             'meta_array_value' => [
-                'client_info' => ClientHelper::information(),
+                'client_info' => Facade::getInformation(),
             ],
         ]);
     }

@@ -3,6 +3,7 @@
 namespace App\Utils;
 
 use App\Http\Requests\Request;
+use App\Vendors\Symfony\Component\HttpFoundation\IpUtils;
 
 trait IpLimiterTrait
 {
@@ -41,12 +42,12 @@ trait IpLimiterTrait
 
     protected function inAllowed(Request $request)
     {
-        return empty($this->allowed) || Helper::matchedIps($request->ips(), $this->allowed);
+        return empty($this->allowed) || IpUtils::checkIps($request->ips(), $this->allowed);
     }
 
     protected function notInDenied(Request $request)
     {
-        return empty($this->denied) || !Helper::matchedIps($request->ips(), $this->denied);
+        return empty($this->denied) || !IpUtils::checkIps($request->ips(), $this->denied);
     }
 
     protected function except(Request $request, $except)

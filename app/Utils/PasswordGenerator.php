@@ -8,14 +8,14 @@ namespace App\Utils;
 
 class PasswordGenerator
 {
-    protected $symbolsIncluded;
-    protected $numbersIncluded;
-    protected $lowerCasesIncluded;
-    protected $upperCasesIncluded;
-    protected $symbolsLength;
-    protected $numbersLength;
-    protected $lowerCasesLength;
-    protected $upperCasesLength;
+    protected $symbolsIncluded = false;
+    protected $numbersIncluded = false;
+    protected $lowerCasesIncluded = false;
+    protected $upperCasesIncluded = false;
+    protected $symbolsLength = 0;
+    protected $numbersLength = 0;
+    protected $lowerCasesLength = 0;
+    protected $upperCasesLength = 0;
     protected $lowerCaseCharacters = 'abcdefghijklmnopqrstuvwxyz';
     protected $upperCaseCharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     protected $numberCharacters = '0123456789';
@@ -80,7 +80,8 @@ class PasswordGenerator
         return $this;
     }
 
-    protected function randomString($included, $length, $characters) {
+    protected function randomString($included, $length, $characters)
+    {
         $random = '';
         if ($included && $length) {
             while (($d = $length - strlen($random)) > 0) {
@@ -118,15 +119,16 @@ class PasswordGenerator
 
     public static function random()
     {
-        return (new PasswordGenerator())->excludeSimilarCharacters(true)
-            ->includeUpperCases(true)
-            ->setUpperCasesLength(3)
-            ->includeLowerCases(true)
-            ->setLowerCasesLength(3)
-            ->includeNumbers(true)
-            ->setNumbersLength(3)
-            ->includeSymbols(true)
-            ->setSymbolsLength(3)
+        return (new PasswordGenerator())
+            ->excludeSimilarCharacters()
+            ->includeUpperCases()
+            ->setUpperCasesLength()
+            ->includeLowerCases()
+            ->setLowerCasesLength()
+            ->includeNumbers()
+            ->setNumbersLength()
+            ->includeSymbols()
+            ->setSymbolsLength()
             ->generate();
     }
 }
