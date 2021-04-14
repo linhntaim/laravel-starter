@@ -6,7 +6,6 @@
 
 namespace App\Http\Requests;
 
-use App\Utils\Helper;
 use Illuminate\Http\Request as BaseRequest;
 
 class Request extends BaseRequest
@@ -54,7 +53,7 @@ class Request extends BaseRequest
         if (is_null($key)) {
             return parent::input($key);
         }
-        return Helper::default(parent::input($key), $default);
+        return got(parent::input($key), $default);
     }
 
     public function ifInputNotEmpty($key, &$input)
@@ -76,7 +75,7 @@ class Request extends BaseRequest
                     function ($item) {
                         return strtolower(trim($item));
                     },
-                    explode(',', $this->headers->get('access-control-request-headers'))
+                    explode(',', $this->headers->get('Access-Control-Request-Headers'))
                 )
             );
     }

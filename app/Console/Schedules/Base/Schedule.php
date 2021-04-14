@@ -7,8 +7,8 @@
 namespace App\Console\Schedules\Base;
 
 use App\Utils\ClientSettings\Traits\ConsoleClientTrait;
-use App\Utils\LogHelper;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Log;
 
 abstract class Schedule
 {
@@ -35,8 +35,13 @@ abstract class Schedule
         try {
             $this->go();
         } catch (\Exception $exception) {
-            LogHelper::error($exception);
+            $this->handleException($exception);
         }
+    }
+
+    protected function handleException($exception)
+    {
+        Log::error($exception);
     }
 
     protected abstract function go();

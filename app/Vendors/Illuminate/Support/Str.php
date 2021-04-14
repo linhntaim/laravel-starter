@@ -1,17 +1,18 @@
 <?php
 
-/**
- * Base - Any modification needs to be approved, except the space inside the block of TODO
- */
-
-namespace App\Utils;
+namespace App\Vendors\Illuminate\Support;
 
 use App\Utils\ClientSettings\Facade;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Illuminate\Support\Str as BaseStr;
 
-class StringHelper
+class Str extends BaseStr
 {
+    public static function uuid()
+    {
+        return parent::uuid()->toString();
+    }
+
     public static function fill($text, $length, $char)
     {
         $textLength = mb_strlen($text);
@@ -26,18 +27,13 @@ class StringHelper
 
     public static function hashRandom($length = 32, &$random = null)
     {
-        $random = Str::random($length);
+        $random = static::random($length);
         return static::hash($random);
     }
 
     public static function hash($text)
     {
         return Hash::make($text);
-    }
-
-    public static function uuid()
-    {
-        return Str::uuid()->toString();
     }
 
     public static function toUtf8($text)
@@ -71,5 +67,15 @@ class StringHelper
     public static function lines($text)
     {
         return preg_split('/\r*\n|\r/', $text);
+    }
+
+    public static function isUnsignedInteger($input)
+    {
+        return preg_match('/^\d+$/', $input) === 1;
+    }
+
+    public static function isInteger($input)
+    {
+        return preg_match('/^[+-]?\d+$/', $input) === 1;
     }
 }

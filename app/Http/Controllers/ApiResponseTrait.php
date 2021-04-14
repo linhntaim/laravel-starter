@@ -11,10 +11,9 @@ use App\Exceptions\UnhandledException;
 use App\Exceptions\UserException;
 use App\Http\Requests\Request;
 use App\Utils\ConfigHelper;
-use App\Utils\Helper;
-use App\Utils\LogHelper;
 use Closure;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -42,7 +41,7 @@ trait ApiResponseTrait
         }
         static::$extraResponse['_error'] = [
             'level' => $level,
-            'data' => Helper::default($data, null),
+            'data' => got($data),
         ];
     }
 
@@ -162,7 +161,7 @@ trait ApiResponseTrait
     {
         $this->transactionStop();
         if ($message instanceof \Exception) {
-            LogHelper::error($message);
+            Log::error($message);
         }
         if ($message instanceof HttpExceptionInterface) {
             $statusCode = $message->getStatusCode();

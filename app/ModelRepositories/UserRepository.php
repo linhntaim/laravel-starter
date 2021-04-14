@@ -15,7 +15,7 @@ use App\Models\Base\IProtected;
 use App\Models\User;
 use App\Utils\ClientSettings\DateTimer;
 use App\Utils\SocialLogin;
-use App\Utils\StringHelper;
+use App\Vendors\Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -131,7 +131,7 @@ class UserRepository extends ModelRepository implements IProtectedRepository, IU
             throw new AppException(static::__transErrorWithModule('email.not_allowed'));
         }
         if (!empty($attributes['password'])) {
-            $attributes['password'] = StringHelper::hash($attributes['password']);
+            $attributes['password'] = Str::hash($attributes['password']);
             $attributes['password_changed_at'] = DateTimer::syncNow();
         } else {
             unset($attributes['password']);
@@ -161,7 +161,7 @@ class UserRepository extends ModelRepository implements IProtectedRepository, IU
         }
 
         if (!empty($attributes['password'])) {
-            $attributes['password'] = StringHelper::hash($attributes['password']);
+            $attributes['password'] = Str::hash($attributes['password']);
             $attributes['password_changed_at'] = DateTimer::syncNow();
         } else {
             unset($attributes['password']);

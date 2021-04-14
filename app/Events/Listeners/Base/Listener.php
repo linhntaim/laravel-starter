@@ -8,6 +8,7 @@ namespace App\Events\Listeners\Base;
 
 use App\Events\Event;
 use App\Utils\ClientSettings\Capture;
+use App\Vendors\Illuminate\Support\Facades\App;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -29,7 +30,7 @@ abstract class Listener extends NowListener implements ShouldQueue
      */
     public function handle($event)
     {
-        if ((app()->runningInConsole() || app()->runningUnitTests()) && !$this->independentClientId()) {
+        if (App::notRunningFromRequest() && !$this->independentClientId()) {
             $event->settingsTemporary(function () use ($event) {
                 parent::handle($event);
             });

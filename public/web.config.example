@@ -15,7 +15,7 @@
         // Ignore: IPs (JPN - Office)
         <add key="IgnoreIPAddresses" value="113.161.68.31;113.161.68.89;113.43.219.94;124.36.26.238"/>
         // Ignore: Images
-        <add key="IgnorePathRegex" value="^.+\.(jpg|jpeg|png|gif|svg|ico)$"/>
+        <add key="IgnorePathRegex" value="\.(jpg|jpeg|png|gif|svg|ico)$|200\.html$"/>
         // Other must fill username and password
         <add key="Credentials" value="hakuhodo_base:Base@190708"/>
     </httpAuthModule>

@@ -7,6 +7,7 @@
 namespace App\Jobs\Base;
 
 use App\Utils\ClientSettings\Capture;
+use App\Vendors\Illuminate\Support\Facades\App;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -23,7 +24,7 @@ abstract class Job extends NowJob implements ShouldQueue
 
     public function handle()
     {
-        if ((app()->runningInConsole() || app()->runningUnitTests()) && !$this->independentClientId()) {
+        if (App::notRunningFromRequest() && !$this->independentClientId()) {
             $this->settingsTemporary(function () {
                 parent::handle();
             });

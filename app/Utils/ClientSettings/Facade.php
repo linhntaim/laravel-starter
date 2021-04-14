@@ -35,6 +35,8 @@ use Illuminate\Support\Facades\Facade as BaseFacade;
  * @method static string getLocale()
  * @method static string getCookie($key)
  * @method static string getPath($key)
+ * @method static array getInformation()
+ * @method static string getUserAgent()
  *
  * @see \App\Utils\ClientSettings\Manager
  */

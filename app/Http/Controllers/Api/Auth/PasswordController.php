@@ -11,7 +11,7 @@ use App\Http\Requests\Request;
 use App\ModelRepositories\Base\IUserRepository;
 use App\ModelRepositories\PasswordResetRepository;
 use App\Models\User;
-use App\Utils\StringHelper;
+use App\Vendors\Illuminate\Support\Str;
 use Closure;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Passwords\PasswordBroker;
@@ -167,7 +167,7 @@ abstract class PasswordController extends ModelApiController
 
     protected function afterReset(User $user, $password)
     {
-        $user->password = StringHelper::hash($password);
+        $user->password = Str::hash($password);
         $user->save();
 
         event(new PasswordReset($user));
