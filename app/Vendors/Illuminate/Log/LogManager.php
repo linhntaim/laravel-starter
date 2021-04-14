@@ -9,6 +9,20 @@ use Illuminate\Support\Facades\Auth;
 
 class LogManager extends BaseLogManager
 {
+    protected $off = false;
+
+    protected function off()
+    {
+        $this->off = true;
+        return $this;
+    }
+
+    protected function on()
+    {
+        $this->off = false;
+        return $this;
+    }
+
     protected function formatMessage($message)
     {
         if ($message instanceof \Throwable) {
@@ -26,7 +40,9 @@ class LogManager extends BaseLogManager
         ];
 
         if (!isset($context['userId'])) {
+            $this->off();
             $context['userId'] = Auth::id();
+            $this->on();
         }
 
         $exceptionContent = [];
@@ -48,46 +64,55 @@ class LogManager extends BaseLogManager
 
     public function emergency($message, array $context = [])
     {
+        if ($this->off) return;
         parent::emergency($this->formatMessage($message), $this->formatContext($context, $message));
     }
 
     public function alert($message, array $context = [])
     {
+        if ($this->off) return;
         parent::alert($this->formatMessage($message), $this->formatContext($context, $message));
     }
 
     public function critical($message, array $context = [])
     {
+        if ($this->off) return;
         parent::critical($this->formatMessage($message), $this->formatContext($context, $message));
     }
 
     public function error($message, array $context = [])
     {
+        if ($this->off) return;
         parent::error($this->formatMessage($message), $this->formatContext($context, $message));
     }
 
     public function warning($message, array $context = [])
     {
+        if ($this->off) return;
         parent::warning($this->formatMessage($message), $this->formatContext($context, $message));
     }
 
     public function notice($message, array $context = [])
     {
+        if ($this->off) return;
         parent::notice($this->formatMessage($message), $this->formatContext($context, $message));
     }
 
     public function info($message, array $context = [])
     {
+        if ($this->off) return;
         parent::info($this->formatMessage($message), $this->formatContext($context, $message));
     }
 
     public function debug($message, array $context = [])
     {
+        if ($this->off) return;
         parent::debug($this->formatMessage($message), $this->formatContext($context, $message));
     }
 
     public function log($level, $message, array $context = [])
     {
+        if ($this->off) return;
         parent::log($level, $this->formatMessage($message), $this->formatContext($context, $message));
     }
 }
