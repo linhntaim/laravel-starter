@@ -8,7 +8,6 @@ namespace App\Exceptions;
 
 use App\Http\Controllers\ApiController;
 use App\Http\Middleware\Web\ViewShare;
-use App\Utils\ClassTrait;
 use App\Utils\ConfigHelper;
 use App\Utils\Database\Transaction\TransactionManager;
 use App\Utils\Theme\ThemeFacade;
@@ -25,8 +24,6 @@ use Throwable;
 
 class Handler extends ExceptionHandler
 {
-    use ClassTrait;
-
     /**
      * A list of the exception types that are not reported.
      *

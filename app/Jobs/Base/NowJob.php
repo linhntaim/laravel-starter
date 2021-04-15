@@ -6,12 +6,18 @@
 
 namespace App\Jobs\Base;
 
+use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\Traits\IndependentClientTrait;
 use Illuminate\Foundation\Bus\Dispatchable;
 
 abstract class NowJob
 {
-    use Dispatchable, IndependentClientTrait;
+    use ClassTrait, Dispatchable, IndependentClientTrait;
+
+    protected static function __transCurrentModule()
+    {
+        return 'job';
+    }
 
     public function handle()
     {
