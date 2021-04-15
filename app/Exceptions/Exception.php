@@ -22,54 +22,78 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
 
     /**
      * @param Throwable $exception
+     * @param string $message
+     * @param array $publicAttachedData
+     * @param array $privateAttachedData
      * @return Exception
      */
-    public static function from($exception)
+    public static function from($exception, $message = '', $publicAttachedData = [], $privateAttachedData = [])
     {
         $class = static::__class();
-        return new $class(null, 0, $exception);
+        return new $class($message, 0, $exception, $publicAttachedData, $privateAttachedData);
     }
 
-    protected static function getThrowableMessage(Throwable $throwable)
-    {
-        if ($throwable instanceof PDOException) {
-            return is_array($throwable->errorInfo) && isset($throwable->errorInfo[2])
-                ? $throwable->errorInfo[2] : $throwable->getMessage();
-        }
-        return $throwable->getMessage();
-    }
-
-    protected $attachedData;
+    /**
+     * @var array
+     */
     protected $messages;
 
-    public function __construct($message = null, $code = 0, Throwable $previous = null)
+    /**
+     * @var array
+     */
+    protected $attachedData;
+
+    /**
+     * @var bool
+     */
+    protected $withMessageLevel = true;
+
+    public function __construct($message = '', $code = 0, Throwable $previous = null, $publicAttachedData = [], $privateAttachedData = [])
     {
-        $withoutMessage = empty($message);
-
-        if (is_array($message)) {
-            $this->messages = $message;
-            $message = array_values($this->messages)[0];
-        } elseif (!$withoutMessage) {
-            $message = $this->formatMessage($message);
-        }
-
-        parent::__construct($message, $code ? $code : static::CODE, $previous);
-
-        if ($withoutMessage) {
-            if (!config('app.debug') && ConfigHelper::get('force_common_exception')) {
-                $this->message = trans('error.exceptions.default_exception.level_failed');
-            } elseif ($previous) {
-                $this->message = $this->formatMessage(static::getThrowableMessage($previous));
-            } else {
-                $this->message = $this->formatMessage();
-            }
-        }
-        $this->messages = [$this->message];
+        parent::__construct('', $code ? $code : static::CODE, $previous);
 
         if ($previous) {
-            $this->line = $previous->getLine();
+            $this->code = $previous instanceof HttpExceptionInterface ?
+                $previous->getStatusCode() : $previous->getCode();
             $this->file = $previous->getFile();
+            $this->line = $previous->getLine();
         }
+
+        if (empty($message)) {
+            if (!config('app.debug') && ConfigHelper::get('force_common_exception')) {
+                $this->messages = [trans('error.exceptions.default_exception.level_failed')];
+            } elseif ($message = $this->getMessageFromPrevious()) {
+                $this->messages = [$message];
+            } else {
+                $this->messages = [$this->defaultMessage()];
+            }
+        } else {
+            if (is_array($message)) {
+                $this->messages = $message;
+            } else {
+                $this->messages = [$message];
+            }
+        }
+        $this->message = $this->formatMessage(array_values($this->messages)[0]);
+
+        $this->attachedData = [
+            'public' => $publicAttachedData,
+            'private' => $privateAttachedData,
+        ];
+    }
+
+    protected function getMessageFromPrevious()
+    {
+        $previous = $this->getPrevious();
+        if ($previous) {
+            if ($previous instanceof PDOException) {
+                if (is_array($previous->errorInfo) && isset($previous->errorInfo[2])) {
+                    return $previous->errorInfo[2];
+                }
+            }
+            return $previous->getMessage();
+        }
+        return '';
     }
 
     public function getStatusCode()
@@ -98,12 +122,18 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
         return $this;
     }
 
-    public function setAttachedData($attachedData)
+    /**
+     * @param array $attachedData
+     * @param bool $public
+     * @return Exception
+     */
+    public function setAttachedData($attachedData, $public = true)
     {
-        if (empty($this->attachedData)) {
-            $this->attachedData = [];
+        if ($public) {
+            $this->attachedData['public'] = array_merge($this->attachedData['public'], $attachedData);
+        } else {
+            $this->attachedData['private'] = array_merge($this->attachedData['private'], $attachedData);
         }
-        $this->attachedData = array_merge($this->attachedData, $attachedData);
         return $this;
     }
 
@@ -124,7 +154,7 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
 
     public function getAttachedData()
     {
-        return $this->attachedData;
+        return $this->attachedData['public'];
     }
 
     public function getMessages()
@@ -137,10 +167,20 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
         return static::LEVEL;
     }
 
-    public function formatMessage($message = '')
+    protected function formatMessage($message)
     {
-        return empty($message) ?
-            $this->__transErrorWithModule('level_failed')
-            : $this->__transErrorWithModule('level', ['message' => $message]);
+        return $this->withMessageLevel ? $this->__transErrorWithModule('level', ['message' => $message]) : $message;
+    }
+
+    protected function defaultMessage()
+    {
+        $transOptions = isset($this->attachedData['private']['trans_options']) ?
+            $this->attachedData['private']['trans_options'] : [];
+        return transIf(
+            'error.def.abort.' . $this->code,
+            $this->__transErrorWithModule('level_failed'),
+            isset($transOptions['replace']) ? $transOptions['replace'] : [],
+            isset($transOptions['locale']) ? $transOptions['locale'] : null
+        );
     }
 }

@@ -16,6 +16,7 @@ use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -63,14 +64,26 @@ class Handler extends ExceptionHandler
 
     protected function prepareException(Throwable $e)
     {
-        if ($e instanceof ThrottleRequestsException) {
-            return new AppException(static::__transErrorWithModule('throttle_requests'), 429);
+        // common
+        $exceptionClasses = [
+            NotFoundHttpException::class,
+            ThrottleRequestsException::class,
+        ];
+        foreach ($exceptionClasses as $exceptionClass) {
+            if ($e instanceof $exceptionClass) {
+                return AppException::from($e);
+            }
         }
+        // specific
         if ($e instanceof MethodNotAllowedHttpException) {
-            return new AppException(static::__transErrorWithModule('method_not_allowed', [
-                'method' => request()->getMethod(),
-                'allow' => $e->getHeaders()['Allow'],
-            ]), 405);
+            return AppException::from($e, [], [
+                'trans_options' => [
+                    'replace' => [
+                        'method' => request()->getMethod(),
+                        'allow' => $e->getHeaders()['Allow'],
+                    ],
+                ],
+            ]);
         }
         return parent::prepareException($e);
     }

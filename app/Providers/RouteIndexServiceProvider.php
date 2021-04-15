@@ -24,7 +24,7 @@ class RouteIndexServiceProvider extends ServiceProvider
                         // TODO
                     ], function () {
                         Route::get('/{path?}', [IndexController::class, 'index'])
-                            ->where('path', '^(?!api\/).*');
+                            ->where('path', '(^(?!api)|^(?!api\/).*)');
                     });
                 });
         });

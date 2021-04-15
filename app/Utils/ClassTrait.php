@@ -13,13 +13,14 @@ use Illuminate\Support\Str;
 trait ClassTrait
 {
     protected static $__transNamespace = '';
+
     protected static $__transNamespaceFallback = false;
 
-    protected $__friendlyClassBaseName;
+    protected static $__friendlyClassBaseName;
 
     protected static $__snakyClassBaseName;
 
-    protected static function setTransNamespace($transNamespace, $fallback = false)
+    protected static function __setTransNamespace($transNamespace, $fallback = false)
     {
         static::$__transNamespace = $transNamespace . '::';
         static::$__transNamespaceFallback = $fallback;
@@ -43,21 +44,21 @@ trait ClassTrait
         return static::$__snakyClassBaseName;
     }
 
-    protected function __friendlyClassBaseName()
+    protected static function __friendlyClassBaseName()
     {
-        if (empty($this->__friendlyClassBaseName)) {
-            $this->__friendlyClassBaseName = Str::title(Str::snake(static::__classBaseName(), ' '));
+        if (empty(static::$__friendlyClassBaseName)) {
+            static::$__friendlyClassBaseName = Str::title(Str::snake(static::__classBaseName(), ' '));
         }
-        return $this->__friendlyClassBaseName;
+        return static::$__friendlyClassBaseName;
     }
 
     protected static function __transWithTemporaryNamespace($transNamespace, callable $transCallback, $fallback = false)
     {
         $origin = static::$__transNamespace;
         $originFallback = static::$__transNamespaceFallback;
-        static::setTransNamespace($transNamespace, $fallback);
+        static::__setTransNamespace($transNamespace, $fallback);
         $trans = $transCallback();
-        static::setTransNamespace($origin, $originFallback);
+        static::__setTransNamespace($origin, $originFallback);
         return $trans;
     }
 
