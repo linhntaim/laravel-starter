@@ -47,7 +47,7 @@ class SystemLogController extends ModelApiController
         if (Helper::hasBackPath($logRealPath)
             || !File::isFile($logRealPath)
             || !in_array(File::extension($logRealPath), static::ALLOWED_LOG_EXTENSIONS)) {
-            return $this->abort404();
+            $this->abort404();
         }
         return $this->responseDownload($logRealPath);
     }

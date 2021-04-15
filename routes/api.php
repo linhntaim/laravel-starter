@@ -136,8 +136,6 @@ Route::group([
                 Route::get('/', [HomeAccountController::class, 'index']);
                 Route::post('/', [HomeAccountController::class, 'store']);
 
-                Route::get('handled-file/{id}', [HomeHandledFileController::class, 'show'])->name('account.handled_file.show');
-
                 // TODO:
 
                 // TODO

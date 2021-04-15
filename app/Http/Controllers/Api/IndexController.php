@@ -9,6 +9,6 @@ class IndexController extends ApiController
 {
     public function index(Request $request)
     {
-        return $this->abort404();
+        $this->abort404();
     }
 }
