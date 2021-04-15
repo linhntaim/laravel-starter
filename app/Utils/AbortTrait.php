@@ -8,13 +8,14 @@ namespace App\Utils;
 
 trait AbortTrait
 {
-    protected function abort($code, $message = null, $transOptions = [])
+    protected function abort($code, $message = '', $transOptions = [])
     {
         abort(
             $code,
-            empty($message) && trans()->ha ?
-                trans(
+            empty($message) ?
+                transIf(
                     'error.def.abort.' . $code,
+                    $message,
                     isset($transOptions['replace']) ? $transOptions['replace'] : [],
                     isset($transOptions['locale']) ? $transOptions['locale'] : null
                 )
@@ -22,32 +23,32 @@ trait AbortTrait
         );
     }
 
-    protected function abort400($message = null, $transOptions = [])
+    protected function abort400($message = '', $transOptions = [])
     {
         $this->abort(400, $message, $transOptions);
     }
 
-    protected function abort401($message = null, $transOptions = [])
+    protected function abort401($message = '', $transOptions = [])
     {
         $this->abort(401, $message, $transOptions);
     }
 
-    protected function abort403($message = null, $transOptions = [])
+    protected function abort403($message = '', $transOptions = [])
     {
         $this->abort(403, $message, $transOptions);
     }
 
-    protected function abort404($message = null, $transOptions = [])
+    protected function abort404($message = '', $transOptions = [])
     {
         $this->abort(404, $message, $transOptions);
     }
 
-    protected function abort500($message = null, $transOptions = [])
+    protected function abort500($message = '', $transOptions = [])
     {
         $this->abort(500, $message, $transOptions);
     }
 
-    protected function abort503($message = null, $transOptions = [])
+    protected function abort503($message = '', $transOptions = [])
     {
         $this->abort(503, $message, $transOptions);
     }
