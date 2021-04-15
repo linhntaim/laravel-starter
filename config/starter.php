@@ -127,15 +127,6 @@ return [
                 'timezone' => 'Asia/Tokyo',
                 'currency' => 'JPY',
             ],
-            'common' => [
-                'app_name' => env('CLIENT_COMMON_NAME'),
-                'app_key' => env('CLIENT_COMMON_KEY'),
-                'app_url' => env('CLIENT_COMMON_URL'),
-                'locale' => 'ja',
-                'country' => 'JP',
-                'timezone' => 'Asia/Tokyo',
-                'currency' => 'JPY',
-            ],
             'web' => [
                 'app_name' => env('APP_NAME'),
                 'app_key' => env('APP_KEY'),
