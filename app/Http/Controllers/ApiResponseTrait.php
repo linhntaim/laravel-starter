@@ -25,7 +25,7 @@ trait ApiResponseTrait
 
     public static function addBlockResponseMessage($message, $fresh = false)
     {
-        if (!empty(static::$extraResponse)) {
+        if (is_null(static::$extraResponse)) {
             static::$extraResponse = [];
         }
         if ($fresh || !isset(static::$extraResponse['_block']) || static::$extraResponse['_block'] == null) {
@@ -36,7 +36,7 @@ trait ApiResponseTrait
 
     public static function addErrorResponseMessage($level, $data)
     {
-        if (!empty(static::$extraResponse)) {
+        if (is_null(static::$extraResponse)) {
             static::$extraResponse = [];
         }
         static::$extraResponse['_error'] = [
@@ -63,14 +63,13 @@ trait ApiResponseTrait
                 'trace' => $exception->getTrace(),
             ];
             if ($exception instanceof OAuthServerException) {
-                $exception = new UserException(
-                    trans('passport.' . $exception->getErrorType() . ($exception->getCode() == 8 ? '_refresh_token' : '')),
-                    0,
-                    $exception
+                $exception = UserException::from(
+                    $exception,
+                    trans('passport.' . $exception->getErrorType() . ($exception->getCode() == 8 ? '_refresh_token' : ''))
                 );
             }
             if (!($exception instanceof Exception)) {
-                $exception = new UnhandledException($exception->getMessage(), 0, $exception);
+                $exception = UnhandledException::from($exception);
             }
 
             $message = $exception->getMessages();

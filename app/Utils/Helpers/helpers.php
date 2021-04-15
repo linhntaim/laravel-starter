@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Auth;
-
 function got($value, $default = null)
 {
     if (filled($value)) {
@@ -25,7 +23,12 @@ function callIf($bool, callable $callback, $if = true)
     return $callback(value($bool));
 }
 
+function transIf($key, $default = null, $replace = [], $locale = null, $fallback = true)
+{
+    return trans()->has($key, $locale, $fallback) ? trans($key, $replace, $locale) : $default;
+}
+
 function currentUserId($default = null)
 {
-    return got(Auth::id(), $default);
+    return got(auth()->id(), $default);
 }
