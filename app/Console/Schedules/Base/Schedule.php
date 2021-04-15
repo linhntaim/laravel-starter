@@ -6,13 +6,14 @@
 
 namespace App\Console\Schedules\Base;
 
+use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\Traits\ConsoleClientTrait;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\Log;
 
 abstract class Schedule
 {
-    use ConsoleClientTrait;
+    use ClassTrait, ConsoleClientTrait;
 
     /**
      * @var ConsoleKernel

@@ -8,9 +8,12 @@ namespace App\Exports\Base;
 
 use App\ModelRepositories\HandledFileRepository;
 use App\Models\HandledFile;
+use App\Utils\ClassTrait;
 
 abstract class Export
 {
+    use ClassTrait;
+
     const NAME = 'export';
 
     /**

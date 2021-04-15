@@ -6,13 +6,12 @@
 
 namespace App\Imports\Base;
 
-use App\Utils\ClassTrait;
 use App\Utils\HandledFiles\Filer\Filer;
 use App\Utils\ValidationTrait;
 
 abstract class Import
 {
-    use ClassTrait, ValidationTrait;
+    use ValidationTrait;
 
     /**
      * @var Filer
