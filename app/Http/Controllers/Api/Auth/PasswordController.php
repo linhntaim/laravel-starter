@@ -92,7 +92,7 @@ abstract class PasswordController extends ModelApiController
         ]);
 
         $email = $this->modelRepository->getEmailByToken($request->input('token'));
-        if (empty($email)) return $this->abort404();
+        if (empty($email)) $this->abort404();
 
         $user = $this->brokerGetUser([
             'email' => $email,
@@ -101,7 +101,7 @@ abstract class PasswordController extends ModelApiController
             return $this->responseFail(trans(Password::INVALID_USER));
         }
         if (!$this->brokerTokenExists($user, $request->input('token'))) {
-            return $this->abort404();
+            $this->abort404();
         }
 
         return $this->responseModel([
