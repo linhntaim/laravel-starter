@@ -29,6 +29,10 @@ return [
             'level_failed' => 'Something went wrong with application',
             'level' => ':message',
         ],
+        'console_exception' => [
+            'level_failed' => 'Something went wrong with application',
+            'level' => ':message',
+        ],
         'database_exception' => [
             'level_failed' => 'Something went wrong with database',
             'level' => ':message',

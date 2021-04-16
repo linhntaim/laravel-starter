@@ -2,8 +2,14 @@
 
 namespace App\Vendors\Illuminate\Support\Facades;
 
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\App as BaseApp;
 
+/**
+ * Class App
+ * @package App\Vendors\Illuminate\Support\Facades
+ * @method static Application terminating(callable|string $callback)
+ */
 class App extends BaseApp
 {
     public static function runningInProduction()

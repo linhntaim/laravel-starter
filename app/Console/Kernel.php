@@ -9,6 +9,7 @@ namespace App\Console;
 use App\Console\Schedules\Base\Schedule as AppSchedule;
 use App\Console\Schedules\ScanHandleFilesSchedule;
 use App\Console\Schedules\TestCommandSchedule;
+use App\Console\Schedules\TestSchedule;
 use App\Console\Schedules\TestShellSchedule;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -30,6 +31,7 @@ class Kernel extends ConsoleKernel
                 'everyMinute',
             ],
             'schedules' => [
+                TestSchedule::class,
                 TestCommandSchedule::class,
                 TestShellSchedule::class,
                 ScanHandleFilesSchedule::class,

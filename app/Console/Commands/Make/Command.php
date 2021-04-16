@@ -18,7 +18,7 @@ abstract class Command extends BaseCommand
     protected function go()
     {
             $this->warn(sprintf('Making [%s]...', $this->__friendlyName()));
-            $this->lineBreak();
+            $this->newLine();
             if ($this->forced()) {
                 $this->goForcingToMake();
             } else {

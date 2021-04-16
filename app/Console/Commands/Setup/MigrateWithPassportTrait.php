@@ -54,16 +54,16 @@ trait MigrateWithPassportTrait
         }
 
         if (!$migrated) {
-            $this->lineBreak();
+            $this->newLine();
             $this->rollbackPassport();
             $this->call('passport:install', [
                 '--force' => true,
             ]);
-            $this->lineBreak();
+            $this->newLine();
         }
 
         $this->info('Passport migrated!!!');
-        $this->lineBreak();
+        $this->newLine();
     }
 
     private function seedPassport()
@@ -105,7 +105,7 @@ trait MigrateWithPassportTrait
         $environmentFileHelper->save();
 
         $this->info('Passport seeded!!!');
-        $this->lineBreak();
+        $this->newLine();
     }
 
     private function rollbackPassport()
@@ -128,6 +128,6 @@ trait MigrateWithPassportTrait
         @unlink(storage_path('oauth-public.key'));
 
         $this->info('Passport immigrated!!!');
-        $this->lineBreak();
+        $this->newLine();
     }
 }

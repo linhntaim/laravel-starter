@@ -29,6 +29,10 @@ return [
             'level_failed' => 'システムエラーが発生しました。しばらくしてからもう一度お試しください。',
             'level' => ':message',
         ],
+        'console_exception' => [
+            'level_failed' => 'システムエラーが発生しました。しばらくしてからもう一度お試しください。',
+            'level' => ':message',
+        ],
         'database_exception' => [
             'level_failed' => 'データベースに問題が発生しました。',
             'level' => ':message',

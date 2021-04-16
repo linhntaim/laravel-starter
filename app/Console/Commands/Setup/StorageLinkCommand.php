@@ -38,7 +38,7 @@ class StorageLinkCommand extends Command
                     }
                 }
             }
-            $this->lineBreak();
+            $this->newLine();
         }
     }
 
