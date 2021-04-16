@@ -34,6 +34,7 @@ use Illuminate\Database\Eloquent\Collection;
  * @property bool $ready
  * @property bool $encrypted
  * @property bool $scanned
+ * @property bool $scanning
  * @property bool $public
  * @property bool $inline
  * @property array $options_array_value
@@ -110,6 +111,11 @@ class HandledFile extends Model
     {
         return (!isset($this->options_array_value['scan']) || $this->options_array_value['scan'] == false)
             && (!isset($this->options_array_value['scanned']) || $this->options_array_value['scanned']);
+    }
+
+    public function getScanningAttribute()
+    {
+        return isset($this->options_array_value['scan']) && $this->options_array_value['scan'];
     }
 
     public function getPublicAttribute()
