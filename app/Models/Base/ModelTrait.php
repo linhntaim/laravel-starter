@@ -14,14 +14,14 @@ trait ModelTrait
     protected static function tableWithPrefix($table, $prefix = '', $as = null)
     {
         return $as ?
-            sprintf('%s%s as `%s`', $prefix, $table, $as)
+            sprintf('%s%s as %s', $prefix, $table, $as)
             : sprintf('%s%s', $prefix, $table);
     }
 
     protected static function columnWithTable($column, $table, $prefix = '', $as = null)
     {
         return $as ?
-            sprintf('%s.%s as `%s`', static::tableWithPrefix($table, $prefix), $column, $as)
+            sprintf('%s.%s as %s', static::tableWithPrefix($table, $prefix), $column, $as)
             : sprintf('%s.%s', static::tableWithPrefix($table, $prefix), $column);
     }
 
