@@ -11,14 +11,51 @@ trait ModelTrait
         return (new static)->getTable();
     }
 
+    protected static function tableWithPrefix($table, $prefix = '', $as = null)
+    {
+        return $as ?
+            sprintf('%s%s as `%s`', $prefix, $table, $as)
+            : sprintf('%s%s', $prefix, $table);
+    }
+
+    protected static function columnWithTable($column, $table, $prefix = '', $as = null)
+    {
+        return $as ?
+            sprintf('%s.%s as `%s`', static::tableWithPrefix($table, $prefix), $column, $as)
+            : sprintf('%s.%s', static::tableWithPrefix($table, $prefix), $column);
+    }
+
+    public static function fullTableOf($table, $as = null)
+    {
+        return static::tableWithPrefix($table, (new static)->getConnection()->getTablePrefix(), $as);
+    }
+
     public static function fullTable($as = null)
     {
         return (new static)->getFullTable($as);
     }
 
+    public static function fullColumnOfTable($column, $table, $as = null)
+    {
+        return static::columnWithTable($column, $table, (new static)->getConnection()->getTablePrefix(), $as);
+    }
+
     public static function fullColumn($column, $as = null)
     {
         return (new static)->getFullColumn($column, $as);
+    }
+
+    public static function fullColumnsOfTable($columns, $table, $as = null)
+    {
+        return array_map(function ($column, $index) use ($table, $as) {
+            return static::columnWithTable(
+                $column,
+                $table,
+                (new static)->getConnection()->getTablePrefix(),
+                isset($as[$column]) ? $as[$column] : (isset($as[$index]) ? $as[$index] : null)
+            );
+        }, $columns);
+
     }
 
     public static function fullColumns($columns, $as = [])
@@ -28,16 +65,12 @@ trait ModelTrait
 
     public function getFullTable($as = null)
     {
-        return $as ?
-            sprintf('`%s%s` as `%s`', $this->getConnection()->getTablePrefix(), $this->getTable(), $as)
-            : sprintf('`%s%s`', $this->getConnection()->getTablePrefix(), $this->getTable());
+        return static::tableWithPrefix($this->getTable(), $this->getConnection()->getTablePrefix(), $as);
     }
 
     public function getFullColumn($column, $as = null)
     {
-        return $as ?
-            sprintf('%s.`%s` as `%s`', $this->getFullTable(), $column, $as)
-            : sprintf('%s.`%s`', $this->getFullTable(), $column);
+        return static::columnWithTable($column, $this->getTable(), $this->getConnection()->getTablePrefix(), $as);
     }
 
     public function getFullColumns($columns, $as = [])
