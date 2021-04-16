@@ -19,6 +19,7 @@ use App\Vendors\Illuminate\Log\LogManager;
 use App\Vendors\Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Passport\Passport;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -93,5 +94,8 @@ class AppServiceProvider extends ServiceProvider
             'JIS',
             'ISO-2022-JP',
         ]);
+
+        Passport::tokensExpireIn(now()->addSeconds(ConfigHelper::get('passport.token_lifetime')));
+        Passport::refreshTokensExpireIn(now()->addSeconds(ConfigHelper::get('passport.refresh_token_lifetime')));
     }
 }

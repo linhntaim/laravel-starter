@@ -31,6 +31,8 @@ return [
             'client_id' => env('PASSPORT_PASSWORD_CLIENT_ID'),
             'client_secret' => env('PASSPORT_PASSWORD_CLIENT_SECRET'),
         ],
+        'token_lifetime' => (int)env('PASSPORT_TOKEN_LIFETIME', 31536000),
+        'refresh_token_lifetime' => (int)env('PASSPORT_REFRESH_TOKEN_LIFETIME', 2 * (int)env('PASSPORT_TOKEN_LIFETIME', 31536000)),
     ],
     'emails' => [
         'send_off' => (bool)env('MAIL_SEND_OFF', false),
