@@ -39,6 +39,7 @@ abstract class ModelRepository
 
     private $with;
     private $withTrashed = false;
+    private $onlyTrashed = false;
     private $lock;
     private $strict = true;
     private $more = false;
@@ -253,6 +254,12 @@ abstract class ModelRepository
         return $this;
     }
 
+    public function onlyTrashed()
+    {
+        $this->onlyTrashed = true;
+        return $this;
+    }
+
     public function with($with)
     {
         $this->with = $with;
@@ -324,6 +331,10 @@ abstract class ModelRepository
         if ($this->withTrashed) {
             $query->withTrashed();
             $this->withTrashed = false;
+        }
+        if ($this->onlyTrashed) {
+            $query->onlyTrashed();
+            $this->onlyTrashed = false;
         }
         $this->more = false;
         if (!empty($this->mores)) {
