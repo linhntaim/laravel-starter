@@ -21,7 +21,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification as BaseNotification;
-use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Notification as NotificationFacade;
+use Throwable;
 
 abstract class NowNotification extends BaseNotification
 {
@@ -136,8 +137,19 @@ abstract class NowNotification extends BaseNotification
     {
         $this->independentClientApply();
         return Facade::temporaryFromUser($notifiable, function () use ($via, $notifiable, $dataCallback) {
-            return $dataCallback($notifiable);
+            try {
+                return $dataCallback($notifiable);
+            } catch (Throwable $e) {
+                if (!($this instanceof Notification)) {
+                    $this->failed($e);
+                }
+                throw $e;
+            }
         });
+    }
+
+    public function failed(Throwable $e)
+    {
     }
 
     public function toBroadcast(IUser $notifiable)
@@ -342,7 +354,7 @@ abstract class NowNotification extends BaseNotification
 
         if ($this->cannotSend($notifiables)) return false;
 
-        Notification::send($notifiables, $this);
+        NotificationFacade::send($notifiables, $this);
 
         return true;
     }

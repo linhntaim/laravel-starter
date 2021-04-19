@@ -25,7 +25,9 @@ abstract class Notification extends NowNotification implements ShouldQueue
     {
         parent::__construct($notifier);
 
-        $this->settingsCapture();
+        if (!$this->independentClientId()) {
+            $this->settingsCapture();
+        }
     }
 
     protected function resolveData($via, IUser $notifiable, $dataCallback)

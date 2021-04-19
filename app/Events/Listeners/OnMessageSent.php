@@ -18,7 +18,13 @@ class OnMessageSent extends NowListener
     protected function go($event)
     {
         if (config('app.debug')) {
-            Log::info(sprintf('[%s] was sent to [%s]', $event->message->getSubject(), json_encode($event->message->getTo())));
+            Log::info(
+                sprintf(
+                    '[%s] was sent to [%s].',
+                    $event->message->getSubject(),
+                    json_encode($event->message->getTo())
+                )
+            );
         }
     }
 }

@@ -17,6 +17,6 @@ class OnTestingEvent extends NowListener
      */
     protected function go($event)
     {
-        Log::info(sprintf('%s executed.', static::class));
+        Log::info(sprintf('Called to %s.', static::class));
     }
 }

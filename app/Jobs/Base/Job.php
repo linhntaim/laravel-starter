@@ -19,7 +19,9 @@ abstract class Job extends NowJob implements ShouldQueue
 
     public function __construct()
     {
-        $this->settingsCapture();
+        if (!$this->independentClientId()) {
+            $this->settingsCapture();
+        }
     }
 
     public function handle()

@@ -18,7 +18,15 @@ class OnQueryExecuted extends NowListener
     protected function go($event)
     {
         if (config('app.debug')) {
-            Log::info(sprintf('SQL: %s. Bindings: %s', $event->sql, json_encode($event->bindings)));
+            Log::info(
+                sprintf(
+                    'Time: %sms. SQL: %s. Bindings: %s. Connection: %s.',
+                    $event->sql,
+                    json_encode($event->bindings),
+                    $event->time,
+                    $event->connectionName
+                )
+            );
         }
     }
 }

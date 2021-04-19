@@ -128,7 +128,6 @@ abstract class Command extends BaseCommand
         $this->start()->before();
         try {
             $this->go();
-            $this->after();
         } catch (Throwable $e) {
             $this->handleException($e);
         }
@@ -161,36 +160,53 @@ abstract class Command extends BaseCommand
         do {
             if ($previous) {
                 $this->output->writeln(
-                    '<caution>[previous stack trace]</caution>',
+                    '<caution>[previous exception]</caution>',
                     $this->parseVerbosity()
                 );
             } else {
                 $this->output->writeln(
-                    '<caution>[stack trace]</caution>',
+                    '<caution>[stacktrace]</caution>',
                     $this->parseVerbosity()
                 );
             }
+            $last = 0;
             foreach ($e->getTrace() as $i => $trace) {
-                $this->output->writeln(
-                    sprintf(
-                        '<comment>#%d</comment> <info>%s:%d</info> :',
-                        $i,
-                        $trace['file'],
-                        $trace['line']
-                    ),
-                    $this->parseVerbosity()
-                );
-                $this->output->writeln(
-                    sprintf(
-                        '%s %s%s%s()',
-                        str_repeat(' ', strlen($i) + 1),
-                        $trace['class'],
-                        $trace['type'],
-                        $trace['function']
-                    ),
-                    $this->parseVerbosity()
-                );
+                if (isset($trace['file'])) {
+                    $this->output->writeln(
+                        sprintf(
+                            '<comment>#%d</comment> <info>%s:%s</info> :',
+                            $i,
+                            isset($trace['file']) ? $trace['file'] : '',
+                            isset($trace['line']) ? $trace['line'] : ''
+                        ),
+                        $this->parseVerbosity()
+                    );
+                    $this->output->writeln(
+                        sprintf(
+                            '%s %s%s%s()',
+                            str_repeat(' ', strlen($i) + 1),
+                            isset($trace['class']) ? $trace['class'] : '',
+                            isset($trace['type']) ? $trace['type'] : '',
+                            isset($trace['function']) ? $trace['function'] : ''
+                        ),
+                        $this->parseVerbosity()
+                    );
+                }
+                else {
+                    $this->output->writeln(
+                        sprintf(
+                            '<comment>#%d</comment> %s%s%s()',
+                            $i,
+                            isset($trace['class']) ? $trace['class'] : '',
+                            isset($trace['type']) ? $trace['type'] : '',
+                            isset($trace['function']) ? $trace['function'] : ''
+                        ),
+                        $this->parseVerbosity()
+                    );
+                }
+                $last = $i + 1;
             }
+            $this->output->writeln(sprintf('<comment>#%d</comment> {main}', $last), $this->parseVerbosity());
         } while (($e = $e->getPrevious()) && ($previous = true));
     }
 

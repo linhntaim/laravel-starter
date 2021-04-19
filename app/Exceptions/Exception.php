@@ -88,7 +88,7 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
         if ($previous) {
             if ($previous instanceof PDOException) {
                 if (is_array($previous->errorInfo) && isset($previous->errorInfo[2])) {
-                    return $previous->errorInfo[2];
+                    return trim($previous->errorInfo[2]);
                 }
             }
             return $previous->getMessage();
