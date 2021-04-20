@@ -9,6 +9,7 @@ namespace App\Events\Listeners;
 use App\Events\Listeners\Base\NowListener;
 use App\Models\Base\IUser;
 use App\Notifications\Base\Notification;
+use App\Vendors\Illuminate\Support\Facades\App;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Facades\Log;
 
@@ -21,7 +22,7 @@ class OnNotificationSent extends NowListener
     {
         $notifiable = $this->getNotifiable($event);
         $this->getNotification($event)->afterNotifying($event->channel, $notifiable);
-        if (config('app.debug')) {
+        if (App::runningInDebug()) {
             Log::info(
                 sprintf(
                     '[%s] was sent to [%s(%s)] via [%s].',

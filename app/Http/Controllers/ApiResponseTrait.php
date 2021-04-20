@@ -11,6 +11,7 @@ use App\Exceptions\UnhandledException;
 use App\Exceptions\UserException;
 use App\Http\Requests\Request;
 use App\Utils\ConfigHelper;
+use App\Vendors\Illuminate\Support\Facades\App;
 use Closure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -53,8 +54,6 @@ trait ApiResponseTrait
     protected static function payload($data = null, $message = null)
     {
         $debug = null;
-        $debugMode = config('app.debug');
-
         if ($message instanceof Throwable) {
             $exception = $message;
             $debug = [
@@ -80,7 +79,7 @@ trait ApiResponseTrait
             '_messages' => empty($message) ? null : (array)$message,
             '_data' => $data,
             '_extra' => static::$extraResponse,
-            '_exception' => $debugMode ? $debug : null,
+            '_exception' => App::runningInDebug() ? $debug : null,
         ];
     }
 

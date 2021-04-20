@@ -8,6 +8,7 @@ namespace App\Exceptions;
 
 use App\Utils\ClassTrait;
 use App\Utils\ConfigHelper;
+use App\Vendors\Illuminate\Support\Facades\App;
 use Exception as BaseException;
 use PDOException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -60,7 +61,7 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
         }
 
         if (empty($message)) {
-            if (!config('app.debug') && ConfigHelper::get('force_common_exception')) {
+            if (!App::runningInDebug() && ConfigHelper::get('force_common_exception')) {
                 $this->messages = [trans('error.exceptions.default_exception.level_failed')];
             } elseif ($message = $this->getMessageFromPrevious()) {
                 $this->messages = [$message];

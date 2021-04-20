@@ -7,6 +7,7 @@
 namespace App\Events\Listeners;
 
 use App\Events\Listeners\Base\NowListener;
+use App\Vendors\Illuminate\Support\Facades\App;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\Facades\Log;
 
@@ -17,7 +18,7 @@ class OnMessageSent extends NowListener
      */
     protected function go($event)
     {
-        if (config('app.debug')) {
+        if (App::runningInDebug()) {
             Log::info(
                 sprintf(
                     '[%s] was sent to [%s].',

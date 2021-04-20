@@ -3,6 +3,7 @@
 namespace App\Events\Listeners;
 
 use App\Events\Listeners\Base\NowListener;
+use App\Vendors\Illuminate\Support\Facades\App;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Log;
 
@@ -13,7 +14,7 @@ class OnJobProcessed extends NowListener
      */
     protected function go($event)
     {
-        if (config('app.debug')) {
+        if (App::runningInDebug()) {
             Log::info(
                 sprintf(
                     'Job [%s] was processed.',

@@ -8,6 +8,7 @@ namespace App\Utils\HandledFiles\Filer;
 
 use App\Exceptions\AppException;
 use App\Exceptions\Exception;
+use App\Vendors\Illuminate\Support\Facades\App;
 use Throwable;
 
 trait ReadFilerTrait
@@ -26,7 +27,7 @@ trait ReadFilerTrait
 
     public function fReadDisableCustomException($excluded = [])
     {
-        if (!config('app.debug')) {
+        if (!App::runningInDebug()) {
             $this->fReadUseCustomException = false;
             $this->fReadExcludedCustomExceptions = $excluded;
         }

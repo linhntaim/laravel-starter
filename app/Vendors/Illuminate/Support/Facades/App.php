@@ -2,14 +2,8 @@
 
 namespace App\Vendors\Illuminate\Support\Facades;
 
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\App as BaseApp;
 
-/**
- * Class App
- * @package App\Vendors\Illuminate\Support\Facades
- * @method static Application terminating(callable|string $callback)
- */
 class App extends BaseApp
 {
     public static function runningInProduction()
@@ -19,17 +13,38 @@ class App extends BaseApp
 
     public static function runningFromRequest()
     {
-        return !static::runningInConsole() && !static::runningUnitTests();
+        static $run = null;
+        if (is_null($run)) {
+            $run = !static::runningInConsole() && !static::runningUnitTests();
+        }
+        return $run;
     }
 
     public static function notRunningFromRequest()
     {
-        return static::runningInConsole() || static::runningUnitTests();
+        static $run = null;
+        if (is_null($run)) {
+            $run = static::runningInConsole() || static::runningUnitTests();
+        }
+        return $run;
     }
 
     public static function runningInWindowsOs()
     {
-        return version_compare(PHP_VERSION, '7.2.0', '>=') ?
-            PHP_OS_FAMILY == 'Windows' : PHP_OS == 'WINNT';
+        static $run = null;
+        if (is_null($run)) {
+            $run = version_compare(PHP_VERSION, '7.2.0', '>=') ?
+                PHP_OS_FAMILY == 'Windows' : PHP_OS == 'WINNT';
+        }
+        return $run;
+    }
+
+    public static function runningInDebug()
+    {
+        static $run = null;
+        if (is_null($run)) {
+            $run = config('app.debug');
+        }
+        return $run;
     }
 }
