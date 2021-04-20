@@ -4,7 +4,7 @@ namespace App\Exports\Base;
 
 class SimpleCsvExport extends CsvExport
 {
-    const NAME = 'simple';
+    public const NAME = 'simple';
 
     protected $headers;
     protected $data;

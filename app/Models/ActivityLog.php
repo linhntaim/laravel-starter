@@ -28,13 +28,13 @@ class ActivityLog extends Model
 {
     use ArrayValuedAttributesTrait, MemorizeTrait;
 
-    const ACTION_LOGIN = 'login';
-    const ACTION_LOGOUT = 'logout';
-    const ACTION_MODEL_LIST = 'model_list';
-    const ACTION_MODEL_EXPORT = 'model_export';
-    const ACTION_MODEL_CREATE = 'model_create';
-    const ACTION_MODEL_EDIT = 'model_edit';
-    const ACTION_MODEL_DELETE = 'model_delete';
+    public const ACTION_LOGIN = 'login';
+    public const ACTION_LOGOUT = 'logout';
+    public const ACTION_MODEL_LIST = 'model_list';
+    public const ACTION_MODEL_EXPORT = 'model_export';
+    public const ACTION_MODEL_CREATE = 'model_create';
+    public const ACTION_MODEL_EDIT = 'model_edit';
+    public const ACTION_MODEL_DELETE = 'model_delete';
     // TODO: Add actions
 
     // TODO

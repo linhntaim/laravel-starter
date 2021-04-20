@@ -8,7 +8,7 @@ namespace App\Utils\ClientSettings;
 
 class NumberFormatter
 {
-    const DEFAULT_NUMBER_OF_DECIMAL_POINTS = 2;
+    public const DEFAULT_NUMBER_OF_DECIMAL_POINTS = 2;
 
     #region Static
     /**

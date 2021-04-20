@@ -48,15 +48,15 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
         NotificationTrait::notifications insteadof Notifiable;
     }
     use PassportTrait, HasApiTokens, MemorizeTrait, SoftDeletes, ProtectedTrait;
-    use ModelTrait, OnlyAttributesToArrayTrait, ResourceTrait, FromModelTrait, ActivityLogTrait;
+    use ModelTrait, HasFactory, OnlyAttributesToArrayTrait, ResourceTrait, FromModelTrait, ActivityLogTrait;
 
-    const MIN_PASSWORD_LENGTH = 8;
+    public const MIN_PASSWORD_LENGTH = 8;
 
-    const USER_SYSTEM_ID = 1;
-    const USER_SUPER_ADMINISTRATOR_ID = 2;
-    const USER_ADMINISTRATOR_ID = 3;
+    public const USER_SYSTEM_ID = 1;
+    public const USER_SUPER_ADMINISTRATOR_ID = 2;
+    public const USER_ADMINISTRATOR_ID = 3;
 
-    const PROTECTED = [
+    public const PROTECTED = [
         User::USER_SYSTEM_ID,
         User::USER_SUPER_ADMINISTRATOR_ID,
         User::USER_ADMINISTRATOR_ID,

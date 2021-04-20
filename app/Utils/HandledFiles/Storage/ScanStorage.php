@@ -7,7 +7,7 @@ use App\Utils\HandledFiles\Storage\Scanners\Scanner;
 
 class ScanStorage extends HandledStorage
 {
-    const NAME = 'scan';
+    public const NAME = 'scan';
 
     protected $scanDiskName;
 

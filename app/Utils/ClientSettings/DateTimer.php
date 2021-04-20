@@ -17,17 +17,17 @@ class DateTimer
 {
     use ClassTrait;
 
-    const LONG_DATE_FUNCTION = 'longDate';
-    const SHORT_DATE_FUNCTION = 'shortDate';
-    const LONG_TIME_FUNCTION = 'longTime';
-    const SHORT_TIME_FUNCTION = 'shortTime';
-    const DATABASE_FORMAT_DATE = 'Y-m-d';
-    const DATABASE_FORMAT_TIME = 'H:i:s';
-    const DATABASE_FORMAT = DateTimer::DATABASE_FORMAT_DATE . ' ' . DateTimer::DATABASE_FORMAT_TIME;
-    const DAY_TYPE_NONE = 0;
-    const DAY_TYPE_START = -1;
-    const DAY_TYPE_END = 1;
-    const DAY_TYPE_NEXT_START = 2;
+    public const LONG_DATE_FUNCTION = 'longDate';
+    public const SHORT_DATE_FUNCTION = 'shortDate';
+    public const LONG_TIME_FUNCTION = 'longTime';
+    public const SHORT_TIME_FUNCTION = 'shortTime';
+    public const DATABASE_FORMAT_DATE = 'Y-m-d';
+    public const DATABASE_FORMAT_TIME = 'H:i:s';
+    public const DATABASE_FORMAT = DateTimer::DATABASE_FORMAT_DATE . ' ' . DateTimer::DATABASE_FORMAT_TIME;
+    public const DAY_TYPE_NONE = 0;
+    public const DAY_TYPE_START = -1;
+    public const DAY_TYPE_END = 1;
+    public const DAY_TYPE_NEXT_START = 2;
 
     /**
      * @var Carbon

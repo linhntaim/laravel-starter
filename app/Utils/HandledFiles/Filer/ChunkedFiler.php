@@ -21,8 +21,8 @@ use Illuminate\Http\UploadedFile;
  */
 class ChunkedFiler extends Filer
 {
-    const CHUNK_FILE_NAME = 'chunk';
-    const CHUNK_FOLDER_NAME = 'chunks';
+    public const CHUNK_FILE_NAME = 'chunk';
+    public const CHUNK_FOLDER_NAME = 'chunks';
 
     protected $chunksId;
     protected $chunksRelativeDirectory;

@@ -9,7 +9,7 @@ namespace App\Http\Controllers;
 use App\Configuration;
 use App\Exceptions\AppException;
 use App\Exports\Base\Export;
-use App\Exports\Base\IndexModelExport;
+use App\Exports\Base\IndexModelCsvExport;
 use App\Http\Requests\Request;
 use App\ModelRepositories\Base\ModelRepository;
 use App\ModelRepositories\DataExportRepository;
@@ -104,7 +104,7 @@ abstract class ModelApiController extends ApiController
 
     /**
      * @param Request $request
-     * @return IndexModelExport|null
+     * @return IndexModelCsvExport|null
      */
     protected function indexModelExporter(Request $request)
     {

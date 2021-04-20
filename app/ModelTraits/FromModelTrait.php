@@ -14,7 +14,7 @@ trait FromModelTrait
      * @param Model|mixed $model
      * @return static
      */
-    public static function factoryFromModel($model)
+    public static function createFromModel($model)
     {
         return (new static())->fromModel($model);
     }

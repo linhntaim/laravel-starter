@@ -4,6 +4,6 @@ namespace App\Exceptions;
 
 class IpLimitException extends Exception
 {
-    const LEVEL = 1;
-    const CODE = 403;
+    public const LEVEL = 1;
+    public const CODE = 403;
 }

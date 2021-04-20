@@ -9,6 +9,7 @@ namespace App\Imports\Base;
 use App\Utils\ExecutionTimeTrait;
 use App\Utils\HandledFiles\Filer\Filer;
 use App\Utils\ValidationTrait;
+use App\Vendors\Illuminate\Support\Facades\App;
 
 abstract class Import
 {
@@ -62,10 +63,12 @@ abstract class Import
 
     public function import()
     {
+        App::benchFrom('import::' . static::class);
         $this->importing();
         if ($this->deleteAfterImporting) {
             $this->filer->delete();
         }
+        App::bench('import::' . static::class);
         return $this;
     }
 }

@@ -27,14 +27,14 @@ class Role extends Model implements IProtected
 {
     use MemorizeTrait, ProtectedTrait;
 
-    const SYSTEM = 'system';
-    const SUPER_ADMIN = 'super_admin';
-    const ADMIN = 'admin';
+    public const SYSTEM = 'system';
+    public const SUPER_ADMIN = 'super_admin';
+    public const ADMIN = 'admin';
     // TODO: Define roles
 
     // TODO
 
-    const PROTECTED = [
+    public const PROTECTED = [
         Role::SYSTEM,
         Role::SUPER_ADMIN,
         // TODO: Protected roles

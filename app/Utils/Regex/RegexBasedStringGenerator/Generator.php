@@ -16,7 +16,7 @@ class Generator
 {
     use ClassTrait;
 
-    const DEFAULT_LIMIT_QUANTIFICATION = 8;
+    public const DEFAULT_LIMIT_QUANTIFICATION = 8;
 
     protected $hasQuantification;
     protected $hasFixedQuantification;

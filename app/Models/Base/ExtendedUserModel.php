@@ -32,7 +32,7 @@ abstract class ExtendedUserModel extends Model implements IUser
     }
     use CanResetPassword, MemorizeTrait, ProtectedTrait, SoftDeletes;
 
-    const PROTECTED = User::PROTECTED;
+    public const PROTECTED = User::PROTECTED;
 
     protected $primaryKey = 'user_id';
 

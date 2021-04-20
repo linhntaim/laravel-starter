@@ -17,9 +17,9 @@ class ClientLimiter extends FrameworkHandler
 {
     use IpLimiterTrait;
 
-    const NAME = 'limit';
+    public const NAME = 'limit';
 
-    const APP_OPTION_KEY = 'client_limit';
+    public const APP_OPTION_KEY = 'client_limit';
 
     /**
      * @var bool

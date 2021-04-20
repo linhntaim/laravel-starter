@@ -23,6 +23,7 @@ abstract class AllCsvImport extends CsvImport
                 return $this->csvImporting($read, $counter);
             },
             function ($reads) {
+                $this->resetExecutionTime();
                 $this->csvAfterImporting($reads);
                 return $reads;
             }

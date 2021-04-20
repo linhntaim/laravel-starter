@@ -20,6 +20,7 @@ use App\ModelTraits\ResourceTrait;
 use App\Notifications\Base\DatabaseNotificationFactory;
 use App\Notifications\Base\NowNotification;
 use App\Utils\ClientSettings\Facade;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\DatabaseNotification as BaseDatabaseNotification;
 
 /**
@@ -42,7 +43,7 @@ use Illuminate\Notifications\DatabaseNotification as BaseDatabaseNotification;
 class DatabaseNotification extends BaseDatabaseNotification implements IResource, IModel
 {
     use MemorizeTrait;
-    use ModelTrait, OnlyAttributesToArrayTrait, ResourceTrait, FromModelTrait;
+    use ModelTrait, HasFactory, OnlyAttributesToArrayTrait, ResourceTrait, FromModelTrait;
 
     protected $visible = [
         'id',

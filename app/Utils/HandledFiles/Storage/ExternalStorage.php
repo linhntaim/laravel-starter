@@ -10,7 +10,7 @@ use App\Exceptions\AppException;
 
 class ExternalStorage extends Storage implements IUrlStorage, IResponseStorage
 {
-    const NAME = 'external';
+    public const NAME = 'external';
 
     protected $url;
 

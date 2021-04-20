@@ -18,8 +18,8 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
 {
     use ClassTrait;
 
-    const LEVEL = 4;
-    const CODE = 500;
+    public const LEVEL = 4;
+    public const CODE = 500;
 
     /**
      * @param Throwable $exception

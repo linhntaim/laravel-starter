@@ -45,9 +45,9 @@ class HandledFile extends Model
 {
     use ArrayValuedAttributesTrait;
 
-    const HANDLING_YES = 1;
-    const HANDLING_NO = 2;
-    const HANDLING_SCAN = 3;
+    public const HANDLING_YES = 1;
+    public const HANDLING_NO = 2;
+    public const HANDLING_SCAN = 3;
 
     protected $table = 'handled_files';
 

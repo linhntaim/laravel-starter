@@ -15,14 +15,14 @@ use App\Models\Base\Model;
  */
 class AppOption extends Model
 {
-    const TYPE_NULL = 'null';
-    const TYPE_STRING = 'string';
-    const TYPE_NUMBER = 'number';
-    const TYPE_ARRAY = 'array';
-    const TYPE_OBJECT = 'object';
+    public const TYPE_NULL = 'null';
+    public const TYPE_STRING = 'string';
+    public const TYPE_NUMBER = 'number';
+    public const TYPE_ARRAY = 'array';
+    public const TYPE_OBJECT = 'object';
 
-    const YES = 1;
-    const NO = 2;
+    public const YES = 1;
+    public const NO = 2;
 
     protected $table = 'app_options';
 

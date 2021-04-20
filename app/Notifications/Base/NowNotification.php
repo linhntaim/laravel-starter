@@ -28,13 +28,13 @@ abstract class NowNotification extends BaseNotification
 {
     use ClassTrait, IndependentClientTrait;
 
-    const VIA_DATABASE = 'database';
-    const VIA_BROADCAST = 'broadcast';
-    const VIA_MAIL = 'mail';
-    const VIA_IOS = 'ios';
-    const VIA_ANDROID = 'android';
+    public const VIA_DATABASE = 'database';
+    public const VIA_BROADCAST = 'broadcast';
+    public const VIA_MAIL = 'mail';
+    public const VIA_IOS = 'ios';
+    public const VIA_ANDROID = 'android';
 
-    const NAME = 'now_notification';
+    public const NAME = 'now_notification';
 
     protected static function __transCurrentModule()
     {

@@ -8,8 +8,10 @@ namespace App\Exports\Base;
 
 use App\Configuration;
 
-abstract class IndexModelExport extends ModelExport
+abstract class IndexModelCsvExport extends ModelCsvExport
 {
+    public const NAME = 'model_index';
+
     protected $search;
     protected $sortBy;
     protected $sortOrder;

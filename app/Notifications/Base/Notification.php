@@ -19,7 +19,7 @@ abstract class Notification extends NowNotification implements ShouldQueue
 {
     use Queueable, InteractsWithQueue, SerializesModels, Capture;
 
-    const NAME = 'notification';
+    public const NAME = 'notification';
 
     public function __construct(IUser $notifier = null)
     {

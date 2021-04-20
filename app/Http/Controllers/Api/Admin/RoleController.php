@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Exports\Base\Export;
-use App\Exports\RoleIndexModelExport;
+use App\Exports\RoleIndexModelCsvExport;
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\RoleRepository;
@@ -50,7 +50,7 @@ class RoleController extends ModelApiController
 
     protected function indexModelExporterClass(Request $request)
     {
-        return RoleIndexModelExport::class;
+        return RoleIndexModelCsvExport::class;
     }
 
     protected function exportExecute(Request $request, Export $exporter = null)

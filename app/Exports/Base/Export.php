@@ -16,7 +16,7 @@ abstract class Export
 {
     use ClassTrait, ExecutionTimeTrait;
 
-    const NAME = 'export';
+    public const NAME = 'export';
 
     /**
      * @var HandledFileRepository

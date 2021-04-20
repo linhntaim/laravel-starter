@@ -10,30 +10,30 @@ use App\Utils\Database\MySqlTableLocks;
 
 class MySqlTransactionHandler extends TransactionHandler
 {
-    const TRANSACTION_SCOPE_GLOBAL = 'GLOBAL';
-    const TRANSACTION_SCOPE_SESSION = 'SESSION';
+    public const TRANSACTION_SCOPE_GLOBAL = 'GLOBAL';
+    public const TRANSACTION_SCOPE_SESSION = 'SESSION';
 
-    const ISOLATION_LEVEL_REPEATABLE_READ = 'REPEATABLE READ';
-    const ISOLATION_LEVEL_READ_COMMITTED = 'READ COMMITTED';
-    const ISOLATION_LEVEL_READ_UNCOMMITTED = 'READ UNCOMMITTED';
-    const ISOLATION_LEVEL_SERIALIZABLE = 'SERIALIZABLE';
+    public const ISOLATION_LEVEL_REPEATABLE_READ = 'REPEATABLE READ';
+    public const ISOLATION_LEVEL_READ_COMMITTED = 'READ COMMITTED';
+    public const ISOLATION_LEVEL_READ_UNCOMMITTED = 'READ UNCOMMITTED';
+    public const ISOLATION_LEVEL_SERIALIZABLE = 'SERIALIZABLE';
 
-    const ACCESS_MODE_READ_WRITE = 'READ WRITE';
-    const ACCESS_MODE_READ_ONLY = 'READ ONLY';
+    public const ACCESS_MODE_READ_WRITE = 'READ WRITE';
+    public const ACCESS_MODE_READ_ONLY = 'READ ONLY';
 
-    const TRANSACTION_SCOPES = [
+    public const TRANSACTION_SCOPES = [
         MySqlTransactionHandler::TRANSACTION_SCOPE_GLOBAL,
         MySqlTransactionHandler::TRANSACTION_SCOPE_SESSION,
     ];
 
-    const ISOLATION_LEVELS = [
+    public const ISOLATION_LEVELS = [
         MySqlTransactionHandler::ISOLATION_LEVEL_REPEATABLE_READ,
         MySqlTransactionHandler::ISOLATION_LEVEL_READ_COMMITTED,
         MySqlTransactionHandler::ISOLATION_LEVEL_READ_UNCOMMITTED,
         MySqlTransactionHandler::ISOLATION_LEVEL_SERIALIZABLE,
     ];
 
-    const ACCESS_MODES = [
+    public const ACCESS_MODES = [
         MySqlTransactionHandler::ACCESS_MODE_READ_WRITE,
         MySqlTransactionHandler::ACCESS_MODE_READ_ONLY,
     ];
