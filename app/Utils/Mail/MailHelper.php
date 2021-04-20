@@ -7,19 +7,40 @@
 namespace App\Utils\Mail;
 
 use App\Utils\ConfigHelper;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class MailHelper
 {
     /**
      * @param TemplateNowMailable $mailable
+     * @param bool $exceptionSkipped
      * @return bool
      * @throws
      */
-    public static function send(TemplateNowMailable $mailable)
+    public static function send(TemplateNowMailable $mailable, $exceptionSkipped = false)
     {
         if (ConfigHelper::get('emails.send_off')) return true;
 
+        if ($mailable instanceof TemplateMailable) {
+            $exceptionSkipped = false;
+        }
+
+        if ($exceptionSkipped) {
+            try {
+                return static::sendRaw($mailable);
+            } catch (Throwable $e) {
+                Log::error($e);
+                return false;
+            }
+        }
+
+        return static::sendRaw($mailable);
+    }
+
+    protected static function sendRaw(TemplateNowMailable $mailable)
+    {
         Mail::send($mailable);
         return true;
     }
@@ -28,24 +49,32 @@ class MailHelper
      * @param string $templatePath
      * @param array $templateParams
      * @param bool $templateLocalized
+     * @param string|null $templateLocale
+     * @param bool $exceptionSkipped
+     * @param string|null $templateNamespace
+     * @param string|array|null $charset
      * @return bool
      * @throws
      */
-    public static function sendWithTemplate($templatePath, array $templateParams = [], $templateLocalized = true)
+    public static function sendWithTemplate($templatePath, array $templateParams = [], $templateLocalized = true, $templateLocale = null, $exceptionSkipped = false, $templateNamespace = null, $charset = null)
     {
-        return static::send(new TemplateMailable($templatePath, $templateParams, $templateLocalized));
+        return static::send(new TemplateMailable($templatePath, $templateParams, $templateLocalized, $templateLocale, $templateNamespace, $charset), $exceptionSkipped);
     }
 
     /**
      * @param string $templatePath
      * @param array $templateParams
      * @param bool $templateLocalized
+     * @param string|null $templateLocale
+     * @param bool $exceptionSkipped
+     * @param string|null $templateNamespace
+     * @param string|array|null $charset
      * @return bool
      * @throws
      */
-    public static function sendNowWithTemplate($templatePath, array $templateParams = [], $templateLocalized = true)
+    public static function sendNowWithTemplate($templatePath, array $templateParams = [], $templateLocalized = true, $templateLocale = null, $exceptionSkipped = false, $templateNamespace = null, $charset = null)
     {
-        return static::send(new TemplateNowMailable($templatePath, $templateParams, $templateLocalized));
+        return static::send(new TemplateNowMailable($templatePath, $templateParams, $templateLocalized, $templateLocale, $templateNamespace, $charset), $exceptionSkipped);
     }
 
     public static function sendTestMail($subject = 'Tested', $templatePath = 'test')

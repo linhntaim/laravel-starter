@@ -21,9 +21,9 @@ class OnQueryExecuted extends NowListener
             Log::info(
                 sprintf(
                     'Time: %sms. SQL: %s. Bindings: %s. Connection: %s.',
+                    $event->time,
                     $event->sql,
                     json_encode($event->bindings),
-                    $event->time,
                     $event->connectionName
                 )
             );
