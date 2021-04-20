@@ -30,45 +30,45 @@ class SetupCommand extends Command
             $this->call('setup:web-server', $forced ? [
                 '--f' => true,
             ] : []);
-            $this->lineBreak();
+            $this->newLine();
         }
         if (!in_array('packages', $skipped) && (!$hasOnly || in_array('packages', $only))) {
             $this->call('setup:packages', $forced ? [
                 '--f' => true,
             ] : []);
-            $this->lineBreak();
+            $this->newLine();
         }
         if (!in_array('key:generate', $skipped) && (!$hasOnly || in_array('key:generate', $only))) {
             $this->call('setup:key:generate', $forced ? [
                 '--f' => true,
             ] : []);
-            $this->lineBreak();
+            $this->newLine();
         }
         if (!in_array('storage:link', $skipped) && (!$hasOnly || in_array('storage:link', $only))) {
             $this->call('setup:storage:link', $forced ? [
                 '--f' => true,
             ] : []);
-            $this->lineBreak();
+            $this->newLine();
         }
         if (!in_array('migrate', $skipped) && (!$hasOnly || in_array('migrate', $only))) {
             $this->call('setup:migrate', $forced ? [
                 '--f' => true,
             ] : []);
-            $this->lineBreak();
+            $this->newLine();
         }
 
         if ($this->option('seed-dummy')) {
             $this->call('setup:seed:dummy', $forced ? [
                 '--f' => true,
             ] : []);
-            $this->lineBreak();
+            $this->newLine();
         }
 
         if ($this->option('seed-test')) {
             $this->call('setup:seed:test', $forced ? [
                 '--f' => true,
             ] : []);
-            $this->lineBreak();
+            $this->newLine();
         }
     }
 
@@ -77,36 +77,36 @@ class SetupCommand extends Command
         $this->call('setup:migrate', [
             '--u' => true,
         ]);
-        $this->lineBreak();
+        $this->newLine();
         $this->call('setup:storage:link', [
             '--u' => true,
         ]);
-        $this->lineBreak();
+        $this->newLine();
         $this->call('setup:key:generate', [
             '--u' => true,
         ]);
-        $this->lineBreak();
+        $this->newLine();
         $this->call('setup:packages', [
             '--u' => true,
         ]);
-        $this->lineBreak();
+        $this->newLine();
         $this->call('setup:web-server', [
             '--u' => true,
         ]);
-        $this->lineBreak();
+        $this->newLine();
 
         if ($this->option('seed-dummy')) {
             $this->call('setup:seed:dummy', [
                 '--u' => true,
             ]);
-            $this->lineBreak();
+            $this->newLine();
         }
 
         if ($this->option('seed-test')) {
             $this->call('setup:seed:test', [
                 '--u' => true,
             ]);
-            $this->lineBreak();
+            $this->newLine();
         }
     }
 }

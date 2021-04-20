@@ -14,6 +14,7 @@ use App\Utils\RateLimiterTrait;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Log;
 use Swift_DependencyContainer;
+use Throwable;
 
 class TemplateNowMailable extends Mailable
 {
@@ -48,7 +49,7 @@ class TemplateNowMailable extends Mailable
 
     protected $htmlCharset;
 
-    protected $templateName;
+    protected $templatePath;
 
     protected $templateParams;
 
@@ -56,9 +57,9 @@ class TemplateNowMailable extends Mailable
 
     protected $templateNamespace;
 
-    public function __construct($templateName, array $templateParams = [], $templateLocalized = true, $templateLocale = null, $templateNamespace = null, $charset = null)
+    public function __construct($templatePath, array $templateParams = [], $templateLocalized = true, $templateLocale = null, $templateNamespace = null, $charset = null)
     {
-        $this->templateName = $templateName;
+        $this->templatePath = $templatePath;
         $this->templateParams = $templateParams;
         $this->templateLocalized = $templateLocalized;
         $this->templateNamespace = $templateNamespace;
@@ -155,11 +156,11 @@ class TemplateNowMailable extends Mailable
         return $this->htmlCharset;
     }
 
-    protected function getTemplatePath()
+    protected function getTemplateViewPath()
     {
         return sprintf('%semails.%s%s',
             $this->templateNamespace ? $this->templateNamespace . '::' : '',
-            $this->templateName,
+            $this->templatePath,
             ($this->templateLocalized ? '.' . $this->locale : '')
         );
     }
@@ -229,7 +230,7 @@ class TemplateNowMailable extends Mailable
                 : $this->__transWithModule('default_subject', 'label', ['app_name' => Facade::getAppName()])
         );
 
-        $this->view($this->getTemplatePath(), $this->getTemplateParams());
+        $this->view($this->getTemplateViewPath(), $this->getTemplateParams());
     }
 
     public function send($mailer)
@@ -240,7 +241,7 @@ class TemplateNowMailable extends Mailable
 
             $key = ConfigHelper::get('emails.send_rate_key');
             if ($this->limiter->tooManyAttempts($key, $maxAttempts)) {
-                Log::info(sprintf('Delay mailing: %s - %s - %s', static::class, $this->templateName, json_encode($this->templateParams)));
+                Log::info(sprintf('Delay mailing: %s - %s - %s', static::class, $this->templatePath, json_encode($this->templateParams)));
                 sleep(ConfigHelper::get('emails.send_rate_wait_for_seconds'));
                 $this->send($mailer);
                 return;
@@ -250,5 +251,9 @@ class TemplateNowMailable extends Mailable
         }
 
         parent::send($mailer);
+    }
+
+    public function failed(Throwable $e)
+    {
     }
 }

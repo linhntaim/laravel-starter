@@ -18,7 +18,7 @@ abstract class SeedCommand extends Command
                 '--class' => $seeder,
                 '--force' => true,
             ]);
-            $this->lineBreak();
+            $this->newLine();
         }
     }
 

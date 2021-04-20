@@ -6,17 +6,21 @@
 
 namespace App\Console\Commands\Base;
 
+use App\Exceptions\ConsoleException;
 use App\Exceptions\Exception;
 use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\Traits\ConsoleClientTrait;
+use App\Utils\Database\Transaction\TransactionTrait;
 use App\Utils\ShellTrait;
 use Illuminate\Console\Command as BaseCommand;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 
 abstract class Command extends BaseCommand
 {
-    use ClassTrait, ShellTrait, ConsoleClientTrait;
+    use ClassTrait, ShellTrait, ConsoleClientTrait, TransactionTrait;
 
     protected $__friendlyName;
 
@@ -35,6 +39,20 @@ abstract class Command extends BaseCommand
         parent::__construct();
 
         $this->consoleClientApply();
+    }
+
+    protected function setStyles()
+    {
+        if (!$this->output->getFormatter()->hasStyle('caution')) {
+            $style = new OutputFormatterStyle('red');
+
+            $this->output->getFormatter()->setStyle('caution', $style);
+        }
+        if (!$this->output->getFormatter()->hasStyle('strong-caution')) {
+            $style = new OutputFormatterStyle('black', 'red');
+
+            $this->output->getFormatter()->setStyle('strong-caution', $style);
+        }
     }
 
     /**
@@ -61,62 +79,139 @@ abstract class Command extends BaseCommand
         );
     }
 
-    protected function lineBreak()
-    {
-        $this->line('');
-    }
-
     public function alert($string)
     {
-        $this->lineBreak();
+        $this->newLine();
         parent::alert($string);
     }
 
-    protected function before()
+    public function before()
     {
         if (!$this->noInformation) {
-            $this->lineBreak();
+            $this->newLine();
             $this->info(sprintf('START %s...', strtoupper($this->__friendlyClassBaseName())));
-            $this->lineBreak();
+            $this->newLine();
         }
+        return $this;
     }
 
-    protected function after()
+    public function after()
     {
         if (!$this->noInformation) {
-            $this->lineBreak();
+            $this->newLine();
             $this->info(sprintf('END %s!!!', strtoupper($this->__friendlyClassBaseName())));
         }
+        return $this;
+    }
+
+    public function start()
+    {
+        Log::info(sprintf('%s commanding...', static::class));
+        return $this;
+    }
+
+    public function end()
+    {
+        Log::info(sprintf('%s commanded!', static::class));
+        return $this;
+    }
+
+    public function fails()
+    {
+        Log::info(sprintf('%s failed!', static::class));
+        return $this;
     }
 
     public function handle()
     {
-        Log::info(sprintf('%s executing...', static::class));
+        $this->setStyles();
+        $this->start()->before();
         try {
-            $this->before();
             $this->go();
-            $this->after();
-        } catch (\Exception $exception) {
-            $this->handleException($exception);
+        } catch (Throwable $e) {
+            $this->handleException($e);
         }
-        Log::info(sprintf('%s executed!', static::class));
+        $this->after()->end();
     }
 
-    protected function handleException(\Exception $exception)
+    protected function handleException(Throwable $e)
     {
-        Log::error($exception);
+        throw ($e instanceof ConsoleException ?
+            $e : ConsoleException::from($e)->setCommand($this));
+    }
 
-        $this->error('EXCEPTION:');
-        $this->warn('- Code: ' . $exception->getCode());
-        $this->warn('- Message: ' . $exception->getMessage());
-        $this->warn('- File: ' . $exception->getFile());
-        $this->warn('- Line: ' . $exception->getLine());
-        if ($exception instanceof Exception) {
-            $this->warn('- Data:');
-            print_r($exception->getAttachedData());
+    public function caution($string, $verbosity = null)
+    {
+        $this->line($string, 'caution', $verbosity);
+    }
+
+    public function renderThrowable(Throwable $e, $previous = false)
+    {
+        $this->output->writeln(sprintf('<strong-caution>%s: %s</strong-caution>', $previous ? 'PREVIOUS EXCEPTION' : 'EXCEPTION', get_class($e)), $this->parseVerbosity());
+        $this->output->writeln(sprintf('<comment>Code:</comment> %s', $e->getCode()), $this->parseVerbosity());
+        if ($e instanceof \SoapFault) {
+            if (isset($e->faultcode)) {
+                $this->output->writeln(sprintf('<comment>Fault code:</comment> %s', $e->faultcode), $this->parseVerbosity());
+            }
+            if (isset($e->faultactor)) {
+                $this->output->writeln(sprintf('<comment>Fault actor:</comment> %s', $e->faultactor), $this->parseVerbosity());
+            }
+            if (isset($e->detail)) {
+                if (is_string($e->detail)) {
+                    $this->output->writeln(sprintf('<comment>Fault detail:</comment> %s', $e->detail), $this->parseVerbosity());
+                } elseif (is_object($e->detail) || is_array($e->detail)) {
+                    $this->output->writeln(sprintf('<comment>Fault detail:</comment> %s', json_encode($e->detail)), $this->parseVerbosity());
+                }
+            }
         }
-        $this->warn('- Trace:');
-        $this->warn($exception->getTraceAsString());
+        $this->output->writeln(sprintf('<comment>Message:</comment> %s', $e->getMessage()), $this->parseVerbosity());
+        $this->output->writeln(sprintf('<comment>File:</comment> [%s:%d]', $e->getFile(), $e->getLine()), $this->parseVerbosity());
+        if ($e instanceof Exception && count($data = $e->getAttachedData()) > 0) {
+            $this->warn('Data:');
+            var_dump($data);
+        }
+        $this->warn('Trace:');
+        $last = 0;
+        foreach ($e->getTrace() as $i => $trace) {
+            if (isset($trace['file'])) {
+                $this->output->writeln(
+                    sprintf(
+                        '<comment>#%d</comment> [<info>%s:%s</info>]',
+                        $i,
+                        isset($trace['file']) ? $trace['file'] : '',
+                        isset($trace['line']) ? $trace['line'] : ''
+                    ),
+                    $this->parseVerbosity()
+                );
+                $this->output->writeln(
+                    sprintf(
+                        '%s %s%s%s()',
+                        str_repeat(' ', strlen($i) + 1),
+                        isset($trace['class']) ? $trace['class'] : '',
+                        isset($trace['type']) ? $trace['type'] : '',
+                        isset($trace['function']) ? $trace['function'] : ''
+                    ),
+                    $this->parseVerbosity()
+                );
+            } else {
+                $this->output->writeln(
+                    sprintf(
+                        '<comment>#%d</comment> %s%s%s()',
+                        $i,
+                        isset($trace['class']) ? $trace['class'] : '',
+                        isset($trace['type']) ? $trace['type'] : '',
+                        isset($trace['function']) ? $trace['function'] : ''
+                    ),
+                    $this->parseVerbosity()
+                );
+            }
+            $last = $i + 1;
+        }
+        $this->output->writeln(sprintf('<comment>#%d</comment> {main}', $last), $this->parseVerbosity());
+        if ($e = $e->getPrevious()) {
+            $this->line(str_repeat('-', 10));
+            $this->renderThrowable($e, true);
+        }
     }
 
     protected abstract function go();

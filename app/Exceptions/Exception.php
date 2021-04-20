@@ -8,6 +8,7 @@ namespace App\Exceptions;
 
 use App\Utils\ClassTrait;
 use App\Utils\ConfigHelper;
+use App\Vendors\Illuminate\Support\Facades\App;
 use Exception as BaseException;
 use PDOException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -60,7 +61,7 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
         }
 
         if (empty($message)) {
-            if (!config('app.debug') && ConfigHelper::get('force_common_exception')) {
+            if (!App::runningInDebug() && ConfigHelper::get('force_common_exception')) {
                 $this->messages = [trans('error.exceptions.default_exception.level_failed')];
             } elseif ($message = $this->getMessageFromPrevious()) {
                 $this->messages = [$message];
@@ -88,7 +89,7 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
         if ($previous) {
             if ($previous instanceof PDOException) {
                 if (is_array($previous->errorInfo) && isset($previous->errorInfo[2])) {
-                    return $previous->errorInfo[2];
+                    return trim($previous->errorInfo[2]);
                 }
             }
             return $previous->getMessage();
@@ -98,7 +99,8 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
 
     public function getStatusCode()
     {
-        return $this->getCode();
+        $code = $this->getCode();
+        return $code >= 100 && $code < 600 ? $code : 500;
     }
 
     public function getHeaders()

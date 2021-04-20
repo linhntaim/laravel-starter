@@ -56,11 +56,11 @@ class Handler extends ExceptionHandler
         });
     }
 
-    public function render($request, Throwable $e)
+    public function report(Throwable $e)
     {
         TransactionManager::getInstance()->stop();
 
-        return parent::render($request, $e);
+        parent::report($e);
     }
 
     protected function prepareException(Throwable $e)
@@ -140,7 +140,7 @@ class Handler extends ExceptionHandler
 
     protected function convertExceptionToArray(Throwable $e)
     {
-        return ApiController::failPayload(null, $e, $this->isHttpException($e) ? $e->getStatusCode() : 500);
+        return ApiController::failPayload(null, $e, $this->isHttpException($e) ? $e->getStatusCode() : 500, $e->getCode());
     }
 
     protected function unauthenticated($request, AuthenticationException $exception)
@@ -164,4 +164,21 @@ class Handler extends ExceptionHandler
             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
         );
     }
+
+    #region Console
+    public function renderForConsole($output, Throwable $e)
+    {
+        $command = $e instanceof ConsoleException ? $e->getCommand() : null;
+
+        if (method_exists($command, 'renderThrowable')) {
+            $command->renderThrowable($e);
+        } else {
+            parent::renderForConsole($output, $e);
+        }
+
+        if ($command) {
+            $command->after()->fails();
+        }
+    }
+    #endregion
 }

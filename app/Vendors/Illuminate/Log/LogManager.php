@@ -4,8 +4,10 @@ namespace App\Vendors\Illuminate\Log;
 
 use App\Exceptions\Exception;
 use App\Vendors\Illuminate\Support\Facades\App;
+use App\Vendors\Monolog\Formatter\LineFormatter;
 use Illuminate\Log\LogManager as BaseLogManager;
 use Illuminate\Support\Facades\Auth;
+use Throwable;
 
 class LogManager extends BaseLogManager
 {
@@ -25,7 +27,7 @@ class LogManager extends BaseLogManager
 
     protected function formatMessage($message)
     {
-        if ($message instanceof \Throwable) {
+        if ($message instanceof Throwable) {
             $message = $message->getMessage();
         }
         return sprintf('%s %s', $this->app['id'], $message);
@@ -39,14 +41,16 @@ class LogManager extends BaseLogManager
             'userAgent' => $request->userAgent(),
         ];
 
-        if (!isset($context['userId'])) {
-            $this->off();
-            $context['userId'] = Auth::id();
-            $this->on();
+        if (App::runningFromRequest()) {
+            if (!isset($context['userId'])) {
+                $this->off();
+                $context['userId'] = Auth::id();
+                $this->on();
+            }
         }
 
         $exceptionContent = [];
-        if (!isset($context['exception']) && $message instanceof \Throwable) {
+        if (!isset($context['exception']) && $message instanceof Throwable) {
             if (method_exists($message, 'context')) {
                 $exceptionContent = $message->context();
             }
@@ -114,5 +118,12 @@ class LogManager extends BaseLogManager
     {
         if ($this->off) return;
         parent::log($level, $this->formatMessage($message), $this->formatContext($context, $message));
+    }
+
+    protected function formatter()
+    {
+        return tap(new LineFormatter(null, $this->dateFormat, true, true), function ($formatter) {
+            $formatter->includeStacktraces();
+        });
     }
 }

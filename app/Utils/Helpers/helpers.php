@@ -1,5 +1,14 @@
 <?php
 
+function maxExecutionTime()
+{
+    static $maxExecutionTime = null;
+    if (is_null($maxExecutionTime)) {
+        $maxExecutionTime = intval(ini_get('max_execution_time'));
+    }
+    return $maxExecutionTime;
+}
+
 function got($value, $default = null)
 {
     if (filled($value)) {

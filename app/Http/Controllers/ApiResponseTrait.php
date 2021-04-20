@@ -11,6 +11,7 @@ use App\Exceptions\UnhandledException;
 use App\Exceptions\UserException;
 use App\Http\Requests\Request;
 use App\Utils\ConfigHelper;
+use App\Vendors\Illuminate\Support\Facades\App;
 use Closure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -53,8 +54,6 @@ trait ApiResponseTrait
     protected static function payload($data = null, $message = null)
     {
         $debug = null;
-        $debugMode = config('app.debug');
-
         if ($message instanceof Throwable) {
             $exception = $message;
             $debug = [
@@ -80,15 +79,16 @@ trait ApiResponseTrait
             '_messages' => empty($message) ? null : (array)$message,
             '_data' => $data,
             '_extra' => static::$extraResponse,
-            '_exception' => $debugMode ? $debug : null,
+            '_exception' => App::runningInDebug() ? $debug : null,
         ];
     }
 
-    public static function failPayload($data = null, $message = null, $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR)
+    public static function failPayload($data = null, $message = null, $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR, $errorCode = 0)
     {
         return array_merge(static::payload($data, $message), [
             '_status' => false,
             '_code' => $statusCode,
+            '_error' => $errorCode ? $errorCode : $statusCode,
         ]);
     }
 
@@ -153,10 +153,11 @@ trait ApiResponseTrait
      * @param Exception|array|string|null $message
      * @param array|null $data
      * @param int $statusCode
+     * @param int $errorCode
      * @param array $headers
      * @return JsonResponse
      */
-    protected function responseFail($message = null, $data = null, $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR, $headers = [])
+    protected function responseFail($message = null, $data = null, $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR, $errorCode = 0, $headers = [])
     {
         $this->transactionStop();
         if ($message instanceof \Exception) {
@@ -164,12 +165,14 @@ trait ApiResponseTrait
         }
         if ($message instanceof HttpExceptionInterface) {
             $statusCode = $message->getStatusCode();
+            $errorCode = $message->getCode();
         }
         return $this->response(
             static::failPayload(
                 $data,
                 $message,
-                $statusCode
+                $statusCode,
+                $errorCode
             ),
             $statusCode,
             $headers

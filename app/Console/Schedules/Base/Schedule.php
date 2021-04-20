@@ -8,12 +8,16 @@ namespace App\Console\Schedules\Base;
 
 use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\Traits\ConsoleClientTrait;
+use App\Utils\Database\Transaction\TransactionTrait;
+use App\Vendors\Illuminate\Support\Facades\App;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 abstract class Schedule
 {
-    use ClassTrait, ConsoleClientTrait;
+    use ClassTrait, ConsoleClientTrait, TransactionTrait;
 
     /**
      * @var ConsoleKernel
@@ -31,18 +35,32 @@ abstract class Schedule
         return $this;
     }
 
-    public function handle()
+    public function start()
     {
-        try {
-            $this->go();
-        } catch (\Exception $exception) {
-            $this->handleException($exception);
-        }
+        Log::info(sprintf('%s scheduling...', static::class));
+        return $this;
     }
 
-    protected function handleException($exception)
+    public function end()
     {
-        Log::error($exception);
+        Log::info(sprintf('%s scheduled!', static::class));
+        return $this;
+    }
+
+    public function handle()
+    {
+        $this->start();
+        try {
+            $this->go();
+        } catch (Throwable $e) {
+            $this->reportException($e);
+        }
+        $this->end();
+    }
+
+    protected function reportException(Throwable $e)
+    {
+        App::make(ExceptionHandler::class)->report($e);
     }
 
     protected abstract function go();

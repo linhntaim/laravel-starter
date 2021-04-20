@@ -8,6 +8,8 @@ namespace App\Utils\HandledFiles\Filer;
 
 use App\Exceptions\AppException;
 use App\Exceptions\Exception;
+use App\Vendors\Illuminate\Support\Facades\App;
+use Throwable;
 
 trait ReadFilerTrait
 {
@@ -25,7 +27,7 @@ trait ReadFilerTrait
 
     public function fReadDisableCustomException($excluded = [])
     {
-        if (!config('app.debug')) {
+        if (!App::runningInDebug()) {
             $this->fReadUseCustomException = false;
             $this->fReadExcludedCustomExceptions = $excluded;
         }
@@ -135,9 +137,15 @@ trait ReadFilerTrait
     public function fReadAll(callable $callback = null, callable $afterCallback = null)
     {
         $reads = [];
+        $this->fReadCounter = 0;
         while (($read = $this->fRead()) !== false) {
             if ($read === null) continue;
-            $reads[] = $callback ? $callback($read) : $read;
+            ++$this->fReadCounter;
+            if ($callback) {
+                $reads[] = $this->makeReadCallback($callback, $read);
+            } else {
+                $reads[] = $read;
+            }
         }
         return $afterCallback ? $afterCallback($reads) : $reads;
     }
@@ -154,21 +162,27 @@ trait ReadFilerTrait
         }
         if ($callback) {
             $this->fReadCounter = 0;
-            foreach ($reads as $key => &$data) {
+            foreach ($reads as &$data) {
                 ++$this->fReadCounter;
-                try {
-                    $data = $callback($data, $this->fReadCounter);
-                } catch (\Exception $exception) {
-                    if ($this->fIsExcludedException($exception)) {
-                        throw ($exception instanceof Exception ? $exception : AppException::from($exception))
-                            ->transformMessage(function ($message) {
-                                return $this->fReadTransformExceptionMessage($message);
-                            });
-                    }
-                    $this->fReadThrowException();
-                }
+                $data = $this->makeReadCallback($callback, $data);
             }
         }
         return $afterCallback ? $afterCallback($reads) : $reads;
+    }
+
+    protected function makeReadCallback($callback, $data)
+    {
+        try {
+            return $callback($data, $this->fReadCounter);
+        } catch (Throwable $exception) {
+            if ($this->fIsExcludedException($exception)) {
+                throw ($exception instanceof Exception ? $exception : AppException::from($exception))
+                    ->transformMessage(function ($message) {
+                        return $this->fReadTransformExceptionMessage($message);
+                    });
+            }
+            $this->fReadThrowException();
+        }
+        return null;
     }
 }

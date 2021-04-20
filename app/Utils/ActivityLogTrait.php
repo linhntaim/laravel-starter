@@ -11,6 +11,7 @@ use App\Models\ActivityLog;
 use App\Models\Base\IActivityLog;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Throwable;
 
 trait ActivityLogTrait
 {
@@ -29,7 +30,7 @@ trait ActivityLogTrait
         if ($actedBy) {
             try {
                 (new ActivityLogRepository())->createWithAction($action, $actedBy, $payload);
-            } catch (\Exception $exception) {
+            } catch (Throwable $exception) {
 
             }
         }

@@ -7,6 +7,7 @@
 namespace App\Events\Listeners;
 
 use App\Events\Listeners\Base\NowListener;
+use App\Vendors\Illuminate\Support\Facades\App;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\Log;
 
@@ -17,8 +18,16 @@ class OnQueryExecuted extends NowListener
      */
     protected function go($event)
     {
-        if (config('app.debug')) {
-            Log::info(sprintf('SQL: %s. Bindings: %s', $event->sql, json_encode($event->bindings)));
+        if (App::runningInDebug()) {
+            Log::info(
+                sprintf(
+                    'Time: %sms. SQL: %s. Bindings: %s. Connection: %s.',
+                    $event->time,
+                    $event->sql,
+                    json_encode($event->bindings),
+                    $event->connectionName
+                )
+            );
         }
     }
 }
