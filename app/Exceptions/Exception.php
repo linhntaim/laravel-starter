@@ -98,7 +98,8 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
 
     public function getStatusCode()
     {
-        return $this->getCode();
+        $code = $this->getCode();
+        return $code >= 100 && $code < 600 ? $code : 500;
     }
 
     public function getHeaders()

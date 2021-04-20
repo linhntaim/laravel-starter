@@ -13,7 +13,7 @@ use App\Utils\HandledFiles\Filer\CsvFiler;
  * @package App\Imports\Base
  * @property CsvFiler $filer
  */
-class CsvImport extends Import
+abstract class CsvImport extends Import
 {
     protected $customExceptionDisabled = true;
     protected $headerSkipped = true;
@@ -49,10 +49,11 @@ class CsvImport extends Import
 
     public function importing()
     {
+        $this->csvRead();
         $this->csvImport();
     }
 
-    protected function csvImport()
+    protected function csvRead()
     {
         if ($this->customExceptionDisabled) {
             $this->filer->fReadDisableCustomException($this->excludedCustomExceptions);
@@ -61,19 +62,8 @@ class CsvImport extends Import
             $this->filer->fReadSetMatchedHeaders($headers, $this->csvExtraHeaders());
         }
         $this->filer->fReadSkipHeader($this->headerSkipped)
-            ->fStartReading()
-            ->fReadWhole(
-                function ($read, $counter) {
-                    $this->csvImporting($read, $counter);
-                },
-                function ($reads) {
-                    $this->csvBeforeImporting($reads);
-                    return $reads;
-                },
-                function ($reads) {
-                    $this->csvAfterImporting($reads);
-                    return $reads;
-                }
-            );
+            ->fStartReading();
     }
+
+    protected abstract function csvImport();
 }

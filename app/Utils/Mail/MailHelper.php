@@ -6,9 +6,7 @@
 
 namespace App\Utils\Mail;
 
-use App\Exceptions\AppException;
 use App\Utils\ConfigHelper;
-use Exception;
 use Illuminate\Support\Facades\Mail;
 
 class MailHelper
@@ -22,16 +20,8 @@ class MailHelper
     {
         if (ConfigHelper::get('emails.send_off')) return true;
 
-        try {
-            if ($mailable instanceof TemplateMailable) {
-                Mail::queue($mailable);
-            } else {
-                Mail::send($mailable);
-            }
-            return true;
-        } catch (Exception $ex) {
-            throw AppException::from($ex);
-        }
+        Mail::send($mailable);
+        return true;
     }
 
     /**

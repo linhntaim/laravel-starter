@@ -52,6 +52,7 @@ class HandledFile extends Model
     protected $table = 'handled_files';
 
     protected $fillable = [
+        'created_by',
         'title',
         'name',
         'mime',

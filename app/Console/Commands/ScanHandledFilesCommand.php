@@ -5,12 +5,10 @@ namespace App\Console\Commands;
 use App\Console\Commands\Base\Command;
 use App\ModelRepositories\HandledFileRepository;
 use App\Models\HandledFile;
-use App\Utils\Database\Transaction\TransactionTrait;
+use Throwable;
 
 class ScanHandledFilesCommand extends Command
 {
-    use TransactionTrait;
-
     protected $signature = 'scan:handled_files';
 
     protected function go()
@@ -26,7 +24,7 @@ class ScanHandledFilesCommand extends Command
         try {
             (new HandledFileRepository())->withModel($handledFile)->scan();
             $this->transactionComplete();
-        } catch (\Exception $exception) {
+        } catch (Throwable $exception) {
             $this->transactionStop();
 
             throw $exception;

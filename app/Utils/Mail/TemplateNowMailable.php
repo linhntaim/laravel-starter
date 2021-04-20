@@ -14,6 +14,7 @@ use App\Utils\RateLimiterTrait;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Log;
 use Swift_DependencyContainer;
+use Throwable;
 
 class TemplateNowMailable extends Mailable
 {
@@ -250,5 +251,9 @@ class TemplateNowMailable extends Mailable
         }
 
         parent::send($mailer);
+    }
+
+    public function failed(Throwable $e)
+    {
     }
 }

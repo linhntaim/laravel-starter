@@ -59,8 +59,10 @@ abstract class ModelExport extends Export implements ICsvExport
     protected function csvExporting()
     {
         $this->modelRepository->batchReadStart($this->query(), $this->readBatch);
+        $this->resetExecutionTime();
         while (($models = $this->modelRepository->batchRead($length, $shouldEnd)) && $length > 0) {
             $this->csvStore($this->modelTransform($models));
+            $this->resetExecutionTime();
             if ($shouldEnd) {
                 break;
             }

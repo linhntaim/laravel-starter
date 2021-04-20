@@ -107,14 +107,15 @@ class HandledFileRepository extends ModelRepository
      * @return HandledFile
      * @throws
      */
-    public function createWithUploadedImageFile(UploadedFile $uploadedFile, $options = [], $imageMaxWidth = null, $imageMaxHeight = null, $name = null)
+    public function createWithUploadedImageFile(UploadedFile $uploadedFile, $options = [], $imageMaxWidth = null, $imageMaxHeight = null, $name = null, $createdBy = null)
     {
         return $this->createWithImageFiler(
             (new ImageFiler())->fromExisted($uploadedFile, false, false),
             $options,
             $imageMaxWidth,
             $imageMaxHeight,
-            $name
+            $name,
+            $createdBy
         );
     }
 
@@ -125,7 +126,7 @@ class HandledFileRepository extends ModelRepository
      * @param int|null|bool $imageMaxHeight
      * @return HandledFile
      */
-    public function createWithImageFiler(ImageFiler $imageFiler, $options = [], $imageMaxWidth = null, $imageMaxHeight = null, $name = null)
+    public function createWithImageFiler(ImageFiler $imageFiler, $options = [], $imageMaxWidth = null, $imageMaxHeight = null, $name = null, $createdBy = null)
     {
         if ($imageMaxWidth !== false && empty($imageMaxWidth)) {
             $imageMaxWidth = ConfigHelper::get('handled_file.image.max_width');
@@ -140,7 +141,7 @@ class HandledFileRepository extends ModelRepository
         if (ConfigHelper::get('handled_file.image.inline') && !isset($options['inline'])) {
             $options['inline'] = true;
         }
-        return $this->createWithFiler($imageFiler, $options, $name);
+        return $this->createWithFiler($imageFiler, $options, $name, $createdBy);
     }
 
     /**
@@ -166,7 +167,7 @@ class HandledFileRepository extends ModelRepository
         return $filer;
     }
 
-    public function createWithFiler(Filer $filer, $options = [], $name = null)
+    public function createWithFiler(Filer $filer, $options = [], $name = null, $createdBy = null)
     {
         if ($this->scan) {
             if (ConfigHelper::get('handled_file.scan.enabled')) {
@@ -216,6 +217,7 @@ class HandledFileRepository extends ModelRepository
         $filer = $this->handleFilerWithOptions($filer, $options)->setName($name);
 
         $this->createWithAttributes([
+            'created_by' => $createdBy ? $createdBy : currentUserId(),
             'title' => (function ($name) {
                 $names = explode('.', $name);
                 if (count($names) > 1) {

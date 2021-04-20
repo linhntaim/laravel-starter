@@ -97,7 +97,7 @@ class Handler extends ExceptionHandler
 
     protected function convertExceptionToArray(Throwable $e)
     {
-        return ApiController::failPayload(null, $e, $this->isHttpException($e) ? $e->getStatusCode() : 500);
+        return ApiController::failPayload(null, $e, $this->isHttpException($e) ? $e->getStatusCode() : 500, $e->getCode());
     }
 
     protected function unauthenticated($request, AuthenticationException $exception)

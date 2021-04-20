@@ -9,12 +9,13 @@ namespace App\Imports\Base;
 use App\ModelRepositories\Base\ModelRepository;
 use App\Models\Base\Model;
 use App\Utils\Database\Transaction\TransactionTrait;
+use Throwable;
 
 /**
  * Class ModelCsvImport
  * @package App\Imports\Base
  */
-abstract class ModelCsvImport extends CsvImport
+abstract class ModelCsvImport extends WholeCsvImport
 {
     use TransactionTrait;
 
@@ -81,7 +82,7 @@ abstract class ModelCsvImport extends CsvImport
 
             $this->modelImporting($read, $counter);
             $this->transactionComplete();
-        } catch (\Exception $exception) {
+        } catch (Throwable $exception) {
             $this->transactionStop();
 
             $this->csvHandleImportingException($exception);

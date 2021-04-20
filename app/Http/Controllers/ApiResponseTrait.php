@@ -84,11 +84,12 @@ trait ApiResponseTrait
         ];
     }
 
-    public static function failPayload($data = null, $message = null, $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR)
+    public static function failPayload($data = null, $message = null, $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR, $errorCode = 0)
     {
         return array_merge(static::payload($data, $message), [
             '_status' => false,
             '_code' => $statusCode,
+            '_error' => $errorCode ? $errorCode : $statusCode,
         ]);
     }
 
@@ -153,10 +154,11 @@ trait ApiResponseTrait
      * @param Exception|array|string|null $message
      * @param array|null $data
      * @param int $statusCode
+     * @param int $errorCode
      * @param array $headers
      * @return JsonResponse
      */
-    protected function responseFail($message = null, $data = null, $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR, $headers = [])
+    protected function responseFail($message = null, $data = null, $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR, $errorCode = 0, $headers = [])
     {
         $this->transactionStop();
         if ($message instanceof \Exception) {
@@ -164,12 +166,14 @@ trait ApiResponseTrait
         }
         if ($message instanceof HttpExceptionInterface) {
             $statusCode = $message->getStatusCode();
+            $errorCode = $message->getCode();
         }
         return $this->response(
             static::failPayload(
                 $data,
                 $message,
-                $statusCode
+                $statusCode,
+                $errorCode
             ),
             $statusCode,
             $headers

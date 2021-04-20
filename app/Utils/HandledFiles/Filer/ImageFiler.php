@@ -11,6 +11,7 @@ use App\Utils\HandledFiles\Storage\LocalStorage;
 use Illuminate\Http\UploadedFile;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManagerStatic;
+use Throwable;
 
 /**
  * Class ImageFiler
@@ -49,7 +50,7 @@ class ImageFiler extends Filer
         if (($storage = $this->getOriginStorage()) && $storage instanceof LocalStorage) {
             try {
                 $this->image = ImageManagerStatic::make($storage->getRealPath());
-            } catch (\Exception $exception) {
+            } catch (Throwable $exception) {
                 throw AppException::from($exception);
             }
         }

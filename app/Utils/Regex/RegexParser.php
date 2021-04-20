@@ -8,10 +8,10 @@ namespace App\Utils\Regex;
 
 use App\Exceptions\AppException;
 use App\Utils\ClassTrait;
-use Exception;
 use Hoa\Compiler\Llk\Llk;
 use Hoa\Compiler\Llk\TreeNode;
 use Hoa\File\Read;
+use Throwable;
 
 class RegexParser
 {
@@ -55,7 +55,7 @@ class RegexParser
                 $this->walk($parsed, empty($callback) ? $this->defaultParsedCallback : $callback);
             }
             return $parsed;
-        } catch (Exception $exception) {
+        } catch (Throwable $exception) {
             throw new AppException($this->__transErrorWithModule('unexpected_token'));
         }
     }
