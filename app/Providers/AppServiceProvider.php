@@ -16,6 +16,7 @@ use App\Utils\ExtraActions\ReplaceAction;
 use App\Utils\Screen\Manager as ScreenManager;
 use App\Vendors\Illuminate\Database\Connectors\ConnectionFactory;
 use App\Vendors\Illuminate\Log\LogManager;
+use App\Vendors\Illuminate\Support\Facades\App;
 use App\Vendors\Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -97,5 +98,9 @@ class AppServiceProvider extends ServiceProvider
 
         Passport::tokensExpireIn(now()->addSeconds(ConfigHelper::get('passport.token_lifetime')));
         Passport::refreshTokensExpireIn(now()->addSeconds(ConfigHelper::get('passport.refresh_token_lifetime')));
+
+        $this->app->terminating(function () {
+            App::bench('app');
+        });
     }
 }
