@@ -4,6 +4,7 @@ namespace App\Vendors\Illuminate\Log;
 
 use App\Exceptions\Exception;
 use App\Vendors\Illuminate\Support\Facades\App;
+use App\Vendors\Monolog\Formatter\LineFormatter;
 use Illuminate\Log\LogManager as BaseLogManager;
 use Illuminate\Support\Facades\Auth;
 use Throwable;
@@ -117,5 +118,12 @@ class LogManager extends BaseLogManager
     {
         if ($this->off) return;
         parent::log($level, $this->formatMessage($message), $this->formatContext($context, $message));
+    }
+
+    protected function formatter()
+    {
+        return tap(new LineFormatter(null, $this->dateFormat, true, true), function ($formatter) {
+            $formatter->includeStacktraces();
+        });
     }
 }

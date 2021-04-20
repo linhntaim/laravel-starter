@@ -145,69 +145,73 @@ abstract class Command extends BaseCommand
         $this->line($string, 'caution', $verbosity);
     }
 
-    public function renderThrowable(Throwable $e)
+    public function renderThrowable(Throwable $e, $previous = false)
     {
-        $this->output->writeln(sprintf('<strong-caution>EXCEPTION: %s</strong-caution>', get_class($e)), $this->parseVerbosity());
-        $this->output->writeln('<comment>Code:</comment> ' . $e->getCode(), $this->parseVerbosity());
-        $this->output->writeln('<comment>Message:</comment> ' . $e->getMessage(), $this->parseVerbosity());
+        $this->output->writeln(sprintf('<strong-caution>%s: %s</strong-caution>', $previous ? 'PREVIOUS EXCEPTION' : 'EXCEPTION', get_class($e)), $this->parseVerbosity());
+        $this->output->writeln(sprintf('<comment>Code:</comment> %s', $e->getCode()), $this->parseVerbosity());
+        if ($e instanceof \SoapFault) {
+            if (isset($e->faultcode)) {
+                $this->output->writeln(sprintf('<comment>Fault code:</comment> %s', $e->faultcode), $this->parseVerbosity());
+            }
+            if (isset($e->faultactor)) {
+                $this->output->writeln(sprintf('<comment>Fault actor:</comment> %s', $e->faultactor), $this->parseVerbosity());
+            }
+            if (isset($e->detail)) {
+                if (is_string($e->detail)) {
+                    $this->output->writeln(sprintf('<comment>Fault detail:</comment> %s', $e->detail), $this->parseVerbosity());
+                } elseif (is_object($e->detail) || is_array($e->detail)) {
+                    $this->output->writeln(sprintf('<comment>Fault detail:</comment> %s', json_encode($e->detail)), $this->parseVerbosity());
+                }
+            }
+        }
+        $this->output->writeln(sprintf('<comment>Message:</comment> %s', $e->getMessage()), $this->parseVerbosity());
         $this->output->writeln(sprintf('<comment>File:</comment> [%s:%d]', $e->getFile(), $e->getLine()), $this->parseVerbosity());
-        if ($e instanceof Exception) {
+        if ($e instanceof Exception && count($data = $e->getAttachedData()) > 0) {
             $this->warn('Data:');
-            var_dump($e->getAttachedData());
+            var_dump($data);
         }
         $this->warn('Trace:');
-        $previous = false;
-        do {
-            if ($previous) {
+        $last = 0;
+        foreach ($e->getTrace() as $i => $trace) {
+            if (isset($trace['file'])) {
                 $this->output->writeln(
-                    '<caution>[previous exception]</caution>',
+                    sprintf(
+                        '<comment>#%d</comment> [<info>%s:%s</info>]',
+                        $i,
+                        isset($trace['file']) ? $trace['file'] : '',
+                        isset($trace['line']) ? $trace['line'] : ''
+                    ),
+                    $this->parseVerbosity()
+                );
+                $this->output->writeln(
+                    sprintf(
+                        '%s %s%s%s()',
+                        str_repeat(' ', strlen($i) + 1),
+                        isset($trace['class']) ? $trace['class'] : '',
+                        isset($trace['type']) ? $trace['type'] : '',
+                        isset($trace['function']) ? $trace['function'] : ''
+                    ),
                     $this->parseVerbosity()
                 );
             } else {
                 $this->output->writeln(
-                    '<caution>[stacktrace]</caution>',
+                    sprintf(
+                        '<comment>#%d</comment> %s%s%s()',
+                        $i,
+                        isset($trace['class']) ? $trace['class'] : '',
+                        isset($trace['type']) ? $trace['type'] : '',
+                        isset($trace['function']) ? $trace['function'] : ''
+                    ),
                     $this->parseVerbosity()
                 );
             }
-            $last = 0;
-            foreach ($e->getTrace() as $i => $trace) {
-                if (isset($trace['file'])) {
-                    $this->output->writeln(
-                        sprintf(
-                            '<comment>#%d</comment> <info>%s:%s</info> :',
-                            $i,
-                            isset($trace['file']) ? $trace['file'] : '',
-                            isset($trace['line']) ? $trace['line'] : ''
-                        ),
-                        $this->parseVerbosity()
-                    );
-                    $this->output->writeln(
-                        sprintf(
-                            '%s %s%s%s()',
-                            str_repeat(' ', strlen($i) + 1),
-                            isset($trace['class']) ? $trace['class'] : '',
-                            isset($trace['type']) ? $trace['type'] : '',
-                            isset($trace['function']) ? $trace['function'] : ''
-                        ),
-                        $this->parseVerbosity()
-                    );
-                }
-                else {
-                    $this->output->writeln(
-                        sprintf(
-                            '<comment>#%d</comment> %s%s%s()',
-                            $i,
-                            isset($trace['class']) ? $trace['class'] : '',
-                            isset($trace['type']) ? $trace['type'] : '',
-                            isset($trace['function']) ? $trace['function'] : ''
-                        ),
-                        $this->parseVerbosity()
-                    );
-                }
-                $last = $i + 1;
-            }
-            $this->output->writeln(sprintf('<comment>#%d</comment> {main}', $last), $this->parseVerbosity());
-        } while (($e = $e->getPrevious()) && ($previous = true));
+            $last = $i + 1;
+        }
+        $this->output->writeln(sprintf('<comment>#%d</comment> {main}', $last), $this->parseVerbosity());
+        if ($e = $e->getPrevious()) {
+            $this->line(str_repeat('-', 10));
+            $this->renderThrowable($e, true);
+        }
     }
 
     protected abstract function go();
