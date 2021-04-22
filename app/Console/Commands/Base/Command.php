@@ -12,6 +12,7 @@ use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\Traits\ConsoleClientTrait;
 use App\Utils\Database\Transaction\TransactionTrait;
 use App\Utils\ShellTrait;
+use App\Vendors\Illuminate\Support\Facades\App;
 use Illuminate\Console\Command as BaseCommand;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -22,23 +23,46 @@ abstract class Command extends BaseCommand
 {
     use ClassTrait, ShellTrait, ConsoleClientTrait, TransactionTrait;
 
-    protected $__friendlyName;
+    protected static $shoutOutEnabled = true;
 
-    protected function __friendlyName()
+    public static function disableShoutOut()
     {
-        if (empty($this->__friendlyName)) {
-            $this->__friendlyName = trim(preg_replace('/command$/i', '', static::__friendlyClassBaseName()));
-        }
-        return $this->__friendlyName;
+        self::$shoutOutEnabled = false;
     }
 
-    protected $noInformation = false;
+    public static function enableShoutOut()
+    {
+        self::$shoutOutEnabled = true;
+    }
+
+    protected $friendlyName;
 
     public function __construct()
     {
         parent::__construct();
 
+        $this->friendlyName = trim(preg_replace('/command$/i', '', static::__friendlyClassBaseName()));
+
         $this->consoleClientApply();
+    }
+
+    public function alert($string)
+    {
+        $this->newLine();
+        parent::alert($string);
+    }
+
+    protected function runCommand($command, array $arguments, OutputInterface $output)
+    {
+        self::disableShoutOut();
+        $run = parent::runCommand($command, $arguments, $output);
+        self::enableShoutOut();
+        return $run;
+    }
+
+    protected function friendlyName()
+    {
+        return $this->friendlyName;
     }
 
     protected function setStyles()
@@ -53,41 +77,19 @@ abstract class Command extends BaseCommand
 
             $this->output->getFormatter()->setStyle('strong-caution', $style);
         }
-    }
-
-    /**
-     * @return Command
-     */
-    public function disableInformation()
-    {
-        $this->noInformation = true;
         return $this;
     }
 
-    protected function runCommand($command, array $arguments, OutputInterface $output)
+    public function start()
     {
-        $arguments['command'] = $command;
-
-        $commander = $this->resolveCommand($command);
-
-        if ($commander instanceof Command) {
-            $commander->disableInformation();
-        }
-
-        return $commander->run(
-            $this->createInputFromArguments($arguments), $output
-        );
+        Log::info(sprintf('%s commanding...', static::class));
+        return $this->setStyles()
+            ->shoutOutAtStart();
     }
 
-    public function alert($string)
+    protected function shoutOutAtStart()
     {
-        $this->newLine();
-        parent::alert($string);
-    }
-
-    public function before()
-    {
-        if (!$this->noInformation) {
+        if (App::runningInConsole() && self::$shoutOutEnabled) {
             $this->newLine();
             $this->info(sprintf('START %s...', strtoupper($this->__friendlyClassBaseName())));
             $this->newLine();
@@ -95,43 +97,36 @@ abstract class Command extends BaseCommand
         return $this;
     }
 
-    public function after()
+    public function end()
     {
-        if (!$this->noInformation) {
+        Log::info(sprintf('%s commanded!', static::class));
+        return $this->shoutOutAtEnd();
+    }
+
+    protected function shoutOutAtEnd()
+    {
+        if (App::runningInConsole() && self::$shoutOutEnabled) {
             $this->newLine();
             $this->info(sprintf('END %s!!!', strtoupper($this->__friendlyClassBaseName())));
         }
         return $this;
     }
 
-    public function start()
-    {
-        Log::info(sprintf('%s commanding...', static::class));
-        return $this;
-    }
-
-    public function end()
-    {
-        Log::info(sprintf('%s commanded!', static::class));
-        return $this;
-    }
-
     public function fails()
     {
         Log::info(sprintf('%s failed!', static::class));
-        return $this;
+        return $this->shoutOutAtEnd();
     }
 
     public function handle()
     {
-        $this->setStyles();
-        $this->start()->before();
         try {
+            $this->start();
             $this->go();
+            $this->end();
         } catch (Throwable $e) {
             $this->handleException($e);
         }
-        $this->after()->end();
     }
 
     protected function handleException(Throwable $e)

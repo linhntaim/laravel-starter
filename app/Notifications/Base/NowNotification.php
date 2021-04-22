@@ -288,6 +288,11 @@ abstract class NowNotification extends BaseNotification
         return null;
     }
 
+    protected function getMailNow(IUser $notifiable)
+    {
+        return true;
+    }
+
     protected function getNowMailable(IUser $notifiable)
     {
         return TemplateNowMailable::class;
@@ -314,11 +319,6 @@ abstract class NowNotification extends BaseNotification
     }
 
     protected function getMailUseLocalizedTemplate(IUser $notifiable)
-    {
-        return true;
-    }
-
-    protected function getMailNow(IUser $notifiable)
     {
         return true;
     }

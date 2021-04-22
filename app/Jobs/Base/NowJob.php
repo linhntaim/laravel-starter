@@ -47,9 +47,9 @@ abstract class NowJob
         if ($this->transactionUsed) {
             $this->transactionStart();
         }
-        $this->start();
         $this->independentClientApply();
         try {
+            $this->start();
             $this->end();
             $this->go();
             if ($this->transactionUsed) {
