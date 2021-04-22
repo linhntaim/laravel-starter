@@ -10,6 +10,8 @@ use App\Exports\Base\Export;
 use App\Exports\RoleIndexModelCsvExport;
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
+use App\Imports\Base\Import;
+use App\Imports\RoleCsvImport;
 use App\ModelRepositories\RoleRepository;
 use App\Models\Role;
 use Illuminate\Validation\Rule;
@@ -57,6 +59,17 @@ class RoleController extends ModelApiController
     {
         parent::exportExecute($request, $exporter);
         $this->logActionModelExport(Role::class, $request->all());
+    }
+
+    protected function modelImporterClass(Request $request)
+    {
+        return RoleCsvImport::class;
+    }
+
+    protected function importExecute(Request $request, Import $importer = null)
+    {
+        parent::importExecute($request, $importer);
+        $this->logActionModelImport(Role::class, $request->all());
     }
 
     protected function storeValidatedRules(Request $request)

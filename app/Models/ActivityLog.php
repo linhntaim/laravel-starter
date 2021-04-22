@@ -32,6 +32,7 @@ class ActivityLog extends Model
     public const ACTION_LOGOUT = 'logout';
     public const ACTION_MODEL_LIST = 'model_list';
     public const ACTION_MODEL_EXPORT = 'model_export';
+    public const ACTION_MODEL_IMPORT = 'model_import';
     public const ACTION_MODEL_CREATE = 'model_create';
     public const ACTION_MODEL_EDIT = 'model_edit';
     public const ACTION_MODEL_DELETE = 'model_delete';

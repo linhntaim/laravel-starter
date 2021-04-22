@@ -17,6 +17,7 @@ abstract class AllCsvImport extends CsvImport
 {
     protected function csvImport()
     {
+        $this->csvBeforeImporting([]);
         $this->filer->fReadAll(
             function ($read, $counter) {
                 $this->resetExecutionTime();

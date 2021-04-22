@@ -6,6 +6,7 @@
 
 namespace App\Imports\Base;
 
+use App\Utils\ClassTrait;
 use App\Utils\ExecutionTimeTrait;
 use App\Utils\HandledFiles\Filer\Filer;
 use App\Utils\ValidationTrait;
@@ -13,7 +14,7 @@ use App\Vendors\Illuminate\Support\Facades\App;
 
 abstract class Import
 {
-    use ValidationTrait, ExecutionTimeTrait;
+    use ClassTrait, ValidationTrait, ExecutionTimeTrait;
 
     /**
      * @var Filer

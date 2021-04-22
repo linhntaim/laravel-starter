@@ -11,11 +11,14 @@ use App\Exceptions\AppException;
 use App\Exports\Base\Export;
 use App\Exports\Base\IndexModelCsvExport;
 use App\Http\Requests\Request;
+use App\Imports\Base\Import;
+use App\Jobs\ImportJob;
 use App\ModelRepositories\Base\ModelRepository;
 use App\ModelRepositories\DataExportRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Symfony\Component\HttpFoundation\Response;
@@ -136,13 +139,92 @@ abstract class ModelApiController extends ApiController
             [
                 'created_by' => $currentUser ? $currentUser->id : null,
             ],
-            $exporter ? $exporter : $this->exporter($request)
+            $exporter
         );
     }
 
     protected function export(Request $request)
     {
         return $this->responseModel($this->exportExecute($request));
+    }
+
+    #endregion
+
+    #region Import
+    /**
+     * @return string
+     */
+    protected function modelImporterFileInputKey()
+    {
+        return 'file';
+    }
+
+    /**
+     * @param Request $request
+     * @return UploadedFile
+     */
+    protected function modelImporterFile(Request $request)
+    {
+        return $request->file($this->modelImporterFileInputKey());
+    }
+
+    /**
+     * @param Request $request
+     * @return string|null
+     */
+    protected function modelImporterClass(Request $request)
+    {
+        return null;
+    }
+
+    /**
+     * @param Request $request
+     * @return IndexModelCsvExport|null
+     */
+    protected function modelImporter(Request $request)
+    {
+        $class = $this->modelImporterClass($request);
+        return $class ? new $class($this->modelImporterFile($request)) : null;
+    }
+
+    /**
+     * @param Request $request
+     * @return Export|null
+     */
+    protected function importer(Request $request)
+    {
+        return $this->modelImporter($request);
+    }
+
+    protected function importExecute(Request $request, Import $importer = null)
+    {
+        if (!$importer) {
+            $importer = $this->importer($request);
+            if (!$importer) {
+                throw new AppException('Importer is not implemented');
+            }
+        }
+
+        ImportJob::dispatch($importer);
+    }
+
+    protected function importValidatedRules(Request $request)
+    {
+        return [
+            $this->modelImporterFileInputKey() => 'required|file|mimes:csv,txt',
+        ];
+    }
+
+    protected function importValidated(Request $request)
+    {
+        $this->validated($request, $this->importValidatedRules($request));
+    }
+
+    protected function import(Request $request)
+    {
+        $this->importValidated($request);
+        $this->importExecute($request);
+        return $this->responseSuccess();
     }
     #endregion
 
@@ -164,6 +246,9 @@ abstract class ModelApiController extends ApiController
 
     public function store(Request $request)
     {
+        if ($request->has('_import')) {
+            return $this->import($request);
+        }
         if ($request->has('_delete')) {
             return $this->bulkDestroy($request);
         }
