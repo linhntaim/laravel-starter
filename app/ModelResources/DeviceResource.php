@@ -12,7 +12,7 @@ use App\Models\Device;
  */
 class DeviceResource extends ModelResource
 {
-    protected $hidden = [
+    public $hidden = [
         'client_agent',
     ];
 }
