@@ -132,8 +132,6 @@ class Helper
             }
         }
 
-        $intSize = intval($size);
-        $size = $size != $intSize ? $size : $intSize;
         if ($callback === true) {
             $size = number_format($size);
         } elseif (is_int($callback)) {
