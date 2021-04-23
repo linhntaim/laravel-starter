@@ -41,7 +41,7 @@ trait PagingTrait
     protected function sortBy()
     {
         $sortBy = request()->input('sort_by', $this->sortBy);
-        return in_array($sortBy, $this->sortByAllows, true) ?
+        return empty($this->sortByAllows) || in_array($sortBy, $this->sortByAllows, true) ?
             $sortBy : $this->sortBy;
     }
 
@@ -54,7 +54,7 @@ trait PagingTrait
     protected function moreBy()
     {
         $moreBy = request()->input('more_by', $this->moreBy);
-        return in_array($moreBy, $this->moreByAllows, true) ?
+        return empty($this->moreByAllows) || in_array($moreBy, $this->moreByAllows, true) ?
             $moreBy : $this->moreBy;
     }
 

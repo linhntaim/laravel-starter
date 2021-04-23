@@ -9,7 +9,6 @@ namespace App\Models;
 use App\ModelResources\RoleResource;
 use App\Models\Base\IProtected;
 use App\Models\Base\Model;
-use App\ModelTraits\MemorizeTrait;
 use App\ModelTraits\ProtectedTrait;
 use App\Vendors\Illuminate\Support\HtmlString;
 use Illuminate\Database\Eloquent\Collection;
@@ -26,7 +25,7 @@ use Illuminate\Database\Eloquent\Collection;
  */
 class Role extends Model implements IProtected
 {
-    use MemorizeTrait, ProtectedTrait;
+    use ProtectedTrait;
 
     public const SYSTEM = 'system';
     public const SUPER_ADMIN = 'super_admin';
@@ -92,9 +91,9 @@ class Role extends Model implements IProtected
         return $this->belongsToMany(Permission::class, 'permissions_roles', 'role_id', 'permission_id');
     }
 
-    public function toActivityLogArray($except = [])
+    public function toActivityLogArray()
     {
-        return array_merge(parent::toActivityLogArray($except), $this->toActivityLogArrayFrom([
+        return array_merge(parent::toActivityLogArray(), $this->toActivityLogArrayFrom([
             'permission_names' => $this->permissionNames,
         ]));
     }

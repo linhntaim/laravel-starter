@@ -103,10 +103,5 @@ class AppServiceProvider extends ServiceProvider
         $this->app->terminating(function () {
             App::bench('app');
         });
-
-        Artisan::call('impersonate', [
-            'user' => 3,
-            'admin_id' => 3,
-        ]);
     }
 }

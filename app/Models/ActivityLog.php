@@ -10,7 +10,6 @@ use App\ModelResources\ActivityLogResource;
 use App\Models\Base\IActivityLog;
 use App\Models\Base\Model;
 use App\ModelTraits\ArrayValuedAttributesTrait;
-use App\ModelTraits\MemorizeTrait;
 use App\Utils\ClientSettings\Facade;
 use Illuminate\Support\Str;
 
@@ -26,7 +25,7 @@ use Illuminate\Support\Str;
  */
 class ActivityLog extends Model
 {
-    use ArrayValuedAttributesTrait, MemorizeTrait;
+    use ArrayValuedAttributesTrait;
 
     public const ACTION_LOGIN = 'login';
     public const ACTION_LOGOUT = 'logout';

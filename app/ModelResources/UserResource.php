@@ -20,13 +20,12 @@ class UserResource extends ModelResource
 {
     use ModelTransformTrait;
 
-    protected function toCustomArray($request)
+    public function toArray($request)
     {
-        return [
-            $this->merge($this->toCurrentArray($request)),
+        return $this->mergeInWithCurrentArray($request, [
             $this->mergeWhen(SocialLogin::getInstance()->enabled(), [
                 'socials' => $this->modelTransform($this->whenLoaded('socials'), $request),
             ]),
-        ];
+        ]);
     }
 }

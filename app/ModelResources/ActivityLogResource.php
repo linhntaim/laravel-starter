@@ -7,6 +7,7 @@
 namespace App\ModelResources;
 
 use App\ModelResources\Base\ModelResource;
+use App\ModelResources\Base\ModelTransformTrait;
 use App\Models\ActivityLog;
 
 /**
@@ -16,15 +17,16 @@ use App\Models\ActivityLog;
  */
 class ActivityLogResource extends ModelResource
 {
-    protected function toCustomArray($request)
+    use ModelTransformTrait;
+
+    public function toArray($request)
     {
-        return [
-            $this->merge($this->toCurrentArray($request)),
-            $this->merge([
+        return $this->mergeInWithCurrentArray($request, [
+            [
                 'screens' => $this->screens_array_value,
                 'payload' => $this->payload_array_value,
-                'device' => $this->whenLoaded('device'),
-            ]),
-        ];
+                'device' => $this->modelTransform($this->whenLoaded('device'), $request),
+            ],
+        ]);
     }
 }

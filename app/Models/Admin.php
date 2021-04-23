@@ -49,6 +49,10 @@ class Admin extends ExtendedUserModel
         'avatar_url',
     ];
 
+    protected $activityLogHidden = [
+        'user_id',
+    ];
+
     protected $resourceClass = AdminResource::class;
 
     #region Get Attributes
@@ -140,10 +144,9 @@ class Admin extends ExtendedUserModel
         return true;
     }
 
-    public function toActivityLogArray($except = [])
+    public function toActivityLogArray()
     {
-        $except[] = 'user_id';
-        return array_merge($this->user->toActivityLogArray(), parent::toActivityLogArray($except));
+        return array_merge($this->user->toActivityLogArray(), parent::toActivityLogArray());
     }
     #endregion
 

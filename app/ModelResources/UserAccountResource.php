@@ -15,13 +15,13 @@ use App\Models\User;
  */
 class UserAccountResource extends UserResource
 {
-    protected function toCustomArray($request)
+    public function toArray($request)
     {
-        return [
-            $this->merge(parent::toCustomArray($request)),
-            $this->merge([
+        return $this->mergeIn([
+            parent::toArray($request),
+            [
                 'settings' => $this->preferredSettings()->toArray(),
-            ]),
-        ];
+            ],
+        ]);
     }
 }

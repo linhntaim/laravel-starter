@@ -10,6 +10,8 @@ use App\Http\Requests\Request;
 use App\Vendors\Illuminate\Support\Arr;
 use App\Vendors\Illuminate\Support\HtmlString;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\MergeValue;
+use Illuminate\Http\Resources\MissingValue;
 
 class ModelResource extends JsonResource implements IModelResource
 {
@@ -53,15 +55,6 @@ class ModelResource extends JsonResource implements IModelResource
      */
     public function toArray($request)
     {
-        return $this->toCustomArray($request);
-    }
-
-    /**
-     * @param Request $request
-     * @return array
-     */
-    protected function toCustomArray($request)
-    {
         return $this->toCurrentArray($request);
     }
 
@@ -69,9 +62,51 @@ class ModelResource extends JsonResource implements IModelResource
      * @param Request $request
      * @return array
      */
-    protected function toCurrentArray($request)
+    protected final function toCurrentArray($request)
     {
         return parent::toArray($request);
+    }
+
+    /**
+     * @param Request $request
+     * @param array ...$data
+     * @return array
+     */
+    protected function mergeAllWithCurrentArray($request, ...$data)
+    {
+        return $this->mergeInWithCurrentArray($request, $data);
+    }
+
+    /**
+     * @param Request $request
+     * @param array $data
+     * @return array
+     */
+    protected function mergeInWithCurrentArray($request, array $data)
+    {
+        array_unshift($data, $this->toCurrentArray($request));
+        return $this->mergeIn($data);
+    }
+
+    /**
+     * @param array ...$data
+     * @return array
+     */
+    protected function mergeAll(...$data)
+    {
+        return $this->mergeIn($data);
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    protected function mergeIn(array $data)
+    {
+        return array_map(function ($data) {
+            return $data instanceof MergeValue || $data instanceof MissingValue ?
+                $data : $this->merge($data);
+        }, $data);
     }
 
     protected function hide($data)

@@ -1,11 +1,18 @@
 <?php
 
-namespace App\Models\Base;
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
+namespace App\ModelTraits;
 
 use App\Utils\Database\MySqlTableLock;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 trait ModelTrait
 {
+    use FromModelTrait, ResourceTrait, ActivityLogTrait, HasFactory, MemorizeTrait;
+
     public static function table()
     {
         return (new static)->getTable();
@@ -122,5 +129,10 @@ trait ModelTrait
             return $this->getConnection()->unprepared($query);
         }
         return false;
+    }
+
+    public function toArray()
+    {
+        return $this->attributesToArray();
     }
 }

@@ -15,13 +15,13 @@ use App\Models\ActivityLog;
  */
 class ActivityLogAdminResource extends ActivityLogResource
 {
-    protected function toCustomArray($request)
+    public function toArray($request)
     {
-        return [
-            $this->merge(parent::toCustomArray($request)),
-            $this->merge([
-                'admin' => $this->whenLoaded('admin'),
-            ]),
-        ];
+        return $this->mergeIn([
+            parent::toArray($request),
+            [
+                'admin' => $this->modelTransform($this->whenLoaded('admin'), $request),
+            ],
+        ]);
     }
 }

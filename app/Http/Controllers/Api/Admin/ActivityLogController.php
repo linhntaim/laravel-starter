@@ -18,6 +18,12 @@ use App\Utils\ClientSettings\Facade;
  */
 class ActivityLogController extends ModelApiController
 {
+    protected $sortByAllows = [
+        'created_at',
+        'screen',
+        'action',
+    ];
+
     protected function modelRepositoryClass()
     {
         return ActivityLogAdminRepository::class;
