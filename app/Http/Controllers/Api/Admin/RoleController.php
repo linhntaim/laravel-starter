@@ -16,31 +16,33 @@ use App\ModelRepositories\RoleRepository;
 use App\Models\Role;
 use Illuminate\Validation\Rule;
 
+/**
+ * Class RoleController
+ * @package App\Http\Controllers\Api\Admin
+ * @property RoleRepository $modelRepository
+ */
 class RoleController extends ModelApiController
 {
-    public function __construct()
-    {
-        parent::__construct();
+    protected $sortByAllows = [
+        'created_at',
+        'name',
+        'display_name',
+    ];
 
-        $this->modelRepository = new RoleRepository();
+    protected function modelRepositoryClass()
+    {
+        return RoleRepository::class;
     }
 
-    protected function search(Request $request)
+    protected function searchParams(Request $request)
     {
-        $search = [];
-        $input = $request->input('name');
-        if (!empty($input)) {
-            $search['name'] = $input;
-        }
-        $input = $request->input('display_name');
-        if (!empty($input)) {
-            $search['display_name'] = $input;
-        }
-        $input = $request->input('permissions', []);
-        if (!empty($input)) {
-            $search['permissions'] = (array)$input;
-        }
-        return $search;
+        return [
+            'name',
+            'display_name',
+            'permissions' => function ($input) {
+                return (array)$input;
+            },
+        ];
     }
 
     protected function indexExecute(Request $request)

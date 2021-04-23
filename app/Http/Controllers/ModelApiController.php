@@ -30,10 +30,127 @@ abstract class ModelApiController extends ApiController
      */
     protected $modelRepository;
 
+    public function __construct()
+    {
+        parent::__construct();
+
+        if ($modelRepositoryClass = $this->modelRepositoryClass()) {
+            $this->modelRepository = new $modelRepositoryClass();
+            if ($modelResourceClass = $this->modelResourceClass()) {
+                $this->setFixedModelResourceClass(
+                    $modelResourceClass,
+                    $this->modelRepository->modelClass()
+                );
+            }
+        }
+    }
+
+    protected function modelRepositoryClass()
+    {
+        return null;
+    }
+
+    protected function modelResourceClass()
+    {
+        return null;
+    }
+
     #region Index
-    protected function search(Request $request)
+    protected function searchParams(Request $request)
     {
         return [];
+    }
+
+    protected function searchDefaultParams(Request $request)
+    {
+        return [];
+    }
+
+    protected function search(Request $request)
+    {
+        $search = [];
+        foreach ($this->searchParams($request) as $key => $param) {
+            if (is_int($key)) {
+                $input = $request->input($param);
+                if (!empty($input)) {
+                    $search[$param] = $input;
+                }
+            } else {
+                $input = $request->input($key);
+                if (!empty($input)) {
+                    if (is_string($param)) {
+                        $search[$param] = $input;
+                    } elseif (is_callable($param)) {
+                        $search[$key] = $param($input, $request);
+                    } elseif (is_array($param)) {
+                        $found0 = false;
+
+                        $name = $key;
+                        if (isset($param['name'])) {
+                            $name = $param['name'];
+                        } elseif (isset($param[0]) && is_string($param[0])) {
+                            $name = $param[0];
+                            $found0 = true;
+                        }
+
+                        $transform = null;
+                        if (isset($param['transform'])) {
+                            $transform = $param['transform'];
+                        } elseif (isset($param[1]) && is_callable($param[1])) {
+                            $transform = $param[1];
+                        } elseif (!$found0 && isset($param[0]) && is_callable($param[0])) {
+                            $transform = $param[0];
+                        }
+
+                        $search[$name] = is_callable($transform) ? $transform($input, $request) : $input;
+                    }
+                } else {
+                    if (is_array($param)) {
+                        $found0 = false;
+                        $found1 = false;
+
+                        $name = $key;
+                        if (isset($param['name'])) {
+                            $name = $param['name'];
+                        } elseif (isset($param[0]) && is_string($param[0])) {
+                            $name = $param[0];
+                            $found0 = true;
+                        }
+
+                        if (!isset($param['transform'])) {
+                            if (isset($param[1]) && is_callable($param[1])) {
+                                $found1 = true;
+                            } elseif (!$found0 && isset($param[0]) && is_callable($param[0])) {
+                                $found0 = true;
+                            }
+                        }
+
+                        $default = null;
+                        if (isset($param['default'])) {
+                            $default = $param['default'];
+                        } elseif (isset($param[2])) {
+                            $default = $param[2];
+                        } elseif (!$found1 && isset($param[1])) {
+                            $default = $param[1];
+                        } elseif (!$found0 && isset($param[0])) {
+                            $default = $param[0];
+                        }
+
+                        if (!is_null($default)) {
+                            $search[$name] = is_callable($default) ? $default($request) : $default;
+                        }
+                    }
+                }
+            }
+        }
+        foreach ($this->searchDefaultParams($request) as $key => $param) {
+            if (is_int($key)) {
+                $search[$param] = 1;
+            } else {
+                $search[$key] = $param;
+            }
+        }
+        return $search;
     }
 
     public function index(Request $request)

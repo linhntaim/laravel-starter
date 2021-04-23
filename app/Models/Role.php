@@ -11,6 +11,7 @@ use App\Models\Base\IProtected;
 use App\Models\Base\Model;
 use App\ModelTraits\MemorizeTrait;
 use App\ModelTraits\ProtectedTrait;
+use App\Vendors\Illuminate\Support\HtmlString;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
@@ -71,7 +72,7 @@ class Role extends Model implements IProtected
 
     public function getHtmlDescriptionAttribute()
     {
-        return escapeHtmlAndBreak($this->description);
+        return (new HtmlString($this->description))->escape()->break()->toHtml();
     }
 
     public function getPermissionNamesAttribute()

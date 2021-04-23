@@ -7,25 +7,21 @@
 namespace App\ModelResources\Base;
 
 use App\Http\Requests\Request;
-use App\Utils\GuardArrayTrait;
+use App\Vendors\Illuminate\Support\Arr;
+use App\Vendors\Illuminate\Support\HtmlString;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Resources\MergeValue;
-use Illuminate\Http\Resources\MissingValue;
-use Illuminate\Support\Arr;
 
 class ModelResource extends JsonResource implements IModelResource
 {
-    use ModelResourceTrait, GuardArrayTrait;
+    use ModelResourceTrait;
 
     public static $wrap = 'model';
 
-    public $preserveKeys = true;
+    public $hidden = [];
 
-    protected $hidden = [];
+    public $escaped = [];
 
-    protected $guarded = [];
-
-    protected $escaped = [];
+    public $guarded = [];
 
     /**
      * @param mixed $resource
@@ -40,61 +36,24 @@ class ModelResource extends JsonResource implements IModelResource
         });
     }
 
-    /**
-     * @param array $array
-     * @return array
-     */
-    protected function guard(array $array)
+    public function resolve($request = null)
     {
-        return $this->guardEmptyValueOfAssocArray($array, $this->guarded);
-    }
-
-    protected function escape(array $array)
-    {
-        array_walk($array, function (&$item, $key) {
-            if (is_string($key)) {
-                if (!in_array($key, $this->escaped)
-                    || $item instanceof MissingValue) return;
-                if ($item instanceof MergeValue) {
-                    $item->data = $this->escapeHtml($item->data);
-                    return;
-                }
-                $item = $this->escapeHtml($item);
-                return;
-            }
-            if ($item instanceof MergeValue) {
-                $item->data = $this->escape($item->data);
-                return;
-            }
-        });
-        return $array;
-    }
-
-    protected function escapeHtml($value)
-    {
-        if (is_string($value)) {
-            return escapeHtml($value);
-        }
-        if (is_array($value)) {
-            return array_map(function ($item) {
-                return $this->escapeHtml($item);
-            }, $value);
-        }
-        return $value;
-    }
-
-    protected function toOriginalArray($request)
-    {
-        return parent::toArray($request);
+        return $this->guard(
+            $this->escape(
+                $this->hide(
+                    parent::resolve($request)
+                )
+            )
+        );
     }
 
     /**
      * @param Request $request
      * @return array
      */
-    protected function toCurrentArray($request)
+    public function toArray($request)
     {
-        return Arr::except($this->toOriginalArray($request), $this->hidden);
+        return $this->toCustomArray($request);
     }
 
     /**
@@ -110,12 +69,31 @@ class ModelResource extends JsonResource implements IModelResource
      * @param Request $request
      * @return array
      */
-    public function toArray($request)
+    protected function toCurrentArray($request)
     {
-        return $this->guard(
-            $this->escape(
-                $this->toCustomArray($request)
-            )
-        );
+        return parent::toArray($request);
+    }
+
+    protected function hide($data)
+    {
+        if (empty($this->hidden)) return $data;
+        return Arr::except($data, $this->hidden);
+    }
+
+    protected function escape($data)
+    {
+        if (empty($this->escaped)) return $data;
+        foreach ($data as $key => &$value) {
+            if (in_array($key, $this->escaped, true)) {
+                $value = HtmlString::escapes($value);
+            }
+        }
+        return $data;
+    }
+
+    protected function guard($data)
+    {
+        if (empty($this->guarded)) return $data;
+        return Arr::jsonGuard($data, $this->guarded);
     }
 }

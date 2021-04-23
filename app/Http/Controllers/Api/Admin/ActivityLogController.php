@@ -11,53 +11,58 @@ use App\Http\Requests\Request;
 use App\ModelRepositories\ActivityLogAdminRepository;
 use App\Utils\ClientSettings\Facade;
 
+/**
+ * Class ActivityLogController
+ * @package App\Http\Controllers\Api\Admin
+ * @property ActivityLogAdminRepository $modelRepository
+ */
 class ActivityLogController extends ModelApiController
 {
-    public function __construct()
+    protected function modelRepositoryClass()
     {
-        parent::__construct();
-
-        $this->modelRepository = new ActivityLogAdminRepository();
+        return ActivityLogAdminRepository::class;
     }
 
-    public function search(Request $request)
+    protected function searchParams(Request $request)
     {
         $dateTimer = Facade::dateTimer();
-        $search = [];
-        $input = $request->input('user_id');
-        if (!empty($input)) {
-            $search['user_id'] = $input;
-        }
-        $search['client'] = 'admin';
-        $input = $request->input('screen');
-        if (!empty($input)) {
-            $search['screen'] = $input;
-        }
-        $input = $request->input('action');
-        if (!empty($input)) {
-            $search['action'] = $input;
-        }
-        $input = $request->input('created_date_from');
-        if (!empty($input)) {
-            $input2 = $request->input('created_time_from');
-            $search['created_from'] = $dateTimer->fromFormatToDatabaseFormat(
-                $dateTimer->compoundFormat('shortDate', ' ', 'longTime'),
-                $input . ' ' . (empty($input2) ? '00:00' : $input2) . ':00'
-            );
-        }
-        $input = $request->input('created_date_to');
-        if (!empty($input)) {
-            $input2 = $request->input('created_time_to');
-            $search['created_to'] = $dateTimer->fromFormatToDatabaseFormat(
-                $dateTimer->compoundFormat('shortDate', ' ', 'longTime'),
-                $input . ' ' . (empty($input2) ? '23:59' : $input2) . ':59'
-            );
-        }
+        return [
+            'user_id',
+            'screen',
+            'action',
+            'created_date_from' => [
+                'created_from',
+                function ($input, Request $request) use ($dateTimer) {
+                    $input2 = $request->input('created_time_from');
+                    return $dateTimer->fromFormatToDatabaseFormat(
+                        $dateTimer->compoundFormat('shortDate', ' ', 'longTime'),
+                        $input . ' ' . (empty($input2) ? '00:00' : $input2) . ':00'
+                    );
+                },
+            ],
+            'created_date_to' => [
+                'created_to',
+                function ($input, Request $request) use ($dateTimer) {
+                    $input2 = $request->input('created_time_to');
+                    return $dateTimer->fromFormatToDatabaseFormat(
+                        $dateTimer->compoundFormat('shortDate', ' ', 'longTime'),
+                        $input . ' ' . (empty($input2) ? '23:59' : $input2) . ':59'
+                    );
+                },
+            ],
+            // TODO:
 
-        // TODO:
+            // TODO
+        ];
+    }
 
-        // TODO
+    protected function searchDefaultParams(Request $request)
+    {
+        return [
+            'client' => 'admin',
+            // TODO:
 
-        return $search;
+            // TODO
+        ];
     }
 }

@@ -10,23 +10,27 @@ use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\DataExportRepository;
 
+/**
+ * Class DataExportController
+ * @package App\Http\Controllers\Api\Admin
+ * @property DataExportRepository $modelRepository
+ */
 class DataExportController extends ModelApiController
 {
-    public function __construct()
+    protected function modelRepositoryClass()
     {
-        parent::__construct();
-
-        $this->modelRepository = new DataExportRepository();
+        return DataExportRepository::class;
     }
 
-    protected function search(Request $request)
+    protected function searchParams(Request $request)
     {
-        $search = [];
-        $input = $request->input('names');
-        if (!empty($input)) {
-            $search['names'] = $input;
-        }
-        return $search;
+        return [
+            'name',
+            'created_by',
+            'names' => function ($input) {
+                return (array)$input;
+            },
+        ];
     }
 
     public function show(Request $request, $id)

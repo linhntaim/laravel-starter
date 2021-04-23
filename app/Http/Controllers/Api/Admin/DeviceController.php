@@ -7,18 +7,10 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Api\DeviceController as BaseDeviceController;
-use App\ModelResources\DeviceResource;
-use App\Models\Device;
 
 class DeviceController extends BaseDeviceController
 {
-    public function __construct()
-    {
-        parent::__construct();
+    // TODO:
 
-        $this->setFixedModelResourceClass(
-            DeviceResource::class,
-            Device::class
-        );
-    }
+    // TODO
 }

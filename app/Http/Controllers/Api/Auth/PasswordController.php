@@ -18,13 +18,30 @@ use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Support\Facades\Password;
 
+/**
+ * Class PasswordController
+ * @package App\Http\Controllers\Api\Auth
+ * @property PasswordResetRepository $modelRepository
+ */
 abstract class PasswordController extends ModelApiController
 {
+    /**
+     * @var IUserRepository
+     */
+    protected $userRepository;
+
     public function __construct()
     {
         parent::__construct();
 
-        $this->modelRepository = new PasswordResetRepository();
+        if ($userRepositoryClass = $this->getUserRepositoryClass()) {
+            $this->userRepository = new $userRepositoryClass;
+        }
+    }
+
+    protected function modelRepositoryClass()
+    {
+        return PasswordResetRepository::class;
     }
 
     /**
@@ -32,18 +49,9 @@ abstract class PasswordController extends ModelApiController
      */
     protected abstract function getUserRepositoryClass();
 
-    /**
-     * @return IUserRepository
-     */
-    protected function getUserRepository()
-    {
-        $repositoryClass = $this->getUserRepositoryClass();
-        return new $repositoryClass();
-    }
-
     protected function getPasswordMinLength()
     {
-        return $this->getUserRepository()->newModel()->getPasswordMinLength();
+        return $this->userRepository->newModel(false)->getPasswordMinLength();
     }
 
     /**
@@ -67,7 +75,7 @@ abstract class PasswordController extends ModelApiController
     protected function brokerSendResetLink(array $credentials, Closure $callback = null)
     {
         return $this->broker()->sendResetLink($credentials, $callback ? $callback : function ($user, $token) {
-            $this->getUserRepository()->model($user)->sendPasswordResetNotification($token);
+            $this->userRepository->model($user)->sendPasswordResetNotification($token);
         });
     }
 

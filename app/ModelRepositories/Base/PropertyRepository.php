@@ -13,7 +13,7 @@ use App\Models\Base\PropertyModel;
 /**
  * Class PropertyRepository
  * @package App\ModelRepositories\Base
- * @method PropertyModel newModel(bool $pinned = true)
+ * @method PropertyModel newModel($pinned = true)
  */
 abstract class PropertyRepository extends ModelRepository
 {

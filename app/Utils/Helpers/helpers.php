@@ -9,14 +9,10 @@ function maxExecutionTime()
     return $maxExecutionTime;
 }
 
-function escapeHtml($text, $flags = ENT_QUOTES)
+function printLine($value)
 {
-    return htmlspecialchars($text, $flags);
-}
-
-function escapeHtmlAndBreak($text, $flags = ENT_QUOTES)
-{
-    return nl2br(escapeHtml($text, $flags));
+    print_r($value);
+    echo PHP_EOL;
 }
 
 function got($value, $default = null)

@@ -11,6 +11,11 @@ use App\Http\Requests\Request;
 use App\ModelRepositories\AdminRepository;
 use App\Utils\ConfigHelper;
 
+/**
+ * Class PasswordController
+ * @package App\Http\Controllers\Api\Admin\Auth
+ * @property AdminRepository $userRepository
+ */
 class PasswordController extends BasePasswordController
 {
     protected function getUserRepositoryClass()

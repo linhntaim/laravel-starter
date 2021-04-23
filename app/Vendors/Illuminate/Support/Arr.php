@@ -22,4 +22,20 @@ class Arr extends BaseArr
         }
         return $array1;
     }
+
+    /**
+     * @param array|mixed $array
+     * @param array $keys
+     * @return array|mixed|null
+     */
+    public static function jsonGuard($array, $keys = [])
+    {
+        if (count($keys) > 0) {
+            foreach ($keys as $key) {
+                $array[$key] = static::jsonGuard($array[$key]);
+            }
+            return $array;
+        }
+        return is_array($array) && count($array) <= 0 ? null : $array;
+    }
 }

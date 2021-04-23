@@ -36,4 +36,9 @@ class ModelResourceCollection extends AnonymousResourceCollection implements IMo
 
         return (new ModelPaginatedResourceResponse($this))->toModel($request);
     }
+
+    public function toArray($request)
+    {
+        return $this->collection->map->resolve($request)->all();
+    }
 }
