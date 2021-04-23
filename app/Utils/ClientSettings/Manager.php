@@ -155,21 +155,16 @@ class Manager
 
     public function decryptHeaders(Request $request)
     {
-        if ($secret = (function ($secret) {
-            $break64 = mb_strlen('base64:');
-            return mb_substr($secret, 0, $break64) == 'base64:' ?
-                utf8_encode(base64_decode(mb_substr($secret, $break64))) : $secret;
-        })($this->settings->getAppKey())) {
-            $headers = ConfigHelper::get('client.headers');
-            $headerEncryptExcepts = ConfigHelper::get('client.header_encrypt_excepts');
-            foreach ($headers as $header) {
-                if (!in_array($header, $headerEncryptExcepts)
-                    && $request->ifHeader($header, $headerValue)) {
-                    if ($headerValue = AES::decrypt(base64_decode($headerValue), $secret)) {
-                        $request->headers->set($header, $headerValue);
-                    } else {
-                        Log::error(new AppException(sprintf('Header [%s] cannot be decrypted.', $header)));
-                    }
+        $appKey = $this->settings->getAppKey();
+        $headers = ConfigHelper::get('client.headers');
+        $headerEncryptExcepts = ConfigHelper::get('client.header_encrypt_excepts');
+        foreach ($headers as $header) {
+            if (!in_array($header, $headerEncryptExcepts)
+                && $request->ifHeader($header, $headerValue)) {
+                if ($headerValue = AES::decrypt(base64_decode($headerValue), $appKey)) {
+                    $request->headers->set($header, $headerValue);
+                } else {
+                    Log::error(new AppException(sprintf('Header [%s] cannot be decrypted.', $header)));
                 }
             }
         }
@@ -267,7 +262,7 @@ class Manager
     public function __call($name, $arguments)
     {
         if (Str::startsWith($name, 'get')) {
-            return $this->settings->{$name}();
+            return $this->settings->{$name}(...$arguments);
         }
 
         throw new AppException('Invalid method');

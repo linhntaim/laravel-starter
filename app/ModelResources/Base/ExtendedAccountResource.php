@@ -12,7 +12,7 @@ namespace App\ModelResources\Base;
  */
 abstract class ExtendedAccountResource extends ExtendedUserResource
 {
-    public function toCustomArray($request)
+    protected function toCustomArray($request)
     {
         return [
             $this->merge(parent::toCustomArray($request)),

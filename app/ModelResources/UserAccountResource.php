@@ -15,7 +15,7 @@ use App\Models\User;
  */
 class UserAccountResource extends UserResource
 {
-    public function toCustomArray($request)
+    protected function toCustomArray($request)
     {
         return [
             $this->merge(parent::toCustomArray($request)),

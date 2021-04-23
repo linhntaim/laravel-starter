@@ -20,7 +20,7 @@ class UserResource extends ModelResource
 {
     use ModelTransformTrait;
 
-    public function toCustomArray($request)
+    protected function toCustomArray($request)
     {
         return [
             $this->merge($this->toCurrentArray($request)),

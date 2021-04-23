@@ -15,7 +15,7 @@ use App\Models\ActivityLog;
  */
 class ActivityLogAdminResource extends ActivityLogResource
 {
-    public function toCustomArray($request)
+    protected function toCustomArray($request)
     {
         return [
             $this->merge(parent::toCustomArray($request)),

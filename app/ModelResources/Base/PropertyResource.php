@@ -18,7 +18,7 @@ class PropertyResource extends ModelResource
 {
     use ModelTransformTrait;
 
-    public function toCustomArray($request)
+    protected function toCustomArray($request)
     {
         $value = $this->value;
         return [

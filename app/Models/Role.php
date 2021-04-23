@@ -55,6 +55,11 @@ class Role extends Model implements IProtected
         'name',
         'display_name',
         'description',
+        'html_description',
+    ];
+
+    protected $appends = [
+        'html_description',
     ];
 
     protected $resourceClass = RoleResource::class;
@@ -62,6 +67,11 @@ class Role extends Model implements IProtected
     public static function getProtectedKey()
     {
         return 'name';
+    }
+
+    public function getHtmlDescriptionAttribute()
+    {
+        return escapeHtmlAndBreak($this->description);
     }
 
     public function getPermissionNamesAttribute()

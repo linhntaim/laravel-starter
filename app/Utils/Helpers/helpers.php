@@ -9,6 +9,16 @@ function maxExecutionTime()
     return $maxExecutionTime;
 }
 
+function escapeHtml($text, $flags = ENT_QUOTES)
+{
+    return htmlspecialchars($text, $flags);
+}
+
+function escapeHtmlAndBreak($text, $flags = ENT_QUOTES)
+{
+    return nl2br(escapeHtml($text, $flags));
+}
+
 function got($value, $default = null)
 {
     if (filled($value)) {

@@ -83,7 +83,7 @@ Route::group([
 
     Route::group([
         'prefix' => 'account',
-        'middleware' => ['authenticated.passport.request', 'auth:api'],
+        'middleware' => ['authenticated.passport.cookie', 'authenticated.passport.request', 'auth:api'],
     ], function () {
         Route::get('handled-file/{id}', [HandledFileController::class, 'show'])->name('account.handled_file.show');
     });
@@ -222,7 +222,7 @@ Route::group([
                 ], function () {
                     Route::get('/', [AdminSystemLogController::class, 'index']);
                     Route::get('{id}', [AdminSystemLogController::class, 'show'])
-                        ->middleware('authenticated.passport.request')
+                        ->middleware(['authenticated.passport.cookie', 'authenticated.passport.request'])
                         ->where('id', '.+')
                         ->name('admin.system_log.show');
                 });
@@ -239,7 +239,7 @@ Route::group([
             ], function () {
                 Route::get('/', [AdminDataExportController::class, 'index']);
                 Route::get('{id}', [AdminDataExportController::class, 'show'])
-                    ->middleware('authenticated.passport.request');
+                    ->middleware(['authenticated.passport.cookie', 'authenticated.passport.request']);
             });
 
             Route::group([
