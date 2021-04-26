@@ -113,12 +113,12 @@ class Kernel extends ConsoleKernel
     public function call($command, array $parameters = [], $outputBuffer = null)
     {
         if (App::runningInConsole()) {
+            $origin = Command::currentShoutOut();
             Command::disableShoutOut();
+            $called = parent::call($command, $parameters, $outputBuffer);
+            Command::setShoutOut($origin);
+            return $called;
         }
-        $called = parent::call($command, $parameters, $outputBuffer);
-        if (App::runningInConsole()) {
-            Command::enableShoutOut();
-        }
-        return $called;
+        return parent::call($command, $parameters, $outputBuffer);
     }
 }

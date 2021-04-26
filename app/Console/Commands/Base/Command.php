@@ -25,6 +25,16 @@ abstract class Command extends BaseCommand
 
     protected static $shoutOutEnabled = true;
 
+    public static function currentShoutOut()
+    {
+        return self::$shoutOutEnabled;
+    }
+
+    public static function setShoutOut($shoutOut = true)
+    {
+        self::$shoutOutEnabled = $shoutOut;
+    }
+
     public static function disableShoutOut()
     {
         self::$shoutOutEnabled = false;
