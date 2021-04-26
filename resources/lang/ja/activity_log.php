@@ -15,7 +15,7 @@ return [
         // TODO
     ],
     'model_export' => [
-        'exported' => '[Exported]',
+        'exported' => '[Imported]',
         App\Models\Role::class => 'Role was exported with: :log',
         // TODO:
 
