@@ -8,10 +8,12 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder as BaseSeeder;
 
-class Seeder extends BaseSeeder
+abstract class Seeder extends BaseSeeder
 {
     public function output()
     {
         return $this->command->getOutput();
     }
+
+    public abstract function run();
 }

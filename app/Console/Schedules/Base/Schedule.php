@@ -47,15 +47,27 @@ abstract class Schedule
         return $this;
     }
 
+    public function fails()
+    {
+        Log::info(sprintf('%s failed!', static::class));
+        return $this;
+    }
+
     public function handle()
     {
-        $this->start();
         try {
+            $this->start();
             $this->go();
+            $this->end();
         } catch (Throwable $e) {
-            $this->reportException($e);
+            $this->handleException($e);
         }
-        $this->end();
+    }
+
+    protected function handleException(Throwable $e)
+    {
+        $this->reportException($e);
+        $this->fails();
     }
 
     protected function reportException(Throwable $e)

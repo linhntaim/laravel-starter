@@ -177,7 +177,7 @@ class Handler extends ExceptionHandler
         }
 
         if ($command) {
-            $command->after()->fails();
+            $command->fails();
         }
     }
     #endregion

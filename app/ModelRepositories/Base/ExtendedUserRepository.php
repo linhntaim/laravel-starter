@@ -17,7 +17,7 @@ use App\Utils\SocialLogin;
  * Class ExtendedUserRepository
  * @package App\ModelRepositories
  * @property ExtendedUserModel $model
- * @method ExtendedUserModel newModel()
+ * @method ExtendedUserModel newModel($pinned = true)
  */
 abstract class ExtendedUserRepository extends DependedRepository implements IUserRepository, IProtectedRepository
 {

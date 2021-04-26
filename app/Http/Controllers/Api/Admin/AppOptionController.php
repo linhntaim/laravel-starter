@@ -10,13 +10,16 @@ use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\AppOptionRepository;
 
+/**
+ * Class AppOptionController
+ * @package App\Http\Controllers\Api\Admin
+ * @property AppOptionRepository $modelRepository
+ */
 class AppOptionController extends ModelApiController
 {
-    public function __construct()
+    protected function modelRepositoryClass()
     {
-        parent::__construct();
-
-        $this->modelRepository = new AppOptionRepository();
+        return AppOptionRepository::class;
     }
 
     protected function storeValidatedRules(Request $request)

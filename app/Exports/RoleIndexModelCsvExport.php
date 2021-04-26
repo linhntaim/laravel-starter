@@ -6,13 +6,13 @@
 
 namespace App\Exports;
 
-use App\Exports\Base\IndexModelExport;
+use App\Exports\Base\IndexModelCsvExport;
 use App\ModelRepositories\RoleRepository;
 use App\ModelResources\ExportedRoleResource;
 
-class RoleIndexModelExport extends IndexModelExport
+class RoleIndexModelCsvExport extends IndexModelCsvExport
 {
-    const NAME = 'role';
+    public const NAME = 'role_index';
 
     protected function modelRepositoryClass()
     {

@@ -11,7 +11,7 @@ use Illuminate\Http\UploadedFile;
 
 class InlineStorage extends Storage implements IFileStorage, IUrlStorage, IResponseStorage
 {
-    const NAME = 'inline';
+    public const NAME = 'inline';
 
     protected $size;
     protected $mime;

@@ -44,7 +44,7 @@ class Settings implements ISettings, Arrayable, Jsonable
 
     public function __construct()
     {
-        $this->appKey = config('app.key');
+        $this->appKey = $this->setAppKey(config('app.key'));
         $this->appName = config('app.name');
         $this->appUrl = config('app.url');
 
@@ -83,6 +83,9 @@ class Settings implements ISettings, Arrayable, Jsonable
 
     public function setAppKey($appKey)
     {
+        if (Str::startsWith($appKey, 'base64:')) {
+            $appKey = utf8_encode(base64_decode(substr($appKey, 7)));
+        }
         $this->appKey = $appKey;
         return $this;
     }

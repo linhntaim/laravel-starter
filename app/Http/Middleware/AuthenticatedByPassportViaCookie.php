@@ -7,7 +7,7 @@
 namespace App\Http\Middleware;
 
 use App\Http\Requests\Request;
-use App\Utils\ConfigHelper;
+use App\Utils\ClientSettings\Facade;
 use App\Utils\CryptoJs\AES;
 use Closure;
 
@@ -15,24 +15,16 @@ class AuthenticatedByPassportViaCookie
 {
     use AuthenticatedByPassportTrait;
 
-    public function handle(Request $request, Closure $next, $clientType = 'admin')
+    public function handle(Request $request, Closure $next)
     {
         if (!auth()->check()) {
-            $clientConfig = ConfigHelper::getClient($clientType);
-            if (!empty($clientConfig) && isset($clientConfig['cookie'])) {
-                $clientCookieConfig = $clientConfig['cookie'];
-                $defaultCookieName = $clientCookieConfig['names']['default'];
-                if (!auth()->check() && $request->hasCookie($defaultCookieName)) {
-                    $token = json_decode(
-                        AES::decrypt($request->cookie($defaultCookieName), $clientCookieConfig['secret'])
-                    );
-                    if (!is_null($token)
-                        && isset($token->access_token)
-                        && isset($token->token_type)
-                        && isset($token->refresh_token)
-                        && isset($token->token_end_time)) {
-                        $this->authenticate($request, $token->token_type . ' ' . $token->access_token);
-                    }
+            if ($request->ifCookie(Facade::getCookie('default'), $cookieValue)
+                && filled($cookieValue)) {
+                $token = json_decode(
+                    AES::decrypt($cookieValue, Facade::getAppKey())
+                );
+                if (isset($token->tokenType) && isset($token->accessToken)) {
+                    $this->authenticate($request, $token->tokenType . ' ' . $token->accessToken);
                 }
             }
         }

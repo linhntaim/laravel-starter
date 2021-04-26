@@ -9,9 +9,11 @@ namespace App\Exports\Base;
 use App\ModelRepositories\Base\ModelRepository;
 use App\ModelResources\Base\ModelTransformTrait;
 
-abstract class ModelExport extends Export implements ICsvExport
+abstract class ModelCsvExport extends CsvExport
 {
-    use ModelTransformTrait, CsvExportTrait;
+    use ModelTransformTrait;
+
+    public const NAME = 'model';
 
     protected $readBatch = 1000;
 
@@ -49,11 +51,6 @@ abstract class ModelExport extends Export implements ICsvExport
     protected function modelResourceClass()
     {
         return null;
-    }
-
-    public function export()
-    {
-        return $this->csvExport();
     }
 
     protected function csvExporting()

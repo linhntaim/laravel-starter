@@ -8,6 +8,6 @@ namespace App\Exceptions;
 
 class UserException extends Exception
 {
-    const LEVEL = 1;
-    const CODE = 400;
+    public const LEVEL = 1;
+    public const CODE = 400;
 }

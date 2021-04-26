@@ -13,6 +13,10 @@ class NotificationController extends BaseNotificationController
 {
     use AdminAccountTrait;
 
+    protected $sortByAllows = [
+        'created_at',
+    ];
+
     // TODO:
 
     // TODO

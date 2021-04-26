@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\File;
 
 class SystemLogController extends ModelApiController
 {
-    const ALLOWED_LOG_EXTENSIONS = ['log', 'txt'];
+    public const ALLOWED_LOG_EXTENSIONS = ['log', 'txt'];
 
     protected $logPath;
 

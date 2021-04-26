@@ -23,10 +23,12 @@ abstract class WholeCsvImport extends CsvImport
                 return $this->csvImporting($read, $counter);
             },
             function ($reads) {
+                $this->resetExecutionTime();
                 $this->csvBeforeImporting($reads);
                 return $reads;
             },
             function ($reads) {
+                $this->resetExecutionTime();
                 $this->csvAfterImporting($reads);
                 return $reads;
             }

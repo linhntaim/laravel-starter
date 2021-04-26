@@ -24,7 +24,7 @@ use App\Notifications\AdminResetPasswordNotification;
  */
 class Admin extends ExtendedUserModel
 {
-    const MAX_AVATAR_SIZE = 512;
+    public const MAX_AVATAR_SIZE = 512;
 
     protected $table = 'admins';
 
@@ -47,6 +47,10 @@ class Admin extends ExtendedUserModel
         'role_name',
         'permission_names',
         'avatar_url',
+    ];
+
+    protected $activityLogHidden = [
+        'user_id',
     ];
 
     protected $resourceClass = AdminResource::class;
@@ -140,10 +144,9 @@ class Admin extends ExtendedUserModel
         return true;
     }
 
-    public function toActivityLogArray($except = [])
+    public function toActivityLogArray()
     {
-        $except[] = 'user_id';
-        return array_merge($this->user->toActivityLogArray(), parent::toActivityLogArray($except));
+        return array_merge($this->user->toActivityLogArray(), parent::toActivityLogArray());
     }
     #endregion
 

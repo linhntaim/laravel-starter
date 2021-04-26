@@ -18,11 +18,9 @@ use App\Utils\HandledFiles\Filer\ChunkedFiler;
  */
 class HandledFileController extends ModelApiController
 {
-    public function __construct()
+    protected function modelRepositoryClass()
     {
-        parent::__construct();
-
-        $this->modelRepository = new HandledFileRepository();
+        return HandledFileRepository::class;
     }
 
     protected function storeValidatedRules(Request $request)

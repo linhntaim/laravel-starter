@@ -75,6 +75,18 @@ trait ActivityLogTrait
 
     /**
      * @param string $modelClass
+     * @param array $params
+     * @param Model|int|null $actedBy
+     */
+    protected function logActionModelImport(string $modelClass, array $params, $actedBy = null)
+    {
+        $this->logActionModel(ActivityLog::ACTION_MODEL_IMPORT, $modelClass, $actedBy, [
+            'params' => $params,
+        ]);
+    }
+
+    /**
+     * @param string $modelClass
      * @param IActivityLog|Model $createdModel
      * @param Model|int|null $actedBy
      */

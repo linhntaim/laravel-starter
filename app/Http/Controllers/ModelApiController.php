@@ -9,13 +9,16 @@ namespace App\Http\Controllers;
 use App\Configuration;
 use App\Exceptions\AppException;
 use App\Exports\Base\Export;
-use App\Exports\Base\IndexModelExport;
+use App\Exports\Base\IndexModelCsvExport;
 use App\Http\Requests\Request;
+use App\Imports\Base\Import;
+use App\Jobs\ImportJob;
 use App\ModelRepositories\Base\ModelRepository;
 use App\ModelRepositories\DataExportRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,10 +30,127 @@ abstract class ModelApiController extends ApiController
      */
     protected $modelRepository;
 
+    public function __construct()
+    {
+        parent::__construct();
+
+        if ($modelRepositoryClass = $this->modelRepositoryClass()) {
+            $this->modelRepository = new $modelRepositoryClass();
+            if ($modelResourceClass = $this->modelResourceClass()) {
+                $this->setFixedModelResourceClass(
+                    $modelResourceClass,
+                    $this->modelRepository->modelClass()
+                );
+            }
+        }
+    }
+
+    protected function modelRepositoryClass()
+    {
+        return null;
+    }
+
+    protected function modelResourceClass()
+    {
+        return null;
+    }
+
     #region Index
-    protected function search(Request $request)
+    protected function searchParams(Request $request)
     {
         return [];
+    }
+
+    protected function searchDefaultParams(Request $request)
+    {
+        return [];
+    }
+
+    protected function search(Request $request)
+    {
+        $search = [];
+        foreach ($this->searchParams($request) as $key => $param) {
+            if (is_int($key)) {
+                $input = $request->input($param);
+                if (!empty($input)) {
+                    $search[$param] = $input;
+                }
+            } else {
+                $input = $request->input($key);
+                if (!empty($input)) {
+                    if (is_string($param)) {
+                        $search[$param] = $input;
+                    } elseif (is_callable($param)) {
+                        $search[$key] = $param($input, $request);
+                    } elseif (is_array($param)) {
+                        $found0 = false;
+
+                        $name = $key;
+                        if (isset($param['name'])) {
+                            $name = $param['name'];
+                        } elseif (isset($param[0]) && is_string($param[0])) {
+                            $name = $param[0];
+                            $found0 = true;
+                        }
+
+                        $transform = null;
+                        if (isset($param['transform'])) {
+                            $transform = $param['transform'];
+                        } elseif (isset($param[1]) && is_callable($param[1])) {
+                            $transform = $param[1];
+                        } elseif (!$found0 && isset($param[0]) && is_callable($param[0])) {
+                            $transform = $param[0];
+                        }
+
+                        $search[$name] = is_callable($transform) ? $transform($input, $request) : $input;
+                    }
+                } else {
+                    if (is_array($param)) {
+                        $found0 = false;
+                        $found1 = false;
+
+                        $name = $key;
+                        if (isset($param['name'])) {
+                            $name = $param['name'];
+                        } elseif (isset($param[0]) && is_string($param[0])) {
+                            $name = $param[0];
+                            $found0 = true;
+                        }
+
+                        if (!isset($param['transform'])) {
+                            if (isset($param[1]) && is_callable($param[1])) {
+                                $found1 = true;
+                            } elseif (!$found0 && isset($param[0]) && is_callable($param[0])) {
+                                $found0 = true;
+                            }
+                        }
+
+                        $default = null;
+                        if (isset($param['default'])) {
+                            $default = $param['default'];
+                        } elseif (isset($param[2])) {
+                            $default = $param[2];
+                        } elseif (!$found1 && isset($param[1])) {
+                            $default = $param[1];
+                        } elseif (!$found0 && isset($param[0])) {
+                            $default = $param[0];
+                        }
+
+                        if (!is_null($default)) {
+                            $search[$name] = is_callable($default) ? $default($request) : $default;
+                        }
+                    }
+                }
+            }
+        }
+        foreach ($this->searchDefaultParams($request) as $key => $param) {
+            if (is_int($key)) {
+                $search[$param] = 1;
+            } else {
+                $search[$key] = $param;
+            }
+        }
+        return $search;
     }
 
     public function index(Request $request)
@@ -104,7 +224,7 @@ abstract class ModelApiController extends ApiController
 
     /**
      * @param Request $request
-     * @return IndexModelExport|null
+     * @return IndexModelCsvExport|null
      */
     protected function indexModelExporter(Request $request)
     {
@@ -136,13 +256,92 @@ abstract class ModelApiController extends ApiController
             [
                 'created_by' => $currentUser ? $currentUser->id : null,
             ],
-            $exporter ? $exporter : $this->exporter($request)
+            $exporter
         );
     }
 
     protected function export(Request $request)
     {
         return $this->responseModel($this->exportExecute($request));
+    }
+
+    #endregion
+
+    #region Import
+    /**
+     * @return string
+     */
+    protected function modelImporterFileInputKey()
+    {
+        return 'file';
+    }
+
+    /**
+     * @param Request $request
+     * @return UploadedFile
+     */
+    protected function modelImporterFile(Request $request)
+    {
+        return $request->file($this->modelImporterFileInputKey());
+    }
+
+    /**
+     * @param Request $request
+     * @return string|null
+     */
+    protected function modelImporterClass(Request $request)
+    {
+        return null;
+    }
+
+    /**
+     * @param Request $request
+     * @return IndexModelCsvExport|null
+     */
+    protected function modelImporter(Request $request)
+    {
+        $class = $this->modelImporterClass($request);
+        return $class ? new $class($this->modelImporterFile($request)) : null;
+    }
+
+    /**
+     * @param Request $request
+     * @return Export|null
+     */
+    protected function importer(Request $request)
+    {
+        return $this->modelImporter($request);
+    }
+
+    protected function importExecute(Request $request, Import $importer = null)
+    {
+        if (!$importer) {
+            $importer = $this->importer($request);
+            if (!$importer) {
+                throw new AppException('Importer is not implemented');
+            }
+        }
+
+        ImportJob::dispatch($importer);
+    }
+
+    protected function importValidatedRules(Request $request)
+    {
+        return [
+            $this->modelImporterFileInputKey() => 'required|file|mimes:csv,txt',
+        ];
+    }
+
+    protected function importValidated(Request $request)
+    {
+        $this->validated($request, $this->importValidatedRules($request));
+    }
+
+    protected function import(Request $request)
+    {
+        $this->importValidated($request);
+        $this->importExecute($request);
+        return $this->responseSuccess();
     }
     #endregion
 
@@ -164,6 +363,9 @@ abstract class ModelApiController extends ApiController
 
     public function store(Request $request)
     {
+        if ($request->has('_import')) {
+            return $this->import($request);
+        }
         if ($request->has('_delete')) {
             return $this->bulkDestroy($request);
         }

@@ -25,6 +25,9 @@ class DataExportRepository extends ModelRepository
 
     protected function searchOn($query, array $search)
     {
+        if (!empty($search['name'])) {
+            $query->where('name', $search['name']);
+        }
         if (!empty($search['names'])) {
             $query->whereIn('name', $search['names']);
         }

@@ -9,21 +9,28 @@ return [
     'logout' => 'Logout with: :log',
     'model_list' => [
         'listed' => '[Listed]',
-        \App\Models\Role::class => 'Role was listed with: :log',
+        App\Models\Role::class => 'Role was listed with: :log',
         // TODO:
 
         // TODO
     ],
     'model_export' => [
+        'exported' => '[Imported]',
+        App\Models\Role::class => 'Role was exported with: :log',
+        // TODO:
+
+        // TODO
+    ],
+    'model_import' => [
         'exported' => '[Exported]',
-        \App\Models\Role::class => 'Role was exported with: :log',
+        App\Models\Role::class => 'Role was imported with: :log',
         // TODO:
 
         // TODO
     ],
     'model_create' => [
         'created' => '[Deleted]',
-        \App\Models\Role::class => 'Role was created with: :log',
+        App\Models\Role::class => 'Role was created with: :log',
         // TODO:
 
         // TODO
@@ -31,14 +38,14 @@ return [
     'model_edit' => [
         'old' => '[Old]',
         'edited' => '[Edited]',
-        \App\Models\Role::class => 'Role was edited with: :log',
+        App\Models\Role::class => 'Role was edited with: :log',
         // TODO:
 
         // TODO
     ],
     'model_delete' => [
         'deleted' => '[Deleted]',
-        \App\Models\Role::class => 'Role was deleted with: :log',
+        App\Models\Role::class => 'Role was deleted with: :log',
         // TODO:
 
         // TODO

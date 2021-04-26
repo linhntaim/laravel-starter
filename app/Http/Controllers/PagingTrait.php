@@ -10,8 +10,10 @@ use App\Configuration;
 
 trait PagingTrait
 {
+    protected $sortByAllows = [];
     protected $sortBy = null;
     protected $sortOrder = 'asc';
+    protected $moreByAllows = [];
     protected $moreBy = null;
     protected $moreOrder = 'asc';
 
@@ -38,7 +40,9 @@ trait PagingTrait
 
     protected function sortBy()
     {
-        return request()->input('sort_by', $this->sortBy);
+        $sortBy = request()->input('sort_by', $this->sortBy);
+        return empty($this->sortByAllows) || in_array($sortBy, $this->sortByAllows, true) ?
+            $sortBy : $this->sortBy;
     }
 
     protected function sortOrder()
@@ -49,7 +53,9 @@ trait PagingTrait
 
     protected function moreBy()
     {
-        return request()->input('more_by', $this->moreBy);
+        $moreBy = request()->input('more_by', $this->moreBy);
+        return empty($this->moreByAllows) || in_array($moreBy, $this->moreByAllows, true) ?
+            $moreBy : $this->moreBy;
     }
 
     protected function moreOrder()
@@ -60,6 +66,6 @@ trait PagingTrait
 
     protected function morePivot()
     {
-        return request()->input('more_pivot', $this->moreBy);
+        return request()->input('more_pivot');
     }
 }

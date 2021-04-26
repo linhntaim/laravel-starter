@@ -17,12 +17,14 @@ abstract class AllCsvImport extends CsvImport
 {
     protected function csvImport()
     {
+        $this->csvBeforeImporting([]);
         $this->filer->fReadAll(
             function ($read, $counter) {
                 $this->resetExecutionTime();
                 return $this->csvImporting($read, $counter);
             },
             function ($reads) {
+                $this->resetExecutionTime();
                 $this->csvAfterImporting($reads);
                 return $reads;
             }

@@ -12,10 +12,7 @@ use App\Models\Device;
  */
 class DeviceResource extends ModelResource
 {
-    public function toCustomArray($request)
-    {
-        $array = $this->toCurrentArray($request);
-        unset($array['client_agent']);
-        return $array;
-    }
+    public $hidden = [
+        'client_agent',
+    ];
 }

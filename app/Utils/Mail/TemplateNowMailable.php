@@ -20,9 +20,9 @@ class TemplateNowMailable extends Mailable
 {
     use ClassTrait, RateLimiterTrait;
 
-    const DEFAULT_CHARSET = 'UTF-8';
+    public const DEFAULT_CHARSET = 'UTF-8';
 
-    const HTML_CHARSETS = [
+    public const HTML_CHARSETS = [
         'sjis' => 'SHIFT_JS',
         'sjis-win' => 'SHIFT_JS',
         'sjis-mac' => 'SHIFT_JS',
@@ -36,11 +36,11 @@ class TemplateNowMailable extends Mailable
         'iso-2022-jp-mobile#kddi' => 'ISO-2022-JP',
     ];
 
-    const EMAIL_FROM = 'x_email_from';
-    const EMAIL_FROM_NAME = 'x_email_from_name';
-    const EMAIL_TO = 'x_email_to';
-    const EMAIL_TO_NAME = 'x_email_to_name';
-    const EMAIL_SUBJECT = 'x_email_subject';
+    public const EMAIL_FROM = 'x_email_from';
+    public const EMAIL_FROM_NAME = 'x_email_from_name';
+    public const EMAIL_TO = 'x_email_to';
+    public const EMAIL_TO_NAME = 'x_email_to_name';
+    public const EMAIL_SUBJECT = 'x_email_subject';
 
     /**
      * @var array

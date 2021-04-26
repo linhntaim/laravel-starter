@@ -119,6 +119,9 @@ return [
                 'country' => 'JP',
                 'timezone' => 'Asia/Tokyo',
                 'currency' => 'JPY',
+                'cookies' => [
+                    'default' => env('CLIENT_ADMIN_COOKIE_DEFAULT_NAME'),
+                ],
             ],
             'home' => [
                 'app_name' => env('CLIENT_HOME_NAME'),
@@ -128,6 +131,9 @@ return [
                 'country' => 'JP',
                 'timezone' => 'Asia/Tokyo',
                 'currency' => 'JPY',
+                'cookies' => [
+                    'default' => env('CLIENT_HOME_COOKIE_DEFAULT_NAME'),
+                ],
             ],
             'web' => [
                 'app_name' => env('APP_NAME'),

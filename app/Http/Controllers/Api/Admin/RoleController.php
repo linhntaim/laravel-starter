@@ -7,38 +7,42 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Exports\Base\Export;
-use App\Exports\RoleIndexModelExport;
+use App\Exports\RoleIndexModelCsvExport;
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
+use App\Imports\Base\Import;
+use App\Imports\RoleCsvImport;
 use App\ModelRepositories\RoleRepository;
 use App\Models\Role;
 use Illuminate\Validation\Rule;
 
+/**
+ * Class RoleController
+ * @package App\Http\Controllers\Api\Admin
+ * @property RoleRepository $modelRepository
+ */
 class RoleController extends ModelApiController
 {
-    public function __construct()
-    {
-        parent::__construct();
+    protected $sortByAllows = [
+        'created_at',
+        'name',
+        'display_name',
+    ];
 
-        $this->modelRepository = new RoleRepository();
+    protected function modelRepositoryClass()
+    {
+        return RoleRepository::class;
     }
 
-    protected function search(Request $request)
+    protected function searchParams(Request $request)
     {
-        $search = [];
-        $input = $request->input('name');
-        if (!empty($input)) {
-            $search['name'] = $input;
-        }
-        $input = $request->input('display_name');
-        if (!empty($input)) {
-            $search['display_name'] = $input;
-        }
-        $input = $request->input('permissions', []);
-        if (!empty($input)) {
-            $search['permissions'] = (array)$input;
-        }
-        return $search;
+        return [
+            'name',
+            'display_name',
+            'permissions' => function ($input) {
+                return (array)$input;
+            },
+        ];
     }
 
     protected function indexExecute(Request $request)
@@ -50,13 +54,24 @@ class RoleController extends ModelApiController
 
     protected function indexModelExporterClass(Request $request)
     {
-        return RoleIndexModelExport::class;
+        return RoleIndexModelCsvExport::class;
     }
 
     protected function exportExecute(Request $request, Export $exporter = null)
     {
         parent::exportExecute($request, $exporter);
         $this->logActionModelExport(Role::class, $request->all());
+    }
+
+    protected function modelImporterClass(Request $request)
+    {
+        return RoleCsvImport::class;
+    }
+
+    protected function importExecute(Request $request, Import $importer = null)
+    {
+        parent::importExecute($request, $importer);
+        $this->logActionModelImport(Role::class, $request->all());
     }
 
     protected function storeValidatedRules(Request $request)

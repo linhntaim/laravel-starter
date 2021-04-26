@@ -15,7 +15,7 @@ use App\Utils\HandledFiles\Helper;
  */
 abstract class LocalStorage extends HandledStorage
 {
-    const NAME = 'local';
+    public const NAME = 'local';
 
     protected $rootDirectory;
 

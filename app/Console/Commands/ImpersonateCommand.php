@@ -19,8 +19,6 @@ class ImpersonateCommand extends Command
 {
     protected $signature = 'impersonate {user} {admin_id}';
 
-    protected $noInformation = true;
-
     protected function go()
     {
         if (($user = $this->getUser()) && ($admin = $this->getAdmin())) {

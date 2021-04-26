@@ -22,17 +22,17 @@ class Permission extends Model implements IProtected
 {
     use ProtectedTrait;
 
-    const BE_SYSTEM = 'be-system';
-    const BE_SUPER_ADMIN = 'be-super-admin';
-    const IMPERSONATE = 'impersonate';
-    const ROLE_MANAGE = 'role-manage';
-    const ADMIN_MANAGE = 'admin-manage';
-    const ACTIVITY_MANAGE = 'activity-log-manage';
+    public const BE_SYSTEM = 'be-system';
+    public const BE_SUPER_ADMIN = 'be-super-admin';
+    public const IMPERSONATE = 'impersonate';
+    public const ROLE_MANAGE = 'role-manage';
+    public const ADMIN_MANAGE = 'admin-manage';
+    public const ACTIVITY_MANAGE = 'activity-log-manage';
     // TODO: Define perms
 
     // TODO
 
-    const PROTECTED = [
+    public const PROTECTED = [
         Permission::BE_SYSTEM,
         Permission::BE_SUPER_ADMIN,
         Permission::IMPERSONATE,

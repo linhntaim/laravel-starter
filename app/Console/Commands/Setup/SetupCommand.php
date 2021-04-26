@@ -8,7 +8,7 @@ namespace App\Console\Commands\Setup;
 
 class SetupCommand extends Command
 {
-    protected $signature = 'setup {--u} {--f} {--seed-dummy} {--seed-test} {--skip=*} {--only=*}';
+    protected $signature = 'setup {--u} {--f} {--seed-dummy} {--seed-bench} {--seed-test} {--skip=*} {--only=*}';
 
     protected function skipped()
     {
@@ -64,6 +64,13 @@ class SetupCommand extends Command
             $this->newLine();
         }
 
+        if ($this->option('seed-bench')) {
+            $this->call('setup:seed:bench', $forced ? [
+                '--f' => true,
+            ] : []);
+            $this->newLine();
+        }
+
         if ($this->option('seed-test')) {
             $this->call('setup:seed:test', $forced ? [
                 '--f' => true,
@@ -97,6 +104,13 @@ class SetupCommand extends Command
 
         if ($this->option('seed-dummy')) {
             $this->call('setup:seed:dummy', [
+                '--u' => true,
+            ]);
+            $this->newLine();
+        }
+
+        if ($this->option('seed-bench')) {
+            $this->call('setup:seed:bench', [
                 '--u' => true,
             ]);
             $this->newLine();

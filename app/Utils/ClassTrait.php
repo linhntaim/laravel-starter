@@ -16,10 +16,6 @@ trait ClassTrait
 
     protected static $__transNamespaceFallback = false;
 
-    protected static $__friendlyClassBaseName;
-
-    protected static $__snakyClassBaseName;
-
     protected static function __setTransNamespace($transNamespace, $fallback = false)
     {
         static::$__transNamespace = $transNamespace . '::';
@@ -33,23 +29,17 @@ trait ClassTrait
 
     protected static function __classBaseName()
     {
-        return class_basename(static::class);
+        return class_basename(static::__class());
     }
 
     protected static function __snakyClassBaseName()
     {
-        if (empty(static::$__snakyClassBaseName)) {
-            static::$__snakyClassBaseName = Str::snake(static::__classBaseName());
-        }
-        return static::$__snakyClassBaseName;
+        return Str::snake(static::__classBaseName());
     }
 
     protected static function __friendlyClassBaseName()
     {
-        if (empty(static::$__friendlyClassBaseName)) {
-            static::$__friendlyClassBaseName = Str::title(Str::snake(static::__classBaseName(), ' '));
-        }
-        return static::$__friendlyClassBaseName;
+        return Str::title(Str::snake(static::__classBaseName(), ' '));
     }
 
     protected static function __transWithTemporaryNamespace($transNamespace, callable $transCallback, $fallback = false)

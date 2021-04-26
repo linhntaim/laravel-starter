@@ -10,13 +10,12 @@ use App\ModelRepositories\HandledFileRepository;
 use App\Models\HandledFile;
 use App\Utils\ClassTrait;
 use App\Utils\ExecutionTimeTrait;
-use App\Vendors\Illuminate\Support\Facades\App;
 
 abstract class Export
 {
     use ClassTrait, ExecutionTimeTrait;
 
-    const NAME = 'export';
+    public const NAME = 'export';
 
     /**
      * @var HandledFileRepository

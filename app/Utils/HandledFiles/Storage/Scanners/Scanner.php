@@ -6,9 +6,9 @@ use App\Utils\HandledFiles\Storage\ScanStorage;
 
 abstract class Scanner
 {
-    const SCANNING = 3;
-    const SCAN_FALSE = 2;
-    const SCAN_TRUE = 1;
+    public const SCANNING = 3;
+    public const SCAN_FALSE = 2;
+    public const SCAN_TRUE = 1;
 
     /**
      * @param ScanStorage $storage

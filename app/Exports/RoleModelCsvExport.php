@@ -7,13 +7,13 @@
 namespace App\Exports;
 
 use App\Configuration;
-use App\Exports\Base\ModelExport;
+use App\Exports\Base\ModelCsvExport;
 use App\ModelRepositories\RoleRepository;
 use App\ModelResources\ExportedRoleResource;
 
-class RoleModelExport extends ModelExport
+class RoleModelCsvExport extends ModelCsvExport
 {
-    const NAME = 'role';
+    public const NAME = 'role';
 
     protected function modelRepositoryClass()
     {

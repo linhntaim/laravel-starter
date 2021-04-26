@@ -6,8 +6,8 @@ use App\Utils\HandledFiles\Storage\ScanStorage;
 
 class FSecureScanner extends Scanner
 {
-    const SCANNED_EXTENSION = 'scanned';
-    const MALWARE_EXTENSION = 'malware';
+    public const SCANNED_EXTENSION = 'scanned';
+    public const MALWARE_EXTENSION = 'malware';
 
     public function getRelativeScanPath(ScanStorage $storage)
     {

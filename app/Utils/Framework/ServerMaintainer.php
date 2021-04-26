@@ -8,7 +8,7 @@ namespace App\Utils\Framework;
 
 class ServerMaintainer extends FrameworkHandler
 {
-    const NAME = 'down';
+    public const NAME = 'down';
 
     protected $data;
 

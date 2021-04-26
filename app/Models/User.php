@@ -8,27 +8,14 @@ namespace App\Models;
 
 use App\Configuration;
 use App\ModelResources\UserResource;
-use App\Models\Base\IActivityLog;
-use App\Models\Base\IFromModel;
-use App\Models\Base\IProtected;
-use App\Models\Base\IResource;
+use App\Models\Base\IModel;
 use App\Models\Base\IUser;
 use App\Models\Base\IUserHasSettings;
-use App\Models\Base\ModelTrait;
-use App\ModelTraits\ActivityLogTrait;
-use App\ModelTraits\FromModelTrait;
-use App\ModelTraits\OnlyAttributesToArrayTrait;
-use App\ModelTraits\MemorizeTrait;
-use App\ModelTraits\NotificationTrait;
+use App\ModelTraits\ModelTrait;
 use App\ModelTraits\PassportTrait;
-use App\ModelTraits\ProtectedTrait;
-use App\ModelTraits\ResourceTrait;
+use App\ModelTraits\UserTrait;
 use App\Utils\ClientSettings\Facade;
-use Illuminate\Contracts\Translation\HasLocalePreference;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Passport\HasApiTokens;
 
@@ -42,21 +29,16 @@ use Laravel\Passport\HasApiTokens;
  * @property bool $hasPassword
  * @property PasswordReset $passwordReset
  */
-class User extends Authenticatable implements HasLocalePreference, IUser, IResource, IActivityLog, IProtected, IFromModel
+class User extends Authenticatable implements IModel, IUser
 {
-    use HasFactory, Notifiable, NotificationTrait {
-        NotificationTrait::notifications insteadof Notifiable;
-    }
-    use PassportTrait, HasApiTokens, MemorizeTrait, SoftDeletes, ProtectedTrait;
-    use ModelTrait, OnlyAttributesToArrayTrait, ResourceTrait, FromModelTrait, ActivityLogTrait;
+    use HasApiTokens;
+    use ModelTrait, UserTrait, PassportTrait;
 
-    const MIN_PASSWORD_LENGTH = 8;
+    public const USER_SYSTEM_ID = 1;
+    public const USER_SUPER_ADMINISTRATOR_ID = 2;
+    public const USER_ADMINISTRATOR_ID = 3;
 
-    const USER_SYSTEM_ID = 1;
-    const USER_SUPER_ADMINISTRATOR_ID = 2;
-    const USER_ADMINISTRATOR_ID = 3;
-
-    const PROTECTED = [
+    public const PROTECTED = [
         User::USER_SYSTEM_ID,
         User::USER_SUPER_ADMINISTRATOR_ID,
         User::USER_ADMINISTRATOR_ID,
@@ -91,6 +73,10 @@ class User extends Authenticatable implements HasLocalePreference, IUser, IResou
         'has_password',
         'ts_last_accessed_at',
         'sd_st_last_accessed_at',
+    ];
+
+    protected $activityLogHidden = [
+
     ];
 
     /**

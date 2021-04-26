@@ -11,6 +11,11 @@ use App\Http\Requests\Request;
 use App\ModelRepositories\AdminRepository;
 use App\ModelResources\AdminAccountResource;
 
+/**
+ * Class RegisterController
+ * @package App\Http\Controllers\Api\Admin\Auth
+ * @property AdminRepository $modelRepository
+ */
 class RegisterController extends BaseRegisterController
 {
     protected function getUserRepositoryClass()

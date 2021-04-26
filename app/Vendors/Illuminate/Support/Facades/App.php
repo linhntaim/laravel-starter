@@ -55,7 +55,7 @@ class App extends BaseApp
     public static function benchFrom($name)
     {
         if (static::runningInDebug()) {
-            static::$benchAt = [
+            static::$benchAt[$name] = [
                 't' => microtime(true),
                 'u' => memory_get_usage(),
                 'ur' => memory_get_usage(true),
@@ -73,8 +73,8 @@ class App extends BaseApp
                     sprintf(
                         'Bench from [%s]: %sms + %sms, %s / %s, %s / %s (real), %s / %s (peak), %s / %s (peak real).',
                         $name,
-                        number_format(round((microtime(true) - static::$benchAt[$name]['t']) * 100, 2)),
-                        number_format(round((static::$benchAt[$name]['t'] - LARAVEL_START) * 100, 2)),
+                        number_format(round((microtime(true) - static::$benchAt[$name]['t']) * 1000, 2), 2),
+                        number_format(round((static::$benchAt[$name]['t'] - LARAVEL_START) * 1000, 2), 2),
                         Helper::autoDisplaySize(memory_get_usage(), 2),
                         Helper::autoDisplaySize(static::$benchAt[$name]['u'], 2),
                         Helper::autoDisplaySize(memory_get_usage(true), 2),
@@ -91,7 +91,7 @@ class App extends BaseApp
                     sprintf(
                         'Bench [%s] from start: %sms, %s, %s (real), %s (peak), %s (peak real).',
                         $name,
-                        number_format(round((microtime(true) - LARAVEL_START) * 100, 2)),
+                        number_format(round((microtime(true) - LARAVEL_START) * 1000, 2), 2),
                         Helper::autoDisplaySize(memory_get_usage(), 2),
                         Helper::autoDisplaySize(memory_get_usage(true), 2),
                         Helper::autoDisplaySize(memory_get_peak_usage(), 2),

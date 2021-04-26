@@ -15,7 +15,7 @@ abstract class SeedCommand extends Command
         foreach ($this->seeders as $seeder) {
             $this->warn(sprintf('Seeding [%s]...', $seeder));
             $this->call('db:seed', [
-                '--class' => $seeder,
+                '--class' => class_basename($seeder),
                 '--force' => true,
             ]);
             $this->newLine();

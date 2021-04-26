@@ -83,7 +83,7 @@ Route::group([
 
     Route::group([
         'prefix' => 'account',
-        'middleware' => ['authenticated.passport.request', 'auth:api'],
+        'middleware' => ['authenticated.passport.cookie', 'authenticated.passport.request', 'auth:api'],
     ], function () {
         Route::get('handled-file/{id}', [HandledFileController::class, 'show'])->name('account.handled_file.show');
     });
@@ -117,7 +117,7 @@ Route::group([
 
         #region Authenticated
         Route::group([
-            'middleware' => ['authenticated.passport.request', 'auth:api', 'impersonate'],
+            'middleware' => ['auth:api', 'impersonate'],
         ], function () {
             Route::group([
                 'prefix' => 'auth',
@@ -180,7 +180,7 @@ Route::group([
 
         #region Authenticated
         Route::group([
-            'middleware' => ['authenticated.passport.request', 'auth:api', 'authorized.admin', 'impersonate'],
+            'middleware' => ['auth:api', 'authorized.admin', 'impersonate'],
         ], function () {
             Route::group([
                 'prefix' => 'auth',
@@ -222,6 +222,7 @@ Route::group([
                 ], function () {
                     Route::get('/', [AdminSystemLogController::class, 'index']);
                     Route::get('{id}', [AdminSystemLogController::class, 'show'])
+                        ->middleware(['authenticated.passport.cookie', 'authenticated.passport.request'])
                         ->where('id', '.+')
                         ->name('admin.system_log.show');
                 });
@@ -237,7 +238,8 @@ Route::group([
                 'prefix' => 'data-export',
             ], function () {
                 Route::get('/', [AdminDataExportController::class, 'index']);
-                Route::get('{id}', [AdminDataExportController::class, 'show']);
+                Route::get('{id}', [AdminDataExportController::class, 'show'])
+                    ->middleware(['authenticated.passport.cookie', 'authenticated.passport.request']);
             });
 
             Route::group([
@@ -297,7 +299,7 @@ Route::group([
 
         #region Authenticated
         Route::group([
-            'middleware' => ['authenticated.passport.request', 'auth:api', 'impersonate'],
+            'middleware' => ['auth:api', 'impersonate'],
         ], function () {
             Route::group([
                 'prefix' => 'auth',

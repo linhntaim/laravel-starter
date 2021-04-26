@@ -9,6 +9,12 @@ function maxExecutionTime()
     return $maxExecutionTime;
 }
 
+function printLine($value)
+{
+    print_r($value);
+    echo PHP_EOL;
+}
+
 function got($value, $default = null)
 {
     if (filled($value)) {

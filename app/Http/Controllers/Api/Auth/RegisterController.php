@@ -16,18 +16,18 @@ use App\Utils\SocialLogin;
 /**
  * Class RegisterController
  * @package App\Http\Controllers\Api\Auth
+ * @property IUserRepository $modelRepository
  */
 abstract class RegisterController extends ModelApiController
 {
-    public function __construct()
+    protected function modelRepositoryClass()
     {
-        parent::__construct();
+        return $this->getUserRepositoryClass();
+    }
 
-        $this->modelRepository = $this->getUserRepository();
-        $this->setFixedModelResourceClass(
-            $this->getUserResourceClass(),
-            $this->modelRepository->modelClass()
-        );
+    protected function modelResourceClass()
+    {
+        return $this->getUserResourceClass();
     }
 
     /**
@@ -44,15 +44,6 @@ abstract class RegisterController extends ModelApiController
     protected function getUserResourceClass()
     {
         return UserAccountResource::class;
-    }
-
-    /**
-     * @return IUserRepository
-     */
-    protected function getUserRepository()
-    {
-        $repositoryClass = $this->getUserRepositoryClass();
-        return new $repositoryClass();
     }
 
     public function store(Request $request)

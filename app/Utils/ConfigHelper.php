@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ConfigHelper
 {
-    const NAME = 'starter';
+    public const NAME = 'starter';
 
     public static function get($key = null, $default = null)
     {

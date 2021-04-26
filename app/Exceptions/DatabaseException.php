@@ -8,6 +8,6 @@ namespace App\Exceptions;
 
 class DatabaseException extends Exception
 {
-    const LEVEL = 2;
-    const CODE = 503;
+    public const LEVEL = 2;
+    public const CODE = 503;
 }
