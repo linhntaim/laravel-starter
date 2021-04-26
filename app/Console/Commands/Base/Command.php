@@ -64,9 +64,10 @@ abstract class Command extends BaseCommand
 
     protected function runCommand($command, array $arguments, OutputInterface $output)
     {
+        $origin = self::currentShoutOut();
         self::disableShoutOut();
         $run = parent::runCommand($command, $arguments, $output);
-        self::enableShoutOut();
+        self::setShoutOut($origin);
         return $run;
     }
 
