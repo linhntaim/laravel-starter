@@ -147,7 +147,8 @@ class Manager
 
     public function setClientFromRequestHeader(Request $request, $force = false)
     {
-        if ($request->ifHeader(ConfigHelper::get('client.headers.client_id'), $headerValue)) {
+        if ($request->ifHeader(ConfigHelper::get('client.headers.client_id'), $headerValue)
+            && filled($headerValue)) {
             return $this->setClient($headerValue, $force);
         }
         return $this;
@@ -160,7 +161,8 @@ class Manager
         $headerEncryptExcepts = ConfigHelper::get('client.header_encrypt_excepts');
         foreach ($headers as $header) {
             if (!in_array($header, $headerEncryptExcepts)
-                && $request->ifHeader($header, $headerValue)) {
+                && $request->ifHeader($header, $headerValue)
+                && filled($headerValue)) {
                 if ($headerValue = AES::decrypt(base64_decode($headerValue), $appKey)) {
                     $request->headers->set($header, $headerValue);
                 } else {

@@ -18,7 +18,8 @@ class AuthenticatedByPassportViaCookie
     public function handle(Request $request, Closure $next)
     {
         if (!auth()->check()) {
-            if ($request->ifCookie(Facade::getCookie('default'), $cookieValue)) {
+            if ($request->ifCookie(Facade::getCookie('default'), $cookieValue)
+                && filled($cookieValue)) {
                 $token = json_decode(
                     AES::decrypt($cookieValue, Facade::getAppKey())
                 );

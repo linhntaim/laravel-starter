@@ -14,7 +14,8 @@ class ClientAuthorizationHeader
 {
     public function handle(Request $request, Closure $next)
     {
-        if ($request->ifHeader(ConfigHelper::get('client.header_token_authorization'), $headerValue)) {
+        if ($request->ifHeader(ConfigHelper::get('client.header_token_authorization'), $headerValue)
+            && filled($headerValue)) {
             $request->headers->set('Authorization', $headerValue);
         }
         return $next($request);
