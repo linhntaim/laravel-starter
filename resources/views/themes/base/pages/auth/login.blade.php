@@ -1,4 +1,6 @@
-@extends('themes.sample.master.guest')
+@extends('themes.base.master.guest', [
+    'page_title' => __t('pages._auth._login._')
+])
 
 @section('body')
     <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
@@ -23,7 +25,7 @@
             @if ($errors->any())
                 <div class="mb-4">
                     <div class="font-medium text-red-600">
-                        {{ __('Whoops! Something went wrong.') }}
+                        {{ __t('Whoops! Something went wrong.') }}
                     </div>
 
                     <ul class="mt-3 list-disc list-inside text-sm text-red-600">
@@ -39,7 +41,7 @@
 
                 <div>
                     <label for="email" class="block font-medium text-sm text-gray-700">
-                        {{ __('Email') }}
+                        {{ __t('pages.email_address') }}
                     </label>
 
                     <input
@@ -50,7 +52,7 @@
 
                 <div class="mt-4">
                     <label for="password" class="block font-medium text-sm text-gray-700">
-                        {{ __('Password') }}
+                        {{ __t('pages.password') }}
                     </label>
 
                     <input
@@ -67,7 +69,7 @@
                         <input id="remember_me" type="checkbox"
                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                name="remember">
-                        <span class="ml-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
+                        <span class="ml-2 text-sm text-gray-600">{{ __t('pages._auth._login.remember_me') }}</span>
                     </label>
                 </div>
 
@@ -75,14 +77,14 @@
                     @if (Route::has('password.request'))
                         <a class="underline text-sm text-gray-600 hover:text-gray-900"
                            href="{{ route('password.request') }}">
-                            {{ __('Forgot your password?') }}
+                            {{ __t('pages._auth._login.forgot_password') }}
                         </a>
                     @endif
 
                     <button
                         class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150 ml-3"
                         type="submit">
-                        {{ __('Log in') }}
+                        {{ __t('actions.login') }}
                     </button>
                 </div>
             </form>

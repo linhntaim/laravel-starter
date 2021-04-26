@@ -6,5 +6,16 @@ use App\Http\Requests\Request;
 
 abstract class ViewShare
 {
-    public abstract function share(Request $request);
+    protected function shared(Request $request)
+    {
+        return [];
+    }
+
+    public function share(Request $request)
+    {
+        $view = view();
+        foreach ($this->shared($request) as $key => $shared) {
+            $view->share($key, $shared);
+        }
+    }
 }

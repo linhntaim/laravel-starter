@@ -2,11 +2,26 @@
 
 namespace App\Utils\Theme;
 
+use App\Utils\ConfigHelper;
+use App\Vendors\Illuminate\Support\HtmlString;
+
 abstract class Theme
 {
-    const NAME = 'theme';
-    const DISPLAY_NAME = 'Theme';
-    const APP_TYPE = 'home';
+    public const NAME = 'theme';
+    public const DISPLAY_NAME = 'Theme';
+
+    protected $titleComplementUsed = true;
+
+    protected $titleComplement = null;
+
+    protected $titleSeparator = '|';
+
+    protected $titleReverse = true;
+
+    public function instance()
+    {
+        return $this;
+    }
 
     public function getName()
     {
@@ -18,16 +33,9 @@ abstract class Theme
         return static::DISPLAY_NAME;
     }
 
-    public function getAppType()
-    {
-        return static::APP_TYPE;
-    }
-
     public function share()
     {
-        return [
-            '_object' => $this,
-        ];
+        return [];
     }
 
     /**
@@ -91,5 +99,61 @@ abstract class Theme
     public function asset($path, $secure = null)
     {
         return asset(sprintf('themes/%s/%s', $this->getName(), $path), $secure);
+    }
+
+    public function trans($key, array $replace = [], $custom = false, $locale = null)
+    {
+        return $custom ?
+            trans(sprintf('themes.custom.%s.%s', $this->getName(), $key), $replace, $locale)
+            : trans('themes.' . $key, $replace, $locale);
+    }
+
+    public function transChoice($key, $number, array $replace = [], $custom = false, $locale = null)
+    {
+        return $custom ?
+            trans_choice(sprintf('themes.custom.%s.%s', $this->getName(), $key), $number, $replace, $locale)
+            : trans_choice('themes.' . $key, $number, $replace, $locale);
+    }
+
+    protected function getTitleComplement()
+    {
+        if (!$this->titleComplementUsed) return null;
+        return is_null($this->titleComplement) ? config('app.name') : $this->titleComplement;
+    }
+
+    protected function getTitleSeparator()
+    {
+        return ' ' . $this->titleSeparator . ' ';
+    }
+
+    protected function getTitleReverse()
+    {
+        return $this->titleReverse;
+    }
+
+    /**
+     * @param string|string[]|array|null $titles
+     * @param string|null $complement
+     * @return string
+     */
+    public function title($titles = null, $complement = null)
+    {
+        if (is_null($complement)) {
+            if (is_null($titles) && ConfigHelper::get('app.id') == 'base') {
+                $titles = 'Laravel Starter';
+                $complement = 'DSquare - GBU';
+            } else {
+                $complement = $this->getTitleComplement();
+            }
+        }
+        $titles = (array)$titles;
+        array_unshift($titles, $complement);
+        $titles = array_map(function ($title) {
+            return (new HtmlString($title))->escape()->toHtml();
+        }, $titles);
+        if ($this->getTitleReverse()) {
+            $titles = array_reverse($titles);
+        }
+        return new HtmlString(implode($this->getTitleSeparator(), $titles));
     }
 }

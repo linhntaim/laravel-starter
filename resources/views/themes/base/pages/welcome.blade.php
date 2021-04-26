@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ $lang }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Laravel Starter | DSquare - GBU</title>
+    <title>{{ $theme->title() }}</title>
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
@@ -37,20 +37,20 @@
             @auth
                 <form class="display-inline" method="post" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="text-sm text-gray-700 underline">Logout</button>
+                    <button type="submit" class="text-sm text-gray-700 underline">{{ __t('actions.logout') }}</button>
                 </form>
             @else
-                <a href="{{ route('login') }}" class="text-sm text-gray-700 underline">Log in</a>
+                <a href="{{ route('login') }}" class="text-sm text-gray-700 underline">{{ __t('actions.login') }}</a>
 
                 @if (Route::has('register'))
-                    <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 underline">Register</a>
+                    <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 underline">{{ __t('actions.register') }}</a>
                 @endif
             @endauth
         </div>
     @endif
 
     <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
-        <div>Theme: {{ $theme['_object']->getDisplayName() }}</div>
+        <div class="flex justify-center pt-8 sm:justify-start sm:pt-0">Theme: {{ $theme->getDisplayName() }}</div>
         <div class="flex justify-center pt-8 sm:justify-start sm:pt-0">
             <h1>Laravel Starter v{{ config('starter.app.version') }}</h1>
         </div>

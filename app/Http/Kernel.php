@@ -22,6 +22,7 @@ use App\Http\Middleware\IpLimitation;
 use App\Http\Middleware\JapaneseTime;
 use App\Http\Middleware\Web\Client as ClientWeb;
 use App\Http\Middleware\Web\Device as DeviceWeb;
+use App\Http\Middleware\Web\Locale;
 use App\Http\Middleware\Web\Settings as SettingsWeb;
 use App\Http\Middleware\Web\ViewShare;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
@@ -64,6 +65,7 @@ class Kernel extends HttpKernel
             ClientWeb::class,
             SettingsWeb::class,
             DeviceWeb::class,
+            Locale::class,
             ViewShare::class,
         ],
 

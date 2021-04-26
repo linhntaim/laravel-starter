@@ -7,11 +7,13 @@
 namespace App\Http\Middleware\Web;
 
 use App\Utils\Theme\AuthViewShare;
+use App\Utils\Theme\ThemeViewShare;
 use App\Utils\Theme\ViewShareMiddleware;
 
 class ViewShare extends ViewShareMiddleware
 {
     protected $viewShareClasses = [
+        ThemeViewShare::class,
         AuthViewShare::class,
         // TODO:
 
