@@ -20,10 +20,10 @@ class ThemeHelper
      */
     public static function themes()
     {
-        $themeDirectory = __DIR__ . DIRECTORY_SEPARATOR . 'Themes';
+        $themeDirectory = app_path('Themes');
         $themes = [];
         foreach ((new Finder)->in($themeDirectory)->depth('< 1')->directories() as $directory) {
-            $themeClass = __NAMESPACE__ . '\\Themes\\' . $directory->getBasename() . '\\Theme';
+            $themeClass = 'App\\Themes\\' . $directory->getBasename() . '\\Theme';
             if (class_exists($themeClass)) {
                 $themes[(new ReflectionClass($themeClass))->getConstant('NAME')] = $themeClass;
             }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils\Theme\Themes\Base;
+namespace App\Themes\Base;
 
 use App\Utils\Theme\Theme as BaseTheme;
 
