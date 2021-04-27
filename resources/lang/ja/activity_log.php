@@ -29,7 +29,7 @@ return [
         // TODO
     ],
     'model_create' => [
-        'created' => '[Deleted]',
+        'created' => '[Created]',
         App\Models\Role::class => 'Role was created with: :log',
         // TODO:
 
