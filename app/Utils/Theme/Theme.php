@@ -141,7 +141,7 @@ abstract class Theme
         if (is_null($complement)) {
             if (is_null($titles) && ConfigHelper::get('app.id') == 'base') {
                 $titles = 'Laravel Starter';
-                $complement = 'DSquare - GBU';
+                $complement = 'Nguyen Tuan Linh';
             } else {
                 $complement = $this->getTitleComplement();
             }

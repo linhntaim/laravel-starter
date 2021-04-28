@@ -371,8 +371,8 @@ Mail server settings:
 MAIL_MAILER=smtp
 MAIL_HOST=smtp.gmail.com
 MAIL_PORT=587
-MAIL_USERNAME=dsquare.gbu@gmail.com
-MAIL_PASSWORD=oviajbqtrcgnalfk
+MAIL_USERNAME=example@gmail.com
+MAIL_PASSWORD=
 MAIL_ENCRYPTION=tls
 MAIL_FROM_ADDRESS="${MAIL_USERNAME}"
 MAIL_FROM_NAME="${APP_NAME}"

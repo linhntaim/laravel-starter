@@ -17,12 +17,12 @@ use App\Vendors\Illuminate\Support\Str;
 
 class DefaultSeeder extends Seeder
 {
-    protected $systemEmail = 'system@dsquare.com.vn';
-    protected $systemPassword = 'Gbu@190708';
-    protected $superAdminEmail = 'superadmin@dsquare.com.vn';
-    protected $superAdminPassword = 'Gbu@190708';
-    protected $administratorEmail = 'admin@dsquare.com.vn';
-    protected $administratorPassword = 'Gbu@190708';
+    protected $systemEmail = 'system@linhntaim.com';
+    protected $systemPassword = '123123132';
+    protected $superAdminEmail = 'superadmin@linhntaim.com';
+    protected $superAdminPassword = '123123132';
+    protected $administratorEmail = 'admin@linhntaim.com';
+    protected $administratorPassword = '123123132';
 
     public function run()
     {
