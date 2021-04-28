@@ -7,6 +7,7 @@
 namespace App\Providers;
 
 use App\Http\Requests\Request;
+use App\Utils\ClientSettings\Facade;
 use App\Utils\ClientSettings\Manager as ClientSettingsManager;
 use App\Utils\ConfigHelper;
 use App\Utils\Device\Manager as DeviceManager;
@@ -99,6 +100,10 @@ class AppServiceProvider extends ServiceProvider
 
         Passport::tokensExpireIn(now()->addSeconds(ConfigHelper::get('passport.token_lifetime')));
         Passport::refreshTokensExpireIn(now()->addSeconds(ConfigHelper::get('passport.refresh_token_lifetime')));
+
+        if (App::runningFromRequest()) {
+            Facade::setClientFromRequestRoute($this->app->make('request'), true);
+        }
 
         $this->app->terminating(function () {
             App::bench('app');

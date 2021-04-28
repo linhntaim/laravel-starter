@@ -69,23 +69,16 @@ class Handler extends ExceptionHandler
         $exceptionClasses = [
             NotFoundHttpException::class,
             ThrottleRequestsException::class,
+            MethodNotAllowedHttpException::class,
         ];
         foreach ($exceptionClasses as $exceptionClass) {
             if ($e instanceof $exceptionClass) {
                 return AppException::from($e);
             }
         }
-        // specific
-        if ($e instanceof MethodNotAllowedHttpException) {
-            return AppException::from($e, [], [
-                'trans_options' => [
-                    'replace' => [
-                        'method' => request()->getMethod(),
-                        'allow' => $e->getHeaders()['Allow'],
-                    ],
-                ],
-            ]);
-        }
+        // TODO: Specific
+
+        // TODO
         return parent::prepareException($e);
     }
 
