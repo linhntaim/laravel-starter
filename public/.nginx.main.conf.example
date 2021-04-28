@@ -33,14 +33,8 @@ location / {
     #auth_basic "Protected Area";
     #auth_basic_user_file /path/to/.htpasswd;
     #satisfy any;
-    # Ignore: IPs (GBU - Security Room)
-    #allow 113.161.68.31;
-    # Ignore: IPs (GBU - Office)
-    #allow 113.161.68.89;
-    # Ignore: IPs (JPN - Office)
-    #allow 113.43.219.94;
-    # Ignore: IPs (JPN - Office)
-    #allow 124.36.26.238;
+    # Ignore: IPs (xxx)
+    #allow xxx.xxx.xxx.xxx;
     # Other must fill username and password
     #deny all;
 
