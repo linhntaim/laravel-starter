@@ -15,15 +15,15 @@ class IndexController extends WebController
 {
     public function index(Request $request, $path = null)
     {
-        $welcome = function ($htmlIndexFolder = '') use ($path) {
+        $welcome = function ($htmlIndexFolder = '') use ($request, $path) {
             $htmlIndexFileNames = ConfigHelper::get('app.html_index.file_names');
             $indexPath = $htmlIndexFolder ? public_path($htmlIndexFolder) . DIRECTORY_SEPARATOR : '';
             foreach ($htmlIndexFileNames as $htmlIndexFileName) {
                 if (file_exists($htmlIndexFile = $indexPath . $htmlIndexFileName)) {
-                    return $this->responseFile($htmlIndexFile);
+                    return $this->htmlView($request, $htmlIndexFile);
                 }
             }
-            return $this->defaultView($path);
+            return $this->defaultView($request, $path);
         };
         if ($path) {
             $htmlIndexFolderNames = ConfigHelper::get('app.html_index.folder_names');
@@ -36,14 +36,14 @@ class IndexController extends WebController
         return $welcome();
     }
 
-    protected function defaultView($path = null)
+    protected function htmlView(Request $request, $htmlFile)
     {
-        if (!is_null($path)) $this->abort404();
-        return $this->home();
+        return $this->responseFile($htmlFile);
     }
 
-    protected function home()
+    protected function defaultView(Request $request, $path = null)
     {
-        return $this->view('welcome');
+        if (!is_null($path)) $this->abort404();
+        return $this->viewHome();
     }
 }

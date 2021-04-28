@@ -6,17 +6,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Configuration;
 use App\Exceptions\Exception;
 use App\Exceptions\UnhandledException;
 use App\Exceptions\UserException;
 use App\Http\Requests\Request;
 use App\Utils\ConfigHelper;
-use App\Utils\Helper;
-use App\Utils\LogHelper;
+use App\Vendors\Illuminate\Support\Facades\App;
 use Closure;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use League\OAuth2\Server\Exception\OAuthServerException;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
@@ -26,7 +26,7 @@ trait ApiResponseTrait
 
     public static function addBlockResponseMessage($message, $fresh = false)
     {
-        if (!empty(static::$extraResponse)) {
+        if (is_null(static::$extraResponse)) {
             static::$extraResponse = [];
         }
         if ($fresh || !isset(static::$extraResponse['_block']) || static::$extraResponse['_block'] == null) {
@@ -37,12 +37,12 @@ trait ApiResponseTrait
 
     public static function addErrorResponseMessage($level, $data)
     {
-        if (!empty(static::$extraResponse)) {
+        if (is_null(static::$extraResponse)) {
             static::$extraResponse = [];
         }
         static::$extraResponse['_error'] = [
             'level' => $level,
-            'data' => Helper::default($data, null),
+            'data' => got($data),
         ];
     }
 
@@ -54,8 +54,6 @@ trait ApiResponseTrait
     protected static function payload($data = null, $message = null)
     {
         $debug = null;
-        $debugMode = config('app.debug');
-
         if ($message instanceof Throwable) {
             $exception = $message;
             $debug = [
@@ -64,14 +62,13 @@ trait ApiResponseTrait
                 'trace' => $exception->getTrace(),
             ];
             if ($exception instanceof OAuthServerException) {
-                $exception = new UserException(
-                    trans('passport.' . $exception->getErrorType() . ($exception->getCode() == 8 ? '_refresh_token' : '')),
-                    0,
-                    $exception
+                $exception = UserException::from(
+                    $exception,
+                    trans('passport.' . $exception->getErrorType() . ($exception->getCode() == 8 ? '_refresh_token' : ''))
                 );
             }
             if (!($exception instanceof Exception)) {
-                $exception = new UnhandledException($exception->getMessage(), 0, $exception);
+                $exception = UnhandledException::from($exception);
             }
 
             $message = $exception->getMessages();
@@ -82,23 +79,24 @@ trait ApiResponseTrait
             '_messages' => empty($message) ? null : (array)$message,
             '_data' => $data,
             '_extra' => static::$extraResponse,
-            '_exception' => $debugMode ? $debug : null,
+            '_exception' => App::runningInDebug() ? $debug : null,
         ];
     }
 
-    public static function failPayload($data = null, $message = null, $statusCode = Configuration::HTTP_RESPONSE_STATUS_ERROR)
+    public static function failPayload($data = null, $message = null, $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR, $errorCode = 0)
     {
         return array_merge(static::payload($data, $message), [
             '_status' => false,
             '_code' => $statusCode,
+            '_error' => $errorCode ? $errorCode : $statusCode,
         ]);
     }
 
-    public static function successPayload($data = null, $message = null)
+    public static function successPayload($data = null, $message = null, $statusCode = Response::HTTP_OK)
     {
         return array_merge(static::payload($data, $message), [
             '_status' => true,
-            '_code' => Configuration::HTTP_RESPONSE_STATUS_OK,
+            '_code' => $statusCode,
         ]);
     }
 
@@ -120,7 +118,7 @@ trait ApiResponseTrait
      * @param array $headers
      * @return JsonResponse
      */
-    protected function response($payload, $status = Configuration::HTTP_RESPONSE_STATUS_OK, $headers = [])
+    protected function response($payload, $status = Response::HTTP_OK, $headers = [])
     {
         return response()->json(
             $payload,
@@ -134,35 +132,47 @@ trait ApiResponseTrait
      * @param array|null $data
      * @param array|string|null $message
      * @param array $headers
+     * @param int $statusCode
      * @return JsonResponse
      */
-    protected function responseSuccess($data = null, $message = null, $headers = [])
+    protected function responseSuccess($data = null, $message = null, $headers = [], $statusCode = Response::HTTP_OK)
     {
         $this->transactionComplete();
-        return $this->response(static::successPayload($data, $message), Configuration::HTTP_RESPONSE_STATUS_OK, $headers);
+        return $this->response(
+            static::successPayload(
+                $data,
+                $message,
+                $statusCode
+            ),
+            $statusCode,
+            $headers
+        );
     }
 
     /**
      * @param Exception|array|string|null $message
      * @param array|null $data
      * @param int $statusCode
+     * @param int $errorCode
      * @param array $headers
      * @return JsonResponse
      */
-    protected function responseFail($message = null, $data = null, $statusCode = Configuration::HTTP_RESPONSE_STATUS_ERROR, $headers = [])
+    protected function responseFail($message = null, $data = null, $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR, $errorCode = 0, $headers = [])
     {
         $this->transactionStop();
         if ($message instanceof \Exception) {
-            LogHelper::error($message);
+            Log::error($message);
         }
         if ($message instanceof HttpExceptionInterface) {
             $statusCode = $message->getStatusCode();
+            $errorCode = $message->getCode();
         }
         return $this->response(
             static::failPayload(
                 $data,
                 $message,
-                $statusCode
+                $statusCode,
+                $errorCode
             ),
             $statusCode,
             $headers

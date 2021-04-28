@@ -6,7 +6,7 @@ use App\Utils\HandledFiles\Storage\HandledStorage;
 
 abstract class Encrypter
 {
-    const ENCRYPT_EXTENSION = 'encrypted';
+    public const ENCRYPT_EXTENSION = 'encrypted';
 
     public function getExtension()
     {

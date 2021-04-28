@@ -12,11 +12,18 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Str;
 
+/**
+ * Class Settings
+ * @package App\Utils\ClientSettings
+ */
 class Settings implements ISettings, Arrayable, Jsonable
 {
     protected $appId;
+    protected $appKey;
     protected $appName;
     protected $appUrl;
+
+    protected $stateful;
 
     protected $locale;
     protected $country;
@@ -29,24 +36,36 @@ class Settings implements ISettings, Arrayable, Jsonable
     protected $longTimeFormat;
     protected $shortTimeFormat;
 
+    protected $cookies;
+
+    protected $paths;
+
     protected $changes;
 
     public function __construct()
     {
-        $this->appId = ConfigHelper::get('app.id');
+        $this->appKey = $this->setAppKey(config('app.key'));
         $this->appName = config('app.name');
         $this->appUrl = config('app.url');
 
+        $this->stateful = false;
+
+        $defaultLocalization = ConfigHelper::get('default_localization');
+
         $this->locale = config('app.locale');
-        $this->country = ConfigHelper::get('localization.country');
+        $this->country = $defaultLocalization['country'];
         $this->timezone = config('app.timezone');
-        $this->currency = ConfigHelper::get('localization.currency');
-        $this->numberFormat = ConfigHelper::get('localization.number_format');
-        $this->firstDayOfWeek = ConfigHelper::get('localization.first_day_of_week');
-        $this->longDateFormat = ConfigHelper::get('localization.long_date_format');
-        $this->shortDateFormat = ConfigHelper::get('localization.short_date_format');
-        $this->longTimeFormat = ConfigHelper::get('localization.long_time_format');
-        $this->shortTimeFormat = ConfigHelper::get('localization.short_time_format');
+        $this->currency = $defaultLocalization['currency'];
+        $this->numberFormat = $defaultLocalization['number_format'];
+        $this->firstDayOfWeek = $defaultLocalization['first_day_of_week'];
+        $this->longDateFormat = $defaultLocalization['long_date_format'];
+        $this->shortDateFormat = $defaultLocalization['short_date_format'];
+        $this->longTimeFormat = $defaultLocalization['long_time_format'];
+        $this->shortTimeFormat = $defaultLocalization['short_time_format'];
+
+        $this->cookies = [];
+
+        $this->paths = [];
 
         $this->clearChanges();
     }
@@ -60,6 +79,20 @@ class Settings implements ISettings, Arrayable, Jsonable
     public function getAppId()
     {
         return $this->appId;
+    }
+
+    public function setAppKey($appKey)
+    {
+        if (Str::startsWith($appKey, 'base64:')) {
+            $appKey = utf8_encode(base64_decode(substr($appKey, 7)));
+        }
+        $this->appKey = $appKey;
+        return $this;
+    }
+
+    public function getAppKey()
+    {
+        return $this->appKey;
     }
 
     public function setAppName($appName)
@@ -82,6 +115,17 @@ class Settings implements ISettings, Arrayable, Jsonable
     public function getAppUrl()
     {
         return $this->appUrl;
+    }
+
+    public function setStateful(bool $stateful)
+    {
+        $this->stateful = $stateful;
+        return $this;
+    }
+
+    public function getStateful()
+    {
+        return $this->stateful;
     }
 
     public function setLocale($locale)
@@ -214,6 +258,52 @@ class Settings implements ISettings, Arrayable, Jsonable
         return $this->shortTimeFormat;
     }
 
+    public function setCookies(array $cookies)
+    {
+        $this->cookies = $cookies;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCookies()
+    {
+        return $this->cookies;
+    }
+
+    /**
+     * @param string $key
+     * @return string
+     */
+    public function getCookie($key)
+    {
+        return isset($this->cookies[$key]) ? $this->cookies[$key] : null;
+    }
+
+    public function setPaths(array $paths)
+    {
+        $this->paths = $paths;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPaths()
+    {
+        return $this->paths;
+    }
+
+    /**
+     * @param string $key
+     * @return string
+     */
+    public function getPath($key)
+    {
+        return isset($this->paths[$key]) ? $this->paths[$key] : null;
+    }
+
     public function merge($settings)
     {
         if (is_array($settings)) {
@@ -254,8 +344,20 @@ class Settings implements ISettings, Arrayable, Jsonable
     {
         $data = [];
         foreach (array_keys(get_class_vars(static::class)) as $propertyName) {
-            if ($propertyName == 'changes') continue;
-            $data[Str::snake($propertyName)] = $this->{$propertyName};
+            if (in_array($propertyName, [
+                'locale',
+                'country',
+                'timezone',
+                'currency',
+                'numberFormat',
+                'firstDayOfWeek',
+                'longDateFormat',
+                'shortDateFormat',
+                'longTimeFormat',
+                'shortTimeFormat',
+            ])) {
+                $data[Str::snake($propertyName)] = $this->{$propertyName};
+            }
         }
         return $data;
     }

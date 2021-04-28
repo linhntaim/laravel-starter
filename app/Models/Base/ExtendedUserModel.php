@@ -9,16 +9,12 @@ namespace App\Models\Base;
 use App\Configuration;
 use App\Models\DatabaseNotification;
 use App\Models\User;
-use App\ModelTraits\MemorizeTrait;
-use App\ModelTraits\NotificationTrait;
-use App\ModelTraits\ProtectedTrait;
+use App\ModelTraits\UserTrait;
 use Illuminate\Auth\Passwords\CanResetPassword;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Notifications\Notifiable;
 
 /**
  * Trait UserExtendedTrait
- * @package App\ModelTraits
+ * @package App\Models\Base
  * @property int $user_id
  * @property string $username
  * @property string $email
@@ -27,12 +23,9 @@ use Illuminate\Notifications\Notifiable;
  */
 abstract class ExtendedUserModel extends Model implements IUser
 {
-    use Notifiable, NotificationTrait {
-        NotificationTrait::notifications insteadof Notifiable;
-    }
-    use CanResetPassword, MemorizeTrait, ProtectedTrait, SoftDeletes;
+    use UserTrait, CanResetPassword;
 
-    const PROTECTED = User::PROTECTED;
+    public const PROTECTED = User::PROTECTED;
 
     protected $primaryKey = 'user_id';
 

@@ -8,7 +8,7 @@ namespace App\Utils\HandledFiles\Storage;
 
 abstract class Storage
 {
-    const NAME = '';
+    public const NAME = '';
 
     public function getName()
     {

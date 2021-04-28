@@ -9,15 +9,24 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\DeviceRepository;
+use App\ModelResources\DeviceResource;
 use App\Models\Device;
 
+/**
+ * Class DeviceController
+ * @package App\Http\Controllers\Api
+ * @property DeviceRepository $modelRepository
+ */
 class DeviceController extends ModelApiController
 {
-    public function __construct()
+    protected function modelRepositoryClass()
     {
-        parent::__construct();
+        return DeviceRepository::class;
+    }
 
-        $this->modelRepository = new DeviceRepository();
+    protected function modelResourceClass()
+    {
+        return DeviceResource::class;
     }
 
     public function currentStore(Request $request)

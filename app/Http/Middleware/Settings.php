@@ -3,14 +3,15 @@
 namespace App\Http\Middleware;
 
 use App\Http\Requests\Request;
-use App\Utils\ClientSettings\Facade;
 use Closure;
 
-class Settings
+abstract class Settings
 {
     public function handle(Request $request, Closure $next)
     {
-        Facade::fetchFromRequestHeaders($request);
+        $this->fetch($request);
         return $next($request);
     }
+
+    protected abstract function fetch(Request $request);
 }

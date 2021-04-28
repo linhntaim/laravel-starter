@@ -9,6 +9,7 @@ namespace App\Exports\Base;
 use App\ModelRepositories\HandledFileRepository;
 use App\Models\HandledFile;
 use App\Utils\HandledFiles\Filer\CsvFiler;
+use App\Vendors\Illuminate\Support\Facades\App;
 
 /**
  * Trait CsvExportTrait
@@ -30,7 +31,7 @@ trait CsvExportTrait
     protected function csvBeforeExporting()
     {
         $this->csvFiler = new CsvFiler();
-        $this->csvFiler->fromCreating($this->getName());
+        $this->csvFiler->fromCreating($this->getName()); // create at private root directory
         if (!empty($headers = $this->csvHeaders())) {
             $this->csvFiler->fStartAppending()
                 ->fWrite([$headers])
@@ -41,7 +42,7 @@ trait CsvExportTrait
 
     protected function csvAfterExporting()
     {
-        $this->csvFiler->moveToPublic(false);
+        $this->csvFiler->moveToPublic(false); // move to a public time-based directory
         return $this;
     }
 
@@ -63,9 +64,17 @@ trait CsvExportTrait
      */
     public function csvExport()
     {
+        App::benchFrom('export::csv::' . $this->getName());
         $this->csvBeforeExporting()
             ->csvExporting()
             ->csvAfterExporting();
-        return $this->handledFileRepository->usePublic()->createWithFiler($this->csvFiler);
+        return tap(
+            $this->handledFileRepository
+                ->usePublic() // make sure to move to cloud if enabled
+                ->createWithFiler($this->csvFiler),
+            function () {
+                App::bench('export::csv::' . $this->getName());
+            }
+        );
     }
 }

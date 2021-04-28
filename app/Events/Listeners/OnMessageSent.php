@@ -7,8 +7,9 @@
 namespace App\Events\Listeners;
 
 use App\Events\Listeners\Base\NowListener;
-use App\Utils\LogHelper;
+use App\Vendors\Illuminate\Support\Facades\App;
 use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Support\Facades\Log;
 
 class OnMessageSent extends NowListener
 {
@@ -17,8 +18,14 @@ class OnMessageSent extends NowListener
      */
     protected function go($event)
     {
-        if (config('app.debug')) {
-            LogHelper::info(sprintf('%s was sent to %s', $event->message->getSubject(), json_encode($event->message->getTo())));
+        if (App::runningInDebug()) {
+            Log::info(
+                sprintf(
+                    '[%s] was sent to [%s].',
+                    $event->message->getSubject(),
+                    json_encode($event->message->getTo())
+                )
+            );
         }
     }
 }

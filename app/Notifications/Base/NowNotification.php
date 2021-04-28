@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\DateTimer;
 use App\Utils\ClientSettings\Facade;
+use App\Utils\ClientSettings\Traits\IndependentClientTrait;
 use App\Utils\ConfigHelper;
 use App\Utils\Mail\TemplateMailable;
 use App\Utils\Mail\TemplateNowMailable;
@@ -20,19 +21,20 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification as BaseNotification;
-use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Notification as NotificationFacade;
+use Throwable;
 
 abstract class NowNotification extends BaseNotification
 {
-    use ClassTrait;
+    use ClassTrait, IndependentClientTrait;
 
-    const VIA_DATABASE = 'database';
-    const VIA_BROADCAST = 'broadcast';
-    const VIA_MAIL = 'mail';
-    const VIA_IOS = 'ios';
-    const VIA_ANDROID = 'android';
+    public const VIA_DATABASE = 'database';
+    public const VIA_BROADCAST = 'broadcast';
+    public const VIA_MAIL = 'mail';
+    public const VIA_IOS = 'ios';
+    public const VIA_ANDROID = 'android';
 
-    const NAME = 'now_notification';
+    public const NAME = 'now_notification';
 
     protected static function __transCurrentModule()
     {
@@ -133,9 +135,21 @@ abstract class NowNotification extends BaseNotification
 
     protected function resolveData($via, IUser $notifiable, $dataCallback)
     {
+        $this->independentClientApply();
         return Facade::temporaryFromUser($notifiable, function () use ($via, $notifiable, $dataCallback) {
-            return $dataCallback($notifiable);
+            try {
+                return $dataCallback($notifiable);
+            } catch (Throwable $e) {
+                if (!($this instanceof Notification)) {
+                    $this->failed($e);
+                }
+                throw $e;
+            }
         });
+    }
+
+    public function failed(Throwable $e)
+    {
     }
 
     public function toBroadcast(IUser $notifiable)
@@ -274,6 +288,11 @@ abstract class NowNotification extends BaseNotification
         return null;
     }
 
+    protected function getMailNow(IUser $notifiable)
+    {
+        return true;
+    }
+
     protected function getNowMailable(IUser $notifiable)
     {
         return TemplateNowMailable::class;
@@ -300,11 +319,6 @@ abstract class NowNotification extends BaseNotification
     }
 
     protected function getMailUseLocalizedTemplate(IUser $notifiable)
-    {
-        return true;
-    }
-
-    protected function getMailNow(IUser $notifiable)
     {
         return true;
     }
@@ -340,7 +354,7 @@ abstract class NowNotification extends BaseNotification
 
         if ($this->cannotSend($notifiables)) return false;
 
-        Notification::send($notifiables, $this);
+        NotificationFacade::send($notifiables, $this);
 
         return true;
     }

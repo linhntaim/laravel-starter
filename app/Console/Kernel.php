@@ -6,10 +6,13 @@
 
 namespace App\Console;
 
+use App\Console\Commands\Base\Command;
 use App\Console\Schedules\Base\Schedule as AppSchedule;
 use App\Console\Schedules\ScanHandleFilesSchedule;
 use App\Console\Schedules\TestCommandSchedule;
+use App\Console\Schedules\TestSchedule;
 use App\Console\Schedules\TestShellSchedule;
+use App\Vendors\Illuminate\Support\Facades\App;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -30,6 +33,7 @@ class Kernel extends ConsoleKernel
                 'everyMinute',
             ],
             'schedules' => [
+                TestSchedule::class,
                 TestCommandSchedule::class,
                 TestShellSchedule::class,
                 ScanHandleFilesSchedule::class,
@@ -104,5 +108,17 @@ class Kernel extends ConsoleKernel
         $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
+    }
+
+    public function call($command, array $parameters = [], $outputBuffer = null)
+    {
+        if (App::runningInConsole()) {
+            $origin = Command::currentShoutOut();
+            Command::disableShoutOut();
+            $called = parent::call($command, $parameters, $outputBuffer);
+            Command::setShoutOut($origin);
+            return $called;
+        }
+        return parent::call($command, $parameters, $outputBuffer);
     }
 }

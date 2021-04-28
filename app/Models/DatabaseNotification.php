@@ -7,11 +7,10 @@
 namespace App\Models;
 
 use App\ModelResources\DatabaseNotificationResource;
-use App\Models\Base\IResource;
+use App\Models\Base\IModel;
 use App\Models\Base\IUser;
 use App\Models\Base\Model;
-use App\ModelTraits\MemorizeTrait;
-use App\ModelTraits\ResourceTrait;
+use App\ModelTraits\ModelTrait;
 use App\Notifications\Base\DatabaseNotificationFactory;
 use App\Notifications\Base\NowNotification;
 use App\Utils\ClientSettings\Facade;
@@ -34,9 +33,9 @@ use Illuminate\Notifications\DatabaseNotification as BaseDatabaseNotification;
  * @property Model|IUser $notifier
  * @property NowNotification|mixed $notification
  */
-class DatabaseNotification extends BaseDatabaseNotification implements IResource
+class DatabaseNotification extends BaseDatabaseNotification implements IModel
 {
-    use MemorizeTrait, ResourceTrait;
+    use ModelTrait;
 
     protected $visible = [
         'id',

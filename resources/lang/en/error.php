@@ -7,8 +7,14 @@
 return [
     'def' => [
         'abort' => [
-            '403' => 'Not authorized',
-            '404' => 'Not found',
+            '400' => 'Bad request.',
+            '401' => 'Not authenticated.',
+            '403' => 'Not authorized.',
+            '404' => 'Not found.',
+            '405' => 'The :method method is not supported for this route. Supported methods: :allow.',
+            '429' => 'Too many attempts.',
+            '500' => 'Server internal error.',
+            '503' => 'Service unavailable.',
             // TODO:
 
             // TODO
@@ -23,6 +29,10 @@ return [
             'level_failed' => 'Something went wrong with application',
             'level' => ':message',
         ],
+        'console_exception' => [
+            'level_failed' => 'Something went wrong with application',
+            'level' => ':message',
+        ],
         'database_exception' => [
             'level_failed' => 'Something went wrong with database',
             'level' => ':message',
@@ -32,6 +42,10 @@ return [
         ],
         'exception' => [
             'level_failed' => 'Something went wrong',
+            'level' => ':message',
+        ],
+        'ip_limit_exception' => [
+            'level_failed' => 'Your IP is not allowed',
             'level' => ':message',
         ],
         'unhandled_exception' => [

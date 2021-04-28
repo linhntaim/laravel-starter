@@ -20,7 +20,7 @@ class Device extends Model
 {
     use ArrayValuedAttributesTrait;
 
-    const PROVIDER_BROWSER = 'browser';
+    public const PROVIDER_BROWSER = 'browser';
 
     protected $table = 'devices';
 

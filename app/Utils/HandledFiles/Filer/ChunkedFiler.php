@@ -10,9 +10,8 @@ use App\Exceptions\AppException;
 use App\Utils\HandledFiles\File;
 use App\Utils\HandledFiles\Helper;
 use App\Utils\HandledFiles\Storage\PrivateStorage;
-use App\Utils\StringHelper;
+use App\Vendors\Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Str;
 
 /**
  * Class ChunkedFiler
@@ -22,8 +21,8 @@ use Illuminate\Support\Str;
  */
 class ChunkedFiler extends Filer
 {
-    const CHUNK_FILE_NAME = 'chunk';
-    const CHUNK_FOLDER_NAME = 'chunks';
+    public const CHUNK_FILE_NAME = 'chunk';
+    public const CHUNK_FOLDER_NAME = 'chunks';
 
     protected $chunksId;
     protected $chunksRelativeDirectory;
@@ -229,7 +228,7 @@ class ChunkedFiler extends Filer
 
     public static function generateChunksId()
     {
-        $chunksId = StringHelper::uuid();
+        $chunksId = Str::uuid();
         $chunksRelativeDirectory = static::generateChunksRelativeDirectory($chunksId);
         $privateStorage = new PrivateStorage();
         if ($privateStorage->exists($chunksRelativeDirectory)) { // prevent duplicate

@@ -13,12 +13,11 @@ use App\ModelRepositories\UserRepository;
 use App\Models\Admin;
 use App\Models\OAuthImpersonate;
 use App\Models\User;
+use Throwable;
 
 class ImpersonateCommand extends Command
 {
     protected $signature = 'impersonate {user} {admin_id}';
-
-    protected $noInformation = true;
 
     protected function go()
     {
@@ -28,7 +27,7 @@ class ImpersonateCommand extends Command
                 $this->warn(json_encode([
                     'impersonate_token' => $oAuthImpersonate->impersonate_token,
                 ]));
-            } catch (\Exception $exception) {
+            } catch (Throwable $exception) {
                 return;
             }
         }

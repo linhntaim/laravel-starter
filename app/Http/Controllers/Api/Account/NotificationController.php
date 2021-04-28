@@ -11,13 +11,16 @@ use App\Http\Requests\Request;
 use App\ModelRepositories\DatabaseNotificationRepository;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class NotificationController
+ * @package App\Http\Controllers\Api\Account
+ * @property DatabaseNotificationRepository $modelRepository
+ */
 abstract class NotificationController extends ModelApiController
 {
-    public function __construct()
+    protected function modelRepositoryClass()
     {
-        parent::__construct();
-
-        $this->modelRepository = new DatabaseNotificationRepository();
+        return DatabaseNotificationRepository::class;
     }
 
     /**
@@ -29,7 +32,7 @@ abstract class NotificationController extends ModelApiController
         return $request->user();
     }
 
-    protected function search(Request $request)
+    protected function searchDefaultParams(Request $request)
     {
         $notifiable = $this->getAccountModel($request);
         return [

@@ -8,10 +8,14 @@ namespace App\Exports\Base;
 
 use App\ModelRepositories\HandledFileRepository;
 use App\Models\HandledFile;
+use App\Utils\ClassTrait;
+use App\Utils\ExecutionTimeTrait;
 
 abstract class Export
 {
-    const NAME = 'export';
+    use ClassTrait, ExecutionTimeTrait;
+
+    public const NAME = 'export';
 
     /**
      * @var HandledFileRepository

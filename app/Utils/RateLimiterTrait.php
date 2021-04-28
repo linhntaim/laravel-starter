@@ -6,6 +6,7 @@
 
 namespace App\Utils;
 
+use App\Vendors\Illuminate\Support\Facades\App;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\RateLimiter;
 
@@ -23,7 +24,7 @@ trait RateLimiterTrait
     {
         $cacheManager = $this->getCacheManager();
         $needToRefreshCacheStore = $cacheManager->getDefaultDriver() === 'database'
-            && app()->runningInConsole();
+            && App::notRunningFromRequest();
         if ($needToRefreshCacheStore) {
             $cacheManager->forgetDriver();
         }

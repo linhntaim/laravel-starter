@@ -12,7 +12,7 @@ use Psy\Util\Json;
 
 abstract class FrameworkHandler implements Arrayable, Jsonable
 {
-    const NAME = '';
+    public const NAME = '';
 
     protected $file;
 

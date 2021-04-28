@@ -118,4 +118,27 @@ class Helper
         closedir($dir);
         return true;
     }
+
+    public static function autoDisplaySize($size, $callback = null, $unitSeparator = ' ')
+    {
+        $units = ['byte', 'bytes', 'KB', 'MB', 'GB', 'TB'];
+        $unitIndex = 0;
+
+        if ($size > 1) {
+            $unitIndex = 1;
+            while ($size > 1024) {
+                $size /= 1024;
+                ++$unitIndex;
+            }
+        }
+
+        if ($callback === true) {
+            $size = number_format($size);
+        } elseif (is_int($callback)) {
+            $size = number_format($size, $callback);
+        } elseif (is_callable($callback)) {
+            $size = $callback($size);
+        }
+        return $size . $unitSeparator . $units[$unitIndex];
+    }
 }

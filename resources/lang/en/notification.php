@@ -7,6 +7,10 @@
 return [
     'test_notification' => [
         'title' => 'Test',
+        'content' => 'This is a test notification',
+    ],
+    'test_database_notification' => [
+        'title' => 'Test',
         'content' => 'This is a :test notification',
     ],
     // TODO:

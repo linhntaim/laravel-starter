@@ -6,109 +6,218 @@
 
 namespace App\Console\Commands\Base;
 
+use App\Exceptions\ConsoleException;
 use App\Exceptions\Exception;
 use App\Utils\ClassTrait;
-use App\Utils\LogHelper;
+use App\Utils\ClientSettings\Traits\ConsoleClientTrait;
+use App\Utils\Database\Transaction\TransactionTrait;
 use App\Utils\ShellTrait;
+use App\Vendors\Illuminate\Support\Facades\App;
 use Illuminate\Console\Command as BaseCommand;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 
 abstract class Command extends BaseCommand
 {
-    use ClassTrait, ShellTrait;
+    use ClassTrait, ShellTrait, ConsoleClientTrait, TransactionTrait;
 
-    protected $__friendlyName;
+    protected static $shoutOutEnabled = true;
 
-    protected function __friendlyName()
+    public static function currentShoutOut()
     {
-        if (empty($this->__friendlyName)) {
-            $this->__friendlyName = trim(preg_replace('/command$/i', '', static::__friendlyClassBaseName()));
-        }
-        return $this->__friendlyName;
+        return self::$shoutOutEnabled;
     }
 
-    protected $noInformation = false;
-
-    /**
-     * @return Command
-     */
-    public function disableInformation()
+    public static function setShoutOut($shoutOut = true)
     {
-        $this->noInformation = true;
-        return $this;
+        self::$shoutOutEnabled = $shoutOut;
     }
 
-    protected function runCommand($command, array $arguments, OutputInterface $output)
+    public static function disableShoutOut()
     {
-        $arguments['command'] = $command;
-
-        $commander = $this->resolveCommand($command);
-
-        if ($commander instanceof Command) {
-            $commander->disableInformation();
-        }
-
-        return $commander->run(
-            $this->createInputFromArguments($arguments), $output
-        );
+        self::$shoutOutEnabled = false;
     }
 
-    protected function lineBreak()
+    public static function enableShoutOut()
     {
-        $this->line('');
+        self::$shoutOutEnabled = true;
+    }
+
+    protected $friendlyName;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->friendlyName = trim(preg_replace('/command$/i', '', static::__friendlyClassBaseName()));
+
+        $this->consoleClientApply();
     }
 
     public function alert($string)
     {
-        $this->lineBreak();
+        $this->newLine();
         parent::alert($string);
     }
 
-    protected function before()
+    protected function runCommand($command, array $arguments, OutputInterface $output)
     {
-        if (!$this->noInformation) {
-            $this->lineBreak();
-            $this->info(sprintf('START %s...', strtoupper($this->__friendlyClassBaseName())));
-            $this->lineBreak();
-        }
+        $origin = self::currentShoutOut();
+        self::disableShoutOut();
+        $run = parent::runCommand($command, $arguments, $output);
+        self::setShoutOut($origin);
+        return $run;
     }
 
-    protected function after()
+    protected function friendlyName()
     {
-        if (!$this->noInformation) {
-            $this->lineBreak();
+        return $this->friendlyName;
+    }
+
+    protected function setStyles()
+    {
+        if (!$this->output->getFormatter()->hasStyle('caution')) {
+            $style = new OutputFormatterStyle('red');
+
+            $this->output->getFormatter()->setStyle('caution', $style);
+        }
+        if (!$this->output->getFormatter()->hasStyle('strong-caution')) {
+            $style = new OutputFormatterStyle('black', 'red');
+
+            $this->output->getFormatter()->setStyle('strong-caution', $style);
+        }
+        return $this;
+    }
+
+    public function start()
+    {
+        Log::info(sprintf('%s commanding...', static::class));
+        return $this->setStyles()
+            ->shoutOutAtStart();
+    }
+
+    protected function shoutOutAtStart()
+    {
+        if (App::runningInConsole() && self::$shoutOutEnabled) {
+            $this->newLine();
+            $this->info(sprintf('START %s...', strtoupper($this->__friendlyClassBaseName())));
+            $this->newLine();
+        }
+        return $this;
+    }
+
+    public function end()
+    {
+        Log::info(sprintf('%s commanded!', static::class));
+        return $this->shoutOutAtEnd();
+    }
+
+    protected function shoutOutAtEnd()
+    {
+        if (App::runningInConsole() && self::$shoutOutEnabled) {
+            $this->newLine();
             $this->info(sprintf('END %s!!!', strtoupper($this->__friendlyClassBaseName())));
         }
+        return $this;
+    }
+
+    public function fails()
+    {
+        Log::info(sprintf('%s failed!', static::class));
+        return $this->shoutOutAtEnd();
     }
 
     public function handle()
     {
-        LogHelper::info(sprintf('%s executing...', static::class));
         try {
-            $this->before();
+            $this->start();
             $this->go();
-            $this->after();
-        } catch (\Exception $exception) {
-            $this->handleException($exception);
+            $this->end();
+        } catch (Throwable $e) {
+            $this->handleException($e);
         }
-        LogHelper::info(sprintf('%s executed!', static::class));
     }
 
-    protected function handleException(\Exception $exception)
+    protected function handleException(Throwable $e)
     {
-        LogHelper::error($exception);
+        throw ($e instanceof ConsoleException ?
+            $e : ConsoleException::from($e)->setCommand($this));
+    }
 
-        $this->error('EXCEPTION:');
-        $this->warn('- Code: ' . $exception->getCode());
-        $this->warn('- Message: ' . $exception->getMessage());
-        $this->warn('- File: ' . $exception->getFile());
-        $this->warn('- Line: ' . $exception->getLine());
-        if ($exception instanceof Exception) {
-            $this->warn('- Data:');
-            print_r($exception->getAttachedData());
+    public function caution($string, $verbosity = null)
+    {
+        $this->line($string, 'caution', $verbosity);
+    }
+
+    public function renderThrowable(Throwable $e, $previous = false)
+    {
+        $this->output->writeln(sprintf('<strong-caution>%s: %s</strong-caution>', $previous ? 'PREVIOUS EXCEPTION' : 'EXCEPTION', get_class($e)), $this->parseVerbosity());
+        $this->output->writeln(sprintf('<comment>Code:</comment> %s', $e->getCode()), $this->parseVerbosity());
+        if ($e instanceof \SoapFault) {
+            if (isset($e->faultcode)) {
+                $this->output->writeln(sprintf('<comment>Fault code:</comment> %s', $e->faultcode), $this->parseVerbosity());
+            }
+            if (isset($e->faultactor)) {
+                $this->output->writeln(sprintf('<comment>Fault actor:</comment> %s', $e->faultactor), $this->parseVerbosity());
+            }
+            if (isset($e->detail)) {
+                if (is_string($e->detail)) {
+                    $this->output->writeln(sprintf('<comment>Fault detail:</comment> %s', $e->detail), $this->parseVerbosity());
+                } elseif (is_object($e->detail) || is_array($e->detail)) {
+                    $this->output->writeln(sprintf('<comment>Fault detail:</comment> %s', json_encode($e->detail)), $this->parseVerbosity());
+                }
+            }
         }
-        $this->warn('- Trace:');
-        $this->warn($exception->getTraceAsString());
+        $this->output->writeln(sprintf('<comment>Message:</comment> %s', $e->getMessage()), $this->parseVerbosity());
+        $this->output->writeln(sprintf('<comment>File:</comment> [%s:%d]', $e->getFile(), $e->getLine()), $this->parseVerbosity());
+        if ($e instanceof Exception && count($data = $e->getAttachedData()) > 0) {
+            $this->warn('Data:');
+            var_dump($data);
+        }
+        $this->warn('Trace:');
+        $last = 0;
+        foreach ($e->getTrace() as $i => $trace) {
+            if (isset($trace['file'])) {
+                $this->output->writeln(
+                    sprintf(
+                        '<comment>#%d</comment> [<info>%s:%s</info>]',
+                        $i,
+                        isset($trace['file']) ? $trace['file'] : '',
+                        isset($trace['line']) ? $trace['line'] : ''
+                    ),
+                    $this->parseVerbosity()
+                );
+                $this->output->writeln(
+                    sprintf(
+                        '%s %s%s%s()',
+                        str_repeat(' ', strlen($i) + 1),
+                        isset($trace['class']) ? $trace['class'] : '',
+                        isset($trace['type']) ? $trace['type'] : '',
+                        isset($trace['function']) ? $trace['function'] : ''
+                    ),
+                    $this->parseVerbosity()
+                );
+            } else {
+                $this->output->writeln(
+                    sprintf(
+                        '<comment>#%d</comment> %s%s%s()',
+                        $i,
+                        isset($trace['class']) ? $trace['class'] : '',
+                        isset($trace['type']) ? $trace['type'] : '',
+                        isset($trace['function']) ? $trace['function'] : ''
+                    ),
+                    $this->parseVerbosity()
+                );
+            }
+            $last = $i + 1;
+        }
+        $this->output->writeln(sprintf('<comment>#%d</comment> {main}', $last), $this->parseVerbosity());
+        if ($e = $e->getPrevious()) {
+            $this->line(str_repeat('-', 10));
+            $this->renderThrowable($e, true);
+        }
     }
 
     protected abstract function go();
@@ -134,7 +243,7 @@ abstract class Command extends BaseCommand
             $this->info('Exit code: ' . $exitCode) : $this->error('Exit code: ' . $exitCode);
         $this->info(sprintf('SHELL %s!!!', $this->shellSuccess() ? 'EXECUTED' : 'FAILED'));
 
-        LogHelper::info(sprintf(
+        Log::info(sprintf(
             'Shell %s:' . PHP_EOL
             . '%s' . PHP_EOL
             . '--------' . PHP_EOL

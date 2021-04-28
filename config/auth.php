@@ -95,8 +95,8 @@ return [
         'users' => [
             'provider' => 'users',
             'table' => 'user_password_resets',
-            'expire' => 1440, // 1 day
-            'throttle' => 60,
+            'expire' => (int)env('PASSWORD_RESET_EXPIRE', 1440), // 1 day
+            'throttle' => (int)env('PASSWORD_RESET_THROTTLE', 60), // 1 minute
         ],
     ],
 

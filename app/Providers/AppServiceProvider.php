@@ -7,18 +7,30 @@
 namespace App\Providers;
 
 use App\Http\Requests\Request;
+use App\Utils\ClientSettings\Facade;
 use App\Utils\ClientSettings\Manager as ClientSettingsManager;
 use App\Utils\ConfigHelper;
+use App\Utils\Device\Manager as DeviceManager;
 use App\Utils\ExtraActions\FilterAction;
 use App\Utils\ExtraActions\HookAction;
 use App\Utils\ExtraActions\ReplaceAction;
+use App\Utils\Screen\Manager as ScreenManager;
 use App\Vendors\Illuminate\Database\Connectors\ConnectionFactory;
+use App\Vendors\Illuminate\Log\LogManager;
+use App\Vendors\Illuminate\Support\Facades\App;
+use App\Vendors\Illuminate\Support\Str;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
+use Laravel\Passport\Passport;
 
 class AppServiceProvider extends ServiceProvider
 {
+    protected function generateAppId()
+    {
+        $this->app['id'] = Str::uuid();
+    }
+
     /**
      * Register any application services.
      *
@@ -26,13 +38,24 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->generateAppId();
+
         $this->app->alias('request', Request::class);
 
         $this->app->singleton('db.factory', function ($app) {
             return new ConnectionFactory($app);
         });
+        $this->app->singleton('log', function ($app) {
+            return new LogManager($app);
+        });
         $this->app->singleton(ClientSettingsManager::class, function () {
             return new ClientSettingsManager();
+        });
+        $this->app->singleton(DeviceManager::class, function () {
+            return new DeviceManager();
+        });
+        $this->app->singleton(ScreenManager::class, function () {
+            return new ScreenManager();
         });
         $this->app->singleton(HookAction::class, function () {
             return new HookAction();
@@ -74,5 +97,16 @@ class AppServiceProvider extends ServiceProvider
             'JIS',
             'ISO-2022-JP',
         ]);
+
+        Passport::tokensExpireIn(now()->addSeconds(ConfigHelper::get('passport.token_lifetime')));
+        Passport::refreshTokensExpireIn(now()->addSeconds(ConfigHelper::get('passport.refresh_token_lifetime')));
+
+        if (App::runningFromRequest()) {
+            Facade::setClientFromRequestRoute($this->app->make('request'), true);
+        }
+
+        $this->app->terminating(function () {
+            App::bench('app');
+        });
     }
 }

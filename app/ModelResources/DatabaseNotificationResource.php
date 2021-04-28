@@ -19,18 +19,17 @@ class DatabaseNotificationResource extends ModelResource
 {
     use ModelTransformTrait;
 
-    public function toCustomArray($request)
+    public function toArray($request)
     {
-        return [
-            $this->merge($this->toCurrentArray($request)),
-            $this->merge([
+        return $this->mergeInWithCurrentArray($request, [
+            [
                 // TODO:
                 'notifier' => [
                     'name' => $this->notifier->preferredName(),
                 ],
 
                 // TODO
-            ]),
-        ];
+            ],
+        ]);
     }
 }

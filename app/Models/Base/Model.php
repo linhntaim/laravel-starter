@@ -6,15 +6,18 @@
 
 namespace App\Models\Base;
 
-use App\ModelTraits\ActivityLogTrait;
-use App\ModelTraits\FromModelTrait;
-use App\ModelTraits\OnlyAttributesToArrayTrait;
-use App\ModelTraits\ResourceTrait;
+use App\ModelTraits\ModelTrait;
 use Illuminate\Database\Eloquent\Model as BaseModel;
 
-abstract class Model extends BaseModel implements IResource, IActivityLog, IFromModel
+/**
+ * Class Model
+ * @package App\Models\Base
+ */
+class Model extends BaseModel implements IModel
 {
-    use OnlyAttributesToArrayTrait, ResourceTrait, ActivityLogTrait, FromModelTrait;
+    use ModelTrait;
 
     protected $resourceClass;
+
+    protected $activityLogHidden = [];
 }

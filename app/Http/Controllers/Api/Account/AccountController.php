@@ -24,16 +24,14 @@ use Illuminate\Validation\Rule;
  */
 abstract class AccountController extends ModelApiController
 {
-    public function __construct()
+    protected function modelRepositoryClass()
     {
-        parent::__construct();
+        return $this->getAccountRepositoryClass();
+    }
 
-        $modelRepositoryClass = $this->getAccountRepositoryClass();
-        $this->modelRepository = new $modelRepositoryClass();
-        $this->setFixedModelResourceClass(
-            $this->getAccountResourceClass(),
-            $this->modelRepository->modelClass()
-        );
+    protected function modelResourceClass()
+    {
+        return $this->getAccountResourceClass();
     }
 
     protected abstract function getAccountRepositoryClass();

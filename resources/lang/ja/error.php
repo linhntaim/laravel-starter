@@ -7,8 +7,14 @@
 return [
     'def' => [
         'abort' => [
-            '403' => '認証されていません',
+            '400' => 'クエリ要求が正しくありませんでした。',
+            '401' => 'Not authenticated.',
+            '403' => '認証されていません。',
             '404' => 'ページが見つかりません。',
+            '405' => 'このメソッドはサポートされていません。サポートされているメソッド：:allow。',
+            '429' => 'クセスしようとしたページは表示できませんでした。',
+            '500' => 'エラーが発生し、要求を完了できませんでした。',
+            '503' => 'エラーが発生し、接続に失敗しました。',
             // TODO:
 
             // TODO
@@ -23,23 +29,31 @@ return [
             'level_failed' => 'システムエラーが発生しました。しばらくしてからもう一度お試しください。',
             'level' => ':message',
         ],
+        'console_exception' => [
+            'level_failed' => 'システムエラーが発生しました。しばらくしてからもう一度お試しください。',
+            'level' => ':message',
+        ],
         'database_exception' => [
-            'level_failed' => 'データベースに問題が発生しました',
+            'level_failed' => 'データベースに問題が発生しました。',
             'level' => ':message',
         ],
         'default_exception' => [
             'level_failed' => 'システムエラーが発生しました。しばらくしてからもう一度お試しください。',
         ],
         'exception' => [
-            'level_failed' => '問題が発生しました',
+            'level_failed' => '問題が発生しました。',
+            'level' => ':message',
+        ],
+        'ip_limit_exception' => [
+            'level_failed' => 'アクセスするには認証が必要です。',
             'level' => ':message',
         ],
         'unhandled_exception' => [
-            'level_failed' => '問題が発生しました',
+            'level_failed' => '問題が発生しました。',
             'level' => ':message',
         ],
         'user_exception' => [
-            'level_failed' => 'ユーザーアクションに問題が発生しました',
+            'level_failed' => 'ユーザーアクションに問題が発生しました。',
             'level' => ':message',
         ],
         // TODO:

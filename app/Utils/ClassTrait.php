@@ -13,13 +13,10 @@ use Illuminate\Support\Str;
 trait ClassTrait
 {
     protected static $__transNamespace = '';
+
     protected static $__transNamespaceFallback = false;
 
-    protected $__friendlyClassBaseName;
-
-    protected static $__snakyClassBaseName;
-
-    protected static function setTransNamespace($transNamespace, $fallback = false)
+    protected static function __setTransNamespace($transNamespace, $fallback = false)
     {
         static::$__transNamespace = $transNamespace . '::';
         static::$__transNamespaceFallback = $fallback;
@@ -32,32 +29,26 @@ trait ClassTrait
 
     protected static function __classBaseName()
     {
-        return class_basename(static::class);
+        return class_basename(static::__class());
     }
 
     protected static function __snakyClassBaseName()
     {
-        if (empty(static::$__snakyClassBaseName)) {
-            static::$__snakyClassBaseName = Str::snake(static::__classBaseName());
-        }
-        return static::$__snakyClassBaseName;
+        return Str::snake(static::__classBaseName());
     }
 
-    protected function __friendlyClassBaseName()
+    protected static function __friendlyClassBaseName()
     {
-        if (empty($this->__friendlyClassBaseName)) {
-            $this->__friendlyClassBaseName = Str::title(Str::snake(static::__classBaseName(), ' '));
-        }
-        return $this->__friendlyClassBaseName;
+        return Str::title(Str::snake(static::__classBaseName(), ' '));
     }
 
     protected static function __transWithTemporaryNamespace($transNamespace, callable $transCallback, $fallback = false)
     {
         $origin = static::$__transNamespace;
         $originFallback = static::$__transNamespaceFallback;
-        static::setTransNamespace($transNamespace, $fallback);
+        static::__setTransNamespace($transNamespace, $fallback);
         $trans = $transCallback();
-        static::setTransNamespace($origin, $originFallback);
+        static::__setTransNamespace($origin, $originFallback);
         return $trans;
     }
 

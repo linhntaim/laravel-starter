@@ -7,7 +7,6 @@
 namespace App\Models;
 
 use App\Models\Base\Model;
-use App\ModelTraits\MemorizeTrait;
 use Illuminate\Support\Str;
 
 /**
@@ -21,8 +20,6 @@ use Illuminate\Support\Str;
  */
 class OAuthImpersonate extends Model
 {
-    use MemorizeTrait;
-
     protected $table = 'oauth_impersonates';
 
     protected $fillable = [

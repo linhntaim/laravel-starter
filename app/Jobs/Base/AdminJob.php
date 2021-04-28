@@ -6,9 +6,9 @@
 
 namespace App\Jobs\Base;
 
-use App\Utils\ClientSettings\AdminSettingsHandleTrait;
+use App\Utils\ClientSettings\Traits\AdminIndependentClientTrait;
 
 abstract class AdminJob extends Job
 {
-    use AdminSettingsHandleTrait;
+    use AdminIndependentClientTrait;
 }

@@ -22,9 +22,10 @@ interface IUserRepository
     public function model($id = null);
 
     /**
+     * @param bool $pinned
      * @return IUser|mixed
      */
-    public function newModel();
+    public function newModel($pinned = true);
 
     /**
      * @param array $attributes

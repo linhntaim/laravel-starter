@@ -12,7 +12,7 @@ use App\Models\HandledFile;
 use App\Utils\AbortTrait;
 use App\Utils\ActivityLogTrait;
 use App\Utils\ClassTrait;
-use App\Utils\TransactionTrait;
+use App\Utils\Database\Transaction\TransactionTrait;
 use App\Utils\ValidationTrait;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -37,6 +37,12 @@ class Controller extends BaseController
     protected function validated(Request $request, array $rules, array $messages = [], array $customAttributes = [], callable $hook = null)
     {
         return $this->validatedData($request->all(), $rules, $messages, $customAttributes, $hook);
+    }
+
+    protected function responseContent($content, $status = 200, array $headers = [])
+    {
+        $this->transactionComplete();
+        return response($content, $status, $headers);
     }
 
     protected function responseFile($file, array $headers = [])

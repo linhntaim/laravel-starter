@@ -18,14 +18,13 @@ class PropertyResource extends ModelResource
 {
     use ModelTransformTrait;
 
-    public function toCustomArray($request)
+    public function toArray($request)
     {
         $value = $this->value;
-        return [
-            $this->merge($this->toCurrentArray($request)),
-            $this->merge([
+        return $this->mergeInWithCurrentArray($request, [
+            [
                 'value' => $value instanceof Model ? $this->modelTransform($value, $request) : $value,
-            ]),
-        ];
+            ],
+        ]);
     }
 }

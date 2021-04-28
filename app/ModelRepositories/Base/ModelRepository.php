@@ -11,6 +11,7 @@ use App\Exceptions\AppException;
 use App\Exceptions\DatabaseException;
 use App\Exceptions\Exception;
 use App\Models\Base\IFromModel;
+use App\Models\Base\IModel;
 use App\Utils\AbortTrait;
 use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\DateTimer;
@@ -38,6 +39,7 @@ abstract class ModelRepository
 
     private $with;
     private $withTrashed = false;
+    private $onlyTrashed = false;
     private $lock;
     private $strict = true;
     private $more = false;
@@ -52,9 +54,9 @@ abstract class ModelRepository
     private $fixedRawQuery = null;
 
     /**
-     * @var array|null
+     * @var array
      */
-    protected $batch;
+    protected $batch = [];
 
     public function __construct($id = null)
     {
@@ -65,13 +67,22 @@ abstract class ModelRepository
     public abstract function modelClass();
 
     /**
-     * @return Model|IFromModel|mixed
+     * @param bool $pinned
+     * @return Model|IFromModel|IModel|mixed
      */
-    public function newModel()
+    public function newModel($pinned = true)
     {
         $modelClass = $this->modelClass;
-        $this->model = new $modelClass();
-        return $this->model;
+        if ($pinned) {
+            $this->model = new $modelClass();
+            return $this->model;
+        }
+        return new $modelClass();
+    }
+
+    public function getTable()
+    {
+        return $this->newModel(false)->getTable();
     }
 
     public function setModelByUnique($modelByUnique = true)
@@ -134,7 +145,7 @@ abstract class ModelRepository
 
     public function getIdKey()
     {
-        return $this->newModel()->getKeyName();
+        return $this->newModel(false)->getKeyName();
     }
 
     public function getId()
@@ -189,9 +200,9 @@ abstract class ModelRepository
     public function modelQuery($model = null, $callback = null)
     {
         if (is_null($model)) {
-            $model = $this->newModel();
+            $model = $this->newModel(false);
         } elseif (is_callable($model)) {
-            $model = $model($this->newModel());
+            $model = $model($this->newModel(false));
         }
         if (is_callable($callback)) {
             $model = $callback($model);
@@ -240,6 +251,12 @@ abstract class ModelRepository
     public function withTrashed()
     {
         $this->withTrashed = true;
+        return $this;
+    }
+
+    public function onlyTrashed()
+    {
+        $this->onlyTrashed = true;
         return $this;
     }
 
@@ -314,6 +331,10 @@ abstract class ModelRepository
         if ($this->withTrashed) {
             $query->withTrashed();
             $this->withTrashed = false;
+        }
+        if ($this->onlyTrashed) {
+            $query->onlyTrashed();
+            $this->onlyTrashed = false;
         }
         $this->more = false;
         if (!empty($this->mores)) {
@@ -393,6 +414,27 @@ abstract class ModelRepository
                 throw DatabaseException::from($exception);
             }
         }
+    }
+
+    protected function getLockTableQuery($lock, $connection = null)
+    {
+        return null;
+    }
+
+    /**
+     * @param array $options
+     * @return ModelRepository
+     */
+    public function lockTable($options = [])
+    {
+        $this->newModel(false)->lockTable($options);
+        return $this;
+    }
+
+    public function unlockTable()
+    {
+        $this->newModel(false)->unlockTable();
+        return $this;
     }
 
     public function queryById($id)
@@ -567,6 +609,22 @@ abstract class ModelRepository
         });
     }
 
+    /**
+     * @param array $attributes
+     * @param array $values
+     * @return Model|mixed
+     * @throws
+     */
+    public function firstOrCreateWithAttributes(array $attributes = [], array $values = [])
+    {
+        return $this->catch(function () use ($attributes, $values) {
+            if (!empty($attributes)) {
+                $this->model = $this->query()->firstOrCreate($attributes, $values);
+            }
+            return $this->model;
+        });
+    }
+
     public function force()
     {
         $this->force = true;
@@ -625,9 +683,7 @@ abstract class ModelRepository
 
     public function batchInsertStart($batch = 1000, $ignored = false)
     {
-        $this->newModel();
-        $this->batch = [
-            'type' => 'insert',
+        $this->batch['insert'] = [
             'values' => [],
             'batch' => $batch,
             'ignored' => $ignored,
@@ -639,55 +695,54 @@ abstract class ModelRepository
 
     protected function batchInsertReset()
     {
-        $this->batch['run'] = 0;
-        $this->batch['values'] = [];
+        $this->batch['insert']['run'] = 0;
+        $this->batch['insert']['values'] = [];
         return $this;
     }
 
     public function batchInsert($attributes)
     {
-        $this->batchInsertAdd($attributes);
-        $this->batchInsertTryToSave();
-        return $this;
+        return $this->batchInsertAdd($attributes)
+            ->batchInsertTryToSave();
     }
 
     public function batchInserted()
     {
-        return $this->batch['inserted'];
+        return $this->batch['insert']['inserted'];
     }
 
     protected function batchInsertAdd($attributes)
     {
-        if ($this->model->timestamps) {
+        if ($this->newModel(false)->timestamps) {
             $now = DateTimer::syncNow();
             $attributes['created_at'] = $now;
             $attributes['updated_at'] = $now;
         }
-        $this->batch['values'][] = $attributes;
+        $this->batch['insert']['values'][] = $attributes;
         return $this;
     }
 
     protected function batchInsertTryToSave()
     {
-        if (++$this->batch['run'] == $this->batch['batch']) {
-            $this->batchInsertSave();
-            $this->batchInsertReset();
+        if (++$this->batch['insert']['run'] == $this->batch['insert']['batch']) {
+            $this->batchInsertSave()
+                ->batchInsertReset();
 
-            $this->batch['inserted'] = true;
+            $this->batch['insert']['inserted'] = true;
         } else {
-            $this->batch['inserted'] = false;
+            $this->batch['insert']['inserted'] = false;
         }
         return $this;
     }
 
     protected function batchInsertSave()
     {
-        if (count($this->batch['values']) > 0) {
+        if (count($this->batch['insert']['values']) > 0) {
             $this->catch(function () {
-                if ($this->batch['ignored']) {
-                    $this->rawQuery()->insertOrIgnore($this->batch['values']);
+                if ($this->batch['insert']['ignored']) {
+                    $this->rawQuery()->insertOrIgnore($this->batch['insert']['values']);
                 } else {
-                    $this->rawQuery()->insert($this->batch['values']);
+                    $this->rawQuery()->insert($this->batch['insert']['values']);
                 }
             });
         }
@@ -696,16 +751,23 @@ abstract class ModelRepository
 
     public function batchInsertEnd()
     {
-        $this->batchInsertSave();
-        $this->model = null;
-        $this->batch = null;
-        return $this;
+        return $this->batchInsertSave()
+            ->batchInsertClear();
+    }
+
+    public function batchInsertAbort()
+    {
+        return $this->batchInsertClear();
+    }
+
+    public function batchInsertClear()
+    {
+        return $this->batchInsertStart();
     }
 
     public function batchReadStart($query, $batch = 1000)
     {
-        $this->batch = [
-            'type' => 'read',
+        $this->batch['read'] = [
             'query' => $query,
             'batch' => $batch,
             'run' => 0,
@@ -722,16 +784,22 @@ abstract class ModelRepository
     public function batchRead(&$length, &$shouldEnd)
     {
         $collection = $this->catch(function () {
-            return $this->batch['query']->skip((++$this->batch['run'] - 1) * $this->batch['batch'])->take($this->batch['batch'])->get();
+            return optional($this->batch['read']['query'])
+                ->skip((++$this->batch['read']['run'] - 1) * $this->batch['read']['batch'])
+                ->take($this->batch['read']['batch'])->get();
         });
         $length = $collection->count();
-        $shouldEnd = $length < $this->batch['batch'];
+        $shouldEnd = $length < $this->batch['read']['batch'];
         return $collection;
     }
 
     public function batchReadEnd()
     {
-        $this->batch = null;
-        return $this;
+        return $this->batchReadClear();
+    }
+
+    public function batchReadClear()
+    {
+        return $this->batchReadStart(null);
     }
 }

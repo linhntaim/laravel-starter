@@ -17,8 +17,8 @@ use App\Models\Base\Model;
  */
 class HandledFileStore extends Model
 {
-    const ORIGIN_YES = 1;
-    const ORIGIN_NO = 2;
+    public const ORIGIN_YES = 1;
+    public const ORIGIN_NO = 2;
 
     protected $table = 'handled_file_stores';
 

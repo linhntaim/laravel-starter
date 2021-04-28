@@ -8,11 +8,14 @@ namespace App\Exceptions;
 
 use App\Http\Controllers\ApiController;
 use App\Utils\ConfigHelper;
-use App\Utils\TransactionHelper;
+use App\Utils\Database\Transaction\TransactionManager;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -49,11 +52,30 @@ class Handler extends ExceptionHandler
         });
     }
 
-    public function render($request, Throwable $e)
+    public function report(Throwable $e)
     {
-        TransactionHelper::getInstance()->stop();
+        TransactionManager::getInstance()->stop();
 
-        return parent::render($request, $e);
+        parent::report($e);
+    }
+
+    protected function prepareException(Throwable $e)
+    {
+        // common
+        $exceptionClasses = [
+            NotFoundHttpException::class,
+            ThrottleRequestsException::class,
+            MethodNotAllowedHttpException::class,
+        ];
+        foreach ($exceptionClasses as $exceptionClass) {
+            if ($e instanceof $exceptionClass) {
+                return AppException::from($e);
+            }
+        }
+        // TODO: Specific
+
+        // TODO
+        return parent::prepareException($e);
     }
 
     protected function prepareJsonResponse($request, Throwable $e)
@@ -68,7 +90,7 @@ class Handler extends ExceptionHandler
 
     protected function convertExceptionToArray(Throwable $e)
     {
-        return ApiController::failPayload(null, $e, $this->isHttpException($e) ? $e->getStatusCode() : 500);
+        return ApiController::failPayload(null, $e, $this->isHttpException($e) ? $e->getStatusCode() : 500, $e->getCode());
     }
 
     protected function unauthenticated($request, AuthenticationException $exception)
@@ -92,4 +114,21 @@ class Handler extends ExceptionHandler
             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
         );
     }
+
+    #region Console
+    public function renderForConsole($output, Throwable $e)
+    {
+        $command = $e instanceof ConsoleException ? $e->getCommand() : null;
+
+        if (method_exists($command, 'renderThrowable')) {
+            $command->renderThrowable($e);
+        } else {
+            parent::renderForConsole($output, $e);
+        }
+
+        if ($command) {
+            $command->fails();
+        }
+    }
+    #endregion
 }

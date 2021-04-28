@@ -6,16 +6,28 @@
 
 namespace App\Console\Schedules\Base;
 
-use App\Utils\LogHelper;
-
+use App\Utils\ClassTrait;
+use App\Utils\ClientSettings\Traits\ConsoleClientTrait;
+use App\Utils\Database\Transaction\TransactionTrait;
+use App\Vendors\Illuminate\Support\Facades\App;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 abstract class Schedule
 {
+    use ClassTrait, ConsoleClientTrait, TransactionTrait;
+
     /**
      * @var ConsoleKernel
      */
     protected $kernel;
+
+    public function __construct()
+    {
+        $this->consoleClientApply();
+    }
 
     public function withKernel(ConsoleKernel $kernel)
     {
@@ -23,13 +35,44 @@ abstract class Schedule
         return $this;
     }
 
+    public function start()
+    {
+        Log::info(sprintf('%s scheduling...', static::class));
+        return $this;
+    }
+
+    public function end()
+    {
+        Log::info(sprintf('%s scheduled!', static::class));
+        return $this;
+    }
+
+    public function fails()
+    {
+        Log::info(sprintf('%s failed!', static::class));
+        return $this;
+    }
+
     public function handle()
     {
         try {
+            $this->start();
             $this->go();
-        } catch (\Exception $exception) {
-            LogHelper::error($exception);
+            $this->end();
+        } catch (Throwable $e) {
+            $this->handleException($e);
         }
+    }
+
+    protected function handleException(Throwable $e)
+    {
+        $this->reportException($e);
+        $this->fails();
+    }
+
+    protected function reportException(Throwable $e)
+    {
+        App::make(ExceptionHandler::class)->report($e);
     }
 
     protected abstract function go();

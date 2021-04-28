@@ -11,6 +11,11 @@ use App\Http\Requests\Request;
 use App\ModelRepositories\AdminRepository;
 use App\Utils\ConfigHelper;
 
+/**
+ * Class PasswordController
+ * @package App\Http\Controllers\Api\Admin\Auth
+ * @property AdminRepository $userRepository
+ */
 class PasswordController extends BasePasswordController
 {
     protected function getUserRepositoryClass()
@@ -20,17 +25,17 @@ class PasswordController extends BasePasswordController
 
     public function index(Request $request)
     {
-        if (ConfigHelper::get('forgot_password_enabled.admin')) {
-            return parent::index($request);
+        if (!ConfigHelper::get('forgot_password_enabled.admin')) {
+            $this->abort404();
         }
-        return $this->abort404();
+        return parent::index($request);
     }
 
     public function store(Request $request)
     {
-        if (ConfigHelper::get('forgot_password_enabled.admin')) {
-            return parent::store($request);
+        if (!ConfigHelper::get('forgot_password_enabled.admin')) {
+            $this->abort404();
         }
-        return $this->abort404();
+        return parent::store($request);
     }
 }

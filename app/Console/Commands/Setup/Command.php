@@ -23,19 +23,19 @@ abstract class Command extends BaseCommand
     protected function go()
     {
         if ($this->uninstalled()) {
-            $this->warn(sprintf('Uninstalling [%s]...', $this->__friendlyName()));
-            $this->lineBreak();
+            $this->warn(sprintf('Uninstalling [%s]...', $this->friendlyName()));
+            $this->newLine();
             $this->goUninstalling();
-            $this->info(sprintf('[%s] uninstalled!!!', $this->__friendlyName()));
+            $this->info(sprintf('[%s] uninstalled!!!', $this->friendlyName()));
         } else {
-            $this->warn(sprintf('Setting up [%s]...', $this->__friendlyName()));
-            $this->lineBreak();
+            $this->warn(sprintf('Setting up [%s]...', $this->friendlyName()));
+            $this->newLine();
             if ($this->forced()) {
                 $this->goForcingToInstall();
             } else {
                 $this->goInstalling();
             }
-            $this->info(sprintf('[%s] set up!!!', $this->__friendlyName()));
+            $this->info(sprintf('[%s] set up!!!', $this->friendlyName()));
         }
     }
 

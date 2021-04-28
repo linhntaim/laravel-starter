@@ -10,11 +10,11 @@ use App\Utils\ConfigHelper;
 
 class PackagesCommand extends Command
 {
-    const PACKAGE_AWS = 'aws/aws-sdk-php';
-    const PACKAGE_AWS_S3 = 'league/flysystem-aws-s3-v3';
-    const PACKAGE_SFTP = 'league/flysystem-sftp';
-    const PACKAGE_AZURE_BLOB = 'matthewbdaly/laravel-azure-storage';
-    const PACKAGE_FILE_VAULT = 'soarecostin/file-vault';
+    public const PACKAGE_AWS = 'aws/aws-sdk-php';
+    public const PACKAGE_AWS_S3 = 'league/flysystem-aws-s3-v3';
+    public const PACKAGE_SFTP = 'league/flysystem-sftp';
+    public const PACKAGE_AZURE_BLOB = 'matthewbdaly/laravel-azure-storage';
+    public const PACKAGE_FILE_VAULT = 'soarecostin/file-vault';
 
     protected $signature = 'setup:packages {--u} {--f}';
 

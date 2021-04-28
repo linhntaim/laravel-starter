@@ -17,7 +17,7 @@ class KeyGenerateCommand extends Command
         if ($this->forced()
             || !(new EnvironmentFileHelper())->hasKey('APP_KEY', true)) {
             $this->call('key:generate');
-            $this->lineBreak();
+            $this->newLine();
         }
     }
 

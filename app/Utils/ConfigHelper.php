@@ -7,11 +7,11 @@
 namespace App\Utils;
 
 use App\Configuration;
-use App\Utils\ClientSettings\Facade;
+use Symfony\Component\HttpFoundation\Response;
 
 class ConfigHelper
 {
-    const NAME = 'starter';
+    public const NAME = 'starter';
 
     public static function get($key = null, $default = null)
     {
@@ -48,10 +48,10 @@ class ConfigHelper
         return static::get('emails.tested');
     }
 
-    public static function getApiResponseStatus($defaultStatus = Configuration::HTTP_RESPONSE_STATUS_OK)
+    public static function getApiResponseStatus($defaultStatus = Response::HTTP_OK)
     {
         return static::get('api_response_ok') ?
-            Configuration::HTTP_RESPONSE_STATUS_OK : $defaultStatus;
+            Response::HTTP_OK : $defaultStatus;
     }
 
     public static function getApiResponseHeaders($headers = [])
@@ -111,13 +111,12 @@ class ConfigHelper
         return !empty($callback) ? $callback($blockKey) : $blockKey;
     }
 
-    public static function getClient($type = null, $id = null)
+    /**
+     * @param string|null $id
+     * @return array
+     */
+    public static function getClient($id = null)
     {
-        if (empty($id)) {
-            $id = Facade::getAppId();
-            $clientAliases = static::get('client_aliases');
-            if (isset($clientAliases[$id])) $id = $clientAliases[$id];
-        }
-        return empty($type) ? static::get('clients.' . $id) : static::get(sprintf('clients.%s.%s', $id, $type));
+        return is_null($id) ? static::get('client.ids') : static::get(sprintf('client.ids.%s', $id));
     }
 }

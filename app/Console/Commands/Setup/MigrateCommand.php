@@ -116,7 +116,7 @@ class MigrateCommand extends Command
                 ->execute();
         }
         $this->info('Database migrated!');
-        $this->lineBreak();
+        $this->newLine();
     }
 
     private function migrateTables()
@@ -126,7 +126,7 @@ class MigrateCommand extends Command
             '--force' => true,
         ]);
         $this->info('Tables migrated!!!');
-        $this->lineBreak();
+        $this->newLine();
     }
 
     protected function migrateSeed()
@@ -135,7 +135,7 @@ class MigrateCommand extends Command
             $this->seedPassport();
         }
         $this->call('setup:seed:default');
-        $this->lineBreak();
+        $this->newLine();
     }
 
     private function rollbackSeed()
@@ -153,7 +153,7 @@ class MigrateCommand extends Command
         }
         DB::statement('set foreign_key_checks = 1');
         $this->info('Tables immigrated!!!');
-        $this->lineBreak();
+        $this->newLine();
     }
 
     private function rollbackDatabase()

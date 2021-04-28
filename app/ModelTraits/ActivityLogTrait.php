@@ -10,9 +10,14 @@ use Illuminate\Support\Arr;
 
 trait ActivityLogTrait
 {
-    public function toActivityLogArray($except = [])
+    public function getActivityLogLogHidden()
     {
-        return $this->toActivityLogArrayFrom(Arr::except($this->toArray(), $except));
+        return $this->activityLogHidden;
+    }
+
+    public function toActivityLogArray()
+    {
+        return $this->toActivityLogArrayFrom(Arr::except($this->toArray(), $this->getActivityLogLogHidden()));
     }
 
     public function toActivityLogArrayFrom($fromArray)

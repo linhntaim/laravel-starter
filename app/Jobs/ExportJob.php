@@ -10,6 +10,7 @@ use App\Exports\Base\Export;
 use App\Jobs\Base\Job;
 use App\ModelRepositories\DataExportRepository;
 use App\Models\DataExport;
+use Throwable;
 
 class ExportJob extends Job
 {
@@ -25,6 +26,8 @@ class ExportJob extends Job
 
     public function __construct(DataExport $dataExport, Export $export)
     {
+        parent::__construct();
+
         $this->dataExport = $dataExport;
         $this->export = $export;
     }
@@ -38,7 +41,7 @@ class ExportJob extends Job
         ]);
     }
 
-    public function failed()
+    public function failed(Throwable $e)
     {
         (new DataExportRepository($this->dataExport))->updateWithAttributes([
             'state' => DataExport::STATE_FAILED,

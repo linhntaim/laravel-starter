@@ -6,6 +6,7 @@
 
 namespace App\Providers;
 
+use App\Events\Listeners\OnJobProcessing;
 use App\Events\Listeners\OnMailTestingEvent;
 use App\Events\Listeners\OnMessageSending;
 use App\Events\Listeners\OnMessageSent;
@@ -21,6 +22,8 @@ use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
 
 // TODO: Extra Events
 
@@ -51,6 +54,12 @@ class EventServiceProvider extends ServiceProvider
         ],
         MessageSent::class => [
             OnMessageSent::class,
+        ],
+        JobProcessing::class => [
+            OnJobProcessing::class,
+        ],
+        JobProcessed::class => [
+            OnJobProcessing::class,
         ],
         TestingEvent::class => [
             OnTestingEvent::class,

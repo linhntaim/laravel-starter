@@ -34,6 +34,7 @@ use Illuminate\Database\Eloquent\Collection;
  * @property bool $ready
  * @property bool $encrypted
  * @property bool $scanned
+ * @property bool $scanning
  * @property bool $public
  * @property bool $inline
  * @property array $options_array_value
@@ -44,13 +45,14 @@ class HandledFile extends Model
 {
     use ArrayValuedAttributesTrait;
 
-    const HANDLING_YES = 1;
-    const HANDLING_NO = 2;
-    const HANDLING_SCAN = 3;
+    public const HANDLING_YES = 1;
+    public const HANDLING_NO = 2;
+    public const HANDLING_SCAN = 3;
 
     protected $table = 'handled_files';
 
     protected $fillable = [
+        'created_by',
         'title',
         'name',
         'mime',
@@ -110,6 +112,11 @@ class HandledFile extends Model
     {
         return (!isset($this->options_array_value['scan']) || $this->options_array_value['scan'] == false)
             && (!isset($this->options_array_value['scanned']) || $this->options_array_value['scanned']);
+    }
+
+    public function getScanningAttribute()
+    {
+        return isset($this->options_array_value['scan']) && $this->options_array_value['scan'];
     }
 
     public function getPublicAttribute()

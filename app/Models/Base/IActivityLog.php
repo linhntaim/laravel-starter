@@ -8,5 +8,5 @@ namespace App\Models\Base;
 
 interface IActivityLog
 {
-    public function toActivityLogArray($except = []);
+    public function toActivityLogArray();
 }

@@ -15,13 +15,13 @@ use App\ModelResources\Base\ModelTransformTrait;
 use App\Utils\Framework\ClientLimiter;
 use App\Utils\ConfigHelper;
 use App\Utils\Framework\ServerMaintainer;
-use App\Utils\GuardArrayTrait;
 use App\Utils\HandledFiles\Helper;
 use App\Utils\SocialLogin;
+use App\Vendors\Illuminate\Support\Arr;
 
 abstract class PrerequisiteController extends ApiController
 {
-    use ModelTransformTrait, GuardArrayTrait;
+    use ModelTransformTrait;
 
     protected $dataset;
 
@@ -62,15 +62,15 @@ abstract class PrerequisiteController extends ApiController
                 ],
                 'max_upload_file_size' => Helper::maxUploadFileSize(),
                 'variables' => ConfigHelper::get('variables'),
-                'app_options' => $this->guardEmptyArray(
+                'app_options' => Arr::jsonGuard(
                     $this->modelTransform((new AppOptionRepository())->getAll()->keyBy('key'))
                 ),
                 'gtm_code' => ConfigHelper::get('gtm_code'),
                 'social_login' => [
                     'enabled' => $socialLogin->enabled(),
                     'email_domain' => [
-                        'allowed' => $this->guardEmptyArray($socialLogin->allowedEmailDomains()),
-                        'denied' => $this->guardEmptyArray($socialLogin->deniedEmailDomains()),
+                        'allowed' => Arr::jsonGuard($socialLogin->allowedEmailDomains()),
+                        'denied' => Arr::jsonGuard($socialLogin->deniedEmailDomains()),
                     ],
                 ],
                 'forgot_password_enabled' => ConfigHelper::get('forgot_password_enabled'),

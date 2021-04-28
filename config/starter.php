@@ -14,19 +14,34 @@ return [
             ],
         ],
     ],
+    'ip_limit' => [
+        'api' => [
+            'allowed' => array_filter(explode(',', env('IP_LIMIT_API_ALLOWED', '')), function ($ip) {
+                return !empty($ip);
+            }),
+            'denied' => array_filter(explode(',', env('IP_LIMIT_API_DENIED', '')), function ($ip) {
+                return !empty($ip);
+            }),
+        ],
+    ],
+    'custom_timezone' => env('CUSTOM_TIMEZONE'),
     'public_path' => env('PUBLIC_PATH'),
     'passport' => [
         'password' => [
             'client_id' => env('PASSPORT_PASSWORD_CLIENT_ID'),
             'client_secret' => env('PASSPORT_PASSWORD_CLIENT_SECRET'),
         ],
+        'token_lifetime' => (int)env('PASSPORT_TOKEN_LIFETIME', 31536000),
+        'refresh_token_lifetime' => (int)env('PASSPORT_REFRESH_TOKEN_LIFETIME', 2 * (int)env('PASSPORT_TOKEN_LIFETIME', 31536000)),
     ],
     'emails' => [
         'send_off' => (bool)env('MAIL_SEND_OFF', false),
         'send_rate_key' => env('MAIL_SEND_RATE_KEY', 'mailing'),
         'send_rate_per_second' => (int)env('MAIL_SEND_RATE_PER_SECOND', 0),
         'send_rate_wait_for_seconds' => (int)env('MAIL_SEND_RATE_WAIT_FOR_SECONDS', 1),
-        'send_charset' => strtolower(env('MAIL_SEND_CHARSET', 'utf-8')),
+        'send_charset' => env('MAIL_SEND_CHARSET',
+            env('MAIL_SEND_CHARSET_HEADER') || env('MAIL_SEND_CHARSET_BODY') ?
+                ['header' => env('MAIL_SEND_CHARSET_HEADER', 'UTF-8'), 'body' => env('MAIL_SEND_CHARSET_BODY', 'UTF-8')] : 'UTF-8'),
         'no_reply' => [
             'name' => env('MAIL_NO_REPLY_FROM_NAME'),
             'address' => env('MAIL_NO_REPLY_FROM_ADDRESS'),
@@ -93,8 +108,8 @@ return [
     ],
     'variables' => json_decode(env('VARIABLES'), true),
     'client_limit_timeout' => (int)env('CLIENT_LIMIT_TIMEOUT'),
-    'clients' => [
-        env('APP_ID', 'base') => [
+    'client' => [
+        'ids' => [
             'admin' => [
                 'app_name' => env('CLIENT_ADMIN_NAME'),
                 'app_key' => env('CLIENT_ADMIN_KEY'),
@@ -103,16 +118,8 @@ return [
                 'country' => 'JP',
                 'timezone' => 'Asia/Tokyo',
                 'currency' => 'JPY',
-                'number_format' => 'point_comma',
-                'first_day_of_week' => 0,
-                'long_date_format' => 0,
-                'short_date_format' => 0,
-                'long_time_format' => 0,
-                'short_time_format' => 0,
-                'cookie' => [
-                    'names' => [
-                        'default' => env('CLIENT_ADMIN_COOKIE_DEFAULT_NAME', ''),
-                    ],
+                'cookies' => [
+                    'default' => env('CLIENT_ADMIN_COOKIE_DEFAULT_NAME'),
                 ],
             ],
             'home' => [
@@ -123,57 +130,36 @@ return [
                 'country' => 'JP',
                 'timezone' => 'Asia/Tokyo',
                 'currency' => 'JPY',
-                'number_format' => 'point_comma',
-                'first_day_of_week' => 0,
-                'long_date_format' => 0,
-                'short_date_format' => 0,
-                'long_time_format' => 0,
-                'short_time_format' => 0,
-                'cookie' => [
-                    'names' => [
-                        'default' => env('CLIENT_HOME_COOKIE_DEFAULT_NAME', ''),
-                    ],
-                ],
-            ],
-            'common' => [
-                'app_name' => env('CLIENT_COMMON_NAME'),
-                'app_key' => env('CLIENT_COMMON_KEY'),
-                'app_url' => env('CLIENT_COMMON_URL'),
-                'locale' => 'ja',
-                'country' => 'JP',
-                'timezone' => 'Asia/Tokyo',
-                'currency' => 'JPY',
-                'number_format' => 'point_comma',
-                'first_day_of_week' => 0,
-                'long_date_format' => 0,
-                'short_date_format' => 0,
-                'long_time_format' => 0,
-                'short_time_format' => 0,
-                'cookie' => [
-                    'names' => [
-                        'default' => env('CLIENT_COMMON_COOKIE_DEFAULT_NAME', ''),
-                    ],
+                'cookies' => [
+                    'default' => env('CLIENT_HOME_COOKIE_DEFAULT_NAME'),
                 ],
             ],
         ],
+        'id_maps' => [
+            'routes' => [
+                '*' => 'home',
+                'api/admin' => 'admin',
+                'api/admin/*' => 'admin',
+                'admin' => 'admin',
+                'admin/*' => 'admin',
+            ],
+        ],
+        'header_token_authorization' => env('HEADER_TOKEN_AUTHORIZATION_NAME'),
+        'headers' => [
+            'client_id' => env('HEADER_CLIENT_ID_NAME'),
+            'screen' => env('HEADER_SCREEN_NAME'),
+            'settings' => env('HEADER_SETTINGS_NAME'),
+            'device' => env('HEADER_DEVICE_NAME'),
+        ],
+        'header_encrypt_excepts' => array_filter(explode(',', env('HEADER_ENCRYPT_EXCEPTS', '')), function ($header) {
+            return !empty($header);
+        }),
     ],
-    'client_aliases' => [
-        env('APP_ID', 'base') . '_admin' => env('APP_ID', 'base'),
-        env('APP_ID', 'base') . '_home' => env('APP_ID', 'base'),
-        env('APP_ID', 'base') . '_common' => env('APP_ID', 'base'),
-    ],
-    'header_token_authorization' => env('HEADER_TOKEN_AUTHORIZATION_NAME'),
-    'headers' => [
-        'screen' => env('HEADER_SCREEN_NAME'),
-        'settings' => env('HEADER_SETTINGS_NAME'),
-        'device' => env('HEADER_DEVICE_NAME'),
-    ],
-    'header_encrypt_excepts' => array_filter(explode(',', env('HEADER_ENCRYPT_EXCEPTS', '')), function ($header) {
-        return !empty($header);
-    }),
 
-    'localization' => [
+    'default_localization' => [
+        'locale' => 'en',
         'country' => 'US',
+        'timezone' => 'UTC',
         'currency' => 'USD',
         'number_format' => 'point_comma',
         'first_day_of_week' => 0,
@@ -192,7 +178,7 @@ return [
 
     'currencies' => [
         'USD' => ['symbol' => '$'],
-        'VND' => ['symbol' => '₫'],
+        'JPY' => ['symbol' => '¥'],
     ],
 
     'locales' => array_filter(explode(',', env('APP_LOCALE_SUPPORTED', 'en,ja')), function ($locale) {

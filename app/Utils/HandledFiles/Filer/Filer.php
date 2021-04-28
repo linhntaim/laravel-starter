@@ -30,9 +30,9 @@ class Filer
 {
     use ClassTrait, ResourceFilerTrait, WriteFilerTrait, ReadFilerTrait;
 
-    const MODE_READ = 'r';
-    const MODE_WRITE = 'w';
-    const MODE_WRITE_APPEND = 'a';
+    public const MODE_READ = 'r';
+    public const MODE_WRITE = 'w';
+    public const MODE_WRITE_APPEND = 'a';
 
     /**
      * @var StorageManager

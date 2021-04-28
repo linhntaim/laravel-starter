@@ -83,7 +83,7 @@ Route::group([
 
     Route::group([
         'prefix' => 'account',
-        'middleware' => ['authenticated.passport.request', 'auth:api'],
+        'middleware' => ['authenticated.passport.cookie', 'authenticated.passport.request', 'auth:api'],
     ], function () {
         Route::get('handled-file/{id}', [HandledFileController::class, 'show'])->name('account.handled_file.show');
     });
@@ -91,7 +91,6 @@ Route::group([
     #region Home
     Route::group([
         'prefix' => 'home',
-        'middleware' => ['header.decrypt:home'],
     ], function () {
         #region Common
         Route::get('prerequisite', [HomePrerequisiteController::class, 'index']);
@@ -118,7 +117,7 @@ Route::group([
 
         #region Authenticated
         Route::group([
-            'middleware' => ['authenticated.passport.request', 'auth:api', 'impersonate'],
+            'middleware' => ['auth:api', 'impersonate'],
         ], function () {
             Route::group([
                 'prefix' => 'auth',
@@ -137,8 +136,6 @@ Route::group([
                 Route::get('/', [HomeAccountController::class, 'index']);
                 Route::post('/', [HomeAccountController::class, 'store']);
 
-                Route::get('handled-file/{id}', [HomeHandledFileController::class, 'show'])->name('account.handled_file.show');
-
                 // TODO:
 
                 // TODO
@@ -155,7 +152,6 @@ Route::group([
     #region Admin
     Route::group([
         'prefix' => 'admin',
-        'middleware' => ['header.decrypt:admin'],
     ], function () {
         #region Common
         Route::get('prerequisite', [AdminPrerequisiteController::class, 'index']);
@@ -184,7 +180,7 @@ Route::group([
 
         #region Authenticated
         Route::group([
-            'middleware' => ['authenticated.passport.request', 'auth:api', 'authorized.admin', 'impersonate'],
+            'middleware' => ['auth:api', 'authorized.admin', 'impersonate'],
         ], function () {
             Route::group([
                 'prefix' => 'auth',
@@ -226,6 +222,7 @@ Route::group([
                 ], function () {
                     Route::get('/', [AdminSystemLogController::class, 'index']);
                     Route::get('{id}', [AdminSystemLogController::class, 'show'])
+                        ->middleware(['authenticated.passport.cookie', 'authenticated.passport.request'])
                         ->where('id', '.+')
                         ->name('admin.system_log.show');
                 });
@@ -241,7 +238,8 @@ Route::group([
                 'prefix' => 'data-export',
             ], function () {
                 Route::get('/', [AdminDataExportController::class, 'index']);
-                Route::get('{id}', [AdminDataExportController::class, 'show']);
+                Route::get('{id}', [AdminDataExportController::class, 'show'])
+                    ->middleware(['authenticated.passport.cookie', 'authenticated.passport.request']);
             });
 
             Route::group([
@@ -285,7 +283,6 @@ Route::group([
     #region Common
     Route::group([
         'prefix' => 'common',
-        'middleware' => ['header.decrypt:common'],
     ], function () {
         #region Common
         Route::get('prerequisite', [CommonPrerequisiteController::class, 'index']);
@@ -302,7 +299,7 @@ Route::group([
 
         #region Authenticated
         Route::group([
-            'middleware' => ['authenticated.passport.request', 'auth:api', 'impersonate'],
+            'middleware' => ['auth:api', 'impersonate'],
         ], function () {
             Route::group([
                 'prefix' => 'auth',

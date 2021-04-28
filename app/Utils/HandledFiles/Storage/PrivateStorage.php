@@ -8,7 +8,7 @@ namespace App\Utils\HandledFiles\Storage;
 
 class PrivateStorage extends LocalStorage
 {
-    const NAME = 'private';
+    public const NAME = 'private';
 
     public function getUrl()
     {

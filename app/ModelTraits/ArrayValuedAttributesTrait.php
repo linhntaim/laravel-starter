@@ -12,9 +12,15 @@ trait ArrayValuedAttributesTrait
 {
     public function getAttribute($key)
     {
-        if (!$key) {
-            return [];
+        if ($this->ifGetArrayValueAttribute($key, $value)) {
+            return $value;
         }
+
+        return parent::getAttribute($key);
+    }
+
+    protected function ifGetArrayValueAttribute($key, &$value)
+    {
         if (Str::endsWith($key, '_array_value')) {
             $key = Str::before($key, '_array_value');
             if (array_key_exists($key, $this->attributes)) {
@@ -22,22 +28,33 @@ trait ArrayValuedAttributesTrait
                     return [];
                 }
                 $value = json_decode($this->attributes[$key], true);
-                return $value === false ? [] : $value;
+                if (!is_array($value)) {
+                    $value = [];
+                }
+                return true;
             }
         }
-
-        return parent::getAttribute($key);
+        return false;
     }
 
     public function setAttribute($key, $value)
     {
-        if (!$key) {
-            return null;
+        if ($this->ifSetArrayValueAttribute($key, $value)) {
+            return $this;
+        }
+
+        return parent::setAttribute($key, $value);
+    }
+
+    protected function ifSetArrayValueAttribute($key, $value)
+    {
+        if (!is_array($value)) {
+            $value = [];
         }
         if (Str::endsWith($key, '_overridden_array_value')) {
             $key = Str::before($key, '_overridden_array_value');
-            $this->attributes[$key] = json_encode(empty($value) ? [] : $value);
-            return $this;
+            $this->attributes[$key] = json_encode($value);
+            return true;
         } elseif (Str::endsWith($key, '_array_value')) {
             $storedValue = $this->getAttribute($key);
             if (!empty($value)) {
@@ -47,10 +64,9 @@ trait ArrayValuedAttributesTrait
             }
 
             $key = Str::before($key, '_array_value');
-            $this->attributes[$key] = json_encode(empty($storedValue) ? [] : $storedValue);
-            return $this;
+            $this->attributes[$key] = json_encode($storedValue);
+            return true;
         }
-
-        return parent::setAttribute($key, $value);
+        return false;
     }
 }

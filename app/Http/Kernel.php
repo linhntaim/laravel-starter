@@ -6,20 +6,23 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\Api\Client as ClientApi;
+use App\Http\Middleware\Api\ClientAuthorizationHeader;
+use App\Http\Middleware\Api\Device as DeviceApi;
+use App\Http\Middleware\Api\Screen as ScreenApi;
+use App\Http\Middleware\Api\Settings as SettingsApi;
 use App\Http\Middleware\AuthenticatedByPassportViaCookie;
 use App\Http\Middleware\AuthenticatedByPassportViaHeader;
 use App\Http\Middleware\AuthenticatedByPassportViaRequest;
 use App\Http\Middleware\AuthorizedWithAdmin;
 use App\Http\Middleware\AuthorizedWithAdminPermissions;
-use App\Http\Middleware\Device;
-use App\Http\Middleware\HeaderDecrypt;
+use App\Http\Middleware\CustomTimezone;
 use App\Http\Middleware\Impersonate;
+use App\Http\Middleware\IpLimitation;
 use App\Http\Middleware\JapaneseTime;
-use App\Http\Middleware\OverrideAuthorizationHeader;
-use App\Http\Middleware\Screen;
-use App\Http\Middleware\Settings;
-use App\Http\Middleware\Web\Device as WebDevice;
-use App\Http\Middleware\Web\Settings as WebSettings;
+use App\Http\Middleware\Web\Client as ClientWeb;
+use App\Http\Middleware\Web\Device as DeviceWeb;
+use App\Http\Middleware\Web\Settings as SettingsWeb;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Laravel\Passport\Http\Middleware\CheckClientCredentials;
 
@@ -57,17 +60,19 @@ class Kernel extends HttpKernel
             //\Illuminate\View\Middleware\ShareErrorsFromSession::class,
             //\App\Http\Middleware\VerifyCsrfToken::class,
             //\Illuminate\Routing\Middleware\SubstituteBindings::class,
-            //WebSettings::class,
-            //WebDevice::class,
+            ClientWeb::class,
+            //SettingsWeb::class,
+            //DeviceWeb::class,
         ],
 
         'api' => [
             'throttle:api',
-            OverrideAuthorizationHeader::class,
-            Settings::class,
-            Screen::class,
-            Device::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            ClientAuthorizationHeader::class,
+            ClientApi::class,
+            SettingsApi::class,
+            DeviceApi::class,
+            ScreenApi::class,
         ],
     ];
 
@@ -90,30 +95,39 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'client' => CheckClientCredentials::class,
 
+        'ip.limit' => IpLimitation::class,
+        'custom_timezone' => CustomTimezone::class,
         'japanese_time' => JapaneseTime::class,
-        'header.decrypt' => HeaderDecrypt::class,
         'authenticated.passport.cookie' => AuthenticatedByPassportViaCookie::class,
         'authenticated.passport.header' => AuthenticatedByPassportViaHeader::class,
         'authenticated.passport.request' => AuthenticatedByPassportViaRequest::class,
         'authorized.admin' => AuthorizedWithAdmin::class,
         'authorized.admin.permissions' => AuthorizedWithAdminPermissions::class,
         'impersonate' => Impersonate::class,
+
+        // TODO:
+
+        // TODO
     ];
 
     protected $middlewarePriority = [
+        IpLimitation::class,
+
         \Illuminate\Session\Middleware\StartSession::class,
         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
         \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
         \Illuminate\Routing\Middleware\ThrottleRequests::class,
 
+        ClientAuthorizationHeader::class,
+        ClientApi::class,
+        ClientWeb::class,
+        SettingsApi::class,
+        SettingsWeb::class,
+        CustomTimezone::class,
         JapaneseTime::class,
-        OverrideAuthorizationHeader::class,
-        HeaderDecrypt::class,
-        Settings::class,
-        WebSettings::class,
-        Screen::class,
-        Device::class,
-        WebDevice::class,
+        DeviceApi::class,
+        DeviceWeb::class,
+        ScreenApi::class,
 
         \Illuminate\Session\Middleware\AuthenticateSession::class,
 

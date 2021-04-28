@@ -6,12 +6,14 @@
 
 namespace App\Console\Commands\Setup;
 
+use Database\Seeders\DefaultSeeder;
+
 class SeedDefaultCommand extends SeedCommand
 {
     protected $signature = 'setup:seed:default {--u} {--f}';
 
     protected $seeders = [
-        'DefaultSeeder',
+        DefaultSeeder::class,
         // TODO:
 
         // TODO

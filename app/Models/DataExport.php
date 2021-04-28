@@ -19,9 +19,9 @@ use App\Utils\ClientSettings\Facade;
  */
 class DataExport extends Model
 {
-    const STATE_EXPORTING = 1;
-    const STATE_EXPORTED = 2;
-    const STATE_FAILED = 3;
+    public const STATE_EXPORTING = 1;
+    public const STATE_EXPORTED = 2;
+    public const STATE_FAILED = 3;
 
     protected $table = 'data_exports';
 

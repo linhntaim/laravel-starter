@@ -19,13 +19,12 @@ class RoleResource extends ModelResource
 {
     use ModelTransformTrait;
 
-    public function toCustomArray($request)
+    public function toArray($request)
     {
-        return [
-            $this->merge($this->toCurrentArray($request)),
-            $this->merge([
+        return $this->mergeInWithCurrentArray($request, [
+            [
                 'permissions' => $this->modelTransform($this->whenLoaded('permissions'), $request),
-            ]),
-        ];
+            ],
+        ]);
     }
 }

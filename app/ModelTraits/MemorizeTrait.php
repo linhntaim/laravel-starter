@@ -45,21 +45,29 @@ trait MemorizeTrait
         return $this;
     }
 
-    protected function forgetAll()
+    protected function unmemorizedAll()
     {
         $this->memories = [];
         return $this;
     }
 
-    public function __call($name, $arguments)
+    protected function __memorizeCall($name, $arguments)
     {
         if (Str::startsWith($name, 'unmemorized')) {
-            $key = Str::snake(Str::substr($name, 11));
+            $key = Str::snake(Str::after($name, 'unmemorized'));
             return $this->unmemorized($key);
         }
         if (Str::startsWith($name, 'memorize')) {
-            $key = Str::snake(Str::substr($name, 11));
+            $key = Str::snake(Str::after($name, 'memorize'));
             return $this->memorize($key, ...$arguments);
+        }
+        return false;
+    }
+
+    public function __call($name, $arguments)
+    {
+        if ($this->__memorizeCall($name, $arguments) !== false) {
+            return $this;
         }
 
         return parent::__call($name, $arguments);

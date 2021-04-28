@@ -7,21 +7,23 @@
 namespace App\ModelResources\Base;
 
 use App\Http\Requests\Request;
-use App\Utils\GuardArrayTrait;
+use App\Vendors\Illuminate\Support\Arr;
+use App\Vendors\Illuminate\Support\HtmlString;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Arr;
+use Illuminate\Http\Resources\MergeValue;
+use Illuminate\Http\Resources\MissingValue;
 
 class ModelResource extends JsonResource implements IModelResource
 {
-    use ModelResourceTrait, GuardArrayTrait;
+    use ModelResourceTrait;
 
     public static $wrap = 'model';
 
-    public $preserveKeys = true;
+    public $hidden = [];
 
-    protected $hidden = [];
+    public $escaped = [];
 
-    protected $guarded = [];
+    public $guarded = [];
 
     /**
      * @param mixed $resource
@@ -36,33 +38,15 @@ class ModelResource extends JsonResource implements IModelResource
         });
     }
 
-    /**
-     * @param array $array
-     * @return array
-     */
-    public function guard(array $array)
+    public function resolve($request = null)
     {
-        return $this->guardEmptyValueOfAssocArray($array, $this->guarded);
-    }
-
-    protected function toOriginalArray($request)
-    {
-        if (is_null($this->resource)) {
-            return [];
-        }
-
-        return is_array($this->resource)
-            ? $this->resource
-            : $this->resource->toArray();
-    }
-
-    /**
-     * @param Request $request
-     * @return array
-     */
-    protected function toCurrentArray($request)
-    {
-        return Arr::except($this->toOriginalArray($request), $this->hidden);
+        return $this->guard(
+            $this->escape(
+                $this->hide(
+                    parent::resolve($request)
+                )
+            )
+        );
     }
 
     /**
@@ -71,15 +55,80 @@ class ModelResource extends JsonResource implements IModelResource
      */
     public function toArray($request)
     {
-        return $this->guard($this->toCustomArray($request));
+        return $this->toCurrentArray($request);
     }
 
     /**
      * @param Request $request
      * @return array
      */
-    public function toCustomArray($request)
+    protected final function toCurrentArray($request)
     {
-        return $this->toCurrentArray($request);
+        return parent::toArray($request);
+    }
+
+    /**
+     * @param Request $request
+     * @param array ...$data
+     * @return array
+     */
+    protected function mergeAllWithCurrentArray($request, ...$data)
+    {
+        return $this->mergeInWithCurrentArray($request, $data);
+    }
+
+    /**
+     * @param Request $request
+     * @param array $data
+     * @return array
+     */
+    protected function mergeInWithCurrentArray($request, array $data)
+    {
+        array_unshift($data, $this->toCurrentArray($request));
+        return $this->mergeIn($data);
+    }
+
+    /**
+     * @param array ...$data
+     * @return array
+     */
+    protected function mergeAll(...$data)
+    {
+        return $this->mergeIn($data);
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    protected function mergeIn(array $data)
+    {
+        return array_map(function ($data) {
+            return $data instanceof MergeValue || $data instanceof MissingValue ?
+                $data : $this->merge($data);
+        }, $data);
+    }
+
+    protected function hide($data)
+    {
+        if (empty($this->hidden)) return $data;
+        return Arr::except($data, $this->hidden);
+    }
+
+    protected function escape($data)
+    {
+        if (empty($this->escaped)) return $data;
+        foreach ($data as $key => &$value) {
+            if (in_array($key, $this->escaped, true)) {
+                $value = HtmlString::escapes($value);
+            }
+        }
+        return $data;
+    }
+
+    protected function guard($data)
+    {
+        if (empty($this->guarded)) return $data;
+        return Arr::jsonGuard($data, $this->guarded);
     }
 }

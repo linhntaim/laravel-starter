@@ -8,5 +8,5 @@ namespace App\Exceptions;
 
 class AppException extends Exception
 {
-    const LEVEL = 3;
+    public const LEVEL = 3;
 }

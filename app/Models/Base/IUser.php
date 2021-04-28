@@ -6,17 +6,17 @@
 
 namespace App\Models\Base;
 
+use Illuminate\Contracts\Translation\HasLocalePreference;
+
 /**
  * Interface IUser
  * @package App\Models\Base
  */
-interface IUser extends IContactable
+interface IUser extends IContactable, HasLocalePreference, IProtected
 {
     public function getId();
 
     public function preferredAvatarUrl();
-
-    public function preferredLocale();
 
     public function preferredSettings();
 

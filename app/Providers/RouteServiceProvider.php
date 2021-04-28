@@ -6,10 +6,10 @@
 
 namespace App\Providers;
 
+use App\Http\Requests\Request;
 use App\Utils\ConfigHelper;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +32,15 @@ class RouteServiceProvider extends ServiceProvider
      * @var string|null
      */
     // protected $namespace = 'App\\Http\\Controllers';
+
+    protected $throttleExcept = [
+        'api' => [
+            // TODO:
+//            'api/registration',
+
+            // TODO
+        ],
+    ];
 
     /**
      * Define your route model bindings, pattern filters, etc.
@@ -62,6 +71,9 @@ class RouteServiceProvider extends ServiceProvider
     protected function configureRateLimiting()
     {
         RateLimiter::for('api', function (Request $request) {
+            if ($request->possiblyIs(...$this->throttleExcept['api'])) {
+                return null;
+            }
             $maxAttempts = ConfigHelper::get('throttle_request.max_attempts');
             $decayMinutes = ConfigHelper::get('throttle_request.decay_minutes');
             return ($decayMinutes == 1 ? Limit::perMinute($maxAttempts) : new Limit('', $maxAttempts, $decayMinutes))

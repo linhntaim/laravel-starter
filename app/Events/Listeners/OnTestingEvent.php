@@ -8,7 +8,7 @@ namespace App\Events\Listeners;
 
 use App\Events\TestingEvent;
 use App\Events\Listeners\Base\NowListener;
-use App\Utils\LogHelper;
+use Illuminate\Support\Facades\Log;
 
 class OnTestingEvent extends NowListener
 {
@@ -17,6 +17,6 @@ class OnTestingEvent extends NowListener
      */
     protected function go($event)
     {
-        LogHelper::info(sprintf('%s executed.', static::class));
+        Log::info(sprintf('Called to %s.', static::class));
     }
 }
