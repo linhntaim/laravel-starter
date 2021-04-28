@@ -39,6 +39,12 @@ class Controller extends BaseController
         return $this->validatedData($request->all(), $rules, $messages, $customAttributes, $hook);
     }
 
+    protected function responseContent($content, $status = 200, array $headers = [])
+    {
+        $this->transactionComplete();
+        return response($content, $status, $headers);
+    }
+
     protected function responseFile($file, array $headers = [])
     {
         $this->transactionComplete();

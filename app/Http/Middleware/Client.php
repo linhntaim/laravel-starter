@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Http\Requests\Request;
 use App\Utils\ClientSettings\Facade;
+use App\Utils\ClientSettings\Manager;
 use Closure;
 
 abstract class Client
@@ -14,8 +15,12 @@ abstract class Client
         return $next($request);
     }
 
+    /**
+     * @param Request $request
+     * @return Manager
+     */
     protected function setClient(Request $request)
     {
-        return Facade::setClientFromRequestRoute($request, true);
+        return Facade::getFacadeRoot();
     }
 }

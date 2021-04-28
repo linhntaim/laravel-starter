@@ -12,6 +12,7 @@ use App\Vendors\Illuminate\Support\Facades\App;
 use Exception as BaseException;
 use PDOException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Throwable;
 
 abstract class Exception extends BaseException implements HttpExceptionInterface
@@ -53,6 +54,11 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
     {
         parent::__construct('', $code ? $code : static::CODE, $previous);
 
+        $this->attachedData = [
+            'public' => $publicAttachedData,
+            'private' => $privateAttachedData,
+        ];
+
         if ($previous) {
             $this->code = $previous instanceof HttpExceptionInterface ?
                 $previous->getStatusCode() : $previous->getCode();
@@ -76,11 +82,6 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
             }
         }
         $this->message = $this->formatMessage(array_values($this->messages)[0]);
-
-        $this->attachedData = [
-            'public' => $publicAttachedData,
-            'private' => $privateAttachedData,
-        ];
     }
 
     protected function getMessageFromPrevious()
@@ -91,6 +92,17 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
                 if (is_array($previous->errorInfo) && isset($previous->errorInfo[2])) {
                     return trim($previous->errorInfo[2]);
                 }
+            }
+            if ($previous instanceof MethodNotAllowedHttpException) {
+                $this->setAttachedData([
+                    'trans_options' => [
+                        'replace' => [
+                            'method' => request()->getMethod(),
+                            'allow' => $previous->getHeaders()['Allow'],
+                        ],
+                    ],
+                ], false);
+                return $this->defaultMessage();
             }
             return $previous->getMessage();
         }
