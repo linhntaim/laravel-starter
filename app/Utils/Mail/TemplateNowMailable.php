@@ -23,13 +23,13 @@ class TemplateNowMailable extends Mailable
     public const DEFAULT_CHARSET = 'UTF-8';
 
     public const HTML_CHARSETS = [
-        'sjis' => 'SHIFT_JS',
-        'sjis-win' => 'SHIFT_JS',
-        'sjis-mac' => 'SHIFT_JS',
-        'macjapanese' => 'SHIFT_JS',
-        'sjis-mobile#docomo' => 'SHIFT_JS',
-        'sjis-mobile#kddi' => 'SHIFT_JS',
-        'sjis-mobile#softbank' => 'SHIFT_JS',
+        'sjis' => 'SHIFT_JIS',
+        'sjis-win' => 'SHIFT_JIS',
+        'sjis-mac' => 'SHIFT_JIS',
+        'macjapanese' => 'SHIFT_JIS',
+        'sjis-mobile#docomo' => 'SHIFT_JIS',
+        'sjis-mobile#kddi' => 'SHIFT_JIS',
+        'sjis-mobile#softbank' => 'SHIFT_JIS',
         'jis' => 'ISO-2022-JP',
         'jis-win' => 'ISO-2022-JP',
         'iso-2022-jp-ms' => 'ISO-2022-JP',
