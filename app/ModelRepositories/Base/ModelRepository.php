@@ -40,6 +40,7 @@ abstract class ModelRepository
     private $with;
     private $withTrashed = false;
     private $onlyTrashed = false;
+    private $selects = [];
     private $lock;
     private $strict = true;
     private $more = false;
@@ -266,6 +267,16 @@ abstract class ModelRepository
         return $this;
     }
 
+    /**
+     * @param string|array $selects
+     * @return static
+     */
+    public function select($selects)
+    {
+        $this->selects = (array)$selects;
+        return $this;
+    }
+
     public function lock($lock)
     {
         $this->lock = $lock;
@@ -327,6 +338,10 @@ abstract class ModelRepository
         if (!is_null($this->with)) {
             $query->with($this->with);
             $this->with = null;
+        }
+        if (!empty($this->selects)) {
+            $query->select($this->selects);
+            $this->selects = [];
         }
         if ($this->withTrashed) {
             $query->withTrashed();
