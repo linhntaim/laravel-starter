@@ -41,7 +41,6 @@ class DataExportRepository extends ModelRepository
     {
         $attributes['name'] = $export->getName();
         $attributes['state'] = DataExport::STATE_EXPORTING;
-        $attributes['payload'] = serialize($export);
         $this->createWithAttributes($attributes);
         ExportJob::dispatch($this->model, $export);
         return $this->model;

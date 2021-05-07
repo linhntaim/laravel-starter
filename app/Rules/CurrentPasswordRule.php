@@ -21,6 +21,6 @@ class CurrentPasswordRule extends Rule
     public function passes($attribute, $value)
     {
         $user = request()->user();
-        return empty($user) ? false : Hash::check($value, $user->password);
+        return !empty($user) && Hash::check($value, $user->password);
     }
 }

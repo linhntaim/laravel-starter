@@ -54,7 +54,7 @@ class ClientLimiter extends FrameworkHandler
     protected function fromDatabase()
     {
         $clientLimit = AppOptionHelper::getInstance()->getBy(static::APP_OPTION_KEY, []);
-        return empty($clientLimit) ? false : $this->fromContent($clientLimit);
+        return !empty($clientLimit) && $this->fromContent($clientLimit);
     }
 
     protected function fromContent($content)
@@ -64,9 +64,9 @@ class ClientLimiter extends FrameworkHandler
             return false;
         }
 
-        $this->setAllowed(isset($content['allowed']) ? $content['allowed'] : [])
-            ->setDenied(isset($content['denied']) ? $content['denied'] : [])
-            ->setAdmin(isset($content['admin']) && $content['admin'] ? true : false);
+        $this->setAllowed($content['allowed'] ?? [])
+            ->setDenied($content['denied'] ?? [])
+            ->setAdmin(isset($content['admin']) && $content['admin']);
         return true;
     }
 

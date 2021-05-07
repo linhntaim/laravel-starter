@@ -31,7 +31,7 @@ trait CsvExportTrait
     protected function csvBeforeExporting()
     {
         $this->csvFiler = new CsvFiler();
-        $this->csvFiler->fromCreating($this->getName()); // create at private root directory
+        $this->csvFiler->fromCreating($this->getName(), 'csv', null); // create at root directory of private storage
         if (!empty($headers = $this->csvHeaders())) {
             $this->csvFiler->fStartAppending()
                 ->fWrite([$headers])
@@ -42,7 +42,7 @@ trait CsvExportTrait
 
     protected function csvAfterExporting()
     {
-        $this->csvFiler->moveToPublic(false); // move to a public time-based directory
+        $this->csvFiler->moveTo(false); // move to time-based directory of private storage
         return $this;
     }
 
@@ -70,7 +70,7 @@ trait CsvExportTrait
             ->csvAfterExporting();
         return tap(
             $this->handledFileRepository
-                ->usePublic() // make sure to move to cloud if enabled
+                ->usePublic() // make sure to move to public storage
                 ->createWithFiler($this->csvFiler),
             function () {
                 App::bench('export::csv::' . $this->getName());

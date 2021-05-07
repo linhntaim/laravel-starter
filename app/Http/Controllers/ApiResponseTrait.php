@@ -88,7 +88,7 @@ trait ApiResponseTrait
         return array_merge(static::payload($data, $message), [
             '_status' => false,
             '_code' => $statusCode,
-            '_error' => $errorCode ? $errorCode : $statusCode,
+            '_error' => $errorCode ?: $statusCode,
         ]);
     }
 

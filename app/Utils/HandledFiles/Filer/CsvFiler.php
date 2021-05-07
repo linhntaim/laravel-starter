@@ -115,7 +115,7 @@ class CsvFiler extends Filer
         });
     }
 
-    public function fromCreating($name = null, $extension = 'csv', $toDirectory = null)
+    public function fromCreating($name = null, $extension = 'csv', $toDirectory = false)
     {
         return parent::fromCreating($name, $extension, $toDirectory);
     }

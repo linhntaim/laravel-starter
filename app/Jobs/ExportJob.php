@@ -6,6 +6,7 @@
 
 namespace App\Jobs;
 
+use App\Exceptions\Exception;
 use App\Exports\Base\Export;
 use App\Jobs\Base\Job;
 use App\ModelRepositories\DataExportRepository;
@@ -45,6 +46,7 @@ class ExportJob extends Job
     {
         (new DataExportRepository($this->dataExport))->updateWithAttributes([
             'state' => DataExport::STATE_FAILED,
+            'exception' => Exception::toArrayFrom($e),
         ]);
     }
 }

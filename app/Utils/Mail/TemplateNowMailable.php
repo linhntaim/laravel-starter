@@ -64,7 +64,7 @@ class TemplateNowMailable extends Mailable
         $this->templateLocalized = $templateLocalized;
         $this->templateNamespace = $templateNamespace;
 
-        $this->locale = $templateLocale ? $templateLocale : Facade::getLocale();
+        $this->locale = $templateLocale ?: Facade::getLocale();
         $this->parseCharset(is_null($charset) ? ConfigHelper::get('emails.send_charset') : $charset);
     }
 
@@ -131,7 +131,7 @@ class TemplateNowMailable extends Mailable
 
     protected function getCharset($charset)
     {
-        return isset($charset['locales'][$this->locale]) ? $charset['locales'][$this->locale] : $charset['default'];
+        return $charset['locales'][$this->locale] ?? $charset['default'];
     }
 
     protected function headerCharset()
@@ -150,7 +150,7 @@ class TemplateNowMailable extends Mailable
             $this->htmlCharset = (function () {
                 $bodyCharset = $this->bodyCharset();
                 $lowerBodyCharset = strtolower($bodyCharset);
-                return isset(static::HTML_CHARSETS[$lowerBodyCharset]) ? static::HTML_CHARSETS[$lowerBodyCharset] : $bodyCharset;
+                return static::HTML_CHARSETS[$lowerBodyCharset] ?? $bodyCharset;
             })();
         }
         return $this->htmlCharset;

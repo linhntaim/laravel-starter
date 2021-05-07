@@ -51,9 +51,9 @@ class MySqlTransactionHandler extends TransactionHandler
 
     protected function beginWithoutLocks($options = [])
     {
-        $isolationLevel = isset($options['isolation_level']) ? $options['isolation_level'] : null;
-        $accessMode = isset($options['access_mode']) ? $options['access_mode'] : null;
-        $transactionScope = isset($options['transaction_scope']) ? $options['transaction_scope'] : null;
+        $isolationLevel = $options['isolation_level'] ?? null;
+        $accessMode = $options['access_mode'] ?? null;
+        $transactionScope = $options['transaction_scope'] ?? null;
 
         if (in_array($isolationLevel, static::ISOLATION_LEVELS) || in_array($accessMode, self::ACCESS_MODES)) {
             $transactionScope = in_array($transactionScope, static::TRANSACTION_SCOPES) ? $transactionScope . ' ' : '';

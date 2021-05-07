@@ -59,7 +59,7 @@ abstract class PropertyRepository extends ModelRepository
                 $name,
                 $value,
                 $hasPropertyModel,
-                isset($extraAttributes[$name]) ? $extraAttributes[$name] : []
+                $extraAttributes[$name] ?? []
             );
         }
         return true;

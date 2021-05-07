@@ -63,12 +63,12 @@ abstract class LoginController extends AccessTokenController
         $parsedBody = $request->getParsedBody();
         if (isset($parsedBody['client_id'])) {
             if (!Str::isUnsignedInteger($parsedBody['client_id'])) {
-                return $this->throwException(LeagueException::invalidClient($request));
+                $this->throwException(LeagueException::invalidClient($request));
             }
         }
         return $this->impersonate(
             parent::issueToken($request),
-            isset($parsedBody['impersonate_token']) ? $parsedBody['impersonate_token'] : null
+            $parsedBody['impersonate_token'] ?? null
         );
     }
 

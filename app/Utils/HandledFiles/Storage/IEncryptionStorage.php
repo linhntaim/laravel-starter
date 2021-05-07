@@ -8,9 +8,9 @@ interface IEncryptionStorage
 
     public function encrypted();
 
-    public function encrypt();
+    public function encrypt($copy = false);
 
-    public function decrypt();
+    public function decrypt($copy = false);
 
     public function streamDecrypt();
 }

@@ -8,10 +8,11 @@ namespace App\Models;
 
 use App\Models\Base\Model;
 use App\ModelTraits\ArrayValuedAttributesTrait;
+use App\ModelTraits\MemorizeTrait;
 use App\Utils\ConfigHelper;
+use App\Utils\HandledFiles\Filer\Filer;
 use App\Utils\HandledFiles\Storage\CloudStorage;
 use App\Utils\HandledFiles\Storage\ExternalStorage;
-use App\Utils\HandledFiles\Storage\HandledStorage;
 use App\Utils\HandledFiles\Storage\IEncryptionStorage;
 use App\Utils\HandledFiles\Storage\InlineStorage;
 use App\Utils\HandledFiles\Storage\IResponseStorage;
@@ -38,7 +39,8 @@ use Illuminate\Database\Eloquent\Collection;
  * @property bool $public
  * @property bool $inline
  * @property array $options_array_value
- * @property Collection $handledFileStores
+ * @property HandledFileStore[]|Collection $handledFileStores
+ * @property Filer $filer
  * @property Storage $originStorage
  */
 class HandledFile extends Model
@@ -81,26 +83,21 @@ class HandledFile extends Model
         return $this->attributes['handling'] == static::HANDLING_NO;
     }
 
+    public function getFilerAttribute()
+    {
+        return $this->remind('filer', function () {
+            $filer = new Filer();
+            $filer->setEncryped($this->encrypted);
+            $this->handledFileStores->each(function (HandledFileStore $store) use ($filer) {
+                $filer->fromStorageData($store->store, $store->data, $store->isOrigin, $this->encrypted);
+            });
+            return $filer;
+        });
+    }
+
     public function getOriginStorageAttribute()
     {
-        $handledFileStore = $this->handledFileStores()->where('origin', HandledFileStore::ORIGIN_YES)->first();
-        if ($handledFileStore->store === PublicStorage::NAME) {
-            $originStorage = (new PublicStorage())->setData($handledFileStore->data);
-        } elseif ($handledFileStore->store === PrivateStorage::NAME) {
-            $originStorage = (new PrivateStorage())->setData($handledFileStore->data);
-        } elseif ($handledFileStore->store === InlineStorage::NAME) {
-            $originStorage = (new InlineStorage())->setData($handledFileStore->data);
-        } elseif ($handledFileStore->store === ExternalStorage::NAME) {
-            $originStorage = (new ExternalStorage())->setData($handledFileStore->data);
-        } elseif ($handledFileStore->store === ScanStorage::NAME) {
-            $originStorage = (new ScanStorage())->setData($handledFileStore->data);
-        } else {
-            $originStorage = ConfigHelper::get('handled_file.cloud.enabled') ? new CloudStorage() : null;
-            if ($originStorage && $handledFileStore->store === $originStorage->getName()) {
-                $originStorage = $originStorage->setData($handledFileStore->data);
-            }
-        }
-        return $originStorage;
+        return $this->filer->getOriginStorage();
     }
 
     public function getEncryptedAttribute()
@@ -160,16 +157,8 @@ class HandledFile extends Model
 
     public function delete()
     {
-        parent::delete();
-        $this->tryStorage(
-            function (Storage $storage, HandledFileStore $store) {
-                return $storage->setData($store->data)->delete();
-            },
-            function (Storage $storage) {
-                return $storage instanceof HandledStorage;
-            }
-        );
-        return true;
+        $this->filer->delete();
+        return parent::delete();
     }
 
     public function responseDownload($name = null, $headers = [])
