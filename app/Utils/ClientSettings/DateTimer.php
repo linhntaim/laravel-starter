@@ -433,8 +433,8 @@ class DateTimer
                 $unixTimezones = [];
             }
             $currentContinent = $continent;
-            $city = isset($zonePart[1]) ? $zonePart[1] : '';
-            $subCity = isset($zonePart[2]) ? $zonePart[2] : '';
+            $city = $zonePart[1] ?? '';
+            $subCity = $zonePart[2] ?? '';
             $unixTimezones[] = [
                 'name' => str_replace('_', ' ', $city) . (empty($subCity) ? '' : ' - ' . str_replace('_', ' ', $subCity)),
                 'value' => $zone,

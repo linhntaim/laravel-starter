@@ -43,7 +43,7 @@ class ReplaceAction extends Action
      */
     protected function executeCondition(string $namespace, array $params)
     {
-        $callback = isset($this->conditionCallbacks[$namespace]) ? $this->conditionCallbacks[$namespace] : true;
+        $callback = $this->conditionCallbacks[$namespace] ?? true;
         if (is_bool($callback)) return $callback;
         return $callback ? $callback(...$params) : true;
     }
@@ -55,7 +55,7 @@ class ReplaceAction extends Action
      */
     protected function executeDefault(string $namespace, array $params)
     {
-        $callback = isset($this->defaultCallbacks[$namespace]) ? $this->defaultCallbacks[$namespace] : null;
+        $callback = $this->defaultCallbacks[$namespace] ?? null;
         return $callback ? $callback(...$params) : null;
     }
 

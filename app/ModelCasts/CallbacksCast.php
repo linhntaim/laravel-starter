@@ -29,9 +29,7 @@ class CallbacksCast implements CastsAttributes
      */
     public function getSetCallback()
     {
-        return isset($this->callbacks['set']) ?
-            $this->callbacks['set']
-            : (isset($this->callbacks[0]) ? $this->callbacks[0] : null);
+        return $this->callbacks['set'] ?? ($this->callbacks[0] ?? null);
     }
 
     /**
@@ -39,9 +37,7 @@ class CallbacksCast implements CastsAttributes
      */
     public function getGetCallback()
     {
-        return isset($this->callbacks['get']) ?
-            $this->callbacks['get']
-            : (isset($this->callbacks[1]) ? $this->callbacks[1] : null);
+        return $this->callbacks['get'] ?? ($this->callbacks[1] ?? null);
     }
 
     public function set($model, string $key, $value, array $attributes)

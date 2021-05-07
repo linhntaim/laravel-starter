@@ -59,8 +59,9 @@ class RoleController extends ModelApiController
 
     protected function exportExecute(Request $request, Export $exporter = null)
     {
-        parent::exportExecute($request, $exporter);
+        $model = parent::exportExecute($request, $exporter);
         $this->logActionModelExport(Role::class, $request->all());
+        return $model;
     }
 
     protected function modelImporterClass(Request $request)
@@ -70,8 +71,9 @@ class RoleController extends ModelApiController
 
     protected function importExecute(Request $request, Import $importer = null)
     {
-        parent::importExecute($request, $importer);
+        $model = parent::importExecute($request, $importer);
         $this->logActionModelImport(Role::class, $request->all());
+        return $model;
     }
 
     protected function storeValidatedRules(Request $request)

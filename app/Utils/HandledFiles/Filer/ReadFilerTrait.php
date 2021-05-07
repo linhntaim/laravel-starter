@@ -95,7 +95,7 @@ trait ReadFilerTrait
 
     protected function fReading()
     {
-        return fread($this->fResource, $this->fReadLength ? $this->fReadLength : $this->getSize());
+        return fread($this->fResource, $this->fReadLength ?: $this->getSize());
     }
 
     /**

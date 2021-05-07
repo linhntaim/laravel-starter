@@ -166,9 +166,9 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
         ]);
     }
 
-    public function getAttachedData()
+    public function getAttachedData($scope = 'public')
     {
-        return $this->attachedData['public'];
+        return is_null($scope) ? $this->attachedData : $this->attachedData[$scope];
     }
 
     public function getMessages()
@@ -188,13 +188,34 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
 
     protected function defaultMessage()
     {
-        $transOptions = isset($this->attachedData['private']['trans_options']) ?
-            $this->attachedData['private']['trans_options'] : [];
+        $transOptions = $this->attachedData['private']['trans_options'] ?? [];
         return transIf(
             'error.def.abort.' . $this->code,
             $this->__transErrorWithModule('level_failed'),
-            isset($transOptions['replace']) ? $transOptions['replace'] : [],
-            isset($transOptions['locale']) ? $transOptions['locale'] : null
+            $transOptions['replace'] ?? [],
+            $transOptions['locale'] ?? null
         );
+    }
+
+    public function toArray()
+    {
+        return static::toArrayFrom($this);
+    }
+
+    public static function toArrayFrom(Throwable $e)
+    {
+        $array = [
+            'class' => get_class($e),
+            'code' => $e->getCode(),
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString(),
+        ];
+        if ($e instanceof Exception) {
+            $array['messages'] = $e->getMessages();
+            $array['data'] = $e->getAttachedData();
+        }
+        return $array;
     }
 }

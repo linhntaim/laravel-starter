@@ -14,6 +14,7 @@ use App\Models\Base\Model;
  * @property int $id
  * @property string $store
  * @property string $data
+ * @property bool $isOrigin
  */
 class HandledFileStore extends Model
 {
@@ -34,6 +35,11 @@ class HandledFileStore extends Model
     ];
 
     public $timestamps = false;
+
+    public function getIsOriginAttribute()
+    {
+        return $this->attributes['origin'] == static::ORIGIN_YES;
+    }
 
     public function handledFile()
     {

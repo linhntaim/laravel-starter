@@ -344,7 +344,7 @@ abstract class NowNotification extends BaseNotification
      */
     public function send($notifiables = null)
     {
-        $notifiables = $notifiables ? $notifiables : $this->getNotifiables();
+        $notifiables = $notifiables ?: $this->getNotifiables();
 
         if ($notifiables instanceof Collection) {
             $notifiables = $notifiables->toArray();

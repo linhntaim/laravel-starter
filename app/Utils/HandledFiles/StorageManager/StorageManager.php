@@ -9,7 +9,7 @@ namespace App\Utils\HandledFiles\StorageManager;
 use App\Utils\HandledFiles\Storage\HandledStorage;
 use App\Utils\HandledFiles\Storage\Storage;
 
-abstract class StorageManager
+class StorageManager
 {
     protected $storage;
     protected $origin;

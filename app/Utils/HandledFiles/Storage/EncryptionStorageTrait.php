@@ -7,7 +7,7 @@ use App\Utils\HandledFiles\Storage\Encrypters\Encrypter;
 
 trait EncryptionStorageTrait
 {
-    protected $encrypted;
+    protected $encrypted = false;
 
     public function setEncrypted($encrypted = true)
     {
@@ -25,29 +25,31 @@ trait EncryptionStorageTrait
      */
     public function encrypter()
     {
-        $encrypterClass = ConfigHelper::get('handled_file.encryption.encrypter');
-        return $encrypterClass ? new $encrypterClass : null;
+        return ($encryptorClass = ConfigHelper::get('handled_file.encryption.encrypter')) ?
+            new $encryptorClass : null;
     }
 
-    public function encrypt()
+    public function encrypt($copy = false)
     {
-        if ($encrypter = $this->encrypter()) {
-            $encrypter->encrypt($this);
+        if (($encryptor = $this->encrypter()) && !$this->encrypted()) {
+            $encryptor->encrypt($this, $copy);
+            $this->setEncrypted();
         }
         return $this;
     }
 
-    public function decrypt()
+    public function decrypt($copy = false)
     {
-        if ($encrypter = $this->encrypter()) {
-            $encrypter->decrypt($this);
+        if (($encryptor = $this->encrypter()) && $this->encrypted()) {
+            $encryptor->decrypt($this, $copy);
+            $this->setEncrypted(false);
         }
         return $this;
     }
 
     public function streamDecrypt()
     {
-        if ($encrypter = $this->encrypter()) {
+        if (($encrypter = $this->encrypter()) && $this->encrypted()) {
             $encrypter->streamDecrypt($this);
         }
         return $this;

@@ -16,7 +16,7 @@ class SimpleCsvExport extends CsvExport
 
         $this->headers = $headers;
         $this->data = $data;
-        $this->name = $name ? $name : static::NAME;
+        $this->name = $name ?: static::NAME;
     }
 
     public function getName()

@@ -118,6 +118,9 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
      */
     public function from($file, $toDirectory = '', $keepOriginalName = true, $visibility = 'public')
     {
+        if ($file instanceof LocalStorage) {
+            $file = $file->getRealPath();
+        }
         if ($keepOriginalName === true) {
             if ($file instanceof HandledStorage) {
                 $originalName = basename($file->getRelativePath());
@@ -180,7 +183,7 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
 
     public function getContentRelativePath($relativePath = null)
     {
-        return $this->disk->get($relativePath ? $relativePath : $this->getRelativePath());
+        return $this->disk->get($relativePath ?: $this->getRelativePath());
     }
 
     public function getSize()
@@ -217,7 +220,7 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
      * @param string $toDirectory
      * @param bool|string|array $keepOriginalName
      * @param bool $override
-     * @param callable $overrideCallback
+     * @param callable|null $overrideCallback
      * @return HandledStorage
      * @throws
      */
@@ -225,6 +228,7 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
     {
         return $this->fromTo(function ($storage, $from, $to) {
             $this->disk->move($from, $to);
+            $this->relativePath = $to;
         }, $toDirectory, $keepOriginalName, $override, $overrideCallback);
     }
 
@@ -232,7 +236,7 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
      * @param string $toDirectory
      * @param bool|string|array $keepOriginalName
      * @param bool $override
-     * @param callable $overrideCallback
+     * @param callable|null $overrideCallback
      * @return HandledStorage
      * @throws
      */
@@ -240,6 +244,7 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
     {
         return $this->fromTo(function ($storage, $from, $to) {
             $this->disk->copy($from, $to);
+            $this->relativePath = $to;
         }, $toDirectory, $keepOriginalName, $override, $overrideCallback);
     }
 
@@ -261,8 +266,8 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
             } else {
                 $toFilename = is_array($keepOriginalName) ?
                     Helper::nameWithExtension(
-                        isset($keepOriginalName['name']) ? $keepOriginalName['name'] : null,
-                        isset($keepOriginalName['extension']) ? $keepOriginalName['extension'] : $this->getExtension()
+                        $keepOriginalName['name'] ?? null,
+                        $keepOriginalName['extension'] ?? $this->getExtension()
                     )
                     : Helper::nameWithExtension(
                         is_string($keepOriginalName) ? $keepOriginalName : null,
@@ -279,7 +284,6 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
                 }
             }
             $callback($this, $this->relativePath, $relativePath);
-            $this->relativePath = $relativePath;
         }
         return $this;
     }
@@ -300,13 +304,13 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
 
     public function deleteRelativePath($relativePath = null)
     {
-        $this->disk->delete($relativePath ? $relativePath : $this->getRelativePath());
+        $this->disk->delete($relativePath ?: $this->getRelativePath());
         return $this;
     }
 
     public function deleteRelativeDirectory($relativeDirectory = null)
     {
-        $this->disk->deleteDirectory($relativeDirectory ? $relativeDirectory : $this->getRelativeDirectory());
+        $this->disk->deleteDirectory($relativeDirectory ?: $this->getRelativeDirectory());
         return $this;
     }
 
