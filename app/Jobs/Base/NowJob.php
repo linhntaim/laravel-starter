@@ -55,7 +55,8 @@ abstract class NowJob
             if ($this->transactionUsed) {
                 $this->transactionComplete();
             }
-        } catch (Throwable $e) {
+        }
+        catch (Throwable $e) {
             if (!($this instanceof Job)) {
                 if ($this->transactionUsed) {
                     $this->transactionStop();

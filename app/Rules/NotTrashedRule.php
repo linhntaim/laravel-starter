@@ -11,6 +11,7 @@ use App\Rules\Base\Rule;
 class NotTrashedRule extends Rule
 {
     protected $modelClass;
+
     protected $modelAttribute;
 
     public function __construct()

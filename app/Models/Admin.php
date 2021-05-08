@@ -131,7 +131,9 @@ class Admin extends ExtendedUserModel
     public function hasPermissionsAtLeast($permissionNames)
     {
         foreach ($permissionNames as $permissionName) {
-            if ($this->hasPermission($permissionName)) return true;
+            if ($this->hasPermission($permissionName)) {
+                return true;
+            }
         }
         return false;
     }
@@ -139,7 +141,9 @@ class Admin extends ExtendedUserModel
     public function hasPermissions($permissionNames)
     {
         foreach ($permissionNames as $permissionName) {
-            if (!$this->hasPermission($permissionName)) return false;
+            if (!$this->hasPermission($permissionName)) {
+                return false;
+            }
         }
         return true;
     }

@@ -53,7 +53,8 @@ abstract class PropertyModel extends Model implements ISelfCaster
         if ($caster instanceof CastsAttributes) {
             $this->casts['value'] = SelfCast::class;
             $this->setCaster('value', $caster);
-        } elseif (is_string($caster)) {
+        }
+        elseif (is_string($caster)) {
             $this->casts['value'] = $caster;
         }
         return $this;

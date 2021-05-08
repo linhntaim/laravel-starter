@@ -42,7 +42,7 @@ class OrGeneratorNode extends GeneratorNode
 
     public function pickRandomValuedNodeIndex()
     {
-        $this->valuedNodeIndex = rand(0, ($this->childrenLength-1));
+        $this->valuedNodeIndex = rand(0, ($this->childrenLength - 1));
     }
 
     /**

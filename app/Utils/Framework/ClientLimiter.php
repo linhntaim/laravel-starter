@@ -18,7 +18,6 @@ class ClientLimiter extends FrameworkHandler
     use IpLimiterTrait;
 
     public const NAME = 'limit';
-
     public const APP_OPTION_KEY = 'client_limit';
 
     /**
@@ -41,7 +40,9 @@ class ClientLimiter extends FrameworkHandler
     public function retrieve()
     {
         $retrieved = parent::retrieve();
-        if (!is_null($retrieved)) return $this;
+        if (!is_null($retrieved)) {
+            return $this;
+        }
 
         // Get from database then cache to file
         if ($this->fromDatabase()) {

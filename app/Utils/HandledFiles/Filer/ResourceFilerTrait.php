@@ -12,16 +12,18 @@ use App\Utils\HandledFiles\Storage\LocalStorage;
 trait ResourceFilerTrait
 {
     protected $fResource = null;
+
     protected $fNewly = true;
 
     protected $fReadAndWriteEnabled = false;
+
     protected $fBinaryEnabled = false;
+
     protected $fTextModeTranslationEnabled = false;
 
     /**
      * @param bool $enabled
-     * @return Filer|mixed
-     * @return $this
+     * @return static
      */
     public function fEnableBothReadingAndWriting($enabled = true)
     {
@@ -31,8 +33,7 @@ trait ResourceFilerTrait
 
     /**
      * @param bool $enabled
-     * @return Filer|mixed
-     * @return $this
+     * @return static
      */
     public function fEnableBinaryHandling($enabled = true)
     {
@@ -42,8 +43,7 @@ trait ResourceFilerTrait
 
     /**
      * @param bool $enabled
-     * @return Filer|mixed
-     * @return $this
+     * @return static
      */
     public function fEnableTextModeTranslation($enabled = true)
     {
@@ -61,7 +61,7 @@ trait ResourceFilerTrait
 
     /**
      * @param string $mode
-     * @return Filer|mixed
+     * @return static
      * @throws
      */
     public function fOpen($mode = Filer::MODE_WRITE)

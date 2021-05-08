@@ -16,7 +16,8 @@ class Arr extends BaseArr
                 && (static::isAssoc($array1[$key]) || static::isAssoc($value))
                 && !Str::is($maxDepths, $currentDepth)) {
                 $array1[$key] = static::mergeAlongDepth($array1[$key], $value, $maxDepths, $currentDepth);
-            } else {
+            }
+            else {
                 $array1[$key] = $value;
             }
         }

@@ -4,7 +4,6 @@
  * Base - Any modification needs to be approved, except the space inside the block of TODO
  */
 
-
 namespace App\Utils\ClientSettings;
 
 use App\Utils\ConfigHelper;
@@ -19,21 +18,33 @@ use Illuminate\Support\Str;
 class Settings implements ISettings, Arrayable, Jsonable
 {
     protected $appId;
+
     protected $appKey;
+
     protected $appName;
+
     protected $appUrl;
 
     protected $stateful;
 
     protected $locale;
+
     protected $country;
+
     protected $timezone;
+
     protected $currency;
+
     protected $numberFormat;
+
     protected $firstDayOfWeek;
+
     protected $longDateFormat;
+
     protected $shortDateFormat;
+
     protected $longTimeFormat;
+
     protected $shortTimeFormat;
 
     protected $cookies;
@@ -308,7 +319,8 @@ class Settings implements ISettings, Arrayable, Jsonable
     {
         if (is_array($settings)) {
             return $this->mergeFromArray($settings);
-        } elseif ($settings instanceof Settings) {
+        }
+        elseif ($settings instanceof Settings) {
             return $this->mergeFromOtherSettings($settings);
         }
         return $this;

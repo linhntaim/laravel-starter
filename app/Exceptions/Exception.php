@@ -69,15 +69,19 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
         if (empty($message)) {
             if (!App::runningInDebug() && ConfigHelper::get('force_common_exception')) {
                 $this->messages = [trans('error.exceptions.default_exception.level_failed')];
-            } elseif ($message = $this->getMessageFromPrevious()) {
+            }
+            elseif ($message = $this->getMessageFromPrevious()) {
                 $this->messages = [$message];
-            } else {
+            }
+            else {
                 $this->messages = [$this->defaultMessage()];
             }
-        } else {
+        }
+        else {
             if (is_array($message)) {
                 $this->messages = $message;
-            } else {
+            }
+            else {
                 $this->messages = [$message];
             }
         }
@@ -145,7 +149,8 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
     {
         if ($public) {
             $this->attachedData['public'] = array_merge($this->attachedData['public'], $attachedData);
-        } else {
+        }
+        else {
             $this->attachedData['private'] = array_merge($this->attachedData['private'], $attachedData);
         }
         return $this;

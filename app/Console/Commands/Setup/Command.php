@@ -27,12 +27,14 @@ abstract class Command extends BaseCommand
             $this->newLine();
             $this->goUninstalling();
             $this->info(sprintf('[%s] uninstalled!!!', $this->friendlyName()));
-        } else {
+        }
+        else {
             $this->warn(sprintf('Setting up [%s]...', $this->friendlyName()));
             $this->newLine();
             if ($this->forced()) {
                 $this->goForcingToInstall();
-            } else {
+            }
+            else {
                 $this->goInstalling();
             }
             $this->info(sprintf('[%s] set up!!!', $this->friendlyName()));

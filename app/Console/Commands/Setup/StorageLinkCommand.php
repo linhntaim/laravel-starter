@@ -33,7 +33,8 @@ class StorageLinkCommand extends Command
                 if (!file_exists($link)) {
                     if (false === @mkdir($link)) {
                         $this->error(sprintf('Cannot create [%s] link.', $link));
-                    } else {
+                    }
+                    else {
                         Helper::copy($target, $link);
                     }
                 }
@@ -46,9 +47,15 @@ class StorageLinkCommand extends Command
     {
         foreach ($this->links() as $link => $target) {
             if (file_exists($link)) {
-                if (is_link($link)) unlink($link);
-                elseif (is_dir($link)) rmdir($link);
-                else unlink($link);
+                if (is_link($link)) {
+                    unlink($link);
+                }
+                elseif (is_dir($link)) {
+                    rmdir($link);
+                }
+                else {
+                    unlink($link);
+                }
             }
         }
     }

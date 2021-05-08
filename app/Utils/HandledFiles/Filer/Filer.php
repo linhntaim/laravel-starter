@@ -108,7 +108,7 @@ class Filer
     }
 
     /**
-     * @throws AppException
+     * @throws
      */
     protected function checkIfCanInitializeFromAnySource()
     {
@@ -117,7 +117,7 @@ class Filer
         }
     }
 
-    protected function getDefaultToDirectory()
+    public function getDefaultToDirectory()
     {
         return Helper::concatPath(date('Y'), date('m'), date('d'), date('H'));
     }
@@ -131,8 +131,8 @@ class Filer
     /**
      * @param Storage $storage
      * @param bool $markOriginal
-     * @return Filer
-     * @throws AppException
+     * @return static
+     * @throws
      */
     public function fromStorage(Storage $storage, $markOriginal = true)
     {
@@ -147,8 +147,8 @@ class Filer
      * @param string $data
      * @param bool $markOriginal
      * @param bool $encrypted
-     * @return Filer
-     * @throws AppException
+     * @return static
+     * @throws
      */
     public function fromStorageData($storageName, $data, $markOriginal = true, $encrypted = false)
     {
@@ -180,8 +180,8 @@ class Filer
 
     /**
      * @param string $url
-     * @return Filer
-     * @throws AppException
+     * @return static
+     * @throws
      */
     public function fromExternal($url)
     {
@@ -192,8 +192,8 @@ class Filer
     /**
      * @param UploadedFile $uploadedFile
      * @param bool|string|null $toDirectory
-     * @return Filer
-     * @throws AppException
+     * @return static
+     * @throws
      */
     public function fromExistedBlob(UploadedFile $uploadedFile, $toDirectory = null)
     {
@@ -204,16 +204,18 @@ class Filer
      * @param UploadedFile|File|string $file
      * @param bool|string|null $toDirectory
      * @param bool|string|array $keepOriginalName
-     * @return Filer
-     * @throws AppException
+     * @return static
+     * @throws
      */
     public function fromExisted($file, $toDirectory = null, $keepOriginalName = true)
     {
         if ($file instanceof UploadedFile) {
             $originalName = $file->getClientOriginalName();
-        } elseif ($file instanceof File) {
+        }
+        elseif ($file instanceof File) {
             $originalName = $file->getBasename();
-        } else {
+        }
+        else {
             $originalName = basename($file);
         }
         $this->name = $originalName;
@@ -223,7 +225,8 @@ class Filer
                 throw new AppException('File was not found');
             }
             $filePath = $file;
-        } elseif ($file instanceof File) {
+        }
+        elseif ($file instanceof File) {
             $filePath = $file->getRealPath();
         }
         if (isset($filePath)) {
@@ -250,8 +253,8 @@ class Filer
      * @param string $name
      * @param string $extension
      * @param bool|string|null $toDirectory
-     * @return Filer
-     * @throws AppException
+     * @return static
+     * @throws
      */
     public function fromCreating($name = null, $extension = null, $toDirectory = false)
     {

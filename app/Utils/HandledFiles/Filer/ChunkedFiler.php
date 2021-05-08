@@ -25,9 +25,13 @@ class ChunkedFiler extends Filer
     public const CHUNK_FOLDER_NAME = 'chunks';
 
     protected $chunksId;
+
     protected $chunksRelativeDirectory;
+
     protected $chunksTotal;
+
     protected $chunksExtension;
+
     protected $chunksJoined;
 
     protected $chunkIndex;
@@ -56,7 +60,8 @@ class ChunkedFiler extends Filer
         $this->fromExisted($chunkFile, false, false);
         if ($this->isFirstChunk()) {
             $this->chunksExtension = $this->getOriginStorage()->getExtension();
-        } else {
+        }
+        else {
             $firstChunkFileBaseName = $this->getOriginStorage()->first(function ($file) {
                 return Str::startsWith(Helper::changeToPath($file), Helper::concatPath(
                     $this->chunksRelativeDirectory,
@@ -111,7 +116,8 @@ class ChunkedFiler extends Filer
             return Str::startsWith(Helper::changeToPath($file), Helper::concatPath(
                     $this->chunksRelativeDirectory,
                     static::CHUNK_FILE_NAME . '.'
-                )) || Helper::changeToPath($file) == Helper::concatPath(
+                ))
+                || Helper::changeToPath($file) == Helper::concatPath(
                     $this->chunksRelativeDirectory,
                     static::CHUNK_FILE_NAME
                 );
@@ -205,7 +211,9 @@ class ChunkedFiler extends Filer
     protected function canJoin()
     {
         for ($i = $this->chunksTotal - 1; $i >= 0; --$i) {
-            if ($this->getOriginStorage()->exists($this->getChunkFileRelativePathByIndex($i))) continue;
+            if ($this->getOriginStorage()->exists($this->getChunkFileRelativePathByIndex($i))) {
+                continue;
+            }
             return false;
         }
         return true;

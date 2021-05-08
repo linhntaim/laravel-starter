@@ -68,55 +68,73 @@ class LogManager extends BaseLogManager
 
     public function emergency($message, array $context = [])
     {
-        if ($this->off) return;
+        if ($this->off) {
+            return;
+        }
         parent::emergency($this->formatMessage($message), $this->formatContext($context, $message));
     }
 
     public function alert($message, array $context = [])
     {
-        if ($this->off) return;
+        if ($this->off) {
+            return;
+        }
         parent::alert($this->formatMessage($message), $this->formatContext($context, $message));
     }
 
     public function critical($message, array $context = [])
     {
-        if ($this->off) return;
+        if ($this->off) {
+            return;
+        }
         parent::critical($this->formatMessage($message), $this->formatContext($context, $message));
     }
 
     public function error($message, array $context = [])
     {
-        if ($this->off) return;
+        if ($this->off) {
+            return;
+        }
         parent::error($this->formatMessage($message), $this->formatContext($context, $message));
     }
 
     public function warning($message, array $context = [])
     {
-        if ($this->off) return;
+        if ($this->off) {
+            return;
+        }
         parent::warning($this->formatMessage($message), $this->formatContext($context, $message));
     }
 
     public function notice($message, array $context = [])
     {
-        if ($this->off) return;
+        if ($this->off) {
+            return;
+        }
         parent::notice($this->formatMessage($message), $this->formatContext($context, $message));
     }
 
     public function info($message, array $context = [])
     {
-        if ($this->off) return;
+        if ($this->off) {
+            return;
+        }
         parent::info($this->formatMessage($message), $this->formatContext($context, $message));
     }
 
     public function debug($message, array $context = [])
     {
-        if ($this->off) return;
+        if ($this->off) {
+            return;
+        }
         parent::debug($this->formatMessage($message), $this->formatContext($context, $message));
     }
 
     public function log($level, $message, array $context = [])
     {
-        if ($this->off) return;
+        if ($this->off) {
+            return;
+        }
         parent::log($level, $this->formatMessage($message), $this->formatContext($context, $message));
     }
 

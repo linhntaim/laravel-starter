@@ -54,7 +54,8 @@ abstract class NowListener
             if ($this->transactionUsed) {
                 $this->transactionComplete();
             }
-        } catch (Throwable $e) {
+        }
+        catch (Throwable $e) {
             if (!($this instanceof Listener)) {
                 if ($this->transactionUsed) {
                     $this->transactionStop();

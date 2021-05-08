@@ -21,7 +21,6 @@ class TemplateNowMailable extends Mailable
     use ClassTrait, RateLimiterTrait;
 
     public const DEFAULT_CHARSET = 'UTF-8';
-
     public const HTML_CHARSETS = [
         'sjis' => 'SHIFT_JIS',
         'sjis-win' => 'SHIFT_JIS',
@@ -35,7 +34,6 @@ class TemplateNowMailable extends Mailable
         'iso-2022-jp-ms' => 'ISO-2022-JP',
         'iso-2022-jp-mobile#kddi' => 'ISO-2022-JP',
     ];
-
     public const EMAIL_FROM = 'x_email_from';
     public const EMAIL_FROM_NAME = 'x_email_from_name';
     public const EMAIL_TO = 'x_email_to';
@@ -75,14 +73,16 @@ class TemplateNowMailable extends Mailable
     {
         if (is_string($charset)) {
             $this->charset = $this->parseCharsetString($charset);
-        } elseif (is_array($charset)) {
+        }
+        elseif (is_array($charset)) {
             $this->charset = [
                 'header' => isset($charset['header']) ?
                     $this->parseCharsetString($charset['header']) : $this->defaultCharset(),
                 'body' => isset($charset['body']) ?
                     $this->parseCharsetString($charset['body']) : $this->defaultCharset(),
             ];
-        } else {
+        }
+        else {
             $this->charset = $this->defaultCharset();
         }
     }
@@ -108,7 +108,8 @@ class TemplateNowMailable extends Mailable
                 if (!empty($localeCharsets[0])) {
                     $charset['default'] = $localeCharsets[0];
                 }
-            } else {
+            }
+            else {
                 $charset['locales'][$localeCharsets[0]] = $localeCharsets[1];
             }
         }
@@ -180,7 +181,8 @@ class TemplateNowMailable extends Mailable
                 ->register('mime.qpheaderencoder')
                 ->asNewInstanceOf('Swift_Mime_HeaderEncoder_QpHeaderEncoder')
                 ->withDependencies(['mime.charstream']);
-        } else {
+        }
+        else {
             Swift_DependencyContainer::getInstance()
                 ->register('mime.qpheaderencoder')
                 ->asAliasOf('mime.base64headerencoder');
@@ -196,10 +198,12 @@ class TemplateNowMailable extends Mailable
             }
             if (isset($this->templateParams[static::EMAIL_FROM_NAME])) {
                 $this->from($this->templateParams[static::EMAIL_FROM], $this->templateParams[static::EMAIL_FROM_NAME]);
-            } else {
+            }
+            else {
                 $this->from($this->templateParams[static::EMAIL_FROM]);
             }
-        } else {
+        }
+        else {
             $noReplyMail = ConfigHelper::getNoReplyMail();
             if (empty($noReplyMail['address'])) {
                 throw new AppException('No-reply email has been not set');
@@ -213,13 +217,15 @@ class TemplateNowMailable extends Mailable
                 throw new AppException('Tested email has been not set');
             }
             $this->to($emailTested['address'], $emailTested['name']);
-        } else {
+        }
+        else {
             if (empty($this->templateParams[static::EMAIL_TO])) {
                 throw new AppException('To email has been not set');
             }
             if (isset($this->templateParams[static::EMAIL_TO_NAME])) {
                 $this->to($this->templateParams[static::EMAIL_TO], $this->templateParams[static::EMAIL_TO_NAME]);
-            } else {
+            }
+            else {
                 $this->to($this->templateParams[static::EMAIL_TO]);
             }
         }

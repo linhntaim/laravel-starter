@@ -99,8 +99,8 @@ class App extends BaseApp
                         Helper::autoDisplaySize(static::$benchAt[$name]['pr'], 2)
                     )
                 );
-            } else {
-
+            }
+            else {
                 Log::info(
                     sprintf(
                         'Bench [%s] from start: %sms, %s, %s (real), %s (peak), %s (peak real).',

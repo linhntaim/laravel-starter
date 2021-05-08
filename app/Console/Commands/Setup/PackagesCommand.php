@@ -41,7 +41,8 @@ class PackagesCommand extends Command
                 if ($this->forced() || !$this->existed($package)) {
                     $requiredPackages[] = $package;
                 }
-            } else {
+            }
+            else {
                 if ($this->forced() || $this->existed($package)) {
                     $removedPackages[] = $package;
                 }

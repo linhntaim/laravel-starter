@@ -27,9 +27,15 @@ trait MigrateWithPassportTrait
         $this->warn('Migrating passport...');
 
         $migrated = true;
-        if ($migrated && $this->forced()) $migrated = false;
-        if ($migrated && !file_exists(storage_path('oauth-private.key'))) $migrated = false;
-        if ($migrated && !file_exists(storage_path('oauth-public.key'))) $migrated = false;
+        if ($migrated && $this->forced()) {
+            $migrated = false;
+        }
+        if ($migrated && !file_exists(storage_path('oauth-private.key'))) {
+            $migrated = false;
+        }
+        if ($migrated && !file_exists(storage_path('oauth-public.key'))) {
+            $migrated = false;
+        }
         if ($migrated) {
             $tablePrefix = DB::getTablePrefix();
             $database = config(sprintf('database.connections.%s.database', config('database.default')));
@@ -38,18 +44,24 @@ trait MigrateWithPassportTrait
                 $tablePrefix . 'oauth_impersonates',
                 $tablePrefix . 'oauth_%',
             ]);
-            if (count($tables) <= 0) $migrated = false;
-            if ($migrated &&
-                !collect($tables)->pluck('table_name')
+            if (count($tables) <= 0) {
+                $migrated = false;
+            }
+            if ($migrated
+                && !collect($tables)->pluck('table_name')
                     ->map(function ($table) use ($tablePrefix) {
                         return $tablePrefix ? substr($table, 0, strlen($tablePrefix)) : $table;
                     })
                     ->every(function ($table) {
                         return in_array($table, $this->passportTables);
-                    })) $migrated = false;
+                    })) {
+                $migrated = false;
+            }
             if ($migrated) {
                 $clients = DB::select('select * from ' . $tablePrefix . 'oauth_clients');
-                if (count($clients) < 2) $migrated = false;
+                if (count($clients) < 2) {
+                    $migrated = false;
+                }
             }
         }
 
@@ -85,7 +97,8 @@ trait MigrateWithPassportTrait
             }
             if (empty($clientSecret)) {
                 $environmentFileHelper->fill('PASSPORT_PASSWORD_CLIENT_SECRET', $oAuthClient->secret);
-            } else {
+            }
+            else {
                 // update with no-need-to-hash secret
                 if ($clientSecret != $oAuthClient->secret) {
                     $old = Passport::$hashesClientSecrets;
@@ -95,11 +108,13 @@ trait MigrateWithPassportTrait
                     ]);
                     Passport::$hashesClientSecrets = $old;
                     $this->info(sprintf('The client ID [%d] has secret updated to [%s]', $clientId, $clientSecret));
-                } else {
+                }
+                else {
                     $this->info(sprintf('The client ID [%d] has secret of [%s]', $clientId, $clientSecret));
                 }
             }
-        } else {
+        }
+        else {
             $this->error('No password client exists');
         }
         $environmentFileHelper->save();

@@ -55,7 +55,6 @@ class User extends Authenticatable implements IModel, IUser
         'username',
         'email',
         'password',
-        'remember_token',
         'password_changed_at',
         'last_accessed_at',
     ];

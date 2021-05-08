@@ -138,7 +138,8 @@ trait MultipleKeyTrait
                     $count++;
                 }
             }
-        } else {
+        }
+        else {
             foreach ($instance->whereIn($key, $ids)->get() as $model) {
                 if ($model->delete()) {
                     $count++;
@@ -157,7 +158,8 @@ trait MultipleKeyTrait
             foreach ($keyName as $k) {
                 $this->setAttribute($k, $id[$k]);
             }
-        } else {
+        }
+        else {
             $this->setAttribute($keyName, $id);
         }
     }

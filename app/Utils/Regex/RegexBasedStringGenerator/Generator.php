@@ -19,12 +19,17 @@ class Generator
     public const DEFAULT_LIMIT_QUANTIFICATION = 8;
 
     protected $hasQuantification;
+
     protected $hasFixedQuantification;
+
     protected $hasMoreQuantification;
+
     protected $lockedQuantification;
 
     protected $hasLimitCharacters;
+
     protected $limitCharacters;
+
     protected $limitQuantification;
 
     protected $tree;
@@ -38,7 +43,7 @@ class Generator
      * @param callable|bool|null $parsedCallback
      * @param bool $debug
      * @param int $matchedLength
-     * @throws AppException
+     * @throws
      */
     public function __construct($regex, $parsedCallback = false, $debug = false, $matchedLength = -1)
     {
@@ -85,14 +90,18 @@ class Generator
      */
     public function generate($limitQuantity = -1, $limitCharacters = -1, $generatedCallback = null, $isRandom = false)
     {
-        if ($limitQuantity == 0 || $limitCharacters == 0) return [];
+        if ($limitQuantity == 0 || $limitCharacters == 0) {
+            return [];
+        }
 
         $this->limitCharacters = $limitCharacters;
         if ($limitCharacters > 0) {
             $this->hasLimitCharacters = !$this->lockedQuantification; // must not locked
             $this->limitQuantification = $limitCharacters;
         }
-        if ($limitQuantity > 0) return $this->generateLimit($limitQuantity, $generatedCallback, $isRandom);
+        if ($limitQuantity > 0) {
+            return $this->generateLimit($limitQuantity, $generatedCallback, $isRandom);
+        }
         return $this->generateAll($generatedCallback);
     }
 
@@ -114,7 +123,8 @@ class Generator
             if (!$this->hasLimitCharacters || strlen($output) <= $this->limitCharacters) {
                 if (!empty($generatedCallback)) {
                     $generatedCallback($output);
-                } else {
+                }
+                else {
                     $outputs[] = $output;
                 }
             }
@@ -135,7 +145,8 @@ class Generator
         while (--$limitQuantity >= 0) {
             if ($isRandom) {
                 $this->tree->beforeRandomGenerating($this->tree);
-            } else {
+            }
+            else {
                 $this->tree->beforeGenerating($this->tree);
             }
             $output = $this->tree->generate();
@@ -145,10 +156,12 @@ class Generator
             $prevOutput = $output;
             if ($this->hasLimitCharacters && strlen($output) > $this->limitCharacters) {
                 ++$limitQuantity;
-            } else {
+            }
+            else {
                 if (!empty($generatedCallback)) {
                     $generatedCallback($output);
-                } else {
+                }
+                else {
                     $outputs[] = $output;
                 }
             }
@@ -204,7 +217,7 @@ class Generator
     /**
      * @param TreeNode $node
      * @return GeneratorNode|string
-     * @throws AppException
+     * @throws
      */
     private function buildGenerationTree(TreeNode $node)
     {

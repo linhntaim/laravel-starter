@@ -12,8 +12,11 @@ use App\Vendors\Illuminate\Support\Str;
 class CsvFiler extends Filer
 {
     protected $fReadMatchedHeaders = [];
+
     protected $fReadExtraHeaders = [];
+
     protected $fReadSkipHeader = true;
+
     protected $fHasTrimBomCharacters = false;
 
     public function fReadSetMatchedHeaders(array $matchHeaders = [], array $extraHeaders = [])
@@ -32,11 +35,13 @@ class CsvFiler extends Filer
     /**
      * @param $read
      * @return array
-     * @throws AppException
+     * @throws
      */
     protected function fReadMatchesHeaders($read)
     {
-        if (empty($this->fReadMatchedHeaders)) return $read;
+        if (empty($this->fReadMatchedHeaders)) {
+            return $read;
+        }
         $countRead = count($read);
         $countMatchedHeaders = count($this->fReadMatchedHeaders);
         $countExtraHeaders = count($this->fReadExtraHeaders);
@@ -44,7 +49,8 @@ class CsvFiler extends Filer
             if ($countRead != $countMatchedHeaders) {
                 $this->fReadThrowException();
             }
-        } else {
+        }
+        else {
             if ($countRead < $countMatchedHeaders || $countRead > $countExtraHeaders + $countMatchedHeaders) {
                 $this->fReadThrowException();
             }
@@ -73,7 +79,7 @@ class CsvFiler extends Filer
 
     /**
      * @return array|null
-     * @throws AppException
+     * @throws
      */
     protected function fReading()
     {

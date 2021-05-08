@@ -11,10 +11,15 @@ use App\Configuration;
 trait PagingTrait
 {
     protected $sortByAllows = [];
+
     protected $sortBy = null;
+
     protected $sortOrder = 'asc';
+
     protected $moreByAllows = [];
+
     protected $moreBy = null;
+
     protected $moreOrder = 'asc';
 
     protected function paging()

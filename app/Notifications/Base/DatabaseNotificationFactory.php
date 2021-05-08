@@ -14,7 +14,7 @@ class DatabaseNotificationFactory
     /**
      * @param DatabaseNotification $notification
      * @return NowNotification|mixed
-     * @throws AppException
+     * @throws
      */
     public static function makeFromModel(DatabaseNotification $notification)
     {

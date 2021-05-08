@@ -42,7 +42,8 @@ class LineFormatter extends BaseLineFormatter
             if (isset($e->detail)) {
                 if (is_string($e->detail)) {
                     $this->varTraces[] = sprintf('Fault detail: %s', $e->detail);
-                } elseif (is_object($e->detail) || is_array($e->detail)) {
+                }
+                elseif (is_object($e->detail) || is_array($e->detail)) {
                     $this->varTraces[] = sprintf('Fault detail: %s', $this->toJson($e->detail, true));
                 }
             }
@@ -66,7 +67,8 @@ class LineFormatter extends BaseLineFormatter
                     $trace['type'] ?? '',
                     $trace['function'] ?? ''
                 );
-            } else {
+            }
+            else {
                 $this->varTraces[] = sprintf(
                     '#%d %s%s%s()',
                     $i,

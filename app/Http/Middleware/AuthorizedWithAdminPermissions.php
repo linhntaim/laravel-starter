@@ -17,9 +17,13 @@ class AuthorizedWithAdminPermissions
     public function handle(Request $request, Closure $next, $permissions = null)
     {
         $admin = $this->getAdmin($request);
-        if (empty($admin)) $this->abort403();
+        if (empty($admin)) {
+            $this->abort403();
+        }
 
-        if (empty($permissions)) return $next($request);
+        if (empty($permissions)) {
+            return $next($request);
+        }
 
         $prePermissions = explode('|', $permissions);
         $permitted = false;
@@ -30,7 +34,8 @@ class AuthorizedWithAdminPermissions
                     $permitted = true;
                     break;
                 }
-            } else {
+            }
+            else {
                 if ($request->has($parts[0])) {
                     if ($admin->hasPermissionsAtLeast(explode('#', $parts[1]))) {
                         $permitted = true;
