@@ -68,7 +68,7 @@ class Helper
 
     public static function nameWithExtension($name = null, $extension = null)
     {
-        return ($name ? $name : static::randomName()) . ($extension ? '.' . $extension : '');
+        return ($name ?: static::randomName()) . ($extension ? '.' . $extension : '');
     }
 
     public static function randomName()

@@ -8,7 +8,7 @@ use App\Vendors\Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateDataExportsTable extends Migration
+class CreateDataImportsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -17,19 +17,19 @@ class CreateDataExportsTable extends Migration
      */
     public function up()
     {
-        Schema::create('data_exports', function (Blueprint $table) {
+        Schema::create('data_imports', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->rowFormat = 'DYNAMIC';
 
             $table->increments('id');
-            $table->integer('file_id')->unsigned()->nullable();
+            $table->integer('file_id')->unsigned();
             $table->tinyInteger('state');
             $table->string('name');
             $table->longText('exception')->nullable();
             $table->timestamps();
 
             $table->foreign('file_id')->references('id')->on('handled_files')
-                ->onUpdate('cascade')->onDelete('set null');
+                ->onUpdate('cascade')->onDelete('cascade');
 
             $table->index('name');
             $table->index('created_at');

@@ -35,7 +35,7 @@ class PropertyDefinition
      */
     public function getCaster(string $name)
     {
-        $cast = isset($this->definition[$name]['cast']) ? $this->definition[$name]['cast'] : null;
+        $cast = $this->definition[$name]['cast'] ?? null;
         return is_array($cast) ? new CallbacksCast($cast) : $cast;
     }
 }

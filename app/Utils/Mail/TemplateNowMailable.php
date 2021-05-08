@@ -23,13 +23,13 @@ class TemplateNowMailable extends Mailable
     public const DEFAULT_CHARSET = 'UTF-8';
 
     public const HTML_CHARSETS = [
-        'sjis' => 'SHIFT_JS',
-        'sjis-win' => 'SHIFT_JS',
-        'sjis-mac' => 'SHIFT_JS',
-        'macjapanese' => 'SHIFT_JS',
-        'sjis-mobile#docomo' => 'SHIFT_JS',
-        'sjis-mobile#kddi' => 'SHIFT_JS',
-        'sjis-mobile#softbank' => 'SHIFT_JS',
+        'sjis' => 'SHIFT_JIS',
+        'sjis-win' => 'SHIFT_JIS',
+        'sjis-mac' => 'SHIFT_JIS',
+        'macjapanese' => 'SHIFT_JIS',
+        'sjis-mobile#docomo' => 'SHIFT_JIS',
+        'sjis-mobile#kddi' => 'SHIFT_JIS',
+        'sjis-mobile#softbank' => 'SHIFT_JIS',
         'jis' => 'ISO-2022-JP',
         'jis-win' => 'ISO-2022-JP',
         'iso-2022-jp-ms' => 'ISO-2022-JP',
@@ -64,7 +64,7 @@ class TemplateNowMailable extends Mailable
         $this->templateLocalized = $templateLocalized;
         $this->templateNamespace = $templateNamespace;
 
-        $this->locale = $templateLocale ? $templateLocale : Facade::getLocale();
+        $this->locale = $templateLocale ?: Facade::getLocale();
         $this->parseCharset(is_null($charset) ? ConfigHelper::get('emails.send_charset') : $charset);
     }
 
@@ -131,7 +131,7 @@ class TemplateNowMailable extends Mailable
 
     protected function getCharset($charset)
     {
-        return isset($charset['locales'][$this->locale]) ? $charset['locales'][$this->locale] : $charset['default'];
+        return $charset['locales'][$this->locale] ?? $charset['default'];
     }
 
     protected function headerCharset()
@@ -150,7 +150,7 @@ class TemplateNowMailable extends Mailable
             $this->htmlCharset = (function () {
                 $bodyCharset = $this->bodyCharset();
                 $lowerBodyCharset = strtolower($bodyCharset);
-                return isset(static::HTML_CHARSETS[$lowerBodyCharset]) ? static::HTML_CHARSETS[$lowerBodyCharset] : $bodyCharset;
+                return static::HTML_CHARSETS[$lowerBodyCharset] ?? $bodyCharset;
             })();
         }
         return $this->htmlCharset;

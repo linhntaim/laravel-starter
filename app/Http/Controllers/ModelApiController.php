@@ -12,9 +12,9 @@ use App\Exports\Base\Export;
 use App\Exports\Base\IndexModelCsvExport;
 use App\Http\Requests\Request;
 use App\Imports\Base\Import;
-use App\Jobs\ImportJob;
 use App\ModelRepositories\Base\ModelRepository;
 use App\ModelRepositories\DataExportRepository;
+use App\ModelRepositories\DataImportRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -301,7 +301,7 @@ abstract class ModelApiController extends ApiController
     protected function modelImporter(Request $request)
     {
         $class = $this->modelImporterClass($request);
-        return $class ? new $class($this->modelImporterFile($request)) : null;
+        return $class ? new $class() : null;
     }
 
     /**
@@ -322,7 +322,14 @@ abstract class ModelApiController extends ApiController
             }
         }
 
-        ImportJob::dispatch($importer);
+        $currentUser = $request->user();
+        return (new DataImportRepository())->createWithAttributesAndImport(
+            [
+                'created_by' => $currentUser ? $currentUser->id : null,
+            ],
+            $this->modelImporterFile($request),
+            $importer
+        );
     }
 
     protected function importValidatedRules(Request $request)
@@ -340,8 +347,7 @@ abstract class ModelApiController extends ApiController
     protected function import(Request $request)
     {
         $this->importValidated($request);
-        $this->importExecute($request);
-        return $this->responseSuccess();
+        return $this->responseModel($this->importExecute($request));
     }
     #endregion
 

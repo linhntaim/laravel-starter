@@ -23,7 +23,7 @@ class TableLock
      */
     public function getTable()
     {
-        return isset($this->options['table']) ? $this->options['table'] : null;
+        return $this->options['table'] ?? null;
     }
 
     public function toLockQuery()

@@ -26,7 +26,7 @@ class ClientLimitCommand extends Command
 
             $clientLimiter->setAllowed(empty($allowed) ? [] : $allowed)
                 ->setDenied(empty($denied) ? [] : $denied)
-                ->setAdmin($admin ? true : false)
+                ->setAdmin((bool)$admin)
                 ->save();
         }
     }

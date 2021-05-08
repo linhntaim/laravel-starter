@@ -24,9 +24,9 @@ abstract class Encrypter
         return mb_substr($encryptedRelativePath, 0, mb_strlen($encryptedRelativePath) - mb_strlen($extension));
     }
 
-    public abstract function encrypt(HandledStorage $storage);
+    public abstract function encrypt(HandledStorage $storage, $copy = false);
 
-    public abstract function decrypt(HandledStorage $storage);
+    public abstract function decrypt(HandledStorage $storage, $copy = false);
 
     public abstract function streamDecrypt(HandledStorage $storage);
 }

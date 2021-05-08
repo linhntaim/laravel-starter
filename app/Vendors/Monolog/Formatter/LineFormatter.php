@@ -56,23 +56,23 @@ class LineFormatter extends BaseLineFormatter
                 $this->varTraces[] = sprintf(
                     '#%d [%s:%s]',
                     $i,
-                    isset($trace['file']) ? $trace['file'] : '',
-                    isset($trace['line']) ? $trace['line'] : ''
+                    $trace['file'] ?? '',
+                    $trace['line'] ?? ''
                 );
                 $this->varTraces[] = sprintf(
                     '%s %s%s%s()',
                     str_repeat(' ', strlen($i) + 1),
-                    isset($trace['class']) ? $trace['class'] : '',
-                    isset($trace['type']) ? $trace['type'] : '',
-                    isset($trace['function']) ? $trace['function'] : ''
+                    $trace['class'] ?? '',
+                    $trace['type'] ?? '',
+                    $trace['function'] ?? ''
                 );
             } else {
                 $this->varTraces[] = sprintf(
                     '#%d %s%s%s()',
                     $i,
-                    isset($trace['class']) ? $trace['class'] : '',
-                    isset($trace['type']) ? $trace['type'] : '',
-                    isset($trace['function']) ? $trace['function'] : ''
+                    $trace['class'] ?? '',
+                    $trace['type'] ?? '',
+                    $trace['function'] ?? ''
                 );
             }
             $last = $i + 1;

@@ -26,6 +26,7 @@ return [
     ],
     'custom_timezone' => env('CUSTOM_TIMEZONE'),
     'public_path' => env('PUBLIC_PATH'),
+    'multiple_instances' => (bool)env('MULTIPLE_INSTANCES', false),
     'passport' => [
         'password' => [
             'client_id' => env('PASSPORT_PASSWORD_CLIENT_ID'),

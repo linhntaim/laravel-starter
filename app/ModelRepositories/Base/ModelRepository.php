@@ -370,7 +370,7 @@ abstract class ModelRepository
             $noNeedToCheckSortsAllowed = empty($sortsAllowed);
             foreach (array_merge($this->sorts, $this->sortsDefault) as $sort) {
                 if ($noNeedToCheckSortsAllowed || in_array($sort['by'], $sortsAllowed)) {
-                    $query->orderBy($sort['by'], $sort['order'] ? $sort['order'] : 'asc');
+                    $query->orderBy($sort['by'], $sort['order'] ?? 'asc');
                 }
             }
             $this->sorts()->sortsAllowed();

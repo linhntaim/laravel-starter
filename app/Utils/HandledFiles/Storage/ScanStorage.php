@@ -21,7 +21,7 @@ class ScanStorage extends HandledStorage
         $this->scanDiskName = ConfigHelper::get('handled_file.scan.disk');
         parent::__construct($this->scanDiskName);
 
-        $this->scanner = $scanner ? $scanner : $this->getDefaultScanner();
+        $this->scanner = $scanner ?: $this->getDefaultScanner();
     }
 
     public function getDiskName()

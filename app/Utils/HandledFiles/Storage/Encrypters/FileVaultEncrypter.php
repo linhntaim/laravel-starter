@@ -9,21 +9,21 @@ use SoareCostin\FileVault\Facades\FileVault;
 
 class FileVaultEncrypter extends Encrypter
 {
-    public function encrypt(HandledStorage $storage)
+    public function encrypt(HandledStorage $storage, $copy = false)
     {
         $relativePath = $storage->getRelativePath();
         $encryptedRelativePath = $this->encryptedRelativePath($relativePath);
         FileVault::disk($storage->getDiskName())
-            ->encrypt($relativePath, $encryptedRelativePath);
+            ->encrypt($relativePath, $encryptedRelativePath, !$copy);
         $storage->setRelativePath($encryptedRelativePath);
     }
 
-    public function decrypt(HandledStorage $storage)
+    public function decrypt(HandledStorage $storage, $copy = false)
     {
         $encryptedRelativePath = $storage->getRelativePath();
         $decryptedRelativePath = $this->decryptedRelativePath($encryptedRelativePath);
         FileVault::disk($storage->getDiskName())
-            ->decrypt($encryptedRelativePath, $decryptedRelativePath);
+            ->decrypt($encryptedRelativePath, $decryptedRelativePath, !$copy);
         $storage->setRelativePath($decryptedRelativePath);
     }
 

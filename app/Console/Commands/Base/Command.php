@@ -184,8 +184,8 @@ abstract class Command extends BaseCommand
                     sprintf(
                         '<comment>#%d</comment> [<info>%s:%s</info>]',
                         $i,
-                        isset($trace['file']) ? $trace['file'] : '',
-                        isset($trace['line']) ? $trace['line'] : ''
+                        $trace['file'] ?? '',
+                        $trace['line'] ?? ''
                     ),
                     $this->parseVerbosity()
                 );
@@ -193,9 +193,9 @@ abstract class Command extends BaseCommand
                     sprintf(
                         '%s %s%s%s()',
                         str_repeat(' ', strlen($i) + 1),
-                        isset($trace['class']) ? $trace['class'] : '',
-                        isset($trace['type']) ? $trace['type'] : '',
-                        isset($trace['function']) ? $trace['function'] : ''
+                        $trace['class'] ?? '',
+                        $trace['type'] ?? '',
+                        $trace['function'] ?? ''
                     ),
                     $this->parseVerbosity()
                 );
@@ -204,9 +204,9 @@ abstract class Command extends BaseCommand
                     sprintf(
                         '<comment>#%d</comment> %s%s%s()',
                         $i,
-                        isset($trace['class']) ? $trace['class'] : '',
-                        isset($trace['type']) ? $trace['type'] : '',
-                        isset($trace['function']) ? $trace['function'] : ''
+                        $trace['class'] ?? '',
+                        $trace['type'] ?? '',
+                        $trace['function'] ?? ''
                     ),
                     $this->parseVerbosity()
                 );

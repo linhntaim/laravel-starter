@@ -18,9 +18,16 @@ class InlineStorage extends Storage implements IFileStorage, IUrlStorage, IRespo
 
     protected $inline;
 
-    public function fromFile($file)
+    public function from($file)
     {
-        if ($file instanceof UploadedFile) {
+        if ($file instanceof LocalStorage) {
+            $file = $file->getRealPath();
+        }
+        if ($file instanceof HandledStorage) {
+            $this->size = $file->getSize();
+            $this->mime = $file->getMime();
+            $content = $file->getContent();
+        } elseif ($file instanceof UploadedFile) {
             $this->size = $file->getSize();
             $this->mime = $file->getClientMimeType();
             $content = file_get_contents($file->getRealPath());
