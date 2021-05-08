@@ -20,7 +20,6 @@ class AppOption extends Model
     public const TYPE_NUMBER = 'number';
     public const TYPE_ARRAY = 'array';
     public const TYPE_OBJECT = 'object';
-
     public const YES = 1;
     public const NO = 2;
 
@@ -62,16 +61,20 @@ class AppOption extends Model
         if (is_object($value)) {
             $this->attributes['type'] = static::TYPE_OBJECT;
             $this->attributes['value'] = serialize($value);
-        } elseif (is_array($value)) {
+        }
+        elseif (is_array($value)) {
             $this->attributes['type'] = static::TYPE_ARRAY;
             $this->attributes['value'] = json_encode($value);
-        } elseif (is_numeric($value)) {
+        }
+        elseif (is_numeric($value)) {
             $this->attributes['type'] = static::TYPE_NUMBER;
             $this->attributes['value'] = $value;
-        } elseif (empty($value)) {
+        }
+        elseif (empty($value)) {
             $this->attributes['type'] = static::TYPE_NULL;
             $this->attributes['value'] = null;
-        } else {
+        }
+        else {
             $this->attributes['type'] = static::TYPE_STRING;
             $this->attributes['value'] = $value;
         }

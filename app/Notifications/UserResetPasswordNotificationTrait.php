@@ -12,6 +12,7 @@ use App\Utils\ClientSettings\Facade;
 trait UserResetPasswordNotificationTrait
 {
     protected $token;
+
     protected $appResetPasswordPath;
 
     public function __construct($token, IUser $notifier = null)

@@ -31,7 +31,8 @@ class Helper
         foreach (func_get_args() as $arg) {
             if (is_array($arg)) {
                 array_push($urls, static::concatUrl(...$arg));
-            } else {
+            }
+            else {
                 $urls[] = $arg;
             }
         }
@@ -54,7 +55,8 @@ class Helper
         foreach (func_get_args() as $arg) {
             if (is_array($arg)) {
                 array_push($paths, static::concatPath(...$arg));
-            } else {
+            }
+            else {
                 $paths[] = $arg;
             }
         }
@@ -68,7 +70,7 @@ class Helper
 
     public static function nameWithExtension($name = null, $extension = null)
     {
-        return ($name ? $name : static::randomName()) . ($extension ? '.' . $extension : '');
+        return ($name ?: static::randomName()) . ($extension ? '.' . $extension : '');
     }
 
     public static function randomName()
@@ -134,9 +136,11 @@ class Helper
 
         if ($callback === true) {
             $size = number_format($size);
-        } elseif (is_int($callback)) {
+        }
+        elseif (is_int($callback)) {
             $size = number_format($size, $callback);
-        } elseif (is_callable($callback)) {
+        }
+        elseif (is_callable($callback)) {
             $size = $callback($size);
         }
         return $size . $unitSeparator . $units[$unitIndex];

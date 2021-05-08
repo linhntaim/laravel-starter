@@ -60,12 +60,14 @@ abstract class DependedRepository extends ModelRepository
                 $query->with([
                     $depended => $this->dependedWith[$depended],
                 ]);
-            } else {
+            }
+            else {
                 $query->with($depended);
             }
             if (isset($this->dependedWhere[$depended])) {
                 $query->whereHas($depended, $this->dependedWhere[$depended]);
-            } else {
+            }
+            else {
                 if (!Str::contains($depended, '.')) {
                     $query->whereHas($depended);
                 }

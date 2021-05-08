@@ -11,17 +11,16 @@ class AES
     public static function encrypt($data, $passPhrase, $salt = null)
     {
         $salt = $salt ?: openssl_random_pseudo_bytes(8);
-        list($key, $iv) = static::evpkdf($passPhrase, $salt);
+        [$key, $iv] = static::evpkdf($passPhrase, $salt);
         $ct = openssl_encrypt($data, 'aes-256-cbc', $key, true, $iv);
         return static::encode($ct, $salt);
     }
 
     public static function decrypt($base64, $passphrase)
     {
-        list($ct, $salt) = static::decode($base64);
-        list($key, $iv) = static::evpkdf($passphrase, $salt);
-        $data = openssl_decrypt($ct, 'aes-256-cbc', $key, true, $iv);
-        return $data;
+        [$ct, $salt] = static::decode($base64);
+        [$key, $iv] = static::evpkdf($passphrase, $salt);
+        return openssl_decrypt($ct, 'aes-256-cbc', $key, true, $iv);
     }
 
     public static function evpkdf($passPhrase, $salt)

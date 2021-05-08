@@ -38,10 +38,12 @@ trait ModelTransformTrait
     {
         if (is_null($modelClass)) {
             $this->temporaryModelResourceClass = $modelResourceClass;
-        } else {
+        }
+        else {
             if (is_null($modelResourceClass)) {
                 unset($this->temporaryModelResourceClasses[$modelClass]);
-            } else {
+            }
+            else {
                 $this->temporaryModelResourceClasses[$modelClass] = $modelResourceClass;
             }
         }
@@ -52,10 +54,12 @@ trait ModelTransformTrait
     {
         if (is_null($modelClass)) {
             $this->fixedModelResourceClass = $modelResourceClass;
-        } else {
+        }
+        else {
             if (is_null($modelResourceClass)) {
                 unset($this->fixedModelResourceClasses[$modelClass]);
-            } else {
+            }
+            else {
                 $this->fixedModelResourceClasses[$modelClass] = $modelResourceClass;
             }
         }
@@ -77,7 +81,9 @@ trait ModelTransformTrait
      */
     protected function modelTransform($model, $request = null, $wrapped = false)
     {
-        if (is_null($model) || $model instanceof MissingValue) return null;
+        if (is_null($model) || $model instanceof MissingValue) {
+            return null;
+        }
 
         return $this->getModelResource($model)->enableWrapping($wrapped)->model($request);
     }
@@ -123,7 +129,9 @@ trait ModelTransformTrait
             }
             if ($model instanceof IResource) {
                 $modelResourceClass = $model->getResourceClass();
-                if ($modelResourceClass) return $modelResourceClass;
+                if ($modelResourceClass) {
+                    return $modelResourceClass;
+                }
             }
         }
 

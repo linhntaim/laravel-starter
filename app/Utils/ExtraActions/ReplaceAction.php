@@ -17,7 +17,7 @@ class ReplaceAction extends Action
     /**
      * @param string $namespace
      * @param callable|bool|null $conditionCallback
-     * @return ReplaceAction
+     * @return static
      */
     public function setConditionCallback(string $namespace, $conditionCallback = true)
     {
@@ -28,7 +28,7 @@ class ReplaceAction extends Action
     /**
      * @param string $namespace
      * @param callable|null $defaultCallback
-     * @return ReplaceAction
+     * @return static
      */
     public function setDefaultCallback(string $namespace, callable $defaultCallback = null)
     {
@@ -43,8 +43,10 @@ class ReplaceAction extends Action
      */
     protected function executeCondition(string $namespace, array $params)
     {
-        $callback = isset($this->conditionCallbacks[$namespace]) ? $this->conditionCallbacks[$namespace] : true;
-        if (is_bool($callback)) return $callback;
+        $callback = $this->conditionCallbacks[$namespace] ?? true;
+        if (is_bool($callback)) {
+            return $callback;
+        }
         return $callback ? $callback(...$params) : true;
     }
 
@@ -55,7 +57,7 @@ class ReplaceAction extends Action
      */
     protected function executeDefault(string $namespace, array $params)
     {
-        $callback = isset($this->defaultCallbacks[$namespace]) ? $this->defaultCallbacks[$namespace] : null;
+        $callback = $this->defaultCallbacks[$namespace] ?? null;
         return $callback ? $callback(...$params) : null;
     }
 

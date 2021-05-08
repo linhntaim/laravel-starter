@@ -118,8 +118,16 @@
                 </rule>
             </outboundRules>
             <rules>
-                <!-- Handle Front -->
-                <rule name="Front" stopProcessing="true">
+                <!-- Redirect Trailing Slashes If Not A Folder... -->
+                <rule name="Imported Rule 1" stopProcessing="true">
+                    <match url="^(.*)/$" ignoreCase="false" />
+                    <conditions>
+                        <add input="{REQUEST_FILENAME}" matchType="IsDirectory" ignoreCase="false" negate="true" />
+                    </conditions>
+                    <action type="Redirect" redirectType="Permanent" url="/{R:1}" />
+                </rule>
+                <!-- Send Requests To Front Controller... -->
+                <rule name="Imported Rule 2" stopProcessing="true">
                     <match url="^" ignoreCase="false"/>
                     <conditions logicalGrouping="MatchAll">
                         <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true"/>

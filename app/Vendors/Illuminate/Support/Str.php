@@ -38,7 +38,9 @@ class Str extends BaseStr
 
     public static function toUtf8($text)
     {
-        if (trim($text) === '') return '';
+        if (trim($text) === '') {
+            return '';
+        }
 
         $utf8Encoding = 'UTF-8';
         $currentEncoding = mb_detect_encoding($text);
@@ -53,9 +55,13 @@ class Str extends BaseStr
      */
     public static function locale($text, $locale = null)
     {
-        if (is_string($text)) return $text;
+        if (is_string($text)) {
+            return $text;
+        }
 
-        if (is_null($locale)) $locale = Facade::getLocale();
+        if (is_null($locale)) {
+            $locale = Facade::getLocale();
+        }
         if (is_array($text)) {
             if (isset($text[$locale])) {
                 return $text[$locale];

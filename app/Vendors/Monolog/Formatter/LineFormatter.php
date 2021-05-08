@@ -42,7 +42,8 @@ class LineFormatter extends BaseLineFormatter
             if (isset($e->detail)) {
                 if (is_string($e->detail)) {
                     $this->varTraces[] = sprintf('Fault detail: %s', $e->detail);
-                } elseif (is_object($e->detail) || is_array($e->detail)) {
+                }
+                elseif (is_object($e->detail) || is_array($e->detail)) {
                     $this->varTraces[] = sprintf('Fault detail: %s', $this->toJson($e->detail, true));
                 }
             }
@@ -56,23 +57,24 @@ class LineFormatter extends BaseLineFormatter
                 $this->varTraces[] = sprintf(
                     '#%d [%s:%s]',
                     $i,
-                    isset($trace['file']) ? $trace['file'] : '',
-                    isset($trace['line']) ? $trace['line'] : ''
+                    $trace['file'] ?? '',
+                    $trace['line'] ?? ''
                 );
                 $this->varTraces[] = sprintf(
                     '%s %s%s%s()',
                     str_repeat(' ', strlen($i) + 1),
-                    isset($trace['class']) ? $trace['class'] : '',
-                    isset($trace['type']) ? $trace['type'] : '',
-                    isset($trace['function']) ? $trace['function'] : ''
+                    $trace['class'] ?? '',
+                    $trace['type'] ?? '',
+                    $trace['function'] ?? ''
                 );
-            } else {
+            }
+            else {
                 $this->varTraces[] = sprintf(
                     '#%d %s%s%s()',
                     $i,
-                    isset($trace['class']) ? $trace['class'] : '',
-                    isset($trace['type']) ? $trace['type'] : '',
-                    isset($trace['function']) ? $trace['function'] : ''
+                    $trace['class'] ?? '',
+                    $trace['type'] ?? '',
+                    $trace['function'] ?? ''
                 );
             }
             $last = $i + 1;

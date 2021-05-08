@@ -18,7 +18,6 @@ class ClientLimiter extends FrameworkHandler
     use IpLimiterTrait;
 
     public const NAME = 'limit';
-
     public const APP_OPTION_KEY = 'client_limit';
 
     /**
@@ -41,7 +40,9 @@ class ClientLimiter extends FrameworkHandler
     public function retrieve()
     {
         $retrieved = parent::retrieve();
-        if (!is_null($retrieved)) return $this;
+        if (!is_null($retrieved)) {
+            return $this;
+        }
 
         // Get from database then cache to file
         if ($this->fromDatabase()) {
@@ -54,7 +55,7 @@ class ClientLimiter extends FrameworkHandler
     protected function fromDatabase()
     {
         $clientLimit = AppOptionHelper::getInstance()->getBy(static::APP_OPTION_KEY, []);
-        return empty($clientLimit) ? false : $this->fromContent($clientLimit);
+        return !empty($clientLimit) && $this->fromContent($clientLimit);
     }
 
     protected function fromContent($content)
@@ -64,9 +65,9 @@ class ClientLimiter extends FrameworkHandler
             return false;
         }
 
-        $this->setAllowed(isset($content['allowed']) ? $content['allowed'] : [])
-            ->setDenied(isset($content['denied']) ? $content['denied'] : [])
-            ->setAdmin(isset($content['admin']) && $content['admin'] ? true : false);
+        $this->setAllowed($content['allowed'] ?? [])
+            ->setDenied($content['denied'] ?? [])
+            ->setAdmin(isset($content['admin']) && $content['admin']);
         return true;
     }
 

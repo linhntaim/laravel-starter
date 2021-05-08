@@ -11,8 +11,11 @@ use App\Rules\Base\Rule;
 class UniqueWithNotTrashedRule extends Rule
 {
     protected $modelClass;
+
     protected $modelAttribute;
+
     protected $ignoredId;
+
     protected $ignoredIdColumn;
 
     public function __construct()

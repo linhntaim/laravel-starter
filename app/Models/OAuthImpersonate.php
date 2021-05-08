@@ -47,9 +47,7 @@ class OAuthImpersonate extends Model
     public function getAdminAttribute()
     {
         return $this->remind('admin', function () {
-            $admin = $this->admin()->first();
-            $admin->load('user');
-            return $admin;
+            return $this->admin()->with('user')->first();
         });
     }
 

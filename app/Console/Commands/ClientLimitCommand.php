@@ -19,14 +19,15 @@ class ClientLimitCommand extends Command
 
         if ($this->option('u')) {
             $clientLimiter->remove();
-        } else {
+        }
+        else {
             $allowed = $this->option('allow');
             $denied = $this->option('deny');
             $admin = $this->option('admin');
 
             $clientLimiter->setAllowed(empty($allowed) ? [] : $allowed)
                 ->setDenied(empty($denied) ? [] : $denied)
-                ->setAdmin($admin ? true : false)
+                ->setAdmin((bool)$admin)
                 ->save();
         }
     }

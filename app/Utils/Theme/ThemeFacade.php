@@ -2,6 +2,8 @@
 
 namespace App\Utils\Theme;
 
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -11,9 +13,9 @@ use Illuminate\Support\Facades\Facade;
  * @method static string getName()
  * @method static string getDisplayName()
  * @method static array share()
- * @method static \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory view($view, $data = [], $mergeData = [])
- * @method static \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory pageView($view, $data = [], $mergeData = [])
- * @method static \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|mixed pageHome($data = [], $mergeData = [], $view = 'welcome')
+ * @method static View|Factory view($view, $data = [], $mergeData = [])
+ * @method static View|Factory pageView($view, $data = [], $mergeData = [])
+ * @method static View|Factory|mixed pageHome($data = [], $mergeData = [], $view = 'welcome')
  * @method static string pageViewPath($view)
  * @method static string viewPath($view)
  * @method static boolean viewExists($view)

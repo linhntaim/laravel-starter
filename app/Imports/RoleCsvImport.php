@@ -11,6 +11,8 @@ use App\ModelRepositories\RoleRepository;
 
 class RoleCsvImport extends ModelCsvImport
 {
+    public const NAME = 'role';
+
     protected function modelRepositoryClass()
     {
         return RoleRepository::class;

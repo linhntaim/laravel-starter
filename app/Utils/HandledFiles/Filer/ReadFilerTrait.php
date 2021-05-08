@@ -14,9 +14,13 @@ use Throwable;
 trait ReadFilerTrait
 {
     protected $fNotRead = true;
+
     protected $fReadCounter = 0;
+
     protected $fReadLength = 0;
+
     protected $fReadUseCustomException = true;
+
     protected $fReadExcludedCustomExceptions = [];
 
     public function fReadSetLength($length = 0)
@@ -36,7 +40,9 @@ trait ReadFilerTrait
 
     public function fIsExcludedException($exception)
     {
-        if ($this->fReadUseCustomException) return true;
+        if ($this->fReadUseCustomException) {
+            return true;
+        }
 
         foreach ($this->fReadExcludedCustomExceptions as $excludedCustomException) {
             if (is_a($exception, $excludedCustomException)) {
@@ -47,7 +53,7 @@ trait ReadFilerTrait
     }
 
     /**
-     * @return ReadFilerTrait|Filer
+     * @return static
      */
     public function fStartReading()
     {
@@ -59,7 +65,7 @@ trait ReadFilerTrait
     }
 
     /**
-     * @return ReadFilerTrait|Filer
+     * @return static
      */
     public function fEndReading()
     {
@@ -95,11 +101,11 @@ trait ReadFilerTrait
 
     protected function fReading()
     {
-        return fread($this->fResource, $this->fReadLength ? $this->fReadLength : $this->getSize());
+        return fread($this->fResource, $this->fReadLength ?: $this->getSize());
     }
 
     /**
-     * @return ReadFilerTrait|Filer
+     * @return static
      */
     protected function fBeforeReading()
     {
@@ -139,11 +145,14 @@ trait ReadFilerTrait
         $reads = [];
         $this->fReadCounter = 0;
         while (($read = $this->fRead()) !== false) {
-            if ($read === null) continue;
+            if ($read === null) {
+                continue;
+            }
             ++$this->fReadCounter;
             if ($callback) {
                 $reads[] = $this->makeReadCallback($callback, $read);
-            } else {
+            }
+            else {
                 $reads[] = $read;
             }
         }
@@ -154,7 +163,9 @@ trait ReadFilerTrait
     {
         $reads = [];
         while (($read = $this->fRead()) !== false) {
-            if ($read === null) continue;
+            if ($read === null) {
+                continue;
+            }
             $reads[] = $read;
         }
         if ($beforeCallback) {
@@ -174,7 +185,8 @@ trait ReadFilerTrait
     {
         try {
             return $callback($data, $this->fReadCounter);
-        } catch (Throwable $exception) {
+        }
+        catch (Throwable $exception) {
             if ($this->fIsExcludedException($exception)) {
                 throw ($exception instanceof Exception ? $exception : AppException::from($exception))
                     ->transformMessage(function ($message) {

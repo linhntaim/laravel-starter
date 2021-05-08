@@ -20,7 +20,8 @@ class TryCommand extends Command
                 $this->remove();
                 $this->copy();
             }
-        } else {
+        }
+        else {
             $this->copy();
         }
     }

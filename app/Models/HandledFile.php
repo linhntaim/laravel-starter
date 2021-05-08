@@ -7,11 +7,10 @@
 namespace App\Models;
 
 use App\Models\Base\Model;
-use App\ModelTraits\ArrayValuedAttributesTrait;
 use App\Utils\ConfigHelper;
+use App\Utils\HandledFiles\Filer\Filer;
 use App\Utils\HandledFiles\Storage\CloudStorage;
 use App\Utils\HandledFiles\Storage\ExternalStorage;
-use App\Utils\HandledFiles\Storage\HandledStorage;
 use App\Utils\HandledFiles\Storage\IEncryptionStorage;
 use App\Utils\HandledFiles\Storage\InlineStorage;
 use App\Utils\HandledFiles\Storage\IResponseStorage;
@@ -37,14 +36,13 @@ use Illuminate\Database\Eloquent\Collection;
  * @property bool $scanning
  * @property bool $public
  * @property bool $inline
- * @property array $options_array_value
- * @property Collection $handledFileStores
+ * @property array $options
+ * @property HandledFileStore[]|Collection $handledFileStores
+ * @property Filer $filer
  * @property Storage $originStorage
  */
 class HandledFile extends Model
 {
-    use ArrayValuedAttributesTrait;
-
     public const HANDLING_YES = 1;
     public const HANDLING_NO = 2;
     public const HANDLING_SCAN = 3;
@@ -58,8 +56,6 @@ class HandledFile extends Model
         'mime',
         'size',
         'options',
-        'options_array_value',
-        'options_overridden_array_value',
         'handling',
     ];
 
@@ -76,57 +72,56 @@ class HandledFile extends Model
         'ready',
     ];
 
+    protected $casts = [
+        'options' => 'array',
+    ];
+
     public function getReadyAttribute()
     {
         return $this->attributes['handling'] == static::HANDLING_NO;
     }
 
+    public function getFilerAttribute()
+    {
+        return $this->remind('filer', function () {
+            $filer = new Filer();
+            $filer->setEncryped($this->encrypted);
+            $this->handledFileStores->each(function (HandledFileStore $store) use ($filer) {
+                $filer->fromStorageData($store->store, $store->data, $store->isOrigin, $this->encrypted);
+            });
+            return $filer;
+        });
+    }
+
     public function getOriginStorageAttribute()
     {
-        $handledFileStore = $this->handledFileStores()->where('origin', HandledFileStore::ORIGIN_YES)->first();
-        if ($handledFileStore->store === PublicStorage::NAME) {
-            $originStorage = (new PublicStorage())->setData($handledFileStore->data);
-        } elseif ($handledFileStore->store === PrivateStorage::NAME) {
-            $originStorage = (new PrivateStorage())->setData($handledFileStore->data);
-        } elseif ($handledFileStore->store === InlineStorage::NAME) {
-            $originStorage = (new InlineStorage())->setData($handledFileStore->data);
-        } elseif ($handledFileStore->store === ExternalStorage::NAME) {
-            $originStorage = (new ExternalStorage())->setData($handledFileStore->data);
-        } elseif ($handledFileStore->store === ScanStorage::NAME) {
-            $originStorage = (new ScanStorage())->setData($handledFileStore->data);
-        } else {
-            $originStorage = ConfigHelper::get('handled_file.cloud.enabled') ? new CloudStorage() : null;
-            if ($originStorage && $handledFileStore->store === $originStorage->getName()) {
-                $originStorage = $originStorage->setData($handledFileStore->data);
-            }
-        }
-        return $originStorage;
+        return $this->filer->getOriginStorage();
     }
 
     public function getEncryptedAttribute()
     {
-        return isset($this->options_array_value['encrypt']) && $this->options_array_value['encrypt'];
+        return isset($this->options['encrypt']) && $this->options['encrypt'];
     }
 
     public function getScannedAttribute()
     {
-        return (!isset($this->options_array_value['scan']) || $this->options_array_value['scan'] == false)
-            && (!isset($this->options_array_value['scanned']) || $this->options_array_value['scanned']);
+        return (!isset($this->options['scan']) || $this->options['scan'] == false)
+            && (!isset($this->options['scanned']) || $this->options['scanned']);
     }
 
     public function getScanningAttribute()
     {
-        return isset($this->options_array_value['scan']) && $this->options_array_value['scan'];
+        return isset($this->options['scan']) && $this->options['scan'];
     }
 
     public function getPublicAttribute()
     {
-        return isset($this->options_array_value['public']) && $this->options_array_value['public'];
+        return isset($this->options['public']) && $this->options['public'];
     }
 
     public function getInlineAttribute()
     {
-        return isset($this->options_array_value['inline']) && $this->options_array_value['inline'];
+        return isset($this->options['inline']) && $this->options['inline'];
     }
 
     public function getUrlAttribute()
@@ -160,21 +155,15 @@ class HandledFile extends Model
 
     public function delete()
     {
-        parent::delete();
-        $this->tryStorage(
-            function (Storage $storage, HandledFileStore $store) {
-                return $storage->setData($store->data)->delete();
-            },
-            function (Storage $storage) {
-                return $storage instanceof HandledStorage;
-            }
-        );
-        return true;
+        $this->filer->delete();
+        return parent::delete();
     }
 
     public function responseDownload($name = null, $headers = [])
     {
-        if (empty($name)) $name = $this->name;
+        if (empty($name)) {
+            $name = $this->name;
+        }
 
         return $this->tryStorage(
             function (Storage $storage, HandledFileStore $store) use ($name, $headers) {
@@ -228,7 +217,9 @@ class HandledFile extends Model
             new PrivateStorage(),
         ];
         foreach ($storagePriorities as $storage) {
-            if (!$storage || ($filterCallback && !$filterCallback($storage))) continue;
+            if (!$storage || ($filterCallback && !$filterCallback($storage))) {
+                continue;
+            }
             if (($result = $try($storage)) !== false) {
                 return $result;
             }

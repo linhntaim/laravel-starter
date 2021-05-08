@@ -42,7 +42,7 @@ trait HasPropertiesTrait
     public function getPropertiesAttribute()
     {
         $propertyDefinition = $this->getPropertyDefinition();
-        $keyedProperties = $this->properties()->get()->keyBy('name');
+        $keyedProperties = $this->getRelationValue('properties')->keyBy('name');
         $properties = new Collection();
         foreach ($propertyDefinition->getNames() as $name) {
             $properties->put(

@@ -2,6 +2,7 @@
 
 namespace App\Vendors\Illuminate\Support\Facades;
 
+use App\Utils\ConfigHelper;
 use App\Utils\HandledFiles\Helper;
 use Illuminate\Support\Facades\App as BaseApp;
 use Illuminate\Support\Facades\Log;
@@ -10,43 +11,56 @@ class App extends BaseApp
 {
     public static function runningInProduction()
     {
-        return config('app.env') == 'production';
+        static $run = null;
+        setIfNull($run, function () {
+            return config('app.env') == 'production';
+        });
+        return $run;
+    }
+
+    public static function runningInMultipleInstances()
+    {
+        static $run = null;
+        setIfNull($run, function () {
+            return ConfigHelper::get('multiple_instances');
+        });
+        return $run;
     }
 
     public static function runningFromRequest()
     {
         static $run = null;
-        if (is_null($run)) {
-            $run = !static::runningInConsole() && !static::runningUnitTests();
-        }
+        setIfNull($run, function () {
+            return !static::runningInConsole() && !static::runningUnitTests();
+        });
         return $run;
     }
 
     public static function notRunningFromRequest()
     {
         static $run = null;
-        if (is_null($run)) {
-            $run = static::runningInConsole() || static::runningUnitTests();
-        }
+        setIfNull($run, function () {
+            return static::runningInConsole() || static::runningUnitTests();
+        });
         return $run;
     }
 
     public static function runningInWindowsOs()
     {
         static $run = null;
-        if (is_null($run)) {
-            $run = version_compare(PHP_VERSION, '7.2.0', '>=') ?
+        setIfNull($run, function () {
+            return version_compare(PHP_VERSION, '7.2.0', '>=') ?
                 PHP_OS_FAMILY == 'Windows' : PHP_OS == 'WINNT';
-        }
+        });
         return $run;
     }
 
     public static function runningInDebug()
     {
         static $run = null;
-        if (is_null($run)) {
-            $run = config('app.debug');
-        }
+        setIfNull($run, function () {
+            return config('app.debug');
+        });
         return $run;
     }
 
@@ -85,8 +99,8 @@ class App extends BaseApp
                         Helper::autoDisplaySize(static::$benchAt[$name]['pr'], 2)
                     )
                 );
-            } else {
-
+            }
+            else {
                 Log::info(
                     sprintf(
                         'Bench [%s] from start: %sms, %s, %s (real), %s (peak), %s (peak real).',

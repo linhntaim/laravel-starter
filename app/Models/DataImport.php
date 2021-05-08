@@ -1,29 +1,25 @@
 <?php
 
-/**
- * Base - Any modification needs to be approved, except the space inside the block of TODO
- */
-
 namespace App\Models;
 
 use App\Models\Base\Model;
 use App\Utils\ClientSettings\Facade;
 
 /**
- * Class DataExport
+ * Class DataImport
  * @package App\Models
  * @property int $id
  * @property int $state
  * @property string sdStCreatedAt
  * @property HandledFile $file
  */
-class DataExport extends Model
+class DataImport extends Model
 {
-    public const STATE_EXPORTING = 1;
-    public const STATE_EXPORTED = 2;
+    public const STATE_IMPORTING = 1;
+    public const STATE_IMPORTED = 2;
     public const STATE_FAILED = 3;
 
-    protected $table = 'data_exports';
+    protected $table = 'data_imports';
 
     protected $fillable = [
         'created_by',
@@ -35,13 +31,11 @@ class DataExport extends Model
 
     protected $visible = [
         'id',
-        'url',
         'state',
         'sd_st_created_at',
     ];
 
     protected $appends = [
-        'url',
         'sd_st_created_at',
     ];
 
@@ -57,11 +51,6 @@ class DataExport extends Model
             'shortTime',
             $this->attributes['created_at']
         );
-    }
-
-    public function getUrlAttribute()
-    {
-        return url('api/admin/data-export', [$this->id]) . '?_download=1';
     }
 
     public function creator()

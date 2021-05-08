@@ -10,7 +10,7 @@ class MySqlTableLock extends TableLock
 {
     public function getLockType()
     {
-        return isset($this->options['lock_type']) ? $this->options['lock_type'] : 'WRITE';
+        return $this->options['lock_type'] ?? 'WRITE';
     }
 
     public function toLockQuery()

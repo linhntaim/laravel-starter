@@ -12,8 +12,11 @@ use Illuminate\Support\Str;
 abstract class Rule implements IRule
 {
     protected $attribute;
+
     protected $transPath;
+
     protected $name;
+
     protected $overriddenMessage;
 
     public function __construct()

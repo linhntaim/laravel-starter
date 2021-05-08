@@ -22,7 +22,9 @@ trait ActivityLogTrait
      */
     protected function logAction(string $action, $actedBy = null, $payload = [])
     {
-        if (!ConfigHelper::get('activity_log_enabled')) return;
+        if (!ConfigHelper::get('activity_log_enabled')) {
+            return;
+        }
 
         if (is_null($actedBy)) {
             $actedBy = request()->user();
@@ -30,8 +32,8 @@ trait ActivityLogTrait
         if ($actedBy) {
             try {
                 (new ActivityLogRepository())->createWithAction($action, $actedBy, $payload);
-            } catch (Throwable $exception) {
-
+            }
+            catch (Throwable $exception) {
             }
         }
     }

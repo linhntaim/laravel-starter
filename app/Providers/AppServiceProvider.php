@@ -15,11 +15,11 @@ use App\Utils\ExtraActions\FilterAction;
 use App\Utils\ExtraActions\HookAction;
 use App\Utils\ExtraActions\ReplaceAction;
 use App\Utils\Screen\Manager as ScreenManager;
-use App\Vendors\Illuminate\Database\Connectors\ConnectionFactory;
+use App\Vendors\Illuminate\Database\MySqlConnection;
 use App\Vendors\Illuminate\Log\LogManager;
 use App\Vendors\Illuminate\Support\Facades\App;
 use App\Vendors\Illuminate\Support\Str;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
@@ -42,9 +42,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->alias('request', Request::class);
 
-        $this->app->singleton('db.factory', function ($app) {
-            return new ConnectionFactory($app);
+        Connection::resolverFor('mysql', function ($connection, $database, $prefix, $config) {
+            return new MySqlConnection($connection, $database, $prefix, $config);
         });
+
         $this->app->singleton('log', function ($app) {
             return new LogManager($app);
         });

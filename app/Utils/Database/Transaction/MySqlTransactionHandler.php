@@ -12,27 +12,22 @@ class MySqlTransactionHandler extends TransactionHandler
 {
     public const TRANSACTION_SCOPE_GLOBAL = 'GLOBAL';
     public const TRANSACTION_SCOPE_SESSION = 'SESSION';
-
     public const ISOLATION_LEVEL_REPEATABLE_READ = 'REPEATABLE READ';
     public const ISOLATION_LEVEL_READ_COMMITTED = 'READ COMMITTED';
     public const ISOLATION_LEVEL_READ_UNCOMMITTED = 'READ UNCOMMITTED';
     public const ISOLATION_LEVEL_SERIALIZABLE = 'SERIALIZABLE';
-
     public const ACCESS_MODE_READ_WRITE = 'READ WRITE';
     public const ACCESS_MODE_READ_ONLY = 'READ ONLY';
-
     public const TRANSACTION_SCOPES = [
         MySqlTransactionHandler::TRANSACTION_SCOPE_GLOBAL,
         MySqlTransactionHandler::TRANSACTION_SCOPE_SESSION,
     ];
-
     public const ISOLATION_LEVELS = [
         MySqlTransactionHandler::ISOLATION_LEVEL_REPEATABLE_READ,
         MySqlTransactionHandler::ISOLATION_LEVEL_READ_COMMITTED,
         MySqlTransactionHandler::ISOLATION_LEVEL_READ_UNCOMMITTED,
         MySqlTransactionHandler::ISOLATION_LEVEL_SERIALIZABLE,
     ];
-
     public const ACCESS_MODES = [
         MySqlTransactionHandler::ACCESS_MODE_READ_WRITE,
         MySqlTransactionHandler::ACCESS_MODE_READ_ONLY,
@@ -51,9 +46,9 @@ class MySqlTransactionHandler extends TransactionHandler
 
     protected function beginWithoutLocks($options = [])
     {
-        $isolationLevel = isset($options['isolation_level']) ? $options['isolation_level'] : null;
-        $accessMode = isset($options['access_mode']) ? $options['access_mode'] : null;
-        $transactionScope = isset($options['transaction_scope']) ? $options['transaction_scope'] : null;
+        $isolationLevel = $options['isolation_level'] ?? null;
+        $accessMode = $options['access_mode'] ?? null;
+        $transactionScope = $options['transaction_scope'] ?? null;
 
         if (in_array($isolationLevel, static::ISOLATION_LEVELS) || in_array($accessMode, self::ACCESS_MODES)) {
             $transactionScope = in_array($transactionScope, static::TRANSACTION_SCOPES) ? $transactionScope . ' ' : '';

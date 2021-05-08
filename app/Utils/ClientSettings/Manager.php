@@ -84,7 +84,7 @@ class Manager
 
     /**
      * @param array|Settings $settings
-     * @return Manager
+     * @return static
      */
     public function set($settings)
     {
@@ -94,7 +94,7 @@ class Manager
 
     /**
      * @param array|Settings $settings
-     * @return Manager
+     * @return static
      */
     public function update($settings)
     {
@@ -165,7 +165,8 @@ class Manager
                 && filled($headerValue)) {
                 if ($headerValue = AES::decrypt(base64_decode($headerValue), $appKey)) {
                     $request->headers->set($header, $headerValue);
-                } else {
+                }
+                else {
                     Log::error(new AppException(sprintf('Header [%s] cannot be decrypted.', $header)));
                 }
             }
@@ -256,7 +257,8 @@ class Manager
             $this->update($settings);
 
             return $callback();
-        } finally {
+        }
+        finally {
             $this->set($original);
         }
     }

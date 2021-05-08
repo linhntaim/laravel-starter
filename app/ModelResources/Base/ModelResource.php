@@ -111,13 +111,17 @@ class ModelResource extends JsonResource implements IModelResource
 
     protected function hide($data)
     {
-        if (empty($this->hidden)) return $data;
+        if (empty($this->hidden)) {
+            return $data;
+        }
         return Arr::except($data, $this->hidden);
     }
 
     protected function escape($data)
     {
-        if (empty($this->escaped)) return $data;
+        if (empty($this->escaped)) {
+            return $data;
+        }
         foreach ($data as $key => &$value) {
             if (in_array($key, $this->escaped, true)) {
                 $value = HtmlString::escapes($value);
@@ -128,7 +132,9 @@ class ModelResource extends JsonResource implements IModelResource
 
     protected function guard($data)
     {
-        if (empty($this->guarded)) return $data;
+        if (empty($this->guarded)) {
+            return $data;
+        }
         return Arr::jsonGuard($data, $this->guarded);
     }
 }

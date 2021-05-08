@@ -38,19 +38,39 @@ abstract class ModelRepository
     protected $modelByUnique = false;
 
     private $with;
+
     private $withTrashed = false;
+
     private $onlyTrashed = false;
+
+    private $selects = [];
+
     private $lock;
+
     private $strict = true;
+
     private $more = false;
+
     private $mores = [];
+
     private $sorts = [];
+
     private $sortsDefault = [];
+
     private $sortsAllowed = [];
+
     private $sortsAllowedDefault = [];
+
+    private $limitTake = 0;
+
+    private $limitSkip = 0;
+
     private $force = false;
+
     private $pinned = false;
+
     private $rawQuery = null;
+
     private $fixedRawQuery = null;
 
     /**
@@ -106,7 +126,8 @@ abstract class ModelRepository
                     throw new AppException('Model does not match the class');
                 }
                 $this->model = $matchedClass ? $id : $this->newModel()->fromModel($id);
-            } else {
+            }
+            else {
                 $this->model = $this->modelByUnique ? $this->getUniquely($id) : $this->getById($id);
             }
         }
@@ -201,7 +222,8 @@ abstract class ModelRepository
     {
         if (is_null($model)) {
             $model = $this->newModel(false);
-        } elseif (is_callable($model)) {
+        }
+        elseif (is_callable($model)) {
             $model = $model($this->newModel(false));
         }
         if (is_callable($callback)) {
@@ -216,7 +238,7 @@ abstract class ModelRepository
     /**
      * @param Model|callable|null $model
      * @param callable|null $callback
-     * @return ModelRepository
+     * @return static
      * @throws
      */
     public function useModelQuery($model = null, $callback = null)
@@ -228,7 +250,7 @@ abstract class ModelRepository
     /**
      * @param Model|callable|null $model
      * @param callable|null $callback
-     * @return ModelRepository
+     * @return static
      * @throws
      */
     public function useModelQueryAsFixed($model = null, $callback = null)
@@ -238,7 +260,7 @@ abstract class ModelRepository
     }
 
     /**
-     * @return ModelRepository
+     * @return static
      * @throws
      */
     public function clearUsingModelQuery()
@@ -263,6 +285,16 @@ abstract class ModelRepository
     public function with($with)
     {
         $this->with = $with;
+        return $this;
+    }
+
+    /**
+     * @param string|array $selects
+     * @return static
+     */
+    public function select($selects)
+    {
+        $this->selects = (array)$selects;
         return $this;
     }
 
@@ -318,6 +350,13 @@ abstract class ModelRepository
         return $this;
     }
 
+    public function limit(int $take, int $skip = 0)
+    {
+        $this->limitTake = $take;
+        $this->limitSkip = $skip;
+        return $this;
+    }
+
     /**
      * @return Builder
      */
@@ -327,6 +366,10 @@ abstract class ModelRepository
         if (!is_null($this->with)) {
             $query->with($this->with);
             $this->with = null;
+        }
+        if (!empty($this->selects)) {
+            $query->select($this->selects);
+            $this->selects = [];
         }
         if ($this->withTrashed) {
             $query->withTrashed();
@@ -355,10 +398,17 @@ abstract class ModelRepository
             $noNeedToCheckSortsAllowed = empty($sortsAllowed);
             foreach (array_merge($this->sorts, $this->sortsDefault) as $sort) {
                 if ($noNeedToCheckSortsAllowed || in_array($sort['by'], $sortsAllowed)) {
-                    $query->orderBy($sort['by'], $sort['order'] ? $sort['order'] : 'asc');
+                    $query->orderBy($sort['by'], $sort['order'] ?? 'asc');
                 }
             }
             $this->sorts()->sortsAllowed();
+        }
+        if ($this->limitTake > 0) {
+            if ($this->limitSkip > 0) {
+                $query->skip($this->limitSkip);
+            }
+            $query->take($this->limitTake);
+            $this->limit(0);
         }
         if (!is_null($this->lock)) {
             $query->lock($this->lock);
@@ -401,16 +451,18 @@ abstract class ModelRepository
      * @param callable $callback
      * @param callable|null $catchCallback
      * @return Model|Collection|boolean|mixed|null|void
-     * @throws Exception
+     * @throws
      */
     protected function catch(callable $callback, callable $catchCallback = null)
     {
         try {
             return $callback();
-        } catch (PDOException $exception) {
+        }
+        catch (PDOException $exception) {
             if ($catchCallback) {
                 return $catchCallback(DatabaseException::from($exception));
-            } else {
+            }
+            else {
                 throw DatabaseException::from($exception);
             }
         }
@@ -423,7 +475,7 @@ abstract class ModelRepository
 
     /**
      * @param array $options
-     * @return ModelRepository
+     * @return static
      */
     public function lockTable($options = [])
     {
@@ -477,13 +529,26 @@ abstract class ModelRepository
     }
 
     /**
+     * @return string[]|array
+     */
+    protected function getUniqueKeys()
+    {
+        return [
+            $this->getIdKey(),
+        ];
+    }
+
+    /**
      * @param Builder $query
      * @param string|mixed $unique
      * @return Builder
      */
     public function queryUniquely($query, $unique)
     {
-        return $query->orWhere($this->getIdKey(), $unique);
+        foreach ($this->getUniqueKeys() as $uniqueKey) {
+            $query->orWhere($uniqueKey, $unique);
+        }
+        return $query;
     }
 
     /**
@@ -501,15 +566,6 @@ abstract class ModelRepository
     }
 
     /**
-     * @return Collection
-     * @throws
-     */
-    public function getAll()
-    {
-        return $this->search([], Configuration::FETCH_PAGING_NO, 0);
-    }
-
-    /**
      * @param Builder $query
      * @param array $search
      * @return Builder
@@ -522,25 +578,28 @@ abstract class ModelRepository
     /**
      * @return Builder
      */
-    protected function searchQuery()
+    public function searchQuery()
     {
         return $this->query();
+    }
+
+    public function where(array $search = [])
+    {
+        return $this->searchQuery()->where(function ($query) use ($search) {
+            $this->searchOn($query, $search);
+        });
     }
 
     /**
      * @param array $search
      * @param int $paging
      * @param int $itemsPerPage
-     * @return Collection|LengthAwarePaginator|Builder
-     * @throws Exception
+     * @return Collection|LengthAwarePaginator|Builder|int
+     * @throws
      */
-    public function search(array $search = [], $paging = Configuration::FETCH_PAGING_YES, $itemsPerPage = Configuration::DEFAULT_ITEMS_PER_PAGE)
+    public function search(array $search = [], int $paging = Configuration::FETCH_PAGING_YES, int $itemsPerPage = Configuration::DEFAULT_ITEMS_PER_PAGE)
     {
-        $query = $this->searchQuery();
-
-        if (!empty($search)) {
-            $query = $this->searchOn($query, $search);
-        }
+        $query = $this->where($search);
 
         switch ($paging) {
             case Configuration::FETCH_PAGING_NO:
@@ -560,9 +619,43 @@ abstract class ModelRepository
                     }
                     return $models;
                 });
+            case Configuration::FETCH_COUNT:
+                return $this->catch(function () use ($query) {
+                    return $query->count();
+                });
             default:
                 return $query;
         }
+    }
+
+    /**
+     * @param array $search
+     * @return int
+     * @throws
+     */
+    public function count(array $search = [])
+    {
+        return $this->search($search, Configuration::FETCH_COUNT);
+    }
+
+    /**
+     * @param array $search
+     * @param int $min
+     * @return bool
+     */
+    public function has(array $search = [], int $min = 0)
+    {
+        return $this->count($search) > $min;
+    }
+
+    /**
+     * @param array $search
+     * @return Collection
+     * @throws
+     */
+    public function getAll(array $search = [])
+    {
+        return $this->search($search, Configuration::FETCH_PAGING_NO, 0);
     }
 
     /**
@@ -631,6 +724,11 @@ abstract class ModelRepository
         return $this;
     }
 
+    public function deleteAll()
+    {
+        return $this->queryDelete($this->query());
+    }
+
     /**
      * @param array $ids
      * @return boolean
@@ -651,7 +749,8 @@ abstract class ModelRepository
             if ($this->force) {
                 $this->force = false;
                 $query->forceDelete();
-            } else {
+            }
+            else {
                 $query->delete();
             }
             return true;
@@ -729,7 +828,8 @@ abstract class ModelRepository
                 ->batchInsertReset();
 
             $this->batch['insert']['inserted'] = true;
-        } else {
+        }
+        else {
             $this->batch['insert']['inserted'] = false;
         }
         return $this;
@@ -741,7 +841,8 @@ abstract class ModelRepository
             $this->catch(function () {
                 if ($this->batch['insert']['ignored']) {
                     $this->rawQuery()->insertOrIgnore($this->batch['insert']['values']);
-                } else {
+                }
+                else {
                     $this->rawQuery()->insert($this->batch['insert']['values']);
                 }
             });
@@ -779,7 +880,7 @@ abstract class ModelRepository
      * @param int $length
      * @param bool $shouldEnd
      * @return Collection
-     * @throws Exception
+     * @throws
      */
     public function batchRead(&$length, &$shouldEnd)
     {

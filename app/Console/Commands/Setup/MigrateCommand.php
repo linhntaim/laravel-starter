@@ -45,7 +45,7 @@ class MigrateCommand extends Command
                     $databaseConnectionWrite = $databaseConnection['write'];
                 }
                 $get = function ($key) use ($databaseConnectionWrite, $databaseConnection) {
-                    return isset($databaseConnectionWrite[$key]) ? $databaseConnectionWrite[$key] : $databaseConnection[$key];
+                    return $databaseConnectionWrite[$key] ?? $databaseConnection[$key];
                 };
                 $this->databaseName = $get('database');
                 $this->pdo = new \PDO(
@@ -158,6 +158,5 @@ class MigrateCommand extends Command
 
     private function rollbackDatabase()
     {
-
     }
 }

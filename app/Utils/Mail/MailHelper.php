@@ -21,7 +21,9 @@ class MailHelper
      */
     public static function send(TemplateNowMailable $mailable, $exceptionSkipped = false)
     {
-        if (ConfigHelper::get('emails.send_off')) return true;
+        if (ConfigHelper::get('emails.send_off')) {
+            return true;
+        }
 
         if ($mailable instanceof TemplateMailable) {
             $exceptionSkipped = false;
@@ -30,7 +32,8 @@ class MailHelper
         if ($exceptionSkipped) {
             try {
                 return static::sendRaw($mailable);
-            } catch (Throwable $e) {
+            }
+            catch (Throwable $e) {
                 Log::error($e);
                 return false;
             }

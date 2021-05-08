@@ -23,8 +23,8 @@ class ActivityLogResource extends ModelResource
     {
         return $this->mergeInWithCurrentArray($request, [
             [
-                'screens' => $this->screens_array_value,
-                'payload' => $this->payload_array_value,
+                'screens' => $this->screens,
+                'payload' => $this->payload,
                 'device' => $this->modelTransform($this->whenLoaded('device'), $request),
             ],
         ]);

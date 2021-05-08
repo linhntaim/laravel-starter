@@ -69,15 +69,19 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
         if (empty($message)) {
             if (!App::runningInDebug() && ConfigHelper::get('force_common_exception')) {
                 $this->messages = [trans('error.exceptions.default_exception.level_failed')];
-            } elseif ($message = $this->getMessageFromPrevious()) {
+            }
+            elseif ($message = $this->getMessageFromPrevious()) {
                 $this->messages = [$message];
-            } else {
+            }
+            else {
                 $this->messages = [$this->defaultMessage()];
             }
-        } else {
+        }
+        else {
             if (is_array($message)) {
                 $this->messages = $message;
-            } else {
+            }
+            else {
                 $this->messages = [$message];
             }
         }
@@ -145,7 +149,8 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
     {
         if ($public) {
             $this->attachedData['public'] = array_merge($this->attachedData['public'], $attachedData);
-        } else {
+        }
+        else {
             $this->attachedData['private'] = array_merge($this->attachedData['private'], $attachedData);
         }
         return $this;
@@ -166,9 +171,9 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
         ]);
     }
 
-    public function getAttachedData()
+    public function getAttachedData($scope = 'public')
     {
-        return $this->attachedData['public'];
+        return is_null($scope) ? $this->attachedData : $this->attachedData[$scope];
     }
 
     public function getMessages()
@@ -188,13 +193,34 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
 
     protected function defaultMessage()
     {
-        $transOptions = isset($this->attachedData['private']['trans_options']) ?
-            $this->attachedData['private']['trans_options'] : [];
+        $transOptions = $this->attachedData['private']['trans_options'] ?? [];
         return transIf(
             'error.def.abort.' . $this->code,
             $this->__transErrorWithModule('level_failed'),
-            isset($transOptions['replace']) ? $transOptions['replace'] : [],
-            isset($transOptions['locale']) ? $transOptions['locale'] : null
+            $transOptions['replace'] ?? [],
+            $transOptions['locale'] ?? null
         );
+    }
+
+    public function toArray()
+    {
+        return static::toArrayFrom($this);
+    }
+
+    public static function toArrayFrom(Throwable $e)
+    {
+        $array = [
+            'class' => get_class($e),
+            'code' => $e->getCode(),
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString(),
+        ];
+        if ($e instanceof Exception) {
+            $array['messages'] = $e->getMessages();
+            $array['data'] = $e->getAttachedData();
+        }
+        return $array;
     }
 }

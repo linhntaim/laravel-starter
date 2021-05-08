@@ -12,9 +12,9 @@ use App\Exports\Base\Export;
 use App\Exports\Base\IndexModelCsvExport;
 use App\Http\Requests\Request;
 use App\Imports\Base\Import;
-use App\Jobs\ImportJob;
 use App\ModelRepositories\Base\ModelRepository;
 use App\ModelRepositories\DataExportRepository;
+use App\ModelRepositories\DataImportRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -75,20 +75,24 @@ abstract class ModelApiController extends ApiController
                 if (!empty($input)) {
                     $search[$param] = $input;
                 }
-            } else {
+            }
+            else {
                 $input = $request->input($key);
                 if (!empty($input)) {
                     if (is_string($param)) {
                         $search[$param] = $input;
-                    } elseif (is_callable($param)) {
+                    }
+                    elseif (is_callable($param)) {
                         $search[$key] = $param($input, $request);
-                    } elseif (is_array($param)) {
+                    }
+                    elseif (is_array($param)) {
                         $found0 = false;
 
                         $name = $key;
                         if (isset($param['name'])) {
                             $name = $param['name'];
-                        } elseif (isset($param[0]) && is_string($param[0])) {
+                        }
+                        elseif (isset($param[0]) && is_string($param[0])) {
                             $name = $param[0];
                             $found0 = true;
                         }
@@ -96,15 +100,18 @@ abstract class ModelApiController extends ApiController
                         $transform = null;
                         if (isset($param['transform'])) {
                             $transform = $param['transform'];
-                        } elseif (isset($param[1]) && is_callable($param[1])) {
+                        }
+                        elseif (isset($param[1]) && is_callable($param[1])) {
                             $transform = $param[1];
-                        } elseif (!$found0 && isset($param[0]) && is_callable($param[0])) {
+                        }
+                        elseif (!$found0 && isset($param[0]) && is_callable($param[0])) {
                             $transform = $param[0];
                         }
 
                         $search[$name] = is_callable($transform) ? $transform($input, $request) : $input;
                     }
-                } else {
+                }
+                else {
                     if (is_array($param)) {
                         $found0 = false;
                         $found1 = false;
@@ -112,7 +119,8 @@ abstract class ModelApiController extends ApiController
                         $name = $key;
                         if (isset($param['name'])) {
                             $name = $param['name'];
-                        } elseif (isset($param[0]) && is_string($param[0])) {
+                        }
+                        elseif (isset($param[0]) && is_string($param[0])) {
                             $name = $param[0];
                             $found0 = true;
                         }
@@ -120,7 +128,8 @@ abstract class ModelApiController extends ApiController
                         if (!isset($param['transform'])) {
                             if (isset($param[1]) && is_callable($param[1])) {
                                 $found1 = true;
-                            } elseif (!$found0 && isset($param[0]) && is_callable($param[0])) {
+                            }
+                            elseif (!$found0 && isset($param[0]) && is_callable($param[0])) {
                                 $found0 = true;
                             }
                         }
@@ -128,11 +137,14 @@ abstract class ModelApiController extends ApiController
                         $default = null;
                         if (isset($param['default'])) {
                             $default = $param['default'];
-                        } elseif (isset($param[2])) {
+                        }
+                        elseif (isset($param[2])) {
                             $default = $param[2];
-                        } elseif (!$found1 && isset($param[1])) {
+                        }
+                        elseif (!$found1 && isset($param[1])) {
                             $default = $param[1];
-                        } elseif (!$found0 && isset($param[0])) {
+                        }
+                        elseif (!$found0 && isset($param[0])) {
                             $default = $param[0];
                         }
 
@@ -146,7 +158,8 @@ abstract class ModelApiController extends ApiController
         foreach ($this->searchDefaultParams($request) as $key => $param) {
             if (is_int($key)) {
                 $search[$param] = 1;
-            } else {
+            }
+            else {
                 $search[$key] = $param;
             }
         }
@@ -301,7 +314,7 @@ abstract class ModelApiController extends ApiController
     protected function modelImporter(Request $request)
     {
         $class = $this->modelImporterClass($request);
-        return $class ? new $class($this->modelImporterFile($request)) : null;
+        return $class ? new $class() : null;
     }
 
     /**
@@ -322,7 +335,14 @@ abstract class ModelApiController extends ApiController
             }
         }
 
-        ImportJob::dispatch($importer);
+        $currentUser = $request->user();
+        return (new DataImportRepository())->createWithAttributesAndImport(
+            [
+                'created_by' => $currentUser ? $currentUser->id : null,
+            ],
+            $this->modelImporterFile($request),
+            $importer
+        );
     }
 
     protected function importValidatedRules(Request $request)
@@ -340,8 +360,7 @@ abstract class ModelApiController extends ApiController
     protected function import(Request $request)
     {
         $this->importValidated($request);
-        $this->importExecute($request);
-        return $this->responseSuccess();
+        return $this->responseModel($this->importExecute($request));
     }
     #endregion
 

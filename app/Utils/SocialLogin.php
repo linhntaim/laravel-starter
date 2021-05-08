@@ -22,7 +22,9 @@ class SocialLogin
     }
 
     protected $enabled;
+
     protected $allowedEmailDomains;
+
     protected $deniedEmailDomains;
 
     private function __construct()

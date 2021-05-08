@@ -12,6 +12,7 @@ use App\Models\Base\ExtendedUserModel;
 use App\Models\Base\IUser;
 use App\Models\User;
 use App\Utils\SocialLogin;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class ExtendedUserRepository
@@ -45,8 +46,8 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
     {
         return parent::queryUniquely($query, $unique)
             ->orWhereHas('user', function ($query) use ($unique) {
-                $query->where('username', $unique)
-                    ->orWhere('email', $unique);
+                $query->orWhere('email', $unique)
+                    ->where(DB::raw('BINARY username'), $unique);
             });
     }
 
@@ -78,9 +79,11 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
             $userSocialAttributes['user_id'] = $user->id;
             $userSocialRepository->updateOrCreateWithAttributes($userSocialAttributes);
             $this->updateOrCreateWithAttributes(['user_id' => $user->id], $attributes);
-        } elseif ($userSocial = $userSocialRepository->notStrict()->getByProvider($userSocialAttributes['provider'], $userSocialAttributes['provider_id'])) {
+        }
+        elseif ($userSocial = $userSocialRepository->notStrict()->getByProvider($userSocialAttributes['provider'], $userSocialAttributes['provider_id'])) {
             $this->updateOrCreateWithAttributes(['user_id' => $userSocial->user->id], $attributes);
-        } else {
+        }
+        else {
             $this->createWithAttributes($attributes, $userAttributes, $userSocialAttributes);
         }
         return $this->afterCreated();

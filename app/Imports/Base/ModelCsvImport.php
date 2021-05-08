@@ -9,6 +9,8 @@ namespace App\Imports\Base;
 use App\ModelRepositories\Base\ModelRepository;
 use App\Models\Base\Model;
 use App\Utils\Database\Transaction\TransactionTrait;
+use App\Utils\HandledFiles\File;
+use Illuminate\Http\UploadedFile;
 use Throwable;
 
 /**
@@ -24,7 +26,11 @@ abstract class ModelCsvImport extends WholeCsvImport
      */
     protected $modelRepository;
 
-    public function __construct($file)
+    /**
+     * Import constructor.
+     * @param UploadedFile|File|string|null $file
+     */
+    public function __construct($file = null)
     {
         parent::__construct($file);
 
@@ -82,7 +88,8 @@ abstract class ModelCsvImport extends WholeCsvImport
 
             $this->modelImporting($read, $counter);
             $this->transactionComplete();
-        } catch (Throwable $exception) {
+        }
+        catch (Throwable $exception) {
             $this->transactionStop();
 
             $this->csvHandleImportingException($exception);

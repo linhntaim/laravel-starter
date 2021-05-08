@@ -27,7 +27,8 @@ class ImpersonateCommand extends Command
                 $this->warn(json_encode([
                     'impersonate_token' => $oAuthImpersonate->impersonate_token,
                 ]));
-            } catch (Throwable $exception) {
+            }
+            catch (Throwable $exception) {
                 return;
             }
         }

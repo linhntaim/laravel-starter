@@ -63,14 +63,17 @@ class Kernel extends ConsoleKernel
         $getScheduledName = function ($name) use (&$scheduledNames) {
             if (in_array($name, $scheduledNames)) {
                 $i = 0;
-                while (($suffixName = $name . '_' . (++$i)) && in_array($suffixName, $scheduledNames)) ;
+                while (($suffixName = $name . '_' . (++$i)) && in_array($suffixName, $scheduledNames)) {
+                }
                 $name = $suffixName;
             }
             $scheduledNames[] = $name;
             return $name;
         };
         foreach ($this->schedules as $scheduleDefinition) {
-            if (empty($scheduleDefinition['frequencies']) || empty($scheduleDefinition['schedules'])) continue;
+            if (empty($scheduleDefinition['frequencies']) || empty($scheduleDefinition['schedules'])) {
+                continue;
+            }
 
             $called = $schedule->call(function () use ($scheduleDefinition) {
                 foreach ($scheduleDefinition['schedules'] as $scheduleClass) {
@@ -84,7 +87,8 @@ class Kernel extends ConsoleKernel
                 if (is_int($key)) {
                     $method = $value;
                     $parameters = [];
-                } else {
+                }
+                else {
                     $method = $key;
                     $parameters = $value;
                 }

@@ -10,8 +10,8 @@ use App\Exceptions\AppException;
 use App\Utils\ClassTrait;
 use Carbon\Carbon;
 use Carbon\CarbonTimeZone;
-use Exception;
 use Illuminate\Support\Str;
+use Throwable;
 
 class DateTimer
 {
@@ -35,11 +35,17 @@ class DateTimer
     protected static $now;
 
     protected $locale;
+
     protected $locales;
+
     protected $transLongDate;
+
     protected $transShortDate;
+
     protected $transShortMonth;
+
     protected $transLongTime;
+
     protected $transShortTime;
 
     /**
@@ -82,7 +88,8 @@ class DateTimer
         if (is_string($time)) {
             try {
                 return (new Carbon($time, new CarbonTimeZone('UTC')))->locale($this->locale);
-            } catch (Exception $exception) {
+            }
+            catch (Throwable $exception) {
                 throw AppException::from($exception);
             }
         }
@@ -127,7 +134,9 @@ class DateTimer
             uasort($this->locales['trans'], function ($t1, $t2) {
                 $t1Length = mb_strlen($t1);
                 $t2Length = mb_strlen($t2);
-                if ($t1Length != $t2Length) return $t1Length < $t2Length ? 1 : -1;
+                if ($t1Length != $t2Length) {
+                    return $t1Length < $t2Length ? 1 : -1;
+                }
 
                 return $t1 == $t2 ? 0 : ($t1 < $t2 ? 1 : -1);
             });
@@ -423,7 +432,9 @@ class DateTimer
             $zonePart = explode('/', $zone);
             $continent = $zonePart[0];
 
-            if ($continent == 'UTC') continue;
+            if ($continent == 'UTC') {
+                continue;
+            }
 
             if (!empty($currentContinent) && $continent != $currentContinent) {
                 $timezones[] = [
@@ -433,8 +444,8 @@ class DateTimer
                 $unixTimezones = [];
             }
             $currentContinent = $continent;
-            $city = isset($zonePart[1]) ? $zonePart[1] : '';
-            $subCity = isset($zonePart[2]) ? $zonePart[2] : '';
+            $city = $zonePart[1] ?? '';
+            $subCity = $zonePart[2] ?? '';
             $unixTimezones[] = [
                 'name' => str_replace('_', ' ', $city) . (empty($subCity) ? '' : ' - ' . str_replace('_', ' ', $subCity)),
                 'value' => $zone,
@@ -509,8 +520,10 @@ class DateTimer
 
     public static function getUtcOffsets()
     {
-        return [-12, -11.5, -11, -10.5, -10, -9.5, -9, -8.5, -8, -7.5, -7, -6.5, -6, -5.5, -5, -4.5, -4, -3.5, -3, -2.5, -2, -1.5, -1, -0.5,
-            0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 5.75, 6, 6.5, 7, 7.5, 8, 8.5, 8.75, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.75, 13, 13.75, 14];
+        return [
+            -12, -11.5, -11, -10.5, -10, -9.5, -9, -8.5, -8, -7.5, -7, -6.5, -6, -5.5, -5, -4.5, -4, -3.5, -3, -2.5, -2, -1.5, -1, -0.5,
+            0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 5.75, 6, 6.5, 7, 7.5, 8, 8.5, 8.75, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.75, 13, 13.75, 14,
+        ];
     }
 
     public static function getTimezoneValues()

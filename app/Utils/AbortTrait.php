@@ -16,8 +16,8 @@ trait AbortTrait
                 transIf(
                     'error.def.abort.' . $code,
                     $message,
-                    isset($transOptions['replace']) ? $transOptions['replace'] : [],
-                    isset($transOptions['locale']) ? $transOptions['locale'] : null
+                    $transOptions['replace'] ?? [],
+                    $transOptions['locale'] ?? null
                 )
                 : $message
         );

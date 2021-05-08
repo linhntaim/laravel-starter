@@ -23,7 +23,7 @@ abstract class Action
         if (!isset($this->registeredCallbacks[$namespace])) {
             $this->registeredCallbacks[$namespace] = [];
         }
-        $id = $id ? $id : count($this->registeredCallbacks[$namespace]);
+        $id = $id ?: count($this->registeredCallbacks[$namespace]);
         $this->registeredCallbacks[$namespace][$id] = $callback;
         return $id;
     }

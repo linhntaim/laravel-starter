@@ -56,6 +56,28 @@ abstract class Command extends BaseCommand
         $this->consoleClientApply();
     }
 
+    public function ifOption($key, &$option, $filled = false)
+    {
+        $option = $this->option($key);
+        return !is_null($option) && (!$filled || filled($option));
+    }
+
+    public function optionOr($key, $default = null, $filled = true)
+    {
+        return got($this->option($key), $default, $filled);
+    }
+
+    public function ifArgument($key, &$argument, $filled = false)
+    {
+        $argument = $this->argument($key);
+        return !is_null($argument) && (!$filled || filled($argument));
+    }
+
+    public function argumentOr($key, $default = null, $filled = true)
+    {
+        return got($this->argument($key), $default, $filled);
+    }
+
     public function alert($string)
     {
         $this->newLine();
@@ -135,7 +157,8 @@ abstract class Command extends BaseCommand
             $this->start();
             $this->go();
             $this->end();
-        } catch (Throwable $e) {
+        }
+        catch (Throwable $e) {
             $this->handleException($e);
         }
     }
@@ -165,7 +188,8 @@ abstract class Command extends BaseCommand
             if (isset($e->detail)) {
                 if (is_string($e->detail)) {
                     $this->output->writeln(sprintf('<comment>Fault detail:</comment> %s', $e->detail), $this->parseVerbosity());
-                } elseif (is_object($e->detail) || is_array($e->detail)) {
+                }
+                elseif (is_object($e->detail) || is_array($e->detail)) {
                     $this->output->writeln(sprintf('<comment>Fault detail:</comment> %s', json_encode($e->detail)), $this->parseVerbosity());
                 }
             }
@@ -184,8 +208,8 @@ abstract class Command extends BaseCommand
                     sprintf(
                         '<comment>#%d</comment> [<info>%s:%s</info>]',
                         $i,
-                        isset($trace['file']) ? $trace['file'] : '',
-                        isset($trace['line']) ? $trace['line'] : ''
+                        $trace['file'] ?? '',
+                        $trace['line'] ?? ''
                     ),
                     $this->parseVerbosity()
                 );
@@ -193,20 +217,21 @@ abstract class Command extends BaseCommand
                     sprintf(
                         '%s %s%s%s()',
                         str_repeat(' ', strlen($i) + 1),
-                        isset($trace['class']) ? $trace['class'] : '',
-                        isset($trace['type']) ? $trace['type'] : '',
-                        isset($trace['function']) ? $trace['function'] : ''
+                        $trace['class'] ?? '',
+                        $trace['type'] ?? '',
+                        $trace['function'] ?? ''
                     ),
                     $this->parseVerbosity()
                 );
-            } else {
+            }
+            else {
                 $this->output->writeln(
                     sprintf(
                         '<comment>#%d</comment> %s%s%s()',
                         $i,
-                        isset($trace['class']) ? $trace['class'] : '',
-                        isset($trace['type']) ? $trace['type'] : '',
-                        isset($trace['function']) ? $trace['function'] : ''
+                        $trace['class'] ?? '',
+                        $trace['type'] ?? '',
+                        $trace['function'] ?? ''
                     ),
                     $this->parseVerbosity()
                 );

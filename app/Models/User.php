@@ -37,7 +37,6 @@ class User extends Authenticatable implements IModel, IUser
     public const USER_SYSTEM_ID = 1;
     public const USER_SUPER_ADMINISTRATOR_ID = 2;
     public const USER_ADMINISTRATOR_ID = 3;
-
     public const PROTECTED = [
         User::USER_SYSTEM_ID,
         User::USER_SUPER_ADMINISTRATOR_ID,
@@ -55,7 +54,6 @@ class User extends Authenticatable implements IModel, IUser
         'username',
         'email',
         'password',
-        'remember_token',
         'password_changed_at',
         'last_accessed_at',
     ];

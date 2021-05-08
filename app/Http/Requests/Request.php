@@ -69,7 +69,8 @@ class Request extends BaseRequest
 
     public function ajax()
     {
-        return parent::ajax() || in_array(
+        return parent::ajax()
+            || in_array(
                 'x-requested-with',
                 array_map(
                     function ($item) {

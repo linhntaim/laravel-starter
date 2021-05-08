@@ -17,14 +17,15 @@ abstract class Command extends BaseCommand
 
     protected function go()
     {
-            $this->warn(sprintf('Making [%s]...', $this->friendlyName()));
-            $this->newLine();
-            if ($this->forced()) {
-                $this->goForcingToMake();
-            } else {
-                $this->goMaking();
-            }
-            $this->info(sprintf('[%s] made!!!', $this->friendlyName()));
+        $this->warn(sprintf('Making [%s]...', $this->friendlyName()));
+        $this->newLine();
+        if ($this->forced()) {
+            $this->goForcingToMake();
+        }
+        else {
+            $this->goMaking();
+        }
+        $this->info(sprintf('[%s] made!!!', $this->friendlyName()));
     }
 
     protected function goForcingToMake()

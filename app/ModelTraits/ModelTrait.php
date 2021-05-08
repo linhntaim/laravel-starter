@@ -59,10 +59,9 @@ trait ModelTrait
                 $column,
                 $table,
                 (new static)->getConnection()->getTablePrefix(),
-                isset($as[$column]) ? $as[$column] : (isset($as[$index]) ? $as[$index] : null)
+                $as[$column] ?? ($as[$index] ?? null)
             );
         }, $columns);
-
     }
 
     public static function fullColumns($columns, $as = [])
@@ -83,7 +82,7 @@ trait ModelTrait
     public function getFullColumns($columns, $as = [])
     {
         return array_map(function ($column, $index) use ($as) {
-            return $this->getFullColumn($column, isset($as[$column]) ? $as[$column] : (isset($as[$index]) ? $as[$index] : null));
+            return $this->getFullColumn($column, $as[$column] ?? ($as[$index] ?? null));
         }, $columns);
     }
 
