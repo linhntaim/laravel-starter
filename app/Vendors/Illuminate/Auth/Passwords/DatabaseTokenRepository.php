@@ -21,6 +21,7 @@ class DatabaseTokenRepository extends BaseDatabaseTokenRepository
 
     public function createNewToken()
     {
+        // Create unique token
         while (($token = parent::createNewToken()) && $this->tokenExists($token)) {
         }
         return $token;
@@ -28,6 +29,7 @@ class DatabaseTokenRepository extends BaseDatabaseTokenRepository
 
     public function getPayload($email, $token)
     {
+        // Do not hash the token anymore
         return ['email' => $email, 'token' => $token, 'created_at' => new Carbon];
     }
 
@@ -39,6 +41,6 @@ class DatabaseTokenRepository extends BaseDatabaseTokenRepository
 
         return $record
             && !$this->tokenExpired($record['created_at'])
-            && $token == $record['token'];
+            && $token == $record['token']; // Compare the value, not check by hashing anymore
     }
 }
