@@ -27,6 +27,7 @@ abstract class Listener extends NowListener implements ShouldQueue
 
     /**
      * @param Event $event
+     * @throws
      */
     public function handle($event)
     {
@@ -34,7 +35,8 @@ abstract class Listener extends NowListener implements ShouldQueue
             $event->settingsTemporary(function () use ($event) {
                 parent::handle($event);
             });
-        } else {
+        }
+        else {
             parent::handle($event);
         }
     }

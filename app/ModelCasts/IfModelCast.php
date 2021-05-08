@@ -27,7 +27,8 @@ class IfModelCast extends ModelCast
         ];
         if (is_array($this->valueAttributes)) {
             $creatingAttributes = array_merge($creatingAttributes, $this->valueAttributes);
-        } elseif (is_callable($this->valueAttributes)) {
+        }
+        elseif (is_callable($this->valueAttributes)) {
             $callback = $this->valueAttributes;
             $creatingAttributes = array_merge($creatingAttributes, $callback($model, $key, $value, $attributes));
         }

@@ -68,7 +68,8 @@ trait ValidationTrait
                         if (is_object($subRule) && method_exists($subRule, '__toString')) {
                             $rule = $subRule->__toString();
                         }
-                    } else {
+                    }
+                    else {
                         $rule = $subRule;
                     }
 

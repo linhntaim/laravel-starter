@@ -19,7 +19,8 @@ class ClientLimitCommand extends Command
 
         if ($this->option('u')) {
             $clientLimiter->remove();
-        } else {
+        }
+        else {
             $allowed = $this->option('allow');
             $denied = $this->option('deny');
             $admin = $this->option('admin');

@@ -35,7 +35,8 @@ class DataImportRepository extends ModelRepository
             if (App::runningInMultipleInstances()) {
                 if (ConfigHelper::get('handled_file.cloud.enabled')) {
                     $handledFileRepository->useCloud();
-                } else {
+                }
+                else {
                     throw new AppException('Job is being queued when app is running in multiple instances but cloud storage is disabled');
                 }
             }

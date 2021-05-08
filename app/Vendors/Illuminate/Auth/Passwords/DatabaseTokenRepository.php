@@ -21,7 +21,8 @@ class DatabaseTokenRepository extends BaseDatabaseTokenRepository
 
     public function createNewToken()
     {
-        while (($token = parent::createNewToken()) && $this->tokenExists($token)) ;
+        while (($token = parent::createNewToken()) && $this->tokenExists($token)) {
+        }
         return $token;
     }
 
@@ -36,8 +37,8 @@ class DatabaseTokenRepository extends BaseDatabaseTokenRepository
             'email', $user->getEmailForPasswordReset()
         )->first();
 
-        return $record &&
-            !$this->tokenExpired($record['created_at']) &&
-            $token == $record['token'];
+        return $record
+            && !$this->tokenExpired($record['created_at'])
+            && $token == $record['token'];
     }
 }

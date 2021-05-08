@@ -31,7 +31,8 @@ trait ShellTrait
         $this->shellExitCode = $this->shellProcess->run(function ($type, $buffer) use ($outputSuccessCallback, $outputErrorCallback) {
             if (Process::ERR === $type) {
                 $outputErrorCallback && $outputErrorCallback($buffer);
-            } else {
+            }
+            else {
                 $outputSuccessCallback && $outputSuccessCallback($buffer);
             }
         });

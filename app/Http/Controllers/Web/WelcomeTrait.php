@@ -38,7 +38,9 @@ trait WelcomeTrait
 
     protected function welcomeDefaultView(Request $request, $path = null)
     {
-        if (!is_null($path)) $this->abort404();
+        if (!is_null($path)) {
+            $this->abort404();
+        }
         return $this->viewHome();
     }
 }

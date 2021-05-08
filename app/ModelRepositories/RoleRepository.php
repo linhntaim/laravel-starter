@@ -31,10 +31,11 @@ class RoleRepository extends ModelRepository implements IProtectedRepository
         return parent::query()->with('permissions');
     }
 
-    public function queryUniquely($query, $unique)
+    protected function getUniqueKeys()
     {
-        return parent::queryUniquely($query, $unique)
-            ->orWhere('name', $unique);
+        return array_merge(parent::getUniqueKeys(), [
+            'name',
+        ]);
     }
 
     /**
@@ -90,12 +91,12 @@ class RoleRepository extends ModelRepository implements IProtectedRepository
     public function updateWithAttributes(array $attributes = [], array $permissions = [])
     {
         $this->validateProtected('Cannot edit this protected role');
-
         parent::updateWithAttributes($attributes);
         return $this->catch(function () use ($permissions) {
             if (count($permissions) > 0) {
                 $this->model->permissions()->sync($permissions);
-            } else {
+            }
+            else {
                 $this->model->permissions()->detach();
             }
             return $this->model;
@@ -105,7 +106,6 @@ class RoleRepository extends ModelRepository implements IProtectedRepository
     public function delete()
     {
         $this->validateProtected('Cannot delete this protected role');
-
         return parent::delete();
     }
 }

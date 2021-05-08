@@ -62,7 +62,6 @@ trait ModelTrait
                 $as[$column] ?? ($as[$index] ?? null)
             );
         }, $columns);
-
     }
 
     public static function fullColumns($columns, $as = [])

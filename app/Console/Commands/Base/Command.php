@@ -157,7 +157,8 @@ abstract class Command extends BaseCommand
             $this->start();
             $this->go();
             $this->end();
-        } catch (Throwable $e) {
+        }
+        catch (Throwable $e) {
             $this->handleException($e);
         }
     }
@@ -187,7 +188,8 @@ abstract class Command extends BaseCommand
             if (isset($e->detail)) {
                 if (is_string($e->detail)) {
                     $this->output->writeln(sprintf('<comment>Fault detail:</comment> %s', $e->detail), $this->parseVerbosity());
-                } elseif (is_object($e->detail) || is_array($e->detail)) {
+                }
+                elseif (is_object($e->detail) || is_array($e->detail)) {
                     $this->output->writeln(sprintf('<comment>Fault detail:</comment> %s', json_encode($e->detail)), $this->parseVerbosity());
                 }
             }
@@ -221,7 +223,8 @@ abstract class Command extends BaseCommand
                     ),
                     $this->parseVerbosity()
                 );
-            } else {
+            }
+            else {
                 $this->output->writeln(
                     sprintf(
                         '<comment>#%d</comment> %s%s%s()',

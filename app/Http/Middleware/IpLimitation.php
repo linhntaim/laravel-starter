@@ -24,7 +24,8 @@ class IpLimitation
         $except = $this->except;
         if (is_null($group)) {
             $this->getLimit($limit, $allowed, $denied);
-        } else {
+        }
+        else {
             if (isset($limit[$group])) {
                 $this->getLimit($limit[$group], $allowed, $denied);
                 if (isset($this->except[$group])) {

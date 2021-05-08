@@ -16,5 +16,8 @@ class GenerateDataCommand extends Command
 
     protected function go()
     {
+        // TODO:
+
+        // TODO
     }
 }

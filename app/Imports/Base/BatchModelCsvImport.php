@@ -15,7 +15,9 @@ use Throwable;
 abstract class BatchModelCsvImport extends ModelCsvImport
 {
     protected $writeBatch = 1000;
+
     protected $writeIgnored = false;
+
     protected $written = true;
 
     protected function csvBeforeImporting($reads)
@@ -29,7 +31,8 @@ abstract class BatchModelCsvImport extends ModelCsvImport
             try {
                 $this->modelRepository->batchInsertEnd();
                 $this->transactionComplete();
-            } catch (Throwable $e) {
+            }
+            catch (Throwable $e) {
                 $this->transactionStop();
 
                 $this->csvHandleImportingException($e);
@@ -59,7 +62,8 @@ abstract class BatchModelCsvImport extends ModelCsvImport
             if ($this->written) {
                 $this->transactionComplete();
             }
-        } catch (Throwable $e) {
+        }
+        catch (Throwable $e) {
             $this->transactionStop();
 
             $this->csvHandleImportingException($e);

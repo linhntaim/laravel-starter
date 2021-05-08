@@ -30,7 +30,8 @@ abstract class Job extends NowJob implements ShouldQueue
             $this->settingsTemporary(function () {
                 parent::handle();
             });
-        } else {
+        }
+        else {
             parent::handle();
         }
     }

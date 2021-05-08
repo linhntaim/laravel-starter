@@ -22,7 +22,7 @@ class ExternalStorage extends Storage implements IUrlStorage, IResponseStorage
 
     /**
      * @param $data
-     * @return IUrlStorage|Storage
+     * @return static
      */
     public function setData($data)
     {

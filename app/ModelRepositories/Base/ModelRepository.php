@@ -238,7 +238,7 @@ abstract class ModelRepository
     /**
      * @param Model|callable|null $model
      * @param callable|null $callback
-     * @return ModelRepository
+     * @return static
      * @throws
      */
     public function useModelQuery($model = null, $callback = null)
@@ -250,7 +250,7 @@ abstract class ModelRepository
     /**
      * @param Model|callable|null $model
      * @param callable|null $callback
-     * @return ModelRepository
+     * @return static
      * @throws
      */
     public function useModelQueryAsFixed($model = null, $callback = null)
@@ -260,7 +260,7 @@ abstract class ModelRepository
     }
 
     /**
-     * @return ModelRepository
+     * @return static
      * @throws
      */
     public function clearUsingModelQuery()
@@ -451,7 +451,7 @@ abstract class ModelRepository
      * @param callable $callback
      * @param callable|null $catchCallback
      * @return Model|Collection|boolean|mixed|null|void
-     * @throws Exception
+     * @throws
      */
     protected function catch(callable $callback, callable $catchCallback = null)
     {
@@ -475,7 +475,7 @@ abstract class ModelRepository
 
     /**
      * @param array $options
-     * @return ModelRepository
+     * @return static
      */
     public function lockTable($options = [])
     {
@@ -595,7 +595,7 @@ abstract class ModelRepository
      * @param int $paging
      * @param int $itemsPerPage
      * @return Collection|LengthAwarePaginator|Builder|int
-     * @throws Exception
+     * @throws
      */
     public function search(array $search = [], int $paging = Configuration::FETCH_PAGING_YES, int $itemsPerPage = Configuration::DEFAULT_ITEMS_PER_PAGE)
     {
@@ -880,7 +880,7 @@ abstract class ModelRepository
      * @param int $length
      * @param bool $shouldEnd
      * @return Collection
-     * @throws Exception
+     * @throws
      */
     public function batchRead(&$length, &$shouldEnd)
     {

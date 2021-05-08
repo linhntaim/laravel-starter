@@ -14,22 +14,11 @@ class UpdatePasswordCommand extends Command
 {
     protected $signature = 'update:password {user} {--password=}';
 
-    protected $passwordOptions = [
-        'lowerCases' => true,
-        'upperCases' => true,
-        'numbers' => true,
-        'symbols' => true,
-        'excludeSimilar' => false,
-        'lowerCaseLength' => 4,
-        'upperCaseLength' => 4,
-        'numberLength' => 4,
-        'symbolLength' => 4,
-    ];
-
     /**
      * @var UserRepository
      */
     protected $userRepository;
+
     protected $password;
 
     protected function go()

@@ -88,7 +88,8 @@ abstract class ModelCsvImport extends WholeCsvImport
 
             $this->modelImporting($read, $counter);
             $this->transactionComplete();
-        } catch (Throwable $exception) {
+        }
+        catch (Throwable $exception) {
             $this->transactionStop();
 
             $this->csvHandleImportingException($exception);

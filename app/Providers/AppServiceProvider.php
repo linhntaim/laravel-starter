@@ -19,7 +19,6 @@ use App\Vendors\Illuminate\Database\Connectors\ConnectionFactory;
 use App\Vendors\Illuminate\Log\LogManager;
 use App\Vendors\Illuminate\Support\Facades\App;
 use App\Vendors\Illuminate\Support\Str;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
