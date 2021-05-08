@@ -4,6 +4,8 @@ namespace App\Utils\Theme;
 
 use App\Utils\ConfigHelper;
 use App\Vendors\Illuminate\Support\HtmlString;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 
 abstract class Theme
 {
@@ -42,7 +44,7 @@ abstract class Theme
      * @param string $view
      * @param array $data
      * @param array $mergeData
-     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
+     * @return View|Factory
      */
     public function view($view, $data = [], $mergeData = [])
     {
@@ -63,7 +65,7 @@ abstract class Theme
      * @param array $data
      * @param array $mergeData
      * @param string $view
-     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|mixed
+     * @return View|Factory
      */
     public function pageHome($data = [], $mergeData = [], $view = 'welcome')
     {
@@ -74,7 +76,7 @@ abstract class Theme
      * @param string $view
      * @param array $data
      * @param array $mergeData
-     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
+     * @return View|Factory
      */
     public function pageView($view, $data = [], $mergeData = [])
     {
@@ -117,7 +119,9 @@ abstract class Theme
 
     protected function getTitleComplement()
     {
-        if (!$this->titleComplementUsed) return null;
+        if (!$this->titleComplementUsed) {
+            return null;
+        }
         return is_null($this->titleComplement) ? config('app.name') : $this->titleComplement;
     }
 
@@ -134,7 +138,7 @@ abstract class Theme
     /**
      * @param string|string[]|array|null $titles
      * @param string|null $complement
-     * @return string
+     * @return HtmlString
      */
     public function title($titles = null, $complement = null)
     {
@@ -142,7 +146,8 @@ abstract class Theme
             if (is_null($titles) && ConfigHelper::get('app.id') == 'base') {
                 $titles = 'Laravel Starter';
                 $complement = 'DSquare - GBU';
-            } else {
+            }
+            else {
                 $complement = $this->getTitleComplement();
             }
         }
