@@ -69,20 +69,6 @@ class ActivityLog extends Model
 
     protected $resourceClass = ActivityLogResource::class;
 
-    public function getUserAttribute()
-    {
-        return $this->remind('user', function () {
-            return $this->user()->first();
-        });
-    }
-
-    public function getAdminAttribute()
-    {
-        return $this->remind('admin', function () {
-            return $this->admin()->first();
-        });
-    }
-
     public function getSdStCreatedAtAttribute()
     {
         $dateTimer = Facade::dateTimer();

@@ -19,8 +19,8 @@ trait MemorizeTrait
 
     /**
      * @param $key
-     * @param \Closure|callable|null $valueCallback
-     * @param \Closure|callable|null $revalidateCallback
+     * @param callable|null $valueCallback
+     * @param callable|null $revalidateCallback
      * @return mixed|null
      */
     protected function remind($key, callable $valueCallback = null, callable $revalidateCallback = null)
