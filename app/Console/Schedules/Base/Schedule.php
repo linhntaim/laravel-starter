@@ -58,7 +58,8 @@ abstract class Schedule
             $this->start();
             $this->go();
             $this->end();
-        } catch (Throwable $e) {
+        }
+        catch (Throwable $e) {
             $this->handleException($e);
         }
     }
