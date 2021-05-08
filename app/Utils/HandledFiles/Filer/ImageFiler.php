@@ -42,7 +42,7 @@ class ImageFiler extends Filer
     }
 
     /**
-     * @return ImageFiler
+     * @return static
      * @throws
      */
     public function imagePrepare()
@@ -50,7 +50,8 @@ class ImageFiler extends Filer
         if (($storage = $this->getOriginStorage()) && $storage instanceof LocalStorage) {
             try {
                 $this->image = ImageManagerStatic::make($storage->getRealPath());
-            } catch (Throwable $exception) {
+            }
+            catch (Throwable $exception) {
                 throw AppException::from($exception);
             }
         }
@@ -62,7 +63,7 @@ class ImageFiler extends Filer
      * @param integer $height
      * @param boolean $aspectRatio
      * @param boolean $upSize
-     * @return ImageFiler
+     * @return static
      */
     public function imageResize($width, $height, $aspectRatio = true, $upSize = false)
     {
@@ -84,7 +85,7 @@ class ImageFiler extends Filer
      * @param integer $height
      * @param integer|null $x
      * @param integer|null $y
-     * @return ImageFiler
+     * @return static
      */
     public function imageCrop($width, $height, $x = null, $y = null)
     {
@@ -97,7 +98,7 @@ class ImageFiler extends Filer
     /**
      * @param float $angle
      * @param string $bgColor
-     * @return ImageFiler
+     * @return static
      */
     public function imageRotate($angle, $bgColor = '#ffffff')
     {

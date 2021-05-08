@@ -31,7 +31,7 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
     /**
      * HandledStorage constructor.
      * @param FilesystemAdapter|null $disk
-     * @throws AppException
+     * @throws
      */
     public function __construct($disk = null)
     {
@@ -44,8 +44,8 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
 
     /**
      * @param FilesystemAdapter|null $disk
-     * @return HandledStorage
-     * @throws AppException
+     * @return static
+     * @throws
      */
     public function setDisk($disk = null)
     {
@@ -70,7 +70,7 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
 
     /**
      * @param string $relativePath
-     * @return HandledStorage
+     * @return static
      */
     public function setRelativePath($relativePath)
     {
@@ -114,7 +114,7 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
      * @param string $toDirectory
      * @param bool|string|array $keepOriginalName
      * @param string $visibility
-     * @return $this
+     * @return static
      */
     public function from($file, $toDirectory = '', $keepOriginalName = true, $visibility = 'public')
     {
@@ -124,18 +124,22 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
         if ($keepOriginalName === true) {
             if ($file instanceof HandledStorage) {
                 $originalName = basename($file->getRelativePath());
-            } elseif ($file instanceof UploadedFile) {
+            }
+            elseif ($file instanceof UploadedFile) {
                 $originalName = $file->getClientOriginalName();
-            } elseif ($file instanceof File) {
+            }
+            elseif ($file instanceof File) {
                 $originalName = $file->getBasename();
-            } else {
+            }
+            else {
                 $originalName = basename($file);
             }
             if ($file instanceof HandledStorage) {
                 $path = trim(Helper::noWrappedSlashes($toDirectory) . '/' . $originalName, '/');
                 $this->disk->put($path, $file->getContent(), $visibility);
                 $this->relativePath = $path;
-            } else {
+            }
+            else {
                 $this->relativePath = Helper::changeToPath($this->disk->putFileAs(Helper::noWrappedSlashes($toDirectory), $file, $originalName, $visibility));
             }
             return $this;
@@ -146,7 +150,8 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
             $path = trim(Helper::noWrappedSlashes($toDirectory) . '/' . Str::random(40) . ($extension ? '.' . $extension : ''), '/');
             $this->disk->put($path, $file->getContent(), $visibility);
             $this->relativePath = $path;
-        } else {
+        }
+        else {
             $this->relativePath = Helper::changeToPath($this->disk->putFile(Helper::noWrappedSlashes($toDirectory), $file, $visibility));
         }
         if ($keepOriginalName !== false) {
@@ -157,7 +162,7 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
 
     /**
      * @param $data
-     * @return IUrlStorage|Storage|HandledStorage
+     * @return static
      */
     public function setData($data)
     {
@@ -221,7 +226,7 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
      * @param bool|string|array $keepOriginalName
      * @param bool $override
      * @param callable|null $overrideCallback
-     * @return HandledStorage
+     * @return static
      * @throws
      */
     public function move($toDirectory = '', $keepOriginalName = true, $override = true, callable $overrideCallback = null)
@@ -237,7 +242,7 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
      * @param bool|string|array $keepOriginalName
      * @param bool $override
      * @param callable|null $overrideCallback
-     * @return HandledStorage
+     * @return static
      * @throws
      */
     public function copy($toDirectory = '', $keepOriginalName = true, $override = true, callable $overrideCallback = null)
@@ -253,8 +258,8 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
      * @param string $toDirectory
      * @param bool|string|array $keepOriginalName
      * @param bool $override
-     * @param callable $overrideCallback
-     * @return HandledStorage
+     * @param callable|null $overrideCallback
+     * @return static
      * @throws
      */
     public function fromTo(callable $callback, $toDirectory = '', $keepOriginalName = true, $override = true, callable $overrideCallback = null)
@@ -263,7 +268,8 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
             $toDirectory = is_null($toDirectory) ? $this->getRelativeDirectory() : Helper::noWrappedSlashes($toDirectory);
             if ($keepOriginalName === true) {
                 $toFilename = $this->getBasename();
-            } else {
+            }
+            else {
                 $toFilename = is_array($keepOriginalName) ?
                     Helper::nameWithExtension(
                         $keepOriginalName['name'] ?? null,
@@ -278,8 +284,11 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
             if ($this->exists($relativePath)) {
                 if ($override) {
                     (new static())->setRelativePath($relativePath)->delete();
-                } else {
-                    if ($overrideCallback) $overrideCallback();
+                }
+                else {
+                    if ($overrideCallback) {
+                        $overrideCallback();
+                    }
                     throw new AppException('Overriding file was not allowed');
                 }
             }
@@ -290,7 +299,7 @@ abstract class HandledStorage extends Storage implements IFileStorage, IResponse
 
     /**
      * @param string|array $filename
-     * @return $this
+     * @return static
      */
     public function changeFilename($filename)
     {

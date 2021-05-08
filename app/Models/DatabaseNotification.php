@@ -62,13 +62,6 @@ class DatabaseNotification extends BaseDatabaseNotification implements IModel
 
     protected $resourceClass = DatabaseNotificationResource::class;
 
-    public function getNotifiableAttribute()
-    {
-        return $this->remind('notifiable', function () {
-            return $this->notifiable()->first();
-        });
-    }
-
     /**
      * @return NowNotification|mixed
      * @throws

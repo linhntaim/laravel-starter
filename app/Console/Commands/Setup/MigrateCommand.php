@@ -158,6 +158,5 @@ class MigrateCommand extends Command
 
     private function rollbackDatabase()
     {
-
     }
 }

@@ -7,7 +7,6 @@
 namespace App\Models;
 
 use App\Models\Base\Model;
-use App\ModelTraits\ArrayValuedAttributesTrait;
 
 /**
  * Class Device
@@ -18,8 +17,6 @@ use App\ModelTraits\ArrayValuedAttributesTrait;
  */
 class Device extends Model
 {
-    use ArrayValuedAttributesTrait;
-
     public const PROVIDER_BROWSER = 'browser';
 
     protected $table = 'devices';
@@ -30,8 +27,6 @@ class Device extends Model
         'client_ips',
         'client_agent',
         'meta',
-        'meta_array_value',
-        'meta_array_overridden_value',
     ];
 
     protected $visible = [
@@ -39,6 +34,10 @@ class Device extends Model
         'secret',
         'client_ips',
         'client_agent',
+    ];
+
+    protected $casts = [
+        'meta' => 'array',
     ];
 
     public function getClientIpsAttribute()

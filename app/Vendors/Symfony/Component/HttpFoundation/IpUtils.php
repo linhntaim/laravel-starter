@@ -9,7 +9,9 @@ class IpUtils extends BaseUtils
     public static function checkIps($requestIps, $ips)
     {
         foreach ($requestIps as $requestIp) {
-            if (static::checkIp($requestIp, $ips)) return true;
+            if (static::checkIp($requestIp, $ips)) {
+                return true;
+            }
         }
         return false;
     }

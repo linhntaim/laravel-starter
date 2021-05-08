@@ -55,7 +55,7 @@ abstract class GeneratorNode
 
     /**
      * @param GeneratorNode $node
-     * @return GeneratorNode
+     * @return static
      */
     public function setParent($node)
     {
@@ -65,7 +65,7 @@ abstract class GeneratorNode
 
     /**
      * @param GeneratorNode|string $node
-     * @return GeneratorNode
+     * @return static
      */
     public function addChild($node)
     {
@@ -78,7 +78,7 @@ abstract class GeneratorNode
 
     /**
      * @param array $nodes
-     * @return $this
+     * @return static
      */
     public function addChildren(array $nodes)
     {
@@ -100,7 +100,7 @@ abstract class GeneratorNode
         return $values;
     }
 
-     /**
+    /**
      * @param GeneratorNode $root
      * @return bool
      */
@@ -109,7 +109,8 @@ abstract class GeneratorNode
         if ($this instanceof OrGeneratorNode) {
             $this->pickRandomValuedNodeIndex();
             $this->getValuedNode()->beforeRandomGenerating($root);
-        } elseif ($this instanceof AndGeneratorNode) {
+        }
+        elseif ($this instanceof AndGeneratorNode) {
             foreach ($this->children as $child) {
                 $child->beforeRandomGenerating($root);
             }
@@ -129,7 +130,8 @@ abstract class GeneratorNode
                     $child->beforeGenerating($root);
                 }
                 return true;
-            } elseif (!$this->valuedAtLast()) {
+            }
+            elseif (!$this->valuedAtLast()) {
                 $valuedNode = $this->getValuedNode();
 
                 if ($valuedNode instanceof LeafGeneratorNode || $valuedNode->beforeGenerating($root)) {
@@ -140,15 +142,21 @@ abstract class GeneratorNode
                     $root->resetAfterNextPicked($this);
                 }
                 return false;
-            } else { // valued at last
+            }
+            else { // valued at last
                 foreach ($this->children as $child) {
-                    if (!$child->beforeGenerating($root)) return false;
+                    if (!$child->beforeGenerating($root)) {
+                        return false;
+                    }
                 }
                 return true;
             }
-        } elseif ($this instanceof AndGeneratorNode) {
+        }
+        elseif ($this instanceof AndGeneratorNode) {
             foreach ($this->children as $child) {
-                if (!$child->beforeGenerating($root)) return false;
+                if (!$child->beforeGenerating($root)) {
+                    return false;
+                }
             }
         }
         return true;
@@ -178,7 +186,8 @@ abstract class GeneratorNode
                             break;
                     }
                 }
-            } else {
+            }
+            else {
                 foreach ($this->children as $child) {
                     switch ($child->canPickNext($currentOrNode)) {
                         case 2:
@@ -190,7 +199,8 @@ abstract class GeneratorNode
                     }
                 }
             }
-        } elseif ($this instanceof AndGeneratorNode) {
+        }
+        elseif ($this instanceof AndGeneratorNode) {
             for ($i = $this->childrenLength - 1; $i >= 0; --$i) {
                 switch ($this->children[$i]->canPickNext($currentOrNode)) {
                     case 2:
@@ -212,7 +222,9 @@ abstract class GeneratorNode
             return false;
         }
         for ($i = $this->childrenLength - 1; $i >= 0; --$i) {
-            if (!$this->children[$i]->resetAfterNextPicked($currentOrNode)) return false;
+            if (!$this->children[$i]->resetAfterNextPicked($currentOrNode)) {
+                return false;
+            }
         }
         if ($this instanceof OrGeneratorNode) {
             $this->resetValuedNodeIndex();

@@ -16,6 +16,20 @@ function printLine($value)
 }
 
 /**
+ * @param string $pattern
+ * @param string $subject
+ * @param string[][]|array|null $matches
+ * @param int $flags
+ * @param int $offset
+ * @return bool
+ */
+function whenPregMatchAll(string $pattern, string $subject, array &$matches = null, int $flags = PREG_PATTERN_ORDER, int $offset = 0)
+{
+    $matched = preg_match_all($pattern, $subject, $matches, $flags, $offset);
+    return is_int($matched) && $matched > 0;
+}
+
+/**
  * @param object|string $object
  * @param string[]|array|string $interfaces
  */
@@ -78,9 +92,9 @@ function fileJsonDecodeArray(string $file, bool $safe = true, int $depth = 512, 
     return [];
 }
 
-function got($value, $default = null)
+function got($value, $default = null, $filled = true)
 {
-    if (filled($value)) {
+    if (($filled && filled($value)) || !is_null($value)) {
         return $value;
     }
 

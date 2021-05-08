@@ -26,10 +26,11 @@ class PermissionRepository extends ModelRepository implements IProtectedReposito
         return Permission::class;
     }
 
-    public function queryUniquely($query, $unique)
+    protected function getUniqueKeys()
     {
-        return parent::queryUniquely($query, $unique)
-            ->orWhere('name', $unique);
+        return array_merge(parent::getUniqueKeys(), [
+            'name',
+        ]);
     }
 
     /**
@@ -52,7 +53,6 @@ class PermissionRepository extends ModelRepository implements IProtectedReposito
     public function delete()
     {
         $this->validateProtected('Cannot delete this protected permission');
-
         return parent::delete();
     }
 }

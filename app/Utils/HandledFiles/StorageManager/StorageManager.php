@@ -12,6 +12,7 @@ use App\Utils\HandledFiles\Storage\Storage;
 class StorageManager
 {
     protected $storage;
+
     protected $origin;
 
     public function __construct()

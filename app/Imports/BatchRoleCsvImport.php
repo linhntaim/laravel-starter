@@ -11,6 +11,8 @@ use App\ModelRepositories\RoleRepository;
 
 class BatchRoleCsvImport extends BatchModelCsvImport
 {
+    public const NAME = 'role';
+
     protected $writeIgnored = true;
 
     protected function modelRepositoryClass()

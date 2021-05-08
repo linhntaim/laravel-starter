@@ -27,7 +27,9 @@ class TransactionManager
      * @var TransactionHandler[]|array
      */
     private $transactionHandlers;
+
     private $laterThrow;
+
     private $hasTransaction;
 
     private function __construct()

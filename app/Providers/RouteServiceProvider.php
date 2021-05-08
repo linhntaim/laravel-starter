@@ -23,7 +23,6 @@ class RouteServiceProvider extends ServiceProvider
      * @var string
      */
     public const HOME = '/';
-
     /**
      * The controller namespace for the application.
      *
@@ -36,7 +35,10 @@ class RouteServiceProvider extends ServiceProvider
     protected $throttleExcept = [
         'api' => [
             // TODO:
-//            'api/registration',
+            'api/home/prerequisite',
+            'api/home/device/current',
+            'api/admin/prerequisite',
+            'api/admin/device/current',
 
             // TODO
         ],

@@ -122,7 +122,8 @@ class Handler extends ExceptionHandler
 
         if (method_exists($command, 'renderThrowable')) {
             $command->renderThrowable($e);
-        } else {
+        }
+        else {
             parent::renderForConsole($output, $e);
         }
 

@@ -10,7 +10,6 @@ class NumberFormatter
 {
     public const DEFAULT_NUMBER_OF_DECIMAL_POINTS = 2;
 
-    #region Static
     /**
      * @var int
      */
@@ -45,7 +44,7 @@ class NumberFormatter
 
     /**
      * @param int $numberOfDecimalPoints
-     * @return NumberFormatter
+     * @return static
      */
     public function mode($numberOfDecimalPoints)
     {

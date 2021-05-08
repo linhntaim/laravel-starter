@@ -31,6 +31,7 @@ class RegexParser
     }
 
     protected $compiler;
+
     protected $defaultParsedCallback;
 
     private function __construct()
@@ -45,7 +46,7 @@ class RegexParser
      * @param $regex
      * @param callable|bool|null $callback
      * @return TreeNode
-     * @throws AppException
+     * @throws
      */
     public function parse($regex, $callback = null)
     {
@@ -55,7 +56,8 @@ class RegexParser
                 $this->walk($parsed, empty($callback) ? $this->defaultParsedCallback : $callback);
             }
             return $parsed;
-        } catch (Throwable $exception) {
+        }
+        catch (Throwable $exception) {
             throw new AppException($this->__transErrorWithModule('unexpected_token'));
         }
     }

@@ -9,16 +9,27 @@ namespace App\Utils;
 class PasswordGenerator
 {
     protected $symbolsIncluded = false;
+
     protected $numbersIncluded = false;
+
     protected $lowerCasesIncluded = false;
+
     protected $upperCasesIncluded = false;
+
     protected $symbolsLength = 0;
+
     protected $numbersLength = 0;
+
     protected $lowerCasesLength = 0;
+
     protected $upperCasesLength = 0;
+
     protected $lowerCaseCharacters = 'abcdefghijklmnopqrstuvwxyz';
+
     protected $upperCaseCharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
     protected $numberCharacters = '0123456789';
+
     protected $symbolCharacters = '!@#$%^&*()-=_+';
 
     public function excludeSimilarCharacters($excluded = true)

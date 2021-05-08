@@ -13,7 +13,9 @@ abstract class IndexModelCsvExport extends ModelCsvExport
     public const NAME = 'model_index';
 
     protected $search;
+
     protected $sortBy;
+
     protected $sortOrder;
 
     public function __construct($search = [], $sortBy = null, $sortOrder = 'asc')

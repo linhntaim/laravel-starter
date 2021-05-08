@@ -74,7 +74,8 @@ trait ClassTrait
             if (static::__hasTransWithoutNamespace($namespacedKey = sprintf('%s%s', static::$__transNamespace, $key), $locale)) {
                 $key = $namespacedKey;
             }
-        } else {
+        }
+        else {
             $key = sprintf('%s%s', static::$__transNamespace, $key);
         }
         return trans($key, $replace, $locale);
@@ -86,7 +87,8 @@ trait ClassTrait
             if (static::__hasTransWithoutNamespace($namespacedKey = sprintf('%s%s', static::$__transNamespace, $key), $locale)) {
                 $key = $namespacedKey;
             }
-        } else {
+        }
+        else {
             $key = sprintf('%s%s', static::$__transNamespace, $key);
         }
         return trans_choice($key, $number, $replace, $locale);

@@ -75,8 +75,8 @@ class ActivityLogRepository extends ModelRepository
             'client' => Facade::getAppId(),
             'screen' => ScreenFacade::getScreenName(),
             'action' => $action,
-            'screens_array_value' => ScreenFacade::getScreens(),
-            'payload_array_value' => $payload,
+            'screens' => ScreenFacade::getScreens(),
+            'payload' => $payload,
         ]);
     }
 }

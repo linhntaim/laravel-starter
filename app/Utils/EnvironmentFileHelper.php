@@ -9,7 +9,9 @@ namespace App\Utils;
 class EnvironmentFileHelper
 {
     protected $content;
+
     protected $modified;
+
     protected $filePath;
 
     public function __construct()
@@ -44,7 +46,7 @@ class EnvironmentFileHelper
     /**
      * @param string $key
      * @param mixed $value
-     * @return $this
+     * @return static
      */
     public function fill($key, $value)
     {
@@ -57,7 +59,8 @@ class EnvironmentFileHelper
                 $replaced,
                 $this->content
             );
-        } else {
+        }
+        else {
             $this->content .= PHP_EOL . $replaced;
         }
         $this->modified = true;
@@ -93,7 +96,8 @@ class EnvironmentFileHelper
     {
         if (is_array($value)) {
             $value = json_encode($value);
-        } elseif (is_bool($value)) {
+        }
+        elseif (is_bool($value)) {
             $value = $value ? 'true' : 'false';
         }
         if (mb_strpos($value, ' ') !== false || preg_match('/(^\\"|\\"$)/', $value) === 1) {

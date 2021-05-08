@@ -47,11 +47,12 @@ class UserRepository extends ModelRepository implements IProtectedRepository, IU
         return parent::searchOn($query, $search);
     }
 
-    public function queryUniquely($query, $unique)
+    protected function getUniqueKeys()
     {
-        return parent::queryUniquely($query, $unique)
-            ->orWhere('email', $unique)
-            ->orWhere(DB::raw('BINARY username'), $unique);
+        return array_merge(parent::getUniqueKeys(), [
+            'email',
+            DB::raw('BINARY username'),
+        ]);
     }
 
     /**
@@ -108,10 +109,12 @@ class UserRepository extends ModelRepository implements IProtectedRepository, IU
             $userSocialAttributes['user_id'] = $this->model->id;
             $userSocialRepository->updateOrCreateWithAttributes($userSocialAttributes);
             $this->updateWithAttributes($attributes);
-        } elseif ($userSocial = $userSocialRepository->notStrict()->getByProvider($userSocialAttributes['provider'], $userSocialAttributes['provider_id'])) {
+        }
+        elseif ($userSocial = $userSocialRepository->notStrict()->getByProvider($userSocialAttributes['provider'], $userSocialAttributes['provider_id'])) {
             $this->model = $userSocial->user;
             $this->updateWithAttributes($attributes);
-        } else {
+        }
+        else {
             $this->createWithAttributes($attributes, $userSocialAttributes);
         }
         return $this->model;
@@ -133,7 +136,8 @@ class UserRepository extends ModelRepository implements IProtectedRepository, IU
         if (!empty($attributes['password'])) {
             $attributes['password'] = Str::hash($attributes['password']);
             $attributes['password_changed_at'] = DateTimer::syncNow();
-        } else {
+        }
+        else {
             unset($attributes['password']);
         }
         parent::createWithAttributes($attributes);
@@ -163,7 +167,8 @@ class UserRepository extends ModelRepository implements IProtectedRepository, IU
         if (!empty($attributes['password'])) {
             $attributes['password'] = Str::hash($attributes['password']);
             $attributes['password_changed_at'] = DateTimer::syncNow();
-        } else {
+        }
+        else {
             unset($attributes['password']);
         }
         if (empty($attributes['email'])) {

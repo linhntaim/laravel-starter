@@ -24,7 +24,8 @@ class ScanHandledFilesCommand extends Command
         try {
             (new HandledFileRepository())->withModel($handledFile)->scan();
             $this->transactionComplete();
-        } catch (Throwable $exception) {
+        }
+        catch (Throwable $exception) {
             $this->transactionStop();
 
             throw $exception;

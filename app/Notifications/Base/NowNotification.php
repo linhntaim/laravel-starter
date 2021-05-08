@@ -28,13 +28,12 @@ abstract class NowNotification extends BaseNotification
 {
     use ClassTrait, IndependentClientTrait;
 
+    public const NAME = 'now_notification';
     public const VIA_DATABASE = 'database';
     public const VIA_BROADCAST = 'broadcast';
     public const VIA_MAIL = 'mail';
     public const VIA_IOS = 'ios';
     public const VIA_ANDROID = 'android';
-
-    public const NAME = 'now_notification';
 
     protected static function __transCurrentModule()
     {
@@ -96,7 +95,8 @@ abstract class NowNotification extends BaseNotification
     protected function shouldSomething()
     {
         return $this->shouldDatabase() || $this->shouldBroadcast() || $this->shouldMail()
-            || $this->shouldIos() || $this->shouldAndroid();
+            || $this->shouldIos()
+            || $this->shouldAndroid();
     }
 
     public function via(IUser $notifiable)
@@ -125,12 +125,10 @@ abstract class NowNotification extends BaseNotification
 
     public function beforeNotifying($via, IUser $notifiable)
     {
-
     }
 
     public function afterNotifying($via, IUser $notifiable)
     {
-
     }
 
     protected function resolveData($via, IUser $notifiable, $dataCallback)
@@ -139,7 +137,8 @@ abstract class NowNotification extends BaseNotification
         return Facade::temporaryFromUser($notifiable, function () use ($via, $notifiable, $dataCallback) {
             try {
                 return $dataCallback($notifiable);
-            } catch (Throwable $e) {
+            }
+            catch (Throwable $e) {
                 if (!($this instanceof Notification)) {
                     $this->failed($e);
                 }
@@ -348,11 +347,14 @@ abstract class NowNotification extends BaseNotification
 
         if ($notifiables instanceof Collection) {
             $notifiables = $notifiables->toArray();
-        } elseif ($notifiables instanceof Model) {
+        }
+        elseif ($notifiables instanceof Model) {
             $notifiables = [$notifiables];
         }
 
-        if ($this->cannotSend($notifiables)) return false;
+        if ($this->cannotSend($notifiables)) {
+            return false;
+        }
 
         NotificationFacade::send($notifiables, $this);
 

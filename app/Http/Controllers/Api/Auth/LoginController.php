@@ -46,7 +46,8 @@ abstract class LoginController extends AccessTokenController
             $accessTokenId = null;
             if (method_exists($parsedToken, 'getClaim')) { // support lcobucci/jwt@3.x
                 $accessTokenId = $parsedToken->getClaim('jti');
-            } elseif (method_exists($parsedToken, 'claims')) { // support lcobucci/jwt@4.x
+            }
+            elseif (method_exists($parsedToken, 'claims')) { // support lcobucci/jwt@4.x
                 $accessTokenId = $parsedToken->claims()->get('jti');;
             }
             $oAuthImpersonateRepository = new OAuthImpersonateRepository();
@@ -74,10 +75,10 @@ abstract class LoginController extends AccessTokenController
 
     protected function withErrorHandling($callback)
     {
-
         try {
             return $callback();
-        } catch (LeagueException $e) {
+        }
+        catch (LeagueException $e) {
             return $this->throwException($e);
         }
     }

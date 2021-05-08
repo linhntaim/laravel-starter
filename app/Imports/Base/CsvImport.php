@@ -16,7 +16,9 @@ use App\Utils\HandledFiles\Filer\CsvFiler;
 abstract class CsvImport extends Import
 {
     protected $customExceptionDisabled = true;
+
     protected $headerSkipped = true;
+
     protected $excludedCustomExceptions = [];
 
     protected function getFilerClass()
