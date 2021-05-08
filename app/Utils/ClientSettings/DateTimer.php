@@ -10,8 +10,8 @@ use App\Exceptions\AppException;
 use App\Utils\ClassTrait;
 use Carbon\Carbon;
 use Carbon\CarbonTimeZone;
-use Exception;
 use Illuminate\Support\Str;
+use Throwable;
 
 class DateTimer
 {
@@ -89,7 +89,7 @@ class DateTimer
             try {
                 return (new Carbon($time, new CarbonTimeZone('UTC')))->locale($this->locale);
             }
-            catch (Exception $exception) {
+            catch (Throwable $exception) {
                 throw AppException::from($exception);
             }
         }
