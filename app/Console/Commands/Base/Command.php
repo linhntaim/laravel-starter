@@ -56,6 +56,28 @@ abstract class Command extends BaseCommand
         $this->consoleClientApply();
     }
 
+    public function ifOption($key, &$option, $filled = false)
+    {
+        $option = $this->option($key);
+        return !is_null($option) && (!$filled || filled($option));
+    }
+
+    public function optionOr($key, $default = null, $filled = true)
+    {
+        return got($this->option($key), $default, $filled);
+    }
+
+    public function ifArgument($key, &$argument, $filled = false)
+    {
+        $argument = $this->argument($key);
+        return !is_null($argument) && (!$filled || filled($argument));
+    }
+
+    public function argumentOr($key, $default = null, $filled = true)
+    {
+        return got($this->argument($key), $default, $filled);
+    }
+
     public function alert($string)
     {
         $this->newLine();

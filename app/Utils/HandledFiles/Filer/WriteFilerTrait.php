@@ -11,7 +11,7 @@ trait WriteFilerTrait
     protected $fNotWritten = true;
 
     /**
-     * @return WriteFilerTrait
+     * @return WriteFilerTrait|Filer|mixed
      */
     public function fStartWriting()
     {
@@ -19,7 +19,7 @@ trait WriteFilerTrait
     }
 
     /**
-     * @return WriteFilerTrait
+     * @return WriteFilerTrait|Filer|mixed
      */
     public function fStartAppending()
     {
@@ -29,7 +29,7 @@ trait WriteFilerTrait
     /**
      * @param array|mixed $contents
      * @param int|null $length
-     * @return WriteFilerTrait
+     * @return WriteFilerTrait|Filer|mixed
      */
     public function fWrite($contents, $length = null)
     {
@@ -42,7 +42,7 @@ trait WriteFilerTrait
     /**
      * @param array|mixed $contents
      * @param callable $callback
-     * @return WriteFilerTrait
+     * @return WriteFilerTrait|Filer|mixed
      */
     protected function fWriting($contents, callable $callback)
     {
@@ -68,7 +68,7 @@ trait WriteFilerTrait
     }
 
     /**
-     * @return WriteFilerTrait
+     * @return WriteFilerTrait|Filer|mixed
      */
     public function fEndWriting()
     {

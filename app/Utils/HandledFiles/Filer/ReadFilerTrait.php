@@ -47,7 +47,7 @@ trait ReadFilerTrait
     }
 
     /**
-     * @return ReadFilerTrait|Filer
+     * @return ReadFilerTrait|Filer|mixed
      */
     public function fStartReading()
     {
@@ -59,7 +59,7 @@ trait ReadFilerTrait
     }
 
     /**
-     * @return ReadFilerTrait|Filer
+     * @return ReadFilerTrait|Filer|mixed
      */
     public function fEndReading()
     {
@@ -99,7 +99,7 @@ trait ReadFilerTrait
     }
 
     /**
-     * @return ReadFilerTrait|Filer
+     * @return ReadFilerTrait|Filer|mixed
      */
     protected function fBeforeReading()
     {

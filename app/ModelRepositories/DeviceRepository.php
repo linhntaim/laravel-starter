@@ -87,13 +87,13 @@ class DeviceRepository extends ModelRepository
             'secret' => empty($secret) ? $this->trySecretWithProvider($provider) : $secret,
             'client_ips' => $clientIps,
             'client_agent' => Facade::getUserAgent(),
-            'meta_array_value' => [
+            'meta' => [
                 'client_info' => Facade::getInformation(),
             ],
         ]) : $this->updateWithAttributes([
             'client_ips' => $clientIps,
             'client_agent' => Facade::getUserAgent(),
-            'meta_array_value' => [
+            'meta' => [
                 'client_info' => Facade::getInformation(),
             ],
         ]);

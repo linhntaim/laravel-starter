@@ -9,7 +9,6 @@ namespace App\Models;
 use App\ModelResources\ActivityLogResource;
 use App\Models\Base\IActivityLog;
 use App\Models\Base\Model;
-use App\ModelTraits\ArrayValuedAttributesTrait;
 use App\Utils\ClientSettings\Facade;
 use Illuminate\Support\Str;
 
@@ -20,13 +19,11 @@ use Illuminate\Support\Str;
  * @property User $user
  * @property Admin $admin
  * @property string $sdStCreatedAt
- * @property array $screens_array_value
- * @property array $payload_array_value
+ * @property array $screens
+ * @property array $payload
  */
 class ActivityLog extends Model
 {
-    use ArrayValuedAttributesTrait;
-
     public const ACTION_LOGIN = 'login';
     public const ACTION_LOGOUT = 'logout';
     public const ACTION_MODEL_LIST = 'model_list';
@@ -48,11 +45,7 @@ class ActivityLog extends Model
         'screen',
         'action',
         'screens',
-        'screens_array_value',
-        'screens_overridden_array_value',
         'payload',
-        'payload_array_value',
-        'payload_overridden_array_value',
     ];
 
     protected $visible = [
@@ -67,6 +60,11 @@ class ActivityLog extends Model
     protected $appends = [
         'log',
         'sd_st_created_at',
+    ];
+
+    protected $casts = [
+        'screens' => 'array',
+        'payload' => 'array',
     ];
 
     protected $resourceClass = ActivityLogResource::class;
@@ -164,9 +162,9 @@ class ActivityLog extends Model
 
     public function getModelListLogAttribute()
     {
-        $modelClass = $this->payload_array_value['model'];
+        $modelClass = $this->payload['model'];
         return trans('activity_log.model_list.' . $modelClass, [
-            'log' => $this->listed($this->payload_array_value['params'], '<br>', '- ', function ($key) use ($modelClass) {
+            'log' => $this->listed($this->payload['params'], '<br>', '- ', function ($key) use ($modelClass) {
                 $modelKey = sprintf('model.%s.%s', $modelClass, $key);
                 $labelKey = sprintf('label.%s', $key);
                 return trans()->has($modelKey) ? $modelKey
@@ -177,9 +175,9 @@ class ActivityLog extends Model
 
     public function getModelExportLogAttribute()
     {
-        $modelClass = $this->payload_array_value['model'];
+        $modelClass = $this->payload['model'];
         return trans('activity_log.model_export.' . $modelClass, [
-            'log' => $this->listed($this->payload_array_value['params'], '<br>', '- ', function ($key) use ($modelClass) {
+            'log' => $this->listed($this->payload['params'], '<br>', '- ', function ($key) use ($modelClass) {
                 $modelKey = sprintf('model.%s.%s', $modelClass, $key);
                 $labelKey = sprintf('label.%s', $key);
                 return trans()->has($modelKey) ? $modelKey
@@ -190,9 +188,9 @@ class ActivityLog extends Model
 
     public function getModelCreateLogAttribute()
     {
-        $modelClass = $this->payload_array_value['model'];
+        $modelClass = $this->payload['model'];
         return trans('activity_log.model_create.' . $modelClass, [
-            'log' => $this->listed($this->payload_array_value['created'], '<br>', '- ', function ($key) use ($modelClass) {
+            'log' => $this->listed($this->payload['created'], '<br>', '- ', function ($key) use ($modelClass) {
                 return sprintf('model.%s', $key);
             }),
         ]);
@@ -200,14 +198,14 @@ class ActivityLog extends Model
 
     public function getModelEditLogAttribute()
     {
-        $modelClass = $this->payload_array_value['model'];
+        $modelClass = $this->payload['model'];
         return trans('activity_log.model_edit.' . $modelClass, [
             'log' => '<br>' . trans('activity_log.model_edit.old')
-                . $this->listed($this->payload_array_value['old'], '<br>', '- ', function ($key) use ($modelClass) {
+                . $this->listed($this->payload['old'], '<br>', '- ', function ($key) use ($modelClass) {
                     return sprintf('model.%s', $key);
                 })
                 . '<br>' . trans('activity_log.model_edit.edited')
-                . $this->listed($this->payload_array_value['edited'], '<br>', '- ', function ($key) use ($modelClass) {
+                . $this->listed($this->payload['edited'], '<br>', '- ', function ($key) use ($modelClass) {
                     return sprintf('model.%s', $key);
                 }),
         ]);
@@ -215,7 +213,7 @@ class ActivityLog extends Model
 
     public function getModelDeleteLogAttribute()
     {
-        $modelClass = $this->payload_array_value['model'];
+        $modelClass = $this->payload['model'];
         return trans('activity_log.model_delete.' . $modelClass, [
             'log' => (function ($deleted) use ($modelClass) {
                 $log = '';
@@ -227,7 +225,7 @@ class ActivityLog extends Model
                         });
                 }
                 return $log;
-            })($this->payload_array_value['deleted']),
+            })($this->payload['deleted']),
         ]);
     }
 

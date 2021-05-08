@@ -27,9 +27,13 @@ use Illuminate\Http\UploadedFile;
 class HandledFileRepository extends ModelRepository
 {
     protected $scan = false;
+
     protected $encrypt = false;
+
     protected $public = false;
+
     protected $cloud = false;
+
     protected $inline = false;
 
     public function modelClass()
@@ -161,7 +165,8 @@ class HandledFileRepository extends ModelRepository
         if (isset($options['public']) && $options['public']) {
             $filer->moveToPublic();
             $filer->moveToCloud(null, true, ConfigHelper::get('handled_file.cloud.only'));
-        } elseif (isset($options['cloud']) && $options['cloud']) {
+        }
+        elseif (isset($options['cloud']) && $options['cloud']) {
             $filer->moveToCloud(null, true, ConfigHelper::get('handled_file.cloud.only'));
         }
         return $filer;
@@ -172,11 +177,13 @@ class HandledFileRepository extends ModelRepository
         if ($this->scan) {
             if (ConfigHelper::get('handled_file.scan.enabled')) {
                 $options['scan'] = true;
-            } else {
+            }
+            else {
                 unset($options['scan']);
             }
             $this->scan = false;
-        } else {
+        }
+        else {
             if (!ConfigHelper::get('handled_file.scan.enabled')) {
                 unset($options['scan']);
             }
@@ -184,11 +191,13 @@ class HandledFileRepository extends ModelRepository
         if ($this->encrypt) {
             if (ConfigHelper::get('handled_file.encryption.enabled')) {
                 $options['encrypt'] = true;
-            } else {
+            }
+            else {
                 unset($options['encrypt']);
             }
             $this->encrypt = false;
-        } else {
+        }
+        else {
             if (!ConfigHelper::get('handled_file.encryption.enabled')) {
                 unset($options['encrypt']);
             }
@@ -204,11 +213,13 @@ class HandledFileRepository extends ModelRepository
         if ($this->cloud) {
             if (ConfigHelper::get('handled_file.cloud.enabled')) {
                 $options['cloud'] = true;
-            } else {
+            }
+            else {
                 unset($options['cloud']);
             }
             $this->cloud = false;
-        } else {
+        }
+        else {
             if (!ConfigHelper::get('handled_file.cloud.enabled')) {
                 unset($options['cloud']);
             }
@@ -229,10 +240,10 @@ class HandledFileRepository extends ModelRepository
             'name' => $filer->getName(),
             'mime' => $filer->getMime(),
             'size' => $filer->getSize(),
-            'options_array_value' => $options,
+            'options' => $options,
             'handling' => isset($options['scan']) && $options['scan'] ?
                 HandledFile::HANDLING_SCAN
-                : HandledFile::HANDLING_NO,
+                : HandledFile::HANDLING_YES,
         ]);
 
         return $this->createStoresWithFiler($filer);
@@ -259,13 +270,13 @@ class HandledFileRepository extends ModelRepository
     public function handledWithFiler(Filer $filer, $options = null)
     {
         if (!$this->model->ready) {
-            $options = is_null($options) ? $this->model->options_array_value : $options;
+            $options = is_null($options) ? $this->model->options : $options;
             $this->updateStoresWithFiler(
                 $this->handleFilerWithOptions($filer, $options)
             );
             $this->updateWithAttributes([
                 'handling' => HandledFile::HANDLING_NO,
-                'options_overridden_array_value' => $options,
+                'options' => $options,
             ]);
         }
         return $this->model;
@@ -293,17 +304,18 @@ class HandledFileRepository extends ModelRepository
                             unset($options['scan']);
                             $options['scanned'] = true;
                             return $options;
-                        })($this->model->options_array_value)
+                        })($this->model->options)
                     );
-                } elseif ($scanned === Scanner::SCAN_FALSE) {
+                }
+                elseif ($scanned === Scanner::SCAN_FALSE) {
                     $originStorage->delete();
                     $this->updateWithAttributes([
                         'handling' => HandledFile::HANDLING_NO,
-                        'options_overridden_array_value' => (function ($options) {
+                        'options' => (function ($options) {
                             unset($options['scan']);
                             $options['scanned'] = false;
                             return $options;
-                        })($this->model->options_array_value),
+                        })($this->model->options),
                     ]);
                 }
             }

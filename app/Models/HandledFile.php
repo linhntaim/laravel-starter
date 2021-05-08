@@ -7,8 +7,6 @@
 namespace App\Models;
 
 use App\Models\Base\Model;
-use App\ModelTraits\ArrayValuedAttributesTrait;
-use App\ModelTraits\MemorizeTrait;
 use App\Utils\ConfigHelper;
 use App\Utils\HandledFiles\Filer\Filer;
 use App\Utils\HandledFiles\Storage\CloudStorage;
@@ -38,15 +36,13 @@ use Illuminate\Database\Eloquent\Collection;
  * @property bool $scanning
  * @property bool $public
  * @property bool $inline
- * @property array $options_array_value
+ * @property array $options
  * @property HandledFileStore[]|Collection $handledFileStores
  * @property Filer $filer
  * @property Storage $originStorage
  */
 class HandledFile extends Model
 {
-    use ArrayValuedAttributesTrait;
-
     public const HANDLING_YES = 1;
     public const HANDLING_NO = 2;
     public const HANDLING_SCAN = 3;
@@ -60,8 +56,6 @@ class HandledFile extends Model
         'mime',
         'size',
         'options',
-        'options_array_value',
-        'options_overridden_array_value',
         'handling',
     ];
 
@@ -76,6 +70,10 @@ class HandledFile extends Model
     protected $appends = [
         'url',
         'ready',
+    ];
+
+    protected $casts = [
+        'options' => 'array',
     ];
 
     public function getReadyAttribute()
@@ -102,28 +100,28 @@ class HandledFile extends Model
 
     public function getEncryptedAttribute()
     {
-        return isset($this->options_array_value['encrypt']) && $this->options_array_value['encrypt'];
+        return isset($this->options['encrypt']) && $this->options['encrypt'];
     }
 
     public function getScannedAttribute()
     {
-        return (!isset($this->options_array_value['scan']) || $this->options_array_value['scan'] == false)
-            && (!isset($this->options_array_value['scanned']) || $this->options_array_value['scanned']);
+        return (!isset($this->options['scan']) || $this->options['scan'] == false)
+            && (!isset($this->options['scanned']) || $this->options['scanned']);
     }
 
     public function getScanningAttribute()
     {
-        return isset($this->options_array_value['scan']) && $this->options_array_value['scan'];
+        return isset($this->options['scan']) && $this->options['scan'];
     }
 
     public function getPublicAttribute()
     {
-        return isset($this->options_array_value['public']) && $this->options_array_value['public'];
+        return isset($this->options['public']) && $this->options['public'];
     }
 
     public function getInlineAttribute()
     {
-        return isset($this->options_array_value['inline']) && $this->options_array_value['inline'];
+        return isset($this->options['inline']) && $this->options['inline'];
     }
 
     public function getUrlAttribute()
@@ -163,7 +161,9 @@ class HandledFile extends Model
 
     public function responseDownload($name = null, $headers = [])
     {
-        if (empty($name)) $name = $this->name;
+        if (empty($name)) {
+            $name = $this->name;
+        }
 
         return $this->tryStorage(
             function (Storage $storage, HandledFileStore $store) use ($name, $headers) {
@@ -217,7 +217,9 @@ class HandledFile extends Model
             new PrivateStorage(),
         ];
         foreach ($storagePriorities as $storage) {
-            if (!$storage || ($filterCallback && !$filterCallback($storage))) continue;
+            if (!$storage || ($filterCallback && !$filterCallback($storage))) {
+                continue;
+            }
             if (($result = $try($storage)) !== false) {
                 return $result;
             }
