@@ -15,6 +15,7 @@ use App\Http\Controllers\Web\Home\Auth\LogoutController as HomeLogoutController;
 
 // TODO
 
+use App\Vendors\Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +34,10 @@ Route::group([
 
     // TODO
 ], function () {
+    if (!App::runningInProduction() && class_exists('App\Http\Controllers\Web\TestWebController')) {
+        Route::any('test', ['App\Http\Controllers\Web\TestWebController', 'test']);
+    }
+
     #region Authentication
     Route::group([
         'prefix' => 'auth',

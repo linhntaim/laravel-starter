@@ -74,7 +74,7 @@ class DeviceRepository extends ModelRepository
     {
         $provider = empty($provider) ? Device::PROVIDER_BROWSER : $provider;
         $secret = empty($secret) ? null : $secret;
-        $clientIps = empty($clientIps) ? null : json_encode((array)$clientIps);
+        $clientIps = is_null($clientIps) ? [] : (array)$clientIps;
 
         if (!empty($secret)) {
             $this->notStrict()

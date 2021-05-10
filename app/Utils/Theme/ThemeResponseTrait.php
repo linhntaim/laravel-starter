@@ -6,14 +6,20 @@ trait ThemeResponseTrait
 {
     protected $viewBase = '';
 
-    public function setViewBase(string $viewBase)
+    protected function setViewBase(string $viewBase)
     {
         $this->viewBase = $viewBase;
     }
 
+    protected function getViewBase()
+    {
+        return $this->viewBase;
+    }
+
     protected function themeView($view = 'index', $data = [], $mergeData = [])
     {
-        return ThemeFacade::pageView($this->viewBase ? $this->viewBase . '.' . $view : $view, $data, $mergeData);
+        return ThemeFacade::pageView(($viewBase = $this->getViewBase()) ?
+            $viewBase . '.' . $view : $view, $data, $mergeData);
     }
 
     protected function themeHome($data = [], $mergeData = [], $view = 'welcome')

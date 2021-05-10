@@ -8,6 +8,7 @@ namespace App\Http\Controllers;
 
 use App\Configuration;
 use App\Exceptions\AppException;
+use App\Exceptions\UserException;
 use App\Exports\Base\Export;
 use App\Exports\Base\IndexModelCsvExport;
 use App\Http\Requests\Request;
@@ -21,6 +22,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\File;
 use Symfony\Component\HttpFoundation\Response;
 
 abstract class ModelApiController extends ApiController
@@ -354,7 +356,18 @@ abstract class ModelApiController extends ApiController
 
     protected function importValidated(Request $request)
     {
-        $this->validated($request, $this->importValidatedRules($request));
+        try {
+            $this->validated($request, $this->importValidatedRules($request));
+        }
+        catch (UserException $exception) {
+            $this->importRemove($request);
+            throw $exception;
+        }
+    }
+
+    protected function importRemove(Request $request)
+    {
+        File::delete($this->modelImporterFile($request)->getRealPath());
     }
 
     protected function import(Request $request)

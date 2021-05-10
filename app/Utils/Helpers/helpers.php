@@ -60,13 +60,13 @@ function classExtended($object, $classes)
 }
 
 /**
- * @param string $json
+ * @param string|null $json
  * @param bool $safe
  * @param int $depth
  * @param int $flags
  * @return array
  */
-function jsonDecodeArray(string $json, bool $safe = true, int $depth = 512, int $flags = 0)
+function jsonDecodeArray($json = null, bool $safe = true, int $depth = 512, int $flags = 0)
 {
     $array = json_decode($json, true, $depth, $flags);
 
