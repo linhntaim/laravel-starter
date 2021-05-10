@@ -32,7 +32,7 @@ trait ValidationTrait
      * @param array $customAttributes
      * @param callable|null $hook
      * @return bool|\Illuminate\Contracts\Validation\Validator
-     * @throws
+     * @throws UserException
      */
     protected function validatedData(array $data, array $rules, array $messages = [], array $customAttributes = [], callable $hook = null)
     {
