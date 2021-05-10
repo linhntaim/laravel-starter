@@ -130,15 +130,15 @@ class HandledFile extends Model
             return null;
         }
         if (!$this->public || $this->encrypted) {
-            return route('account.handled_file.show', ['id' => $this->id]) . '?_inline=1';
+            return route('api.account.handled_file.show', ['id' => $this->id]) . '?_inline=1';
         }
         if ($this->inline) {
-            return route('handled_file.show', ['id' => $this->id]) . '?_inline=1';
+            return route('api.handled_file.show', ['id' => $this->id]) . '?_inline=1';
         }
         return $this->tryStorage(
             function (Storage $storage, HandledFileStore $store) {
                 if ($storage instanceof InlineStorage) {
-                    return route('handled_file.show', ['id' => $this->id]) . '?_inline=1';
+                    return route('api.handled_file.show', ['id' => $this->id]) . '?_inline=1';
                 }
                 return $storage->setData($store->data)->getUrl();
             },

@@ -4,6 +4,8 @@ namespace App\Vendors\Monolog\Formatter;
 
 use Monolog\Formatter\LineFormatter as BaseLineFormatter;
 use Monolog\Utils;
+use SoapFault;
+use Throwable;
 
 class LineFormatter extends BaseLineFormatter
 {
@@ -22,17 +24,17 @@ class LineFormatter extends BaseLineFormatter
         return str_replace('%traces%', '', $output);
     }
 
-    protected function normalizeException(\Throwable $e, int $depth = 0): string
+    protected function normalizeException(Throwable $e, int $depth = 0): string
     {
         $this->traceException($e);
         return $e->getMessage();
     }
 
-    protected function traceException(\Throwable $e, $previous = false)
+    protected function traceException(Throwable $e, $previous = false)
     {
         $this->varTraces[] = sprintf('%s: %s', $previous ? 'PREVIOUS EXCEPTION' : 'EXCEPTION', Utils::getClass($e));
         $this->varTraces[] = sprintf('Code: %s', $e->getCode());
-        if ($e instanceof \SoapFault) {
+        if ($e instanceof SoapFault) {
             if (isset($e->faultcode)) {
                 $this->varTraces[] = sprintf('Fault code: %s', $e->faultcode);
             }
@@ -50,7 +52,7 @@ class LineFormatter extends BaseLineFormatter
         }
         $this->varTraces[] = sprintf('Message: %s', $e->getMessage());
         $this->varTraces[] = sprintf('File: [%s:%s]', $e->getFile(), $e->getLine());
-        $this->varTraces[] = sprintf('Trace:');
+        $this->varTraces[] = 'Trace:';
         $last = 0;
         foreach ($e->getTrace() as $i => $trace) {
             if (isset($trace['file'])) {

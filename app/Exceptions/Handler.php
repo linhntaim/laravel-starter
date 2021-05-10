@@ -58,9 +58,15 @@ class Handler extends ExceptionHandler
 
     public function report(Throwable $e)
     {
-        TransactionManager::getInstance()->stop();
+        $this->protectTransaction($e);
 
         parent::report($e);
+    }
+
+    protected function protectTransaction(Throwable $e)
+    {
+        TransactionManager::getInstance()->stop();
+        return $this;
     }
 
     protected function prepareException(Throwable $e)

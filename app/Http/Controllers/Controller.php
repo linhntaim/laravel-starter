@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\UserException;
 use App\Http\Requests\Request;
 use App\ModelResources\Base\ModelTransformTrait;
 use App\Models\HandledFile;
@@ -32,7 +33,7 @@ class Controller extends BaseController
      * @param array $customAttributes
      * @param callable|null $hook
      * @return bool|Validator
-     * @throws
+     * @throws UserException
      */
     protected function validated(Request $request, array $rules, array $messages = [], array $customAttributes = [], callable $hook = null)
     {

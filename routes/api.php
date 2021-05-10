@@ -61,6 +61,7 @@ use App\Http\Controllers\Api\Home\Account\AccountController as HomeAccountContro
 
 // TODO
 
+use App\Vendors\Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -79,6 +80,10 @@ Route::group([
 
     // TODO
 ], function () {
+    if (!App::runningInProduction() && class_exists('App\Http\Controllers\Api\TestApiController')) {
+        Route::any('test', ['App\Http\Controllers\Api\TestApiController', 'test']);
+    }
+
     Route::get('handled-file/{id}', [HandledFileController::class, 'show'])->name('handled_file.show');
 
     Route::group([
