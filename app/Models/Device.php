@@ -6,7 +6,10 @@
 
 namespace App\Models;
 
+use App\ModelCasts\SafeArrayCast;
+use App\Models\Base\ISafeArrayCast;
 use App\Models\Base\Model;
+use App\ModelTraits\SafeArrayCastTrait;
 
 /**
  * Class Device
@@ -15,8 +18,10 @@ use App\Models\Base\Model;
  * @property string $provider
  * @property string $secret
  */
-class Device extends Model
+class Device extends Model implements ISafeArrayCast
 {
+    use SafeArrayCastTrait;
+
     public const PROVIDER_BROWSER = 'browser';
 
     protected $table = 'devices';
@@ -38,6 +43,6 @@ class Device extends Model
 
     protected $casts = [
         'client_ips' => 'array',
-        'meta' => 'array',
+        'meta' => SafeArrayCast::class,
     ];
 }
