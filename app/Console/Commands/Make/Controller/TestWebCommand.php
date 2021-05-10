@@ -4,11 +4,13 @@
  * Base - Any modification needs to be approved, except the space inside the block of TODO
  */
 
-namespace App\Console\Commands\Make;
+namespace App\Console\Commands\Make\Controller;
 
-class TryCommand extends Command
+use App\Console\Commands\Make\Command;
+
+class TestWebCommand extends Command
 {
-    protected $signature = 'make:command:try {--f}';
+    protected $signature = 'make:controller:test-web {--f}';
 
     protected $tryFilePath;
 
@@ -43,11 +45,11 @@ class TryCommand extends Command
 
     protected function tryFilePath()
     {
-        return app_path(implode(DIRECTORY_SEPARATOR, ['Console', 'Commands', 'TryCommand.php']));
+        return app_path(implode(DIRECTORY_SEPARATOR, ['Http', 'Controllers', 'Web', 'TestWebController.php']));
     }
 
     protected function exampleTryFilePath()
     {
-        return app_path(implode(DIRECTORY_SEPARATOR, ['Console', 'Commands', 'TryCommand.php.example']));
+        return app_path(implode(DIRECTORY_SEPARATOR, ['Http', 'Controllers', 'Web', 'TestWebController.php.example']));
     }
 }

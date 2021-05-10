@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
+namespace App\Http\Controllers\Web;
+
+use App\Http\Controllers\WebController;
+use App\Http\Requests\Request;
+
+class TestWebController extends WebController
+{
+    public function test(Request $request)
+    {
+        // TODO:
+
+        // TODO
+    }
+}
