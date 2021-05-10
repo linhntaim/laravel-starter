@@ -743,7 +743,7 @@ abstract class ModelRepository
      * @return boolean
      * @throws
      */
-    protected function queryDelete($query)
+    public function queryDelete($query)
     {
         return $this->catch(function () use ($query) {
             if ($this->force) {
