@@ -52,12 +52,12 @@ trait ProtectedRepositoryTrait
         });
     }
 
-    protected function searchQuery()
+    public function searchQuery()
     {
         return $this->queryProtected(parent::searchQuery());
     }
 
-    protected function queryProtected($query)
+    public function queryProtected($query)
     {
         if ($this->protected) {
             return $this->queryNoneProtected($query);
@@ -66,7 +66,7 @@ trait ProtectedRepositoryTrait
         return $query;
     }
 
-    protected function queryNoneProtected($query)
+    public function queryNoneProtected($query)
     {
         return $query->noneProtected();
     }
