@@ -37,11 +37,7 @@ class Device extends Model
     ];
 
     protected $casts = [
+        'client_ips' => 'array',
         'meta' => 'array',
     ];
-
-    public function getClientIpsAttribute()
-    {
-        return json_decode($this->attributes['client_ips']);
-    }
 }
