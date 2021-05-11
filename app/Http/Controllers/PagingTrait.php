@@ -7,6 +7,8 @@
 namespace App\Http\Controllers;
 
 use App\Configuration;
+use App\Exceptions\AppException;
+use App\Exceptions\UserException;
 
 trait PagingTrait
 {
@@ -22,9 +24,20 @@ trait PagingTrait
 
     protected $moreOrder = 'asc';
 
+    protected $pagingAll = true;
+
     protected function paging()
     {
-        return $this->paged() ? Configuration::FETCH_PAGING_YES : Configuration::FETCH_PAGING_NO;
+        $paging = $this->paged() ? Configuration::FETCH_PAGING_YES : Configuration::FETCH_PAGING_NO;
+        if ($this->pagingAll == false && $paging == Configuration::FETCH_PAGING_NO) {
+            $this->pagingAllFailed();
+        }
+        return $paging;
+    }
+
+    protected function pagingAllFailed()
+    {
+        abort(403);
     }
 
     protected function paged()

@@ -86,6 +86,10 @@ Route::group([
 
     Route::get('handled-file/{id}', [HandledFileController::class, 'show'])->name('handled_file.show');
 
+    // TODO:
+
+    // TODO
+
     Route::group([
         'prefix' => 'account',
         'middleware' => ['authenticated.passport.cookie', 'authenticated.passport.request', 'auth:api'],
@@ -141,6 +145,15 @@ Route::group([
                 Route::get('/', [HomeAccountController::class, 'index']);
                 Route::post('/', [HomeAccountController::class, 'store']);
 
+                // TODO:
+
+                // TODO
+            });
+
+            Route::group([
+                'prefix' => 'handled-file',
+            ], function () {
+                Route::post('/', [HomeHandledFileController::class, 'store']);
                 // TODO:
 
                 // TODO

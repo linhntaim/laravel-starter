@@ -6,7 +6,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Configuration;
 use App\Exceptions\AppException;
 use App\Exports\Base\Export;
 use App\Exports\Base\IndexModelCsvExport;
@@ -66,6 +65,10 @@ abstract class ModelApiController extends ApiController
         return [];
     }
 
+    /**
+     * @param Request $request
+     * @return array
+     */
     protected function search(Request $request)
     {
         $search = [];
@@ -173,12 +176,13 @@ abstract class ModelApiController extends ApiController
             return $this->load($request);
         }
 
-        return $this->responseModel(
-            $request->has('_all') ?
-                $this->indexAllExecute($request) : $this->indexExecute($request)
-        );
+        return $this->responseModel($this->indexExecute($request));
     }
 
+    /**
+     * @param Request $request
+     * @return Collection|LengthAwarePaginator
+     */
     protected function indexExecute(Request $request)
     {
         return $this->sortExecute()->search(
@@ -188,14 +192,18 @@ abstract class ModelApiController extends ApiController
         );
     }
 
+    /**
+     * @param Request $request
+     * @return Collection
+     */
     protected function indexAllExecute(Request $request)
     {
-        return $this->sortExecute()->search(
-            $this->search($request),
-            Configuration::FETCH_PAGING_NO,
-        );
+        return $this->sortExecute()->getAll($this->search($request));
     }
 
+    /**
+     * @return ModelRepository
+     */
     protected function sortExecute()
     {
         return $this->modelRepository->sort($this->sortBy(), $this->sortOrder());
@@ -208,15 +216,21 @@ abstract class ModelApiController extends ApiController
         ]);
     }
 
+    /**
+     * @param Request $request
+     * @return Collection
+     */
     protected function loadExecute(Request $request)
     {
-        return $this->moreExecute()->search(
+        return $this->moreExecute()->next(
             $this->search($request),
-            Configuration::FETCH_PAGING_MORE,
             $this->itemsPerPage()
         );
     }
 
+    /**
+     * @return ModelRepository
+     */
     protected function moreExecute()
     {
         return $this->modelRepository->more($this->moreBy(), $this->moreOrder(), $this->morePivot());
@@ -373,6 +387,10 @@ abstract class ModelApiController extends ApiController
         $this->validated($request, $this->storeValidatedRules($request));
     }
 
+    /**
+     * @param Request $request
+     * @return null|Model
+     */
     protected function storeExecute(Request $request)
     {
         return null;
@@ -401,6 +419,12 @@ abstract class ModelApiController extends ApiController
     #endregion
 
     #region Show
+    /**
+     * @param Request $request
+     * @param int|string|mixed $id
+     * @return Model|null
+     * @throws
+     */
     public function showExecute(Request $request, $id)
     {
         return $this->modelRepository->model($id);
@@ -430,6 +454,10 @@ abstract class ModelApiController extends ApiController
         $this->validated($request, $this->updateValidatedRules($request));
     }
 
+    /**
+     * @param Request $request
+     * @return null|Model
+     */
     protected function updateExecute(Request $request)
     {
         return null;
@@ -525,10 +553,10 @@ abstract class ModelApiController extends ApiController
      * @param array $extra
      * @param array $headers
      * @param int $statusCode
-     * @param string|null $message
+     * @param array|string|null $message
      * @return JsonResponse
      */
-    protected function responseModel($model, $extra = [], $headers = [], $statusCode = Response::HTTP_OK, $message = null)
+    protected function responseModel($model, array $extra = [], array $headers = [], int $statusCode = Response::HTTP_OK, $message = null)
     {
         return $this->responseSuccess(array_merge($this->getRespondedModel($model), $extra), $message, $headers, $statusCode);
     }
