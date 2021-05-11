@@ -147,8 +147,7 @@ class Manager
 
     public function setClientFromRequestHeader(Request $request, $force = false)
     {
-        if ($request->ifHeader(ConfigHelper::get('client.headers.client_id'), $headerValue)
-            && filled($headerValue)) {
+        if ($request->ifHeader(ConfigHelper::get('client.headers.client_id'), $headerValue, true)) {
             return $this->setClient($headerValue, $force);
         }
         return $this;
@@ -161,8 +160,7 @@ class Manager
         $headerEncryptExcepts = ConfigHelper::get('client.header_encrypt_excepts');
         foreach ($headers as $header) {
             if (!in_array($header, $headerEncryptExcepts)
-                && $request->ifHeader($header, $headerValue)
-                && filled($headerValue)) {
+                && $request->ifHeader($header, $headerValue, true)) {
                 if ($headerValue = AES::decrypt(base64_decode($headerValue), $appKey)) {
                     $request->headers->set($header, $headerValue);
                 }
@@ -176,7 +174,7 @@ class Manager
 
     public function fetchFromRequestHeader(Request $request)
     {
-        if ($request->ifHeaderJson(ConfigHelper::get('client.headers.settings'), $headerValue)) {
+        if ($request->ifHeaderJson(ConfigHelper::get('client.headers.settings'), $headerValue, true)) {
             return $this->update($headerValue);
         }
         return $this;
@@ -184,7 +182,7 @@ class Manager
 
     public function fetchFromRequestCookie(Request $request)
     {
-        if ($request->ifCookieJson($this->settings->getCookie('settings'), $cookieValue)) {
+        if ($request->ifCookieJson($this->settings->getCookie('settings'), $cookieValue, true)) {
             return $this->update($cookieValue);
         }
         return $this->storeCookie();
