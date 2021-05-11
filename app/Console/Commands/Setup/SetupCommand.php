@@ -12,12 +12,12 @@ class SetupCommand extends Command
 
     protected function skipped()
     {
-        return $this->option('skip');
+        return $this->option('skip', []);
     }
 
     protected function only()
     {
-        return $this->option('only');
+        return $this->option('only', []);
     }
 
     protected function goInstalling()
