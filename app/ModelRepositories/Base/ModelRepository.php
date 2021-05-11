@@ -9,7 +9,6 @@ namespace App\ModelRepositories\Base;
 use App\Configuration;
 use App\Exceptions\AppException;
 use App\Exceptions\DatabaseException;
-use App\Exceptions\Exception;
 use App\Models\Base\IFromModel;
 use App\Models\Base\IModel;
 use App\Utils\AbortTrait;
@@ -175,8 +174,8 @@ abstract class ModelRepository
     }
 
     /**
-     * @param Model|mixed $id
-     * @return mixed
+     * @param Model|int|string|mixed $id
+     * @return int|string|mixed
      */
     public function retrieveId($id)
     {
@@ -184,8 +183,8 @@ abstract class ModelRepository
     }
 
     /**
-     * @param Collection|Model[]|array $ids
-     * @return mixed
+     * @param Collection|Model[]|int[]|string[]|array $ids
+     * @return int[]|string[]|array
      */
     public function retrieveIds($ids)
     {
@@ -193,7 +192,7 @@ abstract class ModelRepository
             return $model->getKey();
         })->all() : collect($ids)->map(function ($id) {
             return $id instanceof Model ? $id->getKey() : $id;
-        });
+        })->all();
     }
 
     /**
@@ -648,6 +647,17 @@ abstract class ModelRepository
     public function has(array $search = [], int $min = 0)
     {
         return $this->count($search) > $min;
+    }
+
+    /**
+     * @param array $search
+     * @param int $itemsPerPage
+     * @return Collection
+     * @throws
+     */
+    public function next(array $search = [], int $itemsPerPage = Configuration::DEFAULT_ITEMS_PER_PAGE)
+    {
+        return $this->search($search, Configuration::FETCH_PAGING_MORE, $itemsPerPage);
     }
 
     /**
