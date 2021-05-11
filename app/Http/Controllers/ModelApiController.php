@@ -8,7 +8,6 @@ namespace App\Http\Controllers;
 
 use App\Configuration;
 use App\Exceptions\AppException;
-use App\Exceptions\UserException;
 use App\Exports\Base\Export;
 use App\Exports\Base\IndexModelCsvExport;
 use App\Http\Requests\Request;
@@ -22,7 +21,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\File;
 use Symfony\Component\HttpFoundation\Response;
 
 abstract class ModelApiController extends ApiController
@@ -73,14 +71,12 @@ abstract class ModelApiController extends ApiController
         $search = [];
         foreach ($this->searchParams($request) as $key => $param) {
             if (is_int($key)) {
-                $input = $request->input($param);
-                if (!empty($input)) {
+                if ($request->ifInput($param, $input, true)) {
                     $search[$param] = $input;
                 }
             }
             else {
-                $input = $request->input($key);
-                if (!empty($input)) {
+                if ($request->ifInput($key, $input, true)) {
                     if (is_string($param)) {
                         $search[$param] = $input;
                     }
@@ -356,18 +352,7 @@ abstract class ModelApiController extends ApiController
 
     protected function importValidated(Request $request)
     {
-        try {
-            $this->validated($request, $this->importValidatedRules($request));
-        }
-        catch (UserException $exception) {
-            $this->importRemove($request);
-            throw $exception;
-        }
-    }
-
-    protected function importRemove(Request $request)
-    {
-        File::delete($this->modelImporterFile($request)->getRealPath());
+        $this->validated($request, $this->importValidatedRules($request));
     }
 
     protected function import(Request $request)

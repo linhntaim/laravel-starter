@@ -12,58 +12,72 @@ class Request extends BaseRequest
 {
     use AdminRequestTrait, ImpersonateRequestTrait;
 
-    public function ifHeader($key, &$header)
+    public function ifHeader($key, &$header, $filled = false)
     {
         $header = is_null($key) ? null : parent::header($key);
-        return !is_null($header);
+        return has($header, $filled);
     }
 
-    public function ifHeaderJson($key, &$header)
+    public function header($key = null, $default = null, $filled = true)
     {
-        if ($this->ifHeader($key, $header)) {
-            $header = json_decode($header, true);
+        return is_null($key) ? parent::header($key) : got(parent::header($key), $default, $filled);
+    }
+
+    public function ifHeaderJson($key, &$header, $filled = false)
+    {
+        if ($this->ifHeader($key, $header, $filled)) {
+            $header = jsonDecodeArray($header);
             return !empty($header);
         }
         return false;
     }
 
-    public function ifCookie($key, &$cookie)
+    public function headerJson($key, array $default = [], $filled = true)
     {
-        $cookie = is_null($key) ? null : parent::cookie($key);
-        return !is_null($cookie);
+        $header = is_null($key) ? null : parent::header($key);
+        return has($header, $filled) ? jsonDecodeArray($header) : $default;
     }
 
-    public function ifCookieJson($key, &$cookie)
+    public function ifCookie($key, &$cookie, $filled = false)
     {
-        if ($this->ifCookie($key, $cookie)) {
-            $cookie = json_decode($cookie, true);
+        $cookie = is_null($key) ? null : parent::cookie($key);
+        return has($cookie, $filled);
+    }
+
+    public function cookie($key = null, $default = null, $filled = true)
+    {
+        return is_null($key) ? parent::cookie($key) : got(parent::cookie($key), $default, $filled);
+    }
+
+    public function ifCookieJson($key, &$cookie, $filled = false)
+    {
+        if ($this->ifCookie($key, $cookie, $filled)) {
+            $cookie = jsonDecodeArray($cookie);
             return !empty($cookie);
         }
         return false;
     }
 
-    public function ifInput($key, &$input)
+    public function cookieJson($key, array $default = [], $filled = true)
     {
-        $input = is_null($key) ? null : parent::input($key);
-        return !is_null($input);
+        $cookie = is_null($key) ? null : parent::cookie($key);
+        return has($cookie, $filled) ? jsonDecodeArray($cookie) : $default;
     }
 
-    public function input($key = null, $default = null)
+    public function ifInput($key, &$input, $filled = false)
     {
-        if (is_null($key)) {
-            return parent::input($key);
-        }
-        return got(parent::input($key), $default);
+        $input = is_null($key) ? null : $this->input($key);
+        return has($input, $filled);
     }
 
-    public function ifInputNotEmpty($key, &$input)
+    public function input($key = null, $default = null, $filled = true)
     {
-        return $this->ifInput($key, $input) && !empty($input);
+        return is_null($key) ? parent::input($key) : got(parent::input($key), $default, $filled);
     }
 
     public function ifFile($key, &$file)
     {
-        $file = parent::file($key);
+        $file = $this->file($key);
         return !is_null($file);
     }
 

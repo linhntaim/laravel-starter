@@ -34,7 +34,7 @@ class Manager
 
     public function fetchFromRequestHeader(Request $request)
     {
-        if ($request->ifHeaderJson(ConfigHelper::get('client.headers.device'), $headerValue)
+        if ($request->ifHeaderJson(ConfigHelper::get('client.headers.device'), $headerValue, true)
             && !empty($headerValue['provider'])
             && !empty($headerValue['secret'])) {
             return $this->setDevice(
@@ -50,7 +50,7 @@ class Manager
 
     public function fetchFromRequestCookie(Request $request)
     {
-        if ($request->ifCookieJson(ClientSettingsFacade::getCookie('device'), $cookieValue)
+        if ($request->ifCookieJson(ClientSettingsFacade::getCookie('device'), $cookieValue, true)
             && !empty($cookieValue['provider'])
             && !empty($cookieValue['secret'])) {
             return $this->setDevice(

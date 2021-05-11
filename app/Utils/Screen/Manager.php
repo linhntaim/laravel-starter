@@ -35,7 +35,7 @@ class Manager
 
     public function fetchFromRequestHeader(Request $request)
     {
-        if ($request->ifHeaderJson(ConfigHelper::get('client.headers.screen'), $headerValue)) {
+        if ($request->ifHeaderJson(ConfigHelper::get('client.headers.screen'), $headerValue, true)) {
             return $this->setScreen($headerValue);
         }
         return $this;
