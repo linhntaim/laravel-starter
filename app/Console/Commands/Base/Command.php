@@ -58,24 +58,24 @@ abstract class Command extends BaseCommand
 
     public function ifOption($key, &$option, $filled = false)
     {
-        $option = $this->option($key);
-        return !is_null($option) && (!$filled || filled($option));
+        $option = is_null($key) ? null : parent::option($key);
+        return has($option, $filled);
     }
 
-    public function optionOr($key, $default = null, $filled = true)
+    public function option($key = null, $default = null, $filled = true)
     {
-        return got($this->option($key), $default, $filled);
+        return is_null($key) ? parent::option($key) : got(parent::option($key), $default, $filled);
     }
 
     public function ifArgument($key, &$argument, $filled = false)
     {
-        $argument = $this->argument($key);
-        return !is_null($argument) && (!$filled || filled($argument));
+        $argument = is_null($key) ? null : parent::argument($key);
+        return has($argument, $filled);
     }
 
-    public function argumentOr($key, $default = null, $filled = true)
+    public function argument($key = null, $default = null, $filled = true)
     {
-        return got($this->argument($key), $default, $filled);
+        return is_null($key) ? parent::argument($key) : got(parent::argument($key), $default, $filled);
     }
 
     public function alert($string)
