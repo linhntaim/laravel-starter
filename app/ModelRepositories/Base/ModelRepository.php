@@ -583,13 +583,6 @@ abstract class ModelRepository
         return $this->query();
     }
 
-    public function where(array $search = [])
-    {
-        return $this->searchQuery()->where(function ($query) use ($search) {
-            $this->searchOn($query, $search);
-        });
-    }
-
     /**
      * @param array $search
      * @param int $paging
@@ -599,7 +592,7 @@ abstract class ModelRepository
      */
     public function search(array $search = [], int $paging = Configuration::FETCH_PAGING_YES, int $itemsPerPage = Configuration::DEFAULT_ITEMS_PER_PAGE)
     {
-        $query = $this->where($search);
+        $query = $this->searchOn($this->searchQuery(), $search);
 
         switch ($paging) {
             case Configuration::FETCH_PAGING_NO:
@@ -626,6 +619,15 @@ abstract class ModelRepository
             default:
                 return $query;
         }
+    }
+
+    /**
+     * @param array $search
+     * @return Builder
+     */
+    public function where(array $search = [])
+    {
+        return $this->search($search, Configuration::FETCH_QUERY);
     }
 
     /**
