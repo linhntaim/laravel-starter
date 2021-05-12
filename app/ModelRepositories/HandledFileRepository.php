@@ -243,7 +243,7 @@ class HandledFileRepository extends ModelRepository
             'options' => $options,
             'handling' => isset($options['scan']) && $options['scan'] ?
                 HandledFile::HANDLING_SCAN
-                : HandledFile::HANDLING_YES,
+                : HandledFile::HANDLING_NO,
         ]);
 
         return $this->createStoresWithFiler($filer);
