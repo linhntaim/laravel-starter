@@ -138,7 +138,7 @@ return [
         ],
         'id_maps' => [
             'routes' => [
-                '*' => env('DEFAULT_CLIENT_ID', 'home'),
+                '*' => env('CLIENT_DEFAULT_ID', 'home'),
                 'api/admin' => 'admin',
                 'api/admin/*' => 'admin',
                 'admin' => 'admin',
