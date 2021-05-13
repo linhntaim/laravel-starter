@@ -10,7 +10,7 @@ namespace App\Imports\Base;
  * Class ModelCsvImport
  * @package App\Imports\Base
  */
-abstract class ModelCsvImport extends WholeCsvImport
+abstract class LinearlyModelCsvImport extends LinearlyCsvImport
 {
     use ModelCsvImportTrait;
 }

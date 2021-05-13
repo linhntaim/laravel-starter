@@ -783,7 +783,7 @@ abstract class ModelRepository
      */
     public function restore()
     {
-        if ($this->model->trashed()) {
+        if (!is_null($this->model) && $this->model->trashed()) {
             return $this->catch(function () {
                 $this->model->restore();
                 return $this->model;

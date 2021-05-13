@@ -60,7 +60,7 @@ trait ReadFilerTrait
         if (is_resource($this->fResource)) {
             $this->fEndReading();
         }
-
+        $this->fReadCounter = 0;
         return $this->fOpen(Filer::MODE_READ);
     }
 
@@ -140,15 +140,21 @@ trait ReadFilerTrait
         ]);
     }
 
+    public function fReadFirstOnly()
+    {
+        $this->fStartReading();
+        $read = $this->fRead();
+        $this->fEndReading();
+        return $read;
+    }
+
     public function fReadAll(callable $callback = null, callable $afterCallback = null)
     {
         $reads = [];
-        $this->fReadCounter = 0;
         while (($read = $this->fRead()) !== false) {
             if ($read === null) {
                 continue;
             }
-            ++$this->fReadCounter;
             if ($callback) {
                 $reads[] = $this->makeReadCallback($callback, $read);
             }

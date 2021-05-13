@@ -9,11 +9,11 @@ namespace App\Imports\Base;
 use App\Utils\HandledFiles\Filer\CsvFiler;
 
 /**
- * Class AllCsvImport
+ * Class LinearlyCsvImport
  * @package App\Imports\Base
  * @property CsvFiler $filer
  */
-abstract class AllCsvImport extends CsvImport
+abstract class LinearlyCsvImport extends CsvImport
 {
     protected function csvImport()
     {

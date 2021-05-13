@@ -17,8 +17,6 @@ class CsvFiler extends Filer
 
     protected $fReadSkipHeader = true;
 
-    protected $fHasTrimBomCharacters = false;
-
     public function fReadSetMatchedHeaders(array $matchHeaders = [], array $extraHeaders = [])
     {
         $this->fReadMatchedHeaders = $matchHeaders;
@@ -77,6 +75,15 @@ class CsvFiler extends Filer
         ]);
     }
 
+    public function fReadFirstOnly()
+    {
+        $fReadSkipHeader = $this->fReadSkipHeader;
+        $this->fReadSkipHeader = false;
+        $read = parent::fReadFirstOnly();
+        $this->fReadSkipHeader = $fReadSkipHeader;
+        return $read;
+    }
+
     /**
      * @return array|null
      * @throws
@@ -100,10 +107,9 @@ class CsvFiler extends Filer
             return null;
         }
 
-        array_walk($read, function (&$item) {
-            if (!$this->fHasTrimBomCharacters) {
+        array_walk($read, function (&$item, $index) {
+            if ($this->fReadCounter == 1 && $index == 0) {
                 $item = ltrim($item, chr(0xEF) . chr(0xBB) . chr(0xBF));
-                $this->fHasTrimBomCharacters = true;
             }
             $item = Str::toUtf8($item);
         });

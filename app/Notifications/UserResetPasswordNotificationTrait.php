@@ -46,6 +46,7 @@ trait UserResetPasswordNotificationTrait
         return [
             'url_reset_password' => $this->getAppResetPasswordUrl($notifiable),
             'expired_at' => $notifiable->getPasswordResetExpiredAt(),
+            'name' => $notifiable->preferredName(),
         ];
     }
 
