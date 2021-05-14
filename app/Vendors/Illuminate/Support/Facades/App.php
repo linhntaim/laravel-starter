@@ -66,7 +66,10 @@ class App extends BaseApp
 
     protected static $benchAt = [];
 
-    public static function benchFrom($name)
+    /**
+     * @param string $name
+     */
+    public static function benchFrom(string $name)
     {
         if (static::runningInDebug()) {
             static::$benchAt[$name] = [
@@ -76,16 +79,26 @@ class App extends BaseApp
                 'p' => memory_get_peak_usage(),
                 'pr' => memory_get_peak_usage(true),
             ];
+            Log::info(
+                sprintf(
+                    'Bench start [%s].',
+                    $name
+                )
+            );
         }
     }
 
-    public static function bench($name, $benchFrom = null)
+    /**
+     * @param string $name
+     * @param boolean|string $benchFrom
+     */
+    public static function bench(string $name, $benchFrom = false)
     {
         if (static::runningInDebug()) {
             if (isset(static::$benchAt[$name])) {
                 Log::info(
                     sprintf(
-                        'Bench from [%s]: %sms + %sms, %s / %s, %s / %s (real), %s / %s (peak), %s / %s (peak real).',
+                        'Bench end [%s]: %sms + %sms, %s / %s, %s / %s (real), %s / %s (peak), %s / %s (peak real).',
                         $name,
                         number_format(round((microtime(true) - static::$benchAt[$name]['t']) * 1000, 2), 2),
                         number_format(round((static::$benchAt[$name]['t'] - LARAVEL_START) * 1000, 2), 2),
@@ -113,7 +126,12 @@ class App extends BaseApp
                     )
                 );
             }
-            
+            if ($benchFrom === true) {
+                static::benchFrom($name);
+            }
+            elseif ($benchFrom !== false) {
+                static::benchFrom($benchFrom);
+            }
         }
     }
 }
