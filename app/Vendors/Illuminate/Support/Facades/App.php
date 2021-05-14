@@ -79,7 +79,7 @@ class App extends BaseApp
         }
     }
 
-    public static function bench($name)
+    public static function bench($name, $benchFrom = null)
     {
         if (static::runningInDebug()) {
             if (isset(static::$benchAt[$name])) {
@@ -113,6 +113,7 @@ class App extends BaseApp
                     )
                 );
             }
+            
         }
     }
 }
