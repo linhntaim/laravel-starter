@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\ApiResponseTrait;
-use App\ModelRepositories\OAuthImpersonateRepository;
+use App\ModelRepositories\ImpersonateRepository;
 use App\Utils\ConfigHelper;
 use App\Vendors\Illuminate\Support\Str;
 use Illuminate\Http\Response;
@@ -50,10 +50,10 @@ abstract class LoginController extends AccessTokenController
             elseif (method_exists($parsedToken, 'claims')) { // support lcobucci/jwt@4.x
                 $accessTokenId = $parsedToken->claims()->get('jti');;
             }
-            $oAuthImpersonateRepository = new OAuthImpersonateRepository();
+            $oAuthImpersonateRepository = new ImpersonateRepository();
             $oAuthImpersonateRepository->pinModel()->getByImpersonateToken($impersonateToken);
             $oAuthImpersonateRepository->updateWithAttributes([
-                'access_token_id' => $accessTokenId,
+                'auth_token' => $accessTokenId,
             ]);
         }
         return $response;
@@ -79,7 +79,7 @@ abstract class LoginController extends AccessTokenController
             return $callback();
         }
         catch (LeagueException $e) {
-            return $this->throwException($e);
+            $this->throwException($e);
         }
     }
 

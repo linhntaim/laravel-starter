@@ -7,7 +7,7 @@
 namespace App\Http\Middleware;
 
 use App\Http\Requests\Request;
-use App\ModelRepositories\OAuthImpersonateRepository;
+use App\ModelRepositories\ImpersonateRepository;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,8 +23,8 @@ class Impersonate
                 $config = config('auth.guards.api');
                 if ($config['driver'] == 'passport') {
                     $user = $request->user();
-                    $oAuthImpersonate = (new OAuthImpersonateRepository())->notStrict()
-                        ->getByUserIdAndAccessTokenId($user->id, $user->token()->id);
+                    $oAuthImpersonate = (new ImpersonateRepository())->notStrict()
+                        ->getByUserIdAndAuthToken($user->id, $user->token()->id);
                     if ($oAuthImpersonate) {
                         $request->setImpersonator($oAuthImpersonate->admin);
                     }
