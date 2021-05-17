@@ -67,6 +67,7 @@ return [
     ],
     'forgot_password_enabled' => [
         'admin' => (bool)env('ADMIN_FORGOT_PASSWORD_ENABLED', false),
+        'admin_auto' => (bool)env('ADMIN_FORGOT_PASSWORD_AUTO', false),
     ],
     'impersonated_by_admin' => (bool)env('IMPERSONATED_BY_ADMIN_ENABLED', true),
     'throttle_request' => [

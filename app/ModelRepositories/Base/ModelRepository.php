@@ -450,7 +450,7 @@ abstract class ModelRepository
     /**
      * @param callable $callback
      * @param callable|null $catchCallback
-     * @return Model|Collection|boolean|mixed|null|void
+     * @return Model|Collection|bool|mixed|null|void
      * @throws
      */
     protected function catch(callable $callback, callable $catchCallback = null)
@@ -812,7 +812,7 @@ abstract class ModelRepository
 
     /**
      * @param array $ids
-     * @return boolean
+     * @return bool
      */
     public function deleteWithIds(array $ids)
     {
@@ -821,7 +821,7 @@ abstract class ModelRepository
 
     /**
      * @param Builder $query
-     * @return boolean
+     * @return bool
      * @throws
      */
     public function queryDelete($query)
@@ -839,7 +839,7 @@ abstract class ModelRepository
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function delete()
     {

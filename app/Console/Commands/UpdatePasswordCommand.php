@@ -30,10 +30,7 @@ class UpdatePasswordCommand extends Command
 
     protected function updatePassword()
     {
-        $this->userRepository->skipProtected()
-            ->updateWithAttributes([
-                'password' => $this->password,
-            ]);
+        $this->userRepository->skipProtected()->updatePassword($this->password);
         $this->warn(
             sprintf(
                 '[%s] was updated as password for User ID [%s] successfully!',
@@ -89,12 +86,12 @@ class UpdatePasswordCommand extends Command
 
             $this->password = (new PasswordGenerator())
                 ->excludeSimilarCharacters($similarCharactersExcluded)
-                ->includeLowerCases($lowerCasesIncluded)
                 ->includeUpperCases($upperCasesIncluded)
+                ->includeLowerCases($lowerCasesIncluded)
                 ->includeNumbers($numbersIncluded)
                 ->includeSymbols($symbolsIncluded)
-                ->setLowerCasesLength($lowerCasesLength)
                 ->setUpperCasesLength($upperCasesLength)
+                ->setLowerCasesLength($lowerCasesLength)
                 ->setNumbersLength($numbersLength)
                 ->setSymbolsLength($symbolsLength)
                 ->generate();

@@ -16,7 +16,7 @@ use App\Utils\Screen\Facade as ScreenFacade;
 /**
  * Class ActivityLogRepository
  * @package App\ModelRepositories
- * @property ActivityLog $model
+ * @property ActivityLog|null $model
  */
 class ActivityLogRepository extends ModelRepository
 {

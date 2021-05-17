@@ -61,8 +61,8 @@ class ImageFiler extends Filer
     /**
      * @param integer $width
      * @param integer $height
-     * @param boolean $aspectRatio
-     * @param boolean $upSize
+     * @param bool $aspectRatio
+     * @param bool $upSize
      * @return static
      */
     public function imageResize($width, $height, $aspectRatio = true, $upSize = false)

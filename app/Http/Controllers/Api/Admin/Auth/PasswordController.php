@@ -31,6 +31,11 @@ class PasswordController extends BasePasswordController
         return parent::index($request);
     }
 
+    protected function isAutomatic()
+    {
+        return ConfigHelper::get('forgot_password_enabled.admin_auto');
+    }
+
     public function store(Request $request)
     {
         if (!ConfigHelper::get('forgot_password_enabled.admin')) {

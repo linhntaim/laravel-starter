@@ -12,9 +12,11 @@ use App\Events\Listeners\OnMessageSending;
 use App\Events\Listeners\OnMessageSent;
 use App\Events\Listeners\OnNotificationSending;
 use App\Events\Listeners\OnNotificationSent;
+use App\Events\Listeners\OnPasswordResetAutomatically;
 use App\Events\Listeners\OnQueryExecuted;
 use App\Events\Listeners\OnTestingEvent;
 use App\Events\MailTestingEvent;
+use App\Events\PasswordResetAutomaticallyEvent;
 use App\Events\TestingEvent;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -66,6 +68,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         MailTestingEvent::class => [
             OnMailTestingEvent::class,
+        ],
+        PasswordResetAutomaticallyEvent::class => [
+            OnPasswordResetAutomatically::class,
         ],
         // TODO: Register Events with Listeners
 

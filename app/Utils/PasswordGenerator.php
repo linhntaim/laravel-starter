@@ -43,39 +43,39 @@ class PasswordGenerator
         return $this;
     }
 
-    public function includeUpperCases($upperCasesIncluded = true)
+    public function includeUpperCases($upperCasesIncluded = true, $length = 3)
     {
         $this->upperCasesIncluded = $upperCasesIncluded;
-        return $this;
+        return $this->setUpperCasesLength($length);
     }
 
-    public function includeLowerCases($lowerCasesIncluded = true)
+    public function includeLowerCases($lowerCasesIncluded = true, $length = 3)
     {
         $this->lowerCasesIncluded = $lowerCasesIncluded;
-        return $this;
+        return $this->setLowerCasesLength($length);
     }
 
-    public function includeNumbers($numbersIncluded = true)
+    public function includeNumbers($numbersIncluded = true, $length = 3)
     {
         $this->numbersIncluded = $numbersIncluded;
-        return $this;
+        return $this->setNumbersLength($length);
     }
 
-    public function includeSymbols($symbolsIncluded = true)
+    public function includeSymbols($symbolsIncluded = true, $length = 3)
     {
         $this->symbolsIncluded = $symbolsIncluded;
+        return $this->setSymbolsLength($length);
+    }
+
+    public function setUpperCasesLength($upperCasesLength = 3)
+    {
+        $this->upperCasesLength = $upperCasesLength;
         return $this;
     }
 
     public function setLowerCasesLength($lowerCasesLength = 3)
     {
         $this->lowerCasesLength = $lowerCasesLength;
-        return $this;
-    }
-
-    public function setUpperCasesLength($upperCasesLength = 3)
-    {
-        $this->upperCasesLength = $upperCasesLength;
         return $this;
     }
 

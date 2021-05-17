@@ -19,7 +19,7 @@ interface IHasPropertiesRepository
 
     /**
      * @param array $properties
-     * @return boolean
+     * @return bool
      */
     public function saveProperties(array $properties);
 

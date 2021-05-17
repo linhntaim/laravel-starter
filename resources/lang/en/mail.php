@@ -13,6 +13,16 @@ return [
 
         // TODO
     ],
+    'events' => [
+        'listeners' => [
+            'on_password_reset_automatically' => [
+                'mail_subject' => '[:app_name] Reset password',
+            ],
+            // TODO:
+
+            // TODO
+        ],
+    ],
     // TODO:
 
     // TODO

@@ -15,7 +15,7 @@ use App\Models\Role;
 /**
  * Class RoleRepository
  * @package App\ModelRepositories
- * @property Role|IProtected $model
+ * @property Role|IProtected|null $model
  */
 class RoleRepository extends ModelRepository implements IProtectedRepository
 {

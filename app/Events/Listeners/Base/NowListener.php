@@ -7,8 +7,11 @@
 namespace App\Events\Listeners\Base;
 
 use App\Utils\ClassTrait;
+use App\Utils\ClientSettings\Facade;
 use App\Utils\ClientSettings\Traits\IndependentClientTrait;
 use App\Utils\Database\Transaction\TransactionTrait;
+use App\Utils\Mail\MailHelper;
+use App\Utils\Mail\TemplateMailable;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -71,5 +74,44 @@ abstract class NowListener
     public function failed($event, Throwable $e)
     {
         $this->fails();
+    }
+
+    protected function getMailNow($event)
+    {
+        return true;
+    }
+
+    protected function getMailTemplate($event)
+    {
+        return 'password_reset';
+    }
+
+    protected function getMailSubject($event)
+    {
+        return $this->__transMailWithModule('mail_subject', [
+            'app_name' => Facade::getAppName(),
+        ]);
+    }
+
+    protected function getMailParams($event)
+    {
+        return [
+            TemplateMailable::EMAIL_SUBJECT => $this->getMailSubject($event),
+        ];
+    }
+
+    protected function sendMail($event, $templateLocalized = true, $templateLocale = null)
+    {
+        return $this->getMailNow($event) ? MailHelper::sendNowWithTemplate(
+            $this->getMailTemplate($event),
+            $this->getMailParams($event),
+            $templateLocalized,
+            $templateLocale
+        ) : MailHelper::sendWithTemplate(
+            $this->getMailTemplate($event),
+            $this->getMailParams($event),
+            $templateLocalized,
+            $templateLocale
+        );
     }
 }

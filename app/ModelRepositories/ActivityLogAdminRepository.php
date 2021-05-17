@@ -11,7 +11,7 @@ use App\Models\ActivityLogAdmin;
 /**
  * Class ActivityLogAdminRepository
  * @package App\ModelRepositories
- * @property ActivityLogAdmin $model
+ * @property ActivityLogAdmin|null $model
  */
 class ActivityLogAdminRepository extends ActivityLogRepository
 {

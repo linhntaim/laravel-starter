@@ -17,10 +17,10 @@ use Illuminate\Support\Facades\DB;
 /**
  * Class ExtendedUserRepository
  * @package App\ModelRepositories
- * @property ExtendedUserModel $model
+ * @property ExtendedUserModel|null $model
  * @method ExtendedUserModel newModel($pinned = true)
  */
-abstract class ExtendedUserRepository extends DependedRepository implements IUserRepository, IProtectedRepository
+abstract class ExtendedUserRepository extends DependedRepository implements IUserRepository
 {
     use ProtectedRepositoryTrait;
 
@@ -97,19 +97,48 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
         return $this->model;
     }
 
+    /**
+     * @return UserRepository
+     */
+    protected function getUserRepository()
+    {
+        return tap(new UserRepository(), function (UserRepository $userRepository) {
+            if (!$this->protected) {
+                $userRepository->skipProtected();
+            }
+        });
+    }
+
     public function updateWithAttributes(array $attributes = [], array $userAttributes = [], array $userSocialAttributes = [])
     {
         if (!empty($userAttributes) || !empty($userSocialAttributes)) {
-            (new UserRepository())->withModel($this->model->user)->updateWithAttributes($userAttributes, $userSocialAttributes);
+            $this->getUserRepository()
+                ->withModel($this->model->user)
+                ->updateWithAttributes($userAttributes, $userSocialAttributes);
         }
+
+        $this->validateProtected('Cannot edit this protected user');
         return parent::updateWithAttributes($attributes);
+    }
+
+    public function updatePassword($password)
+    {
+        $this->getUserRepository()
+            ->withModel($this->model->user)
+            ->updatePassword($password);
+
+        $this->validateProtected('Cannot edit this protected user');
+        return $this->model;
     }
 
     public function updateLastAccessedAt()
     {
-        return (new UserRepository())
+        $this->getUserRepository()
             ->withModel($this->model->user)
             ->updateLastAccessedAt();
+
+        $this->validateProtected('Cannot edit this protected user');
+        return $this->model;
     }
 
     /**
@@ -119,18 +148,17 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
      */
     public function deleteWithIds(array $ids)
     {
-        (new UserRepository())->deleteWithIds($ids);
-        return $this->queryDelete(
-            $this->dependedWhere(function ($query) {
-                $query->noneProtected();
-            }, SocialLogin::getInstance()->enabled() ? 'user' : null)
-                ->queryByIds($ids)
-        );
+        $this->getUserRepository()->deleteWithIds($ids);
+        return $this->queryDelete($this->queryProtected($this->queryByIds($ids)));
     }
 
     public function delete()
     {
-        (new UserRepository())->withModel($this->model->user)->delete();
+        $this->getUserRepository()
+            ->withModel($this->model->user)
+            ->delete();
+
+        $this->validateProtected('Cannot delete this protected user');
         return parent::delete();
     }
 }

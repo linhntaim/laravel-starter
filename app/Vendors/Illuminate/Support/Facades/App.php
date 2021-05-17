@@ -90,7 +90,7 @@ class App extends BaseApp
 
     /**
      * @param string $name
-     * @param boolean|string $benchFrom
+     * @param bool|string $benchFrom
      */
     public static function bench(string $name, $benchFrom = false)
     {
