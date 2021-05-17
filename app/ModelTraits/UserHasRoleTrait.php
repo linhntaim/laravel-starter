@@ -2,16 +2,18 @@
 
 namespace App\ModelTraits;
 
-use App\Models\Permission;
 use App\Models\Role;
 
 /**
  * Trait UserHasRoleTrait
  * @package App\ModelTraits
  * @property Role|null $role
+ * @property string[]|array $permissionNames
  */
 trait UserHasRoleTrait
 {
+    use UserHasPermissions;
+
     public function getRoleAttributeName()
     {
         return 'role_id';
@@ -30,12 +32,7 @@ trait UserHasRoleTrait
                 $permissionNames = [];
             }
             else {
-                $permissionNames = $this->role->permissions
-                    ->map(function (Permission $permission) {
-                        return $permission->name;
-                    })
-                    ->unique()
-                    ->all();
+                $permissionNames = $this->role->permissionNames;
             }
         }
         return $permissionNames;
@@ -43,6 +40,11 @@ trait UserHasRoleTrait
 
     public function role()
     {
-        return $this->belongsTo(Role::class, $this->getRoleAttributeName());
+        return $this
+            ->belongsTo(
+                Role::class,
+                $this->getRoleAttributeName()
+            )
+            ->with('permissions');
     }
 }

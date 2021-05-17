@@ -91,31 +91,6 @@ class Admin extends ExtendedUserModel implements IUserHasRole
     }
 
     #region Functionality
-    public function hasPermission($permissionName)
-    {
-        return in_array($permissionName, $this->permissionNames);
-    }
-
-    public function hasPermissionsAtLeast($permissionNames)
-    {
-        foreach ($permissionNames as $permissionName) {
-            if ($this->hasPermission($permissionName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public function hasPermissions($permissionNames)
-    {
-        foreach ($permissionNames as $permissionName) {
-            if (!$this->hasPermission($permissionName)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public function toActivityLogArray()
     {
         return array_merge($this->user->toActivityLogArray(), parent::toActivityLogArray());

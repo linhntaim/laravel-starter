@@ -2,9 +2,9 @@
 
 namespace App\Models\Base;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-interface IUserHasRole extends IUserHasPermissions
+interface IUserHasRoles extends IUserHasPermissions
 {
     /**
      * @return string
@@ -12,9 +12,9 @@ interface IUserHasRole extends IUserHasPermissions
     public function getRoleAttributeName();
 
     /**
-     * @return string|null
+     * @return string[]|array
      */
-    public function getRoleNameAttribute();
+    public function getRoleNamesAttribute();
 
     /**
      * @return string[]|array
@@ -22,7 +22,7 @@ interface IUserHasRole extends IUserHasPermissions
     public function getPermissionNamesAttribute();
 
     /**
-     * @return BelongsTo
+     * @return BelongsToMany
      */
-    public function role();
+    public function roles();
 }

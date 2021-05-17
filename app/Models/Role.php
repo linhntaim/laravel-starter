@@ -76,9 +76,11 @@ class Role extends Model implements IProtected
 
     public function getPermissionNamesAttribute()
     {
-        return $this->remind('permission_names', function () {
-            return $this->permissions->pluck('name')->all();
-        });
+        static $permissionNames = null;
+        if (is_null($permissionNames)) {
+            $permissionNames = $this->permissions->pluck('name')->all();
+        }
+        return $permissionNames;
     }
 
     public function users()
