@@ -85,7 +85,7 @@ abstract class AccountController extends ModelApiController
     {
         if ($this->modelRepository instanceof IUserRepository) {
             return $this->responseModel(
-                $this->modelRepository->updateLastAccessedAt()
+                $this->modelRepository->skipProtected()->updateLastAccessedAt()
             );
         }
         return $this->responseFail();
