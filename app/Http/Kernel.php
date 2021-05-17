@@ -16,9 +16,11 @@ use App\Http\Middleware\AuthenticatedByPassportViaHeader;
 use App\Http\Middleware\AuthenticatedByPassportViaRequest;
 use App\Http\Middleware\AuthorizedWithAdmin;
 use App\Http\Middleware\AuthorizedWithAdminPermissions;
+use App\Http\Middleware\CustomLocale;
 use App\Http\Middleware\CustomTimezone;
 use App\Http\Middleware\Impersonate;
 use App\Http\Middleware\IpLimitation;
+use App\Http\Middleware\JapaneseLang;
 use App\Http\Middleware\JapaneseTime;
 use App\Http\Middleware\Web\Client as ClientWeb;
 use App\Http\Middleware\Web\Device as DeviceWeb;
@@ -97,7 +99,9 @@ class Kernel extends HttpKernel
 
         'ip.limit' => IpLimitation::class,
         'custom_timezone' => CustomTimezone::class,
+        'custom_locale' => CustomLocale::class,
         'japanese_time' => JapaneseTime::class,
+        'japanese_lang' => JapaneseLang::class,
         'authenticated.passport.cookie' => AuthenticatedByPassportViaCookie::class,
         'authenticated.passport.header' => AuthenticatedByPassportViaHeader::class,
         'authenticated.passport.request' => AuthenticatedByPassportViaRequest::class,
@@ -124,7 +128,9 @@ class Kernel extends HttpKernel
         SettingsApi::class,
         SettingsWeb::class,
         CustomTimezone::class,
+        CustomLocale::class,
         JapaneseTime::class,
+        JapaneseLang::class,
         DeviceApi::class,
         DeviceWeb::class,
         ScreenApi::class,
