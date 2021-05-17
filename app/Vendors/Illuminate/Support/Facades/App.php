@@ -116,7 +116,7 @@ class App extends BaseApp
             else {
                 Log::info(
                     sprintf(
-                        'Bench [%s] from start: %sms, %s, %s (real), %s (peak), %s (peak real).',
+                        'Bench [%s]: %sms, %s, %s (real), %s (peak), %s (peak real).',
                         $name,
                         number_format(round((microtime(true) - LARAVEL_START) * 1000, 2), 2),
                         Helper::autoDisplaySize(memory_get_usage(), 2),
