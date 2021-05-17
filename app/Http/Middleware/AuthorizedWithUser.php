@@ -13,7 +13,7 @@ use Closure;
 
 abstract class AuthorizedWithUser
 {
-    use ClassTrait, AdminMiddlewareTrait;
+    use ClassTrait;
 
     public function handle(Request $request, Closure $next)
     {
