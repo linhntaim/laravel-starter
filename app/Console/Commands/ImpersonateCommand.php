@@ -8,10 +8,10 @@ namespace App\Console\Commands;
 
 use App\Console\Commands\Base\Command;
 use App\ModelRepositories\AdminRepository;
-use App\ModelRepositories\OAuthImpersonateRepository;
+use App\ModelRepositories\ImpersonateRepository;
 use App\ModelRepositories\UserRepository;
 use App\Models\Admin;
-use App\Models\OAuthImpersonate;
+use App\Models\Impersonate;
 use App\Models\User;
 use Throwable;
 
@@ -23,9 +23,9 @@ class ImpersonateCommand extends Command
     {
         if (($user = $this->getUser()) && ($admin = $this->getAdmin())) {
             try {
-                $oAuthImpersonate = $this->createImpersonate($user, $admin);
+                $impersonate = $this->createImpersonate($user, $admin);
                 $this->warn(json_encode([
-                    'impersonate_token' => $oAuthImpersonate->impersonate_token,
+                    'impersonate_token' => $impersonate->impersonate_token,
                 ]));
             }
             catch (Throwable $exception) {
@@ -53,12 +53,12 @@ class ImpersonateCommand extends Command
     /**
      * @param User $user
      * @param Admin $admin
-     * @return OAuthImpersonate
+     * @return Impersonate
      * @throws
      */
     private function createImpersonate(User $user, Admin $admin)
     {
-        return (new OAuthImpersonateRepository())->createWithAttributes([
+        return (new ImpersonateRepository())->createWithAttributes([
             'user_id' => $user->id,
             'via_user_id' => $admin->user_id,
         ]);

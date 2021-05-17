@@ -14,6 +14,7 @@ use App\Models\Base\IModel;
 use App\Utils\AbortTrait;
 use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\DateTimer;
+use App\Vendors\Illuminate\Support\Str;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -562,6 +563,74 @@ abstract class ModelRepository
                 return $this->queryUniquely($query, $unique);
             })
         );
+    }
+
+    /**
+     * @return array
+     */
+    protected function getGeneratedUniqueKeys()
+    {
+        return [];
+    }
+
+    /**
+     * @param string $uniqueKey
+     * @return int|callable
+     */
+    protected function generateUniqueCallback(string $uniqueKey)
+    {
+        $generatedUniqueKeys = $this->getGeneratedUniqueKeys();
+        return $generatedUniqueKeys[$uniqueKey] ?? 32;
+    }
+
+    /**
+     * @param string $uniqueKey
+     * @param int|callable|null $generateCallback
+     * @param array|callable|null $ignores
+     * @return string
+     */
+    protected function generateUniqueValue(string $uniqueKey, $generateCallback = null, $ignores = null)
+    {
+        if (is_null($generateCallback)) {
+            if (method_exists($this, $method = 'generate' . Str::studly($uniqueKey))) {
+                $generateCallback = function () use ($method) {
+                    return $this->{$method}();
+                };
+            }
+            else {
+                $generateCallback = $this->generateUniqueCallback($uniqueKey);
+            }
+        }
+        if (is_int($generateCallback)) {
+            $length = $generateCallback;
+            $generateCallback = function () use ($length) {
+                return Str::random($length);
+            };
+        }
+
+        while (($uniqueValue = $generateCallback()) && $this->notStrict()->getByUnique($uniqueKey, $uniqueValue, $ignores)) {
+        }
+        return $uniqueValue;
+    }
+
+    /**
+     * @param string $uniqueKey
+     * @param string $uniqueValue
+     * @param array|callable|null $ignores
+     * @return Model|null
+     */
+    public function getByUnique(string $uniqueKey, string $uniqueValue, $ignores = null)
+    {
+        $query = $this->query()->where($uniqueKey, $uniqueValue);
+        if (is_array($ignores)) {
+            foreach ($ignores as $ignoreKey => $ignoreValue) {
+                $query->where($ignoreKey, '<>', $ignoreValue);
+            }
+        }
+        elseif (is_callable($ignores)) {
+            $query = $ignores($query);
+        }
+        return $this->first($query);
     }
 
     /**

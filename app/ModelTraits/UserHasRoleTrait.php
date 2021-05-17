@@ -26,16 +26,12 @@ trait UserHasRoleTrait
 
     public function getPermissionNamesAttribute()
     {
-        static $permissionNames = null;
-        if (is_null($permissionNames)) {
+        return $this->remind('permission_names', function () {
             if (is_null($this->role)) {
-                $permissionNames = [];
+                return [];
             }
-            else {
-                $permissionNames = $this->role->permissionNames;
-            }
-        }
-        return $permissionNames;
+            return $this->role->permissionNames;
+        });
     }
 
     public function role()

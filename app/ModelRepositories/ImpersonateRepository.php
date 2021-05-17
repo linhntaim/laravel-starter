@@ -7,22 +7,22 @@
 namespace App\ModelRepositories;
 
 use App\ModelRepositories\Base\ModelRepository;
-use App\Models\OAuthImpersonate;
+use App\Models\Impersonate;
 
 /**
- * Class OAuthImpersonateRepository
+ * Class ImpersonateRepository
  * @package App\ModelRepositories
  */
-class OAuthImpersonateRepository extends ModelRepository
+class ImpersonateRepository extends ModelRepository
 {
     public function modelClass()
     {
-        return OAuthImpersonate::class;
+        return Impersonate::class;
     }
 
     /**
      * @param string $impersonateToken
-     * @return OAuthImpersonate
+     * @return Impersonate
      */
     public function getByImpersonateToken($impersonateToken)
     {
@@ -34,15 +34,21 @@ class OAuthImpersonateRepository extends ModelRepository
 
     /**
      * @param int $userId
-     * @param string $accessTokenId
-     * @return OAuthImpersonate
+     * @param string $authToken
+     * @return Impersonate
      */
-    public function getByUserIdAndAccessTokenId($userId, $accessTokenId)
+    public function getByUserIdAndAuthToken($userId, $authToken)
     {
         return $this->first(
             $this->query()
                 ->where('user_id', $userId)
-                ->where('access_token_id', $accessTokenId)
+                ->where('auth_token', $authToken)
         );
+    }
+
+    public function createWithAttributes(array $attributes = [])
+    {
+        $attributes['impersonate_token'] = $this->generateUniqueValue('impersonate_token', 128);
+        return parent::createWithAttributes($attributes);
     }
 }

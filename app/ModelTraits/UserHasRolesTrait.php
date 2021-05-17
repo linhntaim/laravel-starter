@@ -31,22 +31,19 @@ trait UserHasRolesTrait
 
     public function getRoleNamesAttribute()
     {
-        static $roleNames = null;
-        if (is_null($roleNames)) {
-            $roleNames = $this->roles
+        return $this->remind('role_names', function () {
+            return $this->roles
                 ->map(function (Role $role) {
                     return $role->name;
                 })
                 ->all();
-        }
-        return $roleNames;
+        });
     }
 
     public function getPermissionNamesAttribute()
     {
-        static $permissionNames = null;
-        if (is_null($permissionNames)) {
-            $permissionNames = array_unique(
+        return $this->remind('permission_names', function () {
+            return array_unique(
                 array_merge(
                     ...$this->roles
                     ->map(function (Role $role) {
@@ -55,8 +52,7 @@ trait UserHasRolesTrait
                     ->all()
                 )
             );
-        }
-        return $permissionNames;
+        });
     }
 
     public function roles()

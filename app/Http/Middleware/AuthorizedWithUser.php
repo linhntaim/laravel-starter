@@ -35,7 +35,7 @@ abstract class AuthorizedWithUser
 
     protected function hasUser(Request $request)
     {
-        return is_null($this->getUser($request));
+        return !is_null($this->getUser($request));
     }
 
     protected function doesntHave()

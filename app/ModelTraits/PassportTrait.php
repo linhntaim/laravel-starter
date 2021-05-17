@@ -6,7 +6,7 @@
 
 namespace App\ModelTraits;
 
-use App\ModelRepositories\OAuthImpersonateRepository;
+use App\ModelRepositories\ImpersonateRepository;
 use App\ModelRepositories\UserRepository;
 use App\Utils\ConfigHelper;
 use App\Utils\CryptoJs\AES;
@@ -39,7 +39,7 @@ trait PassportTrait
                 }
             }
             if (!empty($advanced->impersonate_token)) {
-                $oAuthImpersonate = (new OAuthImpersonateRepository())->notStrict()
+                $oAuthImpersonate = (new ImpersonateRepository())->notStrict()
                     ->getByImpersonateToken($advanced->impersonate_token);
                 if (!empty($oAuthImpersonate)) {
                     $user = $userRepository->notStrict()->getUniquely($oAuthImpersonate->user_id);
