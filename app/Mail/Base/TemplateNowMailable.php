@@ -4,11 +4,11 @@ namespace App\Mail\Base;
 
 abstract class TemplateNowMailable extends NowMailable
 {
+    public $emailLocalized = true;
+
     public $emailNamespace;
 
     public $emailView;
-
-    public $emailLocalized = true;
 
     public function build()
     {
@@ -16,6 +16,16 @@ abstract class TemplateNowMailable extends NowMailable
             'locale' => $this->locale,
             'charset' => $this->htmlCharset,
         ]);
+    }
+
+    /**
+     * @param bool $emailLocalized
+     * @return static
+     */
+    public function setEmailLocalized(bool $emailLocalized)
+    {
+        $this->emailLocalized = $emailLocalized;
+        return $this;
     }
 
     /**
@@ -45,15 +55,5 @@ abstract class TemplateNowMailable extends NowMailable
             $this->emailView,
             ($this->emailLocalized ? '.' . $this->locale : '')
         );
-    }
-
-    /**
-     * @param bool $emailLocalized
-     * @return static
-     */
-    public function setEmailLocalized(bool $emailLocalized)
-    {
-        $this->emailLocalized = $emailLocalized;
-        return $this;
     }
 }

@@ -6,15 +6,18 @@
 
 namespace App\Notifications;
 
+use App\Mail\AdminPasswordResetMailable;
+use App\Models\Base\INotifiable;
 use App\Models\Base\IUser;
-use App\Notifications\Base\NowNotification;
 
-class AdminResetPasswordNotification extends NowNotification
+class AdminResetPasswordNotification extends UserResetPasswordNotification
 {
-    use UserResetPasswordNotificationTrait;
-
-    protected function getMailTemplate(IUser $notifiable)
+    /**
+     * @param INotifiable|IUser $notifiable
+     * @return AdminPasswordResetMailable
+     */
+    protected function getMailable($notifiable)
     {
-        return 'admin_password_reset';
+        return new AdminPasswordResetMailable();
     }
 }

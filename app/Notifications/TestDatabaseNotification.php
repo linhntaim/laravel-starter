@@ -6,7 +6,8 @@
 
 namespace App\Notifications;
 
-use App\Models\Base\IUser;
+use App\Models\Base\INotifiable;
+use App\Models\Base\INotifier;
 use App\Models\DatabaseNotification;
 use App\Notifications\Base\DatabaseNotificationTrait;
 use App\Notifications\Base\IDatabaseNotification;
@@ -27,28 +28,28 @@ class TestDatabaseNotification extends NowNotification implements IDatabaseNotif
         );
     }
 
-    public function __construct($test = 'test', IUser $notifier = null)
+    public function __construct($test = 'test', INotifier $notifier = null)
     {
         parent::__construct($notifier);
 
         $this->test = $test;
     }
 
-    protected function dataDatabase(IUser $notifiable)
+    protected function dataDatabase(INotifiable $notifiable)
     {
         return array_merge(parent::dataDatabase($notifiable), [
             'test' => $this->test,
         ]);
     }
 
-    public function getContent(IUser $notifiable, $html = true)
+    public function getContent(INotifiable $notifiable, $html = true)
     {
         return static::__transWithCurrentModule('content', [
             'test' => $this->test,
         ]);
     }
 
-    public function getAction(IUser $notifiable)
+    public function getAction(INotifiable $notifiable)
     {
         return NotificationActions::actionGo(
             'test',

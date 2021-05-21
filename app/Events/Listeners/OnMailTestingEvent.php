@@ -6,21 +6,19 @@
 
 namespace App\Events\Listeners;
 
-use App\Events\MailTestingEvent;
+use App\Events\TestMailEvent;
 use App\Events\Listeners\Base\NowListener;
-use App\Mail\Base\MailTrait;
 use App\Mail\TestMailable;
+use Illuminate\Support\Facades\Mail;
 
 class OnMailTestingEvent extends NowListener
 {
-    use MailTrait;
-
     /**
-     * @param MailTestingEvent $event
+     * @param TestMailEvent $event
      */
     public function go($event)
     {
-        $this->mail(
+        Mail::send(
             new TestMailable($event->getSubject(), $event->getView())
         );
     }

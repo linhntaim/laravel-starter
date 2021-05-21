@@ -6,23 +6,19 @@
 
 namespace App\Models\Base;
 
-use Illuminate\Contracts\Translation\HasLocalePreference;
-
 /**
  * Interface IUser
  * @package App\Models\Base
  */
-interface IUser extends IContactable, HasLocalePreference, IProtected
+interface IUser extends IContactable, ILocalizable, IProtected, INotifiable, INotifier
 {
     public function getId();
 
-    public function preferredAvatarUrl();
-
-    public function preferredSettings();
-
-    public function getPasswordResetExpiredAt();
+    public function getEmailForPasswordReset();
 
     public function getPasswordMinLength();
+
+    public function getPasswordResetExpiredAt();
 
     public function sendPasswordResetNotification($token);
 }

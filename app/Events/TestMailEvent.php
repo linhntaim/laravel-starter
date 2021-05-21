@@ -6,10 +6,16 @@
 
 namespace App\Events;
 
-class MailTestingEvent extends Event
+class TestMailEvent extends Event
 {
+    /**
+     * @var string
+     */
     protected $subject;
 
+    /**
+     * @var string
+     */
     protected $view;
 
     public function __construct($subject = 'Tested', $view = 'test')

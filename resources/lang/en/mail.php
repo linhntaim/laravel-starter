@@ -5,23 +5,14 @@
  */
 
 return [
-    'notifications' => [
-        'admin_reset_password_notification' => [
-            'mail_subject' => '[:app_name] Reset password',
-        ],
-        // TODO:
-
-        // TODO
+    'password_reset_automatically_mailable' => [
+        'subject' => '[:app_name] Reset password',
     ],
-    'events' => [
-        'listeners' => [
-            'on_password_reset_automatically' => [
-                'mail_subject' => '[:app_name] Reset password',
-            ],
-            // TODO:
-
-            // TODO
-        ],
+    'admin_reset_password_mailable' => [
+        'subject' => '[:app_name] Reset password',
+    ],
+    'user_reset_password_mailable' => [
+        'subject' => '[:app_name] Reset password',
     ],
     // TODO:
 

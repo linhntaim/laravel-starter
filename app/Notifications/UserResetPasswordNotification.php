@@ -6,16 +6,20 @@
 
 namespace App\Notifications;
 
+use App\Mail\PasswordResetMailable;
+use App\Models\Base\INotifiable;
+use App\Models\Base\INotifier;
 use App\Models\Base\IUser;
+use App\Notifications\Base\NowNotification;
 use App\Utils\ClientSettings\Facade;
 
-trait UserResetPasswordNotificationTrait
+class UserResetPasswordNotification extends NowNotification
 {
     protected $token;
 
     protected $appResetPasswordPath;
 
-    public function __construct($token, IUser $notifier = null)
+    public function __construct($token, INotifier $notifier = null)
     {
         parent::__construct($notifier);
 
@@ -29,19 +33,20 @@ trait UserResetPasswordNotificationTrait
         return true;
     }
 
-    protected function getMailTemplate(IUser $notifiable)
+    /**
+     * @param INotifiable|IUser $notifiable
+     * @return PasswordResetMailable
+     */
+    protected function getMailable($notifiable)
     {
-        return 'password_reset';
+        return new PasswordResetMailable();
     }
 
-    protected function getMailSubject(IUser $notifiable)
-    {
-        return $this->__transMailWithModule('mail_subject', [
-            'app_name' => Facade::getAppName(),
-        ]);
-    }
-
-    protected function getMailParams(IUser $notifiable)
+    /**
+     * @param INotifiable|IUser $notifiable
+     * @return array
+     */
+    protected function getMailParams($notifiable)
     {
         return [
             'url_reset_password' => $this->getAppResetPasswordUrl($notifiable),
@@ -50,7 +55,11 @@ trait UserResetPasswordNotificationTrait
         ];
     }
 
-    public function getAppResetPasswordUrl(IUser $notifiable)
+    /**
+     * @param INotifiable|IUser $notifiable
+     * @return string
+     */
+    public function getAppResetPasswordUrl($notifiable)
     {
         return implode('/', [
             Facade::getAppUrl(),

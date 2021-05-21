@@ -5,23 +5,14 @@
  */
 
 return [
-    'notifications' => [
-        'reset_password_notification' => [
-            'mail_subject' => '【:app_name】パスワードのリセット',
-        ],
-        // TODO:
-
-        // TODO
+    'password_reset_automatically_mailable' => [
+        'subject' => '【:app_name】パスワードのリセット',
     ],
-    'events' => [
-        'listeners' => [
-            'on_password_reset_automatically' => [
-                'mail_subject' => '【:app_name】パスワードのリセット',
-            ],
-            // TODO:
-
-            // TODO
-        ],
+    'admin_reset_password_mailable' => [
+        'subject' => '【:app_name】パスワードのリセット',
+    ],
+    'user_reset_password_mailable' => [
+        'subject' => '【:app_name】パスワードのリセット',
     ],
     // TODO:
 

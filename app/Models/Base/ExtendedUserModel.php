@@ -6,10 +6,10 @@
 
 namespace App\Models\Base;
 
-use App\Configuration;
 use App\Models\DatabaseNotification;
 use App\Models\User;
 use App\ModelTraits\UserTrait;
+use App\Notifications\UserResetPasswordNotification;
 use Illuminate\Auth\Passwords\CanResetPassword;
 
 /**
@@ -31,39 +31,9 @@ abstract class ExtendedUserModel extends Model implements IUser
 
     public $incrementing = false;
 
-    public function getPasswordMinLength()
-    {
-        return Configuration::PASSWORD_MIN_LENGTH;
-    }
-
     public static function getProtectedKey()
     {
         return 'user_id';
-    }
-
-    public function getUsernameAttribute()
-    {
-        return $this->user->username;
-    }
-
-    public function getEmailAttribute()
-    {
-        return $this->user->email;
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id', 'id');
-    }
-
-    public function getEmailForPasswordReset()
-    {
-        return $this->preferredEmail();
-    }
-
-    public function getId()
-    {
-        return $this->getKey();
     }
 
     public function preferredName()
@@ -81,18 +51,52 @@ abstract class ExtendedUserModel extends Model implements IUser
         return $this->user->preferredAvatarUrl();
     }
 
-    public function preferredLocale()
-    {
-        return $this->user->preferredLocale();
-    }
-
     public function preferredSettings()
     {
         return $this->user->preferredSettings();
     }
 
+    public function preferredLocale()
+    {
+        return $this->user->preferredLocale();
+    }
+
+    public function getEmailForPasswordReset()
+    {
+        return $this->email;
+    }
+
     public function getPasswordResetExpiredAt()
     {
         return $this->user->getPasswordResetExpiredAt();
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify($this->getPasswordResetNotification($token));
+    }
+
+    /**
+     * @param string $token
+     * @return UserResetPasswordNotification
+     */
+    protected function getPasswordResetNotification($token)
+    {
+        return new UserResetPasswordNotification($token);
+    }
+
+    public function getUsernameAttribute()
+    {
+        return $this->user->username;
+    }
+
+    public function getEmailAttribute()
+    {
+        return $this->user->email;
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

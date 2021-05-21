@@ -7,6 +7,7 @@
 namespace App\Events\Listeners;
 
 use App\Events\Listeners\Base\NowListener;
+use App\Models\Base\INotifiable;
 use App\Models\Base\IUser;
 use App\Notifications\Base\Notification;
 use App\Vendors\Illuminate\Support\Facades\App;
@@ -28,7 +29,7 @@ class OnNotificationSent extends NowListener
                     '[%s] was sent to [%s(%s)] via [%s].',
                     get_class($this->getNotification($event)),
                     get_class($notifiable),
-                    $notifiable->getId(),
+                    $notifiable->getKey(),
                     $event->channel
                 )
             );
@@ -37,7 +38,7 @@ class OnNotificationSent extends NowListener
 
     /**
      * @param NotificationSent $event
-     * @return IUser
+     * @return INotifiable
      */
     protected function getNotifiable($event)
     {

@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Mail\Base\MailAddress;
 use App\Mail\Base\TemplateMailable;
 use App\Utils\ConfigHelper;
 
@@ -13,13 +14,10 @@ class TestMailable extends TemplateMailable
     {
         parent::__construct();
 
-        $mail = ConfigHelper::getTestedMail();
-        $this
-            ->to(
-                is_array($mail) ? $mail['address'] : $mail,
-                is_array($mail) && isset($mail['name']) ? $mail['name'] : null
-            )
+        $mail = MailAddress::from(ConfigHelper::getTestedMail(), 'Test e-mail has not been configured.');
+        $this->to($mail->address, $mail->name)
             ->subject($subject)
+            ->setEmailLocalized(false)
             ->setEmailView($emailView);
     }
 }

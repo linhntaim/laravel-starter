@@ -7,20 +7,22 @@
 namespace App\Notifications\Base;
 
 use App\Exceptions\AppException;
+use App\Mail\Base\MailAddress;
+use App\Mail\Base\NowMailable;
 use App\ModelRepositories\AdminRepository;
-use App\Models\Base\IUser;
+use App\Models\Base\ILocalizable;
+use App\Models\Base\INotifiable;
+use App\Models\Base\INotifier;
 use App\Models\User;
 use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\DateTimer;
 use App\Utils\ClientSettings\Facade;
 use App\Utils\ClientSettings\Traits\IndependentClientTrait;
 use App\Utils\ConfigHelper;
-use App\Utils\Mail\TemplateMailable;
-use App\Utils\Mail\TemplateNowMailable;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification as BaseNotification;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Throwable;
 
@@ -41,26 +43,26 @@ abstract class NowNotification extends BaseNotification
     }
 
     /**
-     * @var IUser|Model
+     * @var INotifier
      */
     public $notifier;
 
-    public function __construct(IUser $notifier = null)
+    public function __construct(INotifier $notifier = null)
     {
         $this->setNotifier($notifier);
     }
 
     /**
-     * @return IUser
+     * @return INotifier
      */
     public function getNotifier()
     {
         return $this->notifier;
     }
 
-    public function setNotifier(IUser $notifier = null)
+    public function setNotifier(INotifier $notifier = null)
     {
-        $this->notifier = empty($notifier) ?
+        $this->notifier = is_null($notifier) ?
             (new AdminRepository())->getById(User::USER_SYSTEM_ID)
             : $notifier;
 
@@ -99,7 +101,7 @@ abstract class NowNotification extends BaseNotification
             || $this->shouldAndroid();
     }
 
-    public function via(IUser $notifiable)
+    public function via(INotifiable $notifiable)
     {
         $via = [];
         if ($this->shouldDatabase()) {
@@ -123,42 +125,45 @@ abstract class NowNotification extends BaseNotification
         return $via;
     }
 
-    public function beforeNotifying($via, IUser $notifiable)
+    public function beforeNotifying($via, INotifiable $notifiable)
     {
     }
 
-    public function afterNotifying($via, IUser $notifiable)
+    public function afterNotifying($via, INotifiable $notifiable)
     {
     }
 
-    protected function resolveData($via, IUser $notifiable, $dataCallback)
+    protected function resolveData($via, INotifiable $notifiable, $dataCallback)
     {
         $this->independentClientApply();
-        return Facade::temporaryFromUser($notifiable, function () use ($via, $notifiable, $dataCallback) {
-            try {
-                return $dataCallback($notifiable);
-            }
-            catch (Throwable $e) {
-                if (!($this instanceof Notification)) {
-                    $this->failed($e);
+        return Facade::temporary(
+            $notifiable instanceof ILocalizable ? $notifiable->preferredSettings() : [],
+            function () use ($via, $notifiable, $dataCallback) {
+                try {
+                    return $dataCallback($notifiable);
                 }
-                throw $e;
+                catch (Throwable $e) {
+                    if (!($this instanceof Notification)) {
+                        $this->failed($e);
+                    }
+                    throw $e;
+                }
             }
-        });
+        );
     }
 
     public function failed(Throwable $e)
     {
     }
 
-    public function toBroadcast(IUser $notifiable)
+    public function toBroadcast(INotifiable $notifiable)
     {
-        return $this->resolveData(static::VIA_BROADCAST, $notifiable, function (IUser $notifiable) {
+        return $this->resolveData(static::VIA_BROADCAST, $notifiable, function (INotifiable $notifiable) {
             return $this->dataBroadcast($notifiable);
         });
     }
 
-    protected function dataBroadcast(IUser $notifiable)
+    protected function dataBroadcast(INotifiable $notifiable)
     {
         return (new BroadcastMessage([
             'id' => $this->id,
@@ -169,14 +174,14 @@ abstract class NowNotification extends BaseNotification
         ]));
     }
 
-    public function toDatabase(IUser $notifiable)
+    public function toDatabase(INotifiable $notifiable)
     {
         return $this->resolveData(static::VIA_DATABASE, $notifiable, function ($notifiable) {
             return $this->dataDatabase($notifiable);
         });
     }
 
-    protected function dataDatabase(IUser $notifiable)
+    protected function dataDatabase(INotifiable $notifiable)
     {
         return [
             'notifier_id' => $this->notifier->getKey(),
@@ -184,36 +189,49 @@ abstract class NowNotification extends BaseNotification
         ];
     }
 
-    public function toMail(IUser $notifiable)
+    public function toMail(INotifiable $notifiable)
     {
         return $this->resolveData(static::VIA_MAIL, $notifiable, function ($notifiable) {
             return $this->dataMail($notifiable);
         });
     }
 
-    protected function dataMail(IUser $notifiable)
+    protected function dataMail(INotifiable $notifiable)
     {
-        $mailable = $this->getMailNow($notifiable) ? $this->getNowMailable($notifiable) : $this->getMailable($notifiable);
-        return new $mailable(
-            $this->getMailTemplate($notifiable),
-            array_merge([
-                TemplateMailable::EMAIL_TO => $notifiable->preferredEmail(),
-                TemplateMailable::EMAIL_TO_NAME => $notifiable->preferredName(),
-                TemplateMailable::EMAIL_SUBJECT => $this->getMailSubject($notifiable),
-            ], $this->getMailParams($notifiable)),
-            $this->getMailUseLocalizedTemplate($notifiable),
-            $this->locale
-        );
+        $mail = MailAddress::from($notifiable);
+        $mailable = $this->getMailable($notifiable)
+            ->locale($this->getMailLocale($notifiable))
+            ->with($this->getMailParams($notifiable));
+        return $mail ? $mailable->clearTos()->to($mail->address, $mail->name) : $mailable;
     }
 
-    public function toIos(IUser $notifiable)
+    /**
+     * @param INotifiable $notifiable
+     * @return NowMailable|null
+     */
+    protected function getMailable(INotifiable $notifiable)
+    {
+        return null;
+    }
+
+    protected function getMailLocale(INotifiable $notifiable)
+    {
+        return $this->locale;
+    }
+
+    protected function getMailParams(INotifiable $notifiable)
+    {
+        return [];
+    }
+
+    public function toIos(INotifiable $notifiable)
     {
         return $this->resolveData(static::VIA_IOS, $notifiable, function ($notifiable) {
             return $this->dataIos($notifiable);
         });
     }
 
-    protected function dataIos(IUser $notifiable)
+    protected function dataIos(INotifiable $notifiable)
     {
         return [
             'aps' => [
@@ -230,14 +248,14 @@ abstract class NowNotification extends BaseNotification
         ];
     }
 
-    public function toAndroid(IUser $notifiable)
+    public function toAndroid(INotifiable $notifiable)
     {
         return $this->resolveData(static::VIA_ANDROID, $notifiable, function ($notifiable) {
             return $this->dataAndroid($notifiable);
         });
     }
 
-    protected function dataAndroid(IUser $notifiable)
+    protected function dataAndroid(INotifiable $notifiable)
     {
         return [
             'notification' => [
@@ -251,7 +269,7 @@ abstract class NowNotification extends BaseNotification
         ];
     }
 
-    protected function dataArray(IUser $notifiable)
+    protected function dataArray(INotifiable $notifiable)
     {
         return [
             'name' => $this->getName(),
@@ -267,59 +285,24 @@ abstract class NowNotification extends BaseNotification
         return static::NAME;
     }
 
-    public function getImage(IUser $notifiable)
+    public function getImage(INotifiable $notifiable)
     {
         return $this->notifier->preferredAvatarUrl();
     }
 
-    public function getTitle(IUser $notifiable)
+    public function getTitle(INotifiable $notifiable)
     {
         return static::__transWithCurrentModule('title');
     }
 
-    public function getContent(IUser $notifiable, $html = true)
+    public function getContent(INotifiable $notifiable, $html = true)
     {
         return static::__transWithCurrentModule('content');
     }
 
-    public function getAction(IUser $notifiable)
+    public function getAction(INotifiable $notifiable)
     {
         return null;
-    }
-
-    protected function getMailNow(IUser $notifiable)
-    {
-        return true;
-    }
-
-    protected function getNowMailable(IUser $notifiable)
-    {
-        return TemplateNowMailable::class;
-    }
-
-    protected function getMailable(IUser $notifiable)
-    {
-        return TemplateMailable::class;
-    }
-
-    protected function getMailTemplate(IUser $notifiable)
-    {
-        return null;
-    }
-
-    protected function getMailSubject(IUser $notifiable)
-    {
-        return null;
-    }
-
-    protected function getMailParams(IUser $notifiable)
-    {
-        return [];
-    }
-
-    protected function getMailUseLocalizedTemplate(IUser $notifiable)
-    {
-        return true;
     }
 
     /**
@@ -330,10 +313,14 @@ abstract class NowNotification extends BaseNotification
         return null;
     }
 
+    /**
+     * @param Collection|null $notifiables
+     * @return bool
+     */
     public function cannotSend($notifiables)
     {
-        return empty($notifiables)
-            || ($notifiables instanceof Collection && $notifiables->count() <= 0)
+        return is_null($notifiables)
+            || $notifiables->count() <= 0
             || !$this->shouldSomething();
     }
 
@@ -345,11 +332,13 @@ abstract class NowNotification extends BaseNotification
     {
         $notifiables = $notifiables ?: $this->getNotifiables();
 
-        if ($notifiables instanceof Collection) {
-            $notifiables = $notifiables->toArray();
-        }
-        elseif ($notifiables instanceof Model) {
-            $notifiables = [$notifiables];
+        if (!($notifiables instanceof Collection)) {
+            if (is_array($notifiables)) {
+                $notifiables = new Collection($notifiables);
+            }
+            else {
+                $notifiables = new Collection([$notifiables]);
+            }
         }
 
         if ($this->cannotSend($notifiables)) {
@@ -357,6 +346,44 @@ abstract class NowNotification extends BaseNotification
         }
 
         NotificationFacade::send($notifiables, $this);
+
+        return true;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getAnyRoutes()
+    {
+        return [];
+    }
+
+    /**
+     * @param array $routes
+     * @return bool
+     */
+    public function cannotSendAny(array $routes = [])
+    {
+        return !$this->shouldSomething();
+    }
+
+    /**
+     * @param array|null $routes
+     * @return bool
+     */
+    public function sendAny(array $routes = null)
+    {
+        $routes = $routes ?: $this->getAnyRoutes();
+
+        if ($this->cannotSendAny($routes)) {
+            return false;
+        }
+
+        $notifiable = new AnonymousNotifiable;
+        foreach ($routes as $channel => $to) {
+            $notifiable->route($channel, $to);
+        }
+        $notifiable->notify($this);
 
         return true;
     }

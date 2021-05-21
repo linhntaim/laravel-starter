@@ -4,10 +4,12 @@ namespace App\Mail\Base;
 
 use App\Exceptions\AppException;
 use App\Exceptions\Exception;
+use App\Exceptions\MailException;
 use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\Facade;
 use App\Utils\ConfigHelper;
 use App\Utils\RateLimiterTrait;
+use App\Utils\ReportExceptionTrait;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Log;
 use Swift_DependencyContainer;
@@ -16,7 +18,7 @@ use Throwable;
 
 abstract class NowMailable extends Mailable
 {
-    use ClassTrait, RateLimiterTrait;
+    use ClassTrait, RateLimiterTrait, ReportExceptionTrait;
 
     public const DEFAULT_CHARSET = 'UTF-8';
     public const HTML_CHARSETS = [
@@ -44,6 +46,11 @@ abstract class NowMailable extends Mailable
     protected $htmlCharset;
 
     /**
+     * @var bool
+     */
+    protected $sendOff;
+
+    /**
      * @var int
      */
     protected $sendMaxAttempts;
@@ -58,14 +65,35 @@ abstract class NowMailable extends Mailable
      */
     protected $sendAttemptDelay;
 
+    /**
+     * @var string|null
+     */
+    protected $exceptionMessage = null;
+
+    protected static function __transCurrentModule()
+    {
+        return 'mail';
+    }
+
     public function __construct()
     {
-        $this->locale(Facade::getLocale())
-            ->setCharset(ConfigHelper::get('emails.send_charset'));
-
+        $this->sendOff = ConfigHelper::get('emails.send_off');
         $this->sendMaxAttempts = ConfigHelper::get('emails.send_rate_per_second');
         $this->sendAttemptCacheKey = ConfigHelper::get('emails.send_rate_key');
         $this->sendAttemptDelay = ConfigHelper::get('emails.send_rate_wait_for_seconds');
+
+        $this->locale(Facade::getLocale())
+            ->setCharset(ConfigHelper::get('emails.send_charset'));
+    }
+
+    /**
+     * @param string $exceptionMessage
+     * @return static
+     */
+    public function setExceptionMessage(string $exceptionMessage)
+    {
+        $this->exceptionMessage = $exceptionMessage;
+        return $this;
     }
 
     #region Charset
@@ -164,12 +192,54 @@ abstract class NowMailable extends Mailable
 
     #endregion
 
+    public function clearFroms()
+    {
+        return $this->clearFrom()->clearReplyTo();
+    }
+
+    public function clearFrom()
+    {
+        return $this->clearAddress('from');
+    }
+
+    public function clearReplyTo()
+    {
+        return $this->clearAddress('replyTo');
+    }
+
+    public function clearTos()
+    {
+        return $this->clearTo()->clearCc()->clearBcc();
+    }
+
+    public function clearTo()
+    {
+        return $this->clearAddress();
+    }
+
+    public function clearCc()
+    {
+        return $this->clearAddress('cc');
+    }
+
+    public function clearBcc()
+    {
+        return $this->clearAddress('bcc');
+    }
+
+    public function clearAddress($property = 'to')
+    {
+        $this->{$property} = [];
+        return $this;
+    }
+
     #region Build
     public function build()
     {
         return $this->prepareCharset()
             ->prepareFrom()
-            ->prepareTo();
+            ->prepareTo()
+            ->prepareSubject();
     }
 
     protected function prepareCharset()
@@ -195,8 +265,8 @@ abstract class NowMailable extends Mailable
     protected function prepareFrom()
     {
         if (empty($this->from)) {
-            $mailAddress = MailAddress::from(ConfigHelper::getNoReplyMail());
-            $this->from($mailAddress->address, $mailAddress->name);
+            $mail = MailAddress::from(ConfigHelper::getNoReplyMail(), 'No-reply e-mail has not been configured');
+            $this->from($mail->address, $mail->name);
         }
         return $this;
     }
@@ -204,38 +274,63 @@ abstract class NowMailable extends Mailable
     protected function prepareTo()
     {
         $testedMail = ConfigHelper::getTestedMail();
-        if ($testedMail['used']) {
-            $mailAddress = MailAddress::from($testedMail);
-            return $this->to($mailAddress->address, $mailAddress->name);
+        if ($testedMail['used'] ?? false) {
+            $mail = MailAddress::from($testedMail, 'Test e-mail has not been configured');
+            return $this->to($mail->address, $mail->name);
         }
         if (empty($this->to)) {
             throw new AppException('To e-mail has been not set.');
         }
         return $this;
     }
+
+    protected function prepareSubject()
+    {
+        return blank($this->subject) ? $this->subject(static::__transWithCurrentModule('subject', [
+            'app_name' => Facade::getAppName(),
+        ])) : $this;
+    }
     #endregion
 
     #region Send
     public function send($mailer)
     {
-        if ($this->reachSendingLimit()) {
-            $this->sendOnDelay($mailer);
+        if (!$this->sendOff) {
+            $this->goOnSending($mailer);
         }
-        else {
+    }
+
+    protected function goOnSending($mailer)
+    {
+        if ($this->limitOnSending()) {
+            return $this->delayOnSending($mailer);
+        }
+        return $this->tryOnSending($mailer);
+    }
+
+    /**
+     * @param \Illuminate\Contracts\Mail\Factory|\Illuminate\Contracts\Mail\Mailer $mailer
+     * @return static
+     * @throws Exception
+     */
+    protected function tryOnSending($mailer)
+    {
+        try {
             parent::send($mailer);
         }
+        catch (Throwable $e) {
+            if ($e instanceof Exception) {
+                throw $e;
+            }
+            throw MailException::from(
+                $e,
+                $this->exceptionMessage
+            );
+        }
+        return $this;
     }
 
-    protected function sendOnDelay($mailer)
-    {
-        Log::warning(sprintf('[%s] delaying', static::class));
-
-        sleep($this->sendAttemptDelay);
-
-        $this->send($mailer);
-    }
-
-    protected function reachSendingLimit()
+    protected function limitOnSending()
     {
         if ($this->sendMaxAttempts) {
             $this->getLimiter();
@@ -248,6 +343,16 @@ abstract class NowMailable extends Mailable
         }
         return false;
     }
+
+    protected function delayOnSending($mailer)
+    {
+        Log::warning(sprintf('[%s] delaying', static::class));
+
+        sleep($this->sendAttemptDelay);
+
+        return $this->goOnSending($mailer);
+    }
+
     #endregion
 
     public function failed(Throwable $e)

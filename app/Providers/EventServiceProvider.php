@@ -15,9 +15,9 @@ use App\Events\Listeners\OnNotificationSent;
 use App\Events\Listeners\OnPasswordResetAutomatically;
 use App\Events\Listeners\OnQueryExecuted;
 use App\Events\Listeners\OnTestingEvent;
-use App\Events\MailTestingEvent;
+use App\Events\TestMailEvent;
 use App\Events\PasswordResetAutomaticallyEvent;
-use App\Events\TestingEvent;
+use App\Events\TestEvent;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Mail\Events\MessageSending;
@@ -63,10 +63,10 @@ class EventServiceProvider extends ServiceProvider
         JobProcessed::class => [
             OnJobProcessing::class,
         ],
-        TestingEvent::class => [
+        TestEvent::class => [
             OnTestingEvent::class,
         ],
-        MailTestingEvent::class => [
+        TestMailEvent::class => [
             OnMailTestingEvent::class,
         ],
         PasswordResetAutomaticallyEvent::class => [

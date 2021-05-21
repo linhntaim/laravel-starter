@@ -75,11 +75,6 @@ class Admin extends ExtendedUserModel implements IUserHasRole
 
     #endregion
 
-    public function sendPasswordResetNotification($token)
-    {
-        $this->notify(new AdminResetPasswordNotification($token));
-    }
-
     public function preferredName()
     {
         return $this->display_name;
@@ -88,6 +83,11 @@ class Admin extends ExtendedUserModel implements IUserHasRole
     public function preferredAvatarUrl()
     {
         return $this->avatarUrl;
+    }
+
+    protected function getPasswordResetNotification($token)
+    {
+        return new AdminResetPasswordNotification($token);
     }
 
     #region Functionality

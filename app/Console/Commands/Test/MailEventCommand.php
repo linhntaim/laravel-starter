@@ -7,7 +7,7 @@
 namespace App\Console\Commands\Test;
 
 use App\Console\Commands\Base\Command;
-use App\Events\MailTestingEvent;
+use App\Events\TestMailEvent;
 
 class MailEventCommand extends Command
 {
@@ -15,6 +15,6 @@ class MailEventCommand extends Command
 
     protected function go()
     {
-        event(new MailTestingEvent($this->option('subject'), $this->option('view')));
+        event(new TestMailEvent($this->option('subject'), $this->option('view')));
     }
 }
