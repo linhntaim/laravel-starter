@@ -24,15 +24,28 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
 
     /**
      * @param Throwable $exception
-     * @param string $message
+     * @param string|string[]|array|null $message
      * @param array $publicAttachedData
      * @param array $privateAttachedData
      * @return Exception
      */
-    public static function from($exception, $message = '', $publicAttachedData = [], $privateAttachedData = [])
+    public static function from(Throwable $exception, $message = '', $publicAttachedData = [], $privateAttachedData = [])
     {
         $class = static::__class();
         return new $class($message, 0, $exception, $publicAttachedData, $privateAttachedData);
+    }
+
+    /**
+     * @param Throwable $exception
+     * @return Throwable
+     */
+    public static function firstThrowable(Throwable $exception)
+    {
+        $first = $exception;
+        while ($previous = $first->getPrevious()) {
+            $first = $previous;
+        }
+        return $first;
     }
 
     /**
@@ -50,9 +63,17 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
      */
     protected $withMessageLevel = true;
 
+    /**
+     * Exception constructor.
+     * @param string|string[]|array|null $message
+     * @param int $code
+     * @param Throwable|null $previous
+     * @param array $publicAttachedData
+     * @param array $privateAttachedData
+     */
     public function __construct($message = '', $code = 0, Throwable $previous = null, $publicAttachedData = [], $privateAttachedData = [])
     {
-        parent::__construct('', $code ? $code : static::CODE, $previous);
+        parent::__construct('', 0, $previous);
 
         $this->attachedData = [
             'public' => $publicAttachedData,
@@ -60,13 +81,19 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
         ];
 
         if ($previous) {
-            $this->code = $previous instanceof HttpExceptionInterface ?
-                $previous->getStatusCode() : $previous->getCode();
-            $this->file = $previous->getFile();
-            $this->line = $previous->getLine();
+            $this->code = method_exists($previous, 'getStatusCode') ?
+                $previous->getStatusCode()
+                : (method_exists($previous, 'getHttpStatusCode') ? $previous->getHttpStatusCode()
+                    : $previous->getCode());
+        }
+        else {
+            $this->code = $code ?: static::CODE;
         }
 
-        if (empty($message)) {
+        if (is_null($message)) {
+            $this->messages = [$this->defaultExceptionMessage()];
+        }
+        elseif (blank($message)) {
             if (!App::runningInDebug() && ConfigHelper::get('force_common_exception')) {
                 $this->messages = [trans('error.exceptions.default_exception.level_failed')];
             }
@@ -111,6 +138,28 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
             return $previous->getMessage();
         }
         return '';
+    }
+
+    public function getTraces()
+    {
+        $traces = [];
+        $exception = $this;
+        while ($exception) {
+            $traces[] = $exception->getTrace();
+            $exception = $exception->getPrevious();
+        }
+        return $traces;
+    }
+
+    public function getTracesAsString()
+    {
+        $traces = [];
+        $exception = $this;
+        while ($exception) {
+            $traces[] = $exception->getTraceAsString();
+            $exception = $exception->getPrevious();
+        }
+        return $traces;
     }
 
     public function getStatusCode()
@@ -196,10 +245,15 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
         $transOptions = $this->attachedData['private']['trans_options'] ?? [];
         return transIf(
             'error.def.abort.' . $this->code,
-            $this->__transErrorWithModule('level_failed'),
+            $this->defaultExceptionMessage(),
             $transOptions['replace'] ?? [],
             $transOptions['locale'] ?? null
         );
+    }
+
+    protected function defaultExceptionMessage()
+    {
+        return $this->__transErrorWithModule('level_failed');
     }
 
     public function toArray()

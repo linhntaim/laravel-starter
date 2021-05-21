@@ -177,9 +177,7 @@ class User extends Authenticatable implements IModel, IUser
 
     public function preferredName()
     {
-        return isset($this->attributes['username']) ?
-            $this->attributes['username']
-            : Str::before($this->preferredEmail(), '@');
+        return $this->attributes['username'] ?? Str::before($this->preferredEmail(), '@');
     }
 
     public function preferredAvatarUrl()

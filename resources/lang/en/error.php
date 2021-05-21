@@ -26,34 +26,38 @@ return [
 
     'exceptions' => [
         'app_exception' => [
-            'level_failed' => 'Something went wrong with application',
+            'level_failed' => 'Something went wrong with application.',
             'level' => ':message',
         ],
         'console_exception' => [
-            'level_failed' => 'Something went wrong with application',
+            'level_failed' => 'Something went wrong with console application.',
             'level' => ':message',
         ],
         'database_exception' => [
-            'level_failed' => 'Something went wrong with database',
+            'level_failed' => 'Something went wrong with database.',
             'level' => ':message',
         ],
         'default_exception' => [
-            'level_failed' => 'Something went wrong with application',
+            'level_failed' => 'Something went wrong.',
         ],
         'exception' => [
-            'level_failed' => 'Something went wrong',
+            'level_failed' => 'Something went wrong.',
             'level' => ':message',
         ],
         'ip_limit_exception' => [
-            'level_failed' => 'Your IP is not allowed',
+            'level_failed' => 'Your IP is not allowed.',
+            'level' => ':message',
+        ],
+        'mail_exception' => [
+            'level_failed' => 'E-mail cannot be sent.',
             'level' => ':message',
         ],
         'unhandled_exception' => [
-            'level_failed' => 'Something went wrong',
+            'level_failed' => 'Something went wrong.',
             'level' => ':message',
         ],
         'user_exception' => [
-            'level_failed' => 'Something went wrong with user action',
+            'level_failed' => 'Something went wrong with user action.',
             'level' => ':message',
         ],
         // TODO:

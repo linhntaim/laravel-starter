@@ -24,6 +24,8 @@ abstract class LoginController extends AccessTokenController
 {
     use ApiResponseTrait;
 
+    protected $grantType = '';
+
     public function __construct(AuthorizationServer $server, TokenRepository $tokens, JwtParser $jwt)
     {
         parent::__construct($server, $tokens, $jwt);
@@ -67,6 +69,9 @@ abstract class LoginController extends AccessTokenController
                 $this->throwException(LeagueException::invalidClient($request));
             }
         }
+        if (isset($parsedBody['grant_type'])) {
+            $this->grantType = $parsedBody['grant_type'];
+        }
         return $this->impersonate(
             parent::issueToken($request),
             $parsedBody['impersonate_token'] ?? null
@@ -85,16 +90,14 @@ abstract class LoginController extends AccessTokenController
 
     protected function throwException(LeagueException $e)
     {
-        $e->setPayload(static::failPayload(null, $e, 401));
+        if ($this->grantType == 'password' && $e->getErrorType() == 'invalid_grant') {
+            $this->throwException(LeagueException::invalidCredentials());
+        }
+
+        $e->setPayload(static::failPayload(null, $e, $e->getHttpStatusCode()));
         throw new OAuthServerException(
             $e,
             $this->convertResponse($e->generateHttpResponse(new Psr7Response))
         );
-    }
-
-    public function convertResponse($psrResponse)
-    {
-        return parent::convertResponse($psrResponse)
-            ->setStatusCode(ConfigHelper::getApiResponseStatus($psrResponse->getStatusCode()));
     }
 }

@@ -67,7 +67,9 @@ class Handler extends ExceptionHandler
 
     protected function prepareException(Throwable $e)
     {
-        // common
+        // TODO: Specific
+
+        // TODO
         $exceptionClasses = [
             NotFoundHttpException::class,
             ThrottleRequestsException::class,
@@ -78,9 +80,6 @@ class Handler extends ExceptionHandler
                 return AppException::from($e);
             }
         }
-        // TODO: Specific
-
-        // TODO
         return parent::prepareException($e);
     }
 
