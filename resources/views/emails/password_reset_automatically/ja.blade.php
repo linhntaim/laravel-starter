@@ -6,7 +6,7 @@
 </head>
 <body>
 <p>
-    {{ $x_email_to_name }}様<br>
+    {{ $name }}様<br>
     お世話になっております。<br>
     <br>
     パスワードは自動的に「<strong>{{ $password }}</strong>」にリセットされました。<br>

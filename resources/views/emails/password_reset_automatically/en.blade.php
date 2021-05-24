@@ -6,7 +6,7 @@
 </head>
 <body>
 <p>
-    Dear {{ $x_email_to_name }},<br>
+    Dear {{ $name }},<br>
     <br>
     We've got a request to reset your password.<br>
     <br>

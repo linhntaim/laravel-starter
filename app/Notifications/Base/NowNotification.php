@@ -49,7 +49,8 @@ abstract class NowNotification extends BaseNotification
 
     public function __construct(INotifier $notifier = null)
     {
-        $this->setNotifier($notifier);
+        $this->locale(Facade::getLocale())
+            ->setNotifier($notifier);
     }
 
     /**

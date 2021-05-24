@@ -18,6 +18,7 @@ class OnPasswordResetAutomatically extends NowListener
             (new PasswordResetAutomaticallyMailable())
                 ->to($event->user->preferredEmail(), $event->user->preferredName())
                 ->with([
+                    'name' => $event->user->preferredName(),
                     'password' => $event->password,
                 ])
         );
