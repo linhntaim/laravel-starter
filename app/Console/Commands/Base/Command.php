@@ -194,7 +194,15 @@ abstract class Command extends BaseCommand
                 }
             }
         }
-        $this->output->writeln(sprintf('<comment>Message:</comment> %s', $e->getMessage()), $this->parseVerbosity());
+        if ($e instanceof Exception && count($messages = $e->getMessages()) > 1) {
+            $this->output->writeln('<comment>Message:</comment>', $this->parseVerbosity());
+            foreach ($messages as $message) {
+                $this->output->writeln('- ' . $message, $this->parseVerbosity());
+            }
+        }
+        else {
+            $this->output->writeln(sprintf('<comment>Message:</comment> %s', $e->getMessage()), $this->parseVerbosity());
+        }
         $this->output->writeln(sprintf('<comment>File:</comment> [%s:%d]', $e->getFile(), $e->getLine()), $this->parseVerbosity());
         if ($e instanceof Exception && count($data = $e->getAttachedData()) > 0) {
             $this->warn('Data:');

@@ -38,7 +38,7 @@ trait PassportTrait
                     return $user;
                 }
             }
-            if (!empty($advanced->impersonate_token)) {
+            if (ConfigHelper::get('impersonated_by_admin') && !empty($advanced->impersonate_token)) {
                 $oAuthImpersonate = (new ImpersonateRepository())->notStrict()
                     ->getByImpersonateToken($advanced->impersonate_token);
                 if (!empty($oAuthImpersonate)) {

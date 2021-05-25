@@ -9,7 +9,6 @@ use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\Facade;
 use App\Utils\ConfigHelper;
 use App\Utils\RateLimiterTrait;
-use App\Utils\ReportExceptionTrait;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Log;
 use Swift_DependencyContainer;
@@ -18,7 +17,7 @@ use Throwable;
 
 abstract class NowMailable extends Mailable
 {
-    use ClassTrait, RateLimiterTrait, ReportExceptionTrait;
+    use ClassTrait, RateLimiterTrait;
 
     public const DEFAULT_CHARSET = 'UTF-8';
     public const HTML_CHARSETS = [

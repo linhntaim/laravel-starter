@@ -2,6 +2,7 @@
 
 namespace App\Vendors\Monolog\Formatter;
 
+use App\Exceptions\Exception;
 use Monolog\Formatter\LineFormatter as BaseLineFormatter;
 use Monolog\Utils;
 use SoapFault;
@@ -50,7 +51,13 @@ class LineFormatter extends BaseLineFormatter
                 }
             }
         }
-        $this->varTraces[] = sprintf('Message: %s', $e->getMessage());
+        if ($e instanceof Exception && count($messages = $e->getMessages()) > 1) {
+            $this->varTraces[] = 'Message:';
+            array_push($this->varTraces, ...$messages);
+        }
+        else {
+            $this->varTraces[] = sprintf('Message: %s', $e->getMessage());
+        }
         $this->varTraces[] = sprintf('File: [%s:%s]', $e->getFile(), $e->getLine());
         $this->varTraces[] = 'Trace:';
         $last = 0;

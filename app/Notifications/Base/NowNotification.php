@@ -19,6 +19,7 @@ use App\Utils\ClientSettings\DateTimer;
 use App\Utils\ClientSettings\Facade;
 use App\Utils\ClientSettings\Traits\IndependentClientTrait;
 use App\Utils\ConfigHelper;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification as BaseNotification;
@@ -217,7 +218,8 @@ abstract class NowNotification extends BaseNotification
 
     protected function getMailLocale(INotifiable $notifiable)
     {
-        return $this->locale;
+        return $notifiable instanceof HasLocalePreference ?
+            $notifiable->preferredLocale() : $this->locale;
     }
 
     protected function getMailParams(INotifiable $notifiable)

@@ -65,11 +65,7 @@ trait ApiResponseTrait
             if (!($exception instanceof Exception)) {
                 $exception = UnhandledException::from($exception);
             }
-            $debug = [
-                'file' => $exception->getFile(),
-                'line' => $exception->getLine(),
-                'trace' => $exception->getTraces(),
-            ];
+            $debug = $exception->toArray();
             $message = $exception->getMessages();
             static::addErrorResponseMessage($exception->getLevel(), $exception->getAttachedData());
         }

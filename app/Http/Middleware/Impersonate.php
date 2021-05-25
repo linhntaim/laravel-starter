@@ -8,6 +8,7 @@ namespace App\Http\Middleware;
 
 use App\Http\Requests\Request;
 use App\ModelRepositories\ImpersonateRepository;
+use App\Utils\ConfigHelper;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,7 +16,7 @@ class Impersonate
 {
     public function handle(Request $request, Closure $next, $guard = null)
     {
-        if (Auth::guard($guard)->check()) {
+        if (ConfigHelper::get('impersonated_by_admin') && Auth::guard($guard)->check()) {
             if (is_null($guard)) {
                 $guard = config('auth.defaults.guard');
             }

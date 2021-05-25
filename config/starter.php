@@ -69,10 +69,10 @@ return [
         'admin' => (bool)env('ADMIN_FORGOT_PASSWORD_ENABLED', false),
         'admin_auto' => (bool)env('ADMIN_FORGOT_PASSWORD_AUTO', false),
     ],
-    'impersonated_by_admin' => (bool)env('IMPERSONATED_BY_ADMIN_ENABLED', true),
+    'impersonated_by_admin' => (bool)env('IMPERSONATED_BY_ADMIN_ENABLED', false),
     'throttle_request' => [
         'max_attempts' => (int)env('THROTTLE_REQUEST_MAX_ATTEMPTS', 60),
-        'decay_minutes' => (int)env('THROTTLE_REQUEST_DECAY_MINUTES', 1),
+        'decay_minutes' => (int)env('THROTTLE_REQUEST_DECAY_MINUTES', 1), // minutes
     ],
     'api_response_ok' => (bool)env('API_RESPONSE_OK', env('RESPONSE_OK', false)),
     'api_response_headers' => [
@@ -98,19 +98,19 @@ return [
             ],
         ],
         'image' => [
-            'max_width' => (int)env('HANDLED_FILE_IMAGE_MAX_WIDTH'),
-            'max_height' => (int)env('HANDLED_FILE_IMAGE_MAX_HEIGHT'),
-            'inline' => (bool)env('HANDLED_FILE_IMAGE_INLINE'),
+            'max_width' => (int)env('HANDLED_FILE_IMAGE_MAX_WIDTH', 0),
+            'max_height' => (int)env('HANDLED_FILE_IMAGE_MAX_HEIGHT', 0),
+            'inline' => (bool)env('HANDLED_FILE_IMAGE_INLINE', false),
         ],
     ],
-    'activity_log_enabled' => (bool)env('ACTIVITY_LOG_ENABLED'),
+    'activity_log_enabled' => (bool)env('ACTIVITY_LOG_ENABLED', false),
     'notification' => [
         'via' => [
             'database' => (bool)env('NOTIFICATION_VIA_DATABASE', false),
         ],
     ],
     'variables' => json_decode(env('VARIABLES'), true),
-    'client_limit_timeout' => (int)env('CLIENT_LIMIT_TIMEOUT'),
+    'client_limit_timeout' => (int)env('CLIENT_LIMIT_TIMEOUT', 60), // seconds
     'client' => [
         'ids' => [
             'admin' => [

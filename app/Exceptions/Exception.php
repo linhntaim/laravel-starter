@@ -140,28 +140,6 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
         return '';
     }
 
-    public function getTraces()
-    {
-        $traces = [];
-        $exception = $this;
-        while ($exception) {
-            $traces[] = $exception->getTrace();
-            $exception = $exception->getPrevious();
-        }
-        return $traces;
-    }
-
-    public function getTracesAsString()
-    {
-        $traces = [];
-        $exception = $this;
-        while ($exception) {
-            $traces[] = $exception->getTraceAsString();
-            $exception = $exception->getPrevious();
-        }
-        return $traces;
-    }
-
     public function getStatusCode()
     {
         $code = $this->getCode();
@@ -261,20 +239,44 @@ abstract class Exception extends BaseException implements HttpExceptionInterface
         return static::toArrayFrom($this);
     }
 
-    public static function toArrayFrom(Throwable $e)
+    public static function toArrayFrom(Throwable $e = null)
     {
-        $array = [
-            'class' => get_class($e),
-            'code' => $e->getCode(),
-            'message' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-            'trace' => $e->getTraceAsString(),
-        ];
-        if ($e instanceof Exception) {
-            $array['messages'] = $e->getMessages();
-            $array['data'] = $e->getAttachedData();
-        }
-        return $array;
+        return $e ? array_merge(
+            [
+                'class' => get_class($e),
+                'code' => $e->getCode(),
+            ],
+            $e instanceof Exception ? [
+                'messages' => $e->getMessages(),
+                'data' => $e->getAttachedData(null),
+            ] : [
+                'message' => $e->getMessage(),
+            ],
+            [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => static::traceToArrayFrom($e),
+                'previous' => static::toArrayFrom($e->getPrevious()),
+            ]
+        ) : null;
+    }
+
+    public static function traceToArrayFrom(Throwable $e)
+    {
+        return array_map(function ($trace) {
+            return array_merge(
+                isset($trace['file']) ? [
+                    'file' => $trace['file'],
+                    'line' => $trace['line'],
+                ] : [],
+                isset($trace['class']) ? [
+                    'class' => $trace['class'],
+                    'type' => $trace['type'],
+                ] : [],
+                isset($trace['function']) ? [
+                    'function' => $trace['function'],
+                ] : [],
+            );
+        }, $e->getTrace());
     }
 }

@@ -41,7 +41,7 @@ abstract class LoginController extends AccessTokenController
      */
     private function impersonate($response, $impersonateToken)
     {
-        if (!is_null($impersonateToken) && ConfigHelper::get('impersonated_by_admin')) {
+        if (ConfigHelper::get('impersonated_by_admin') && !is_null($impersonateToken)) {
             $parsedToken = $this->jwt->parse(
                 json_decode($response->getContent(), true)['_data']['access_token']
             );
