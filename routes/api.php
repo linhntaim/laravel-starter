@@ -81,7 +81,7 @@ Route::group([
     // TODO
 ], function () {
     if (!App::runningInProduction() && class_exists('App\Http\Controllers\Api\TestApiController')) {
-        Route::any('test', ['App\Http\Controllers\Api\TestApiController', 'test']);
+        Route::any('test', ['App\Http\Controllers\Api\TestApiController', 'test'])->name('debug.test');
     }
 
     Route::get('handled-file/{id}', [HandledFileController::class, 'show'])->name('handled_file.show');

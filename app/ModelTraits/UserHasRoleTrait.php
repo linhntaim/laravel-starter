@@ -7,16 +7,30 @@ use App\Models\Role;
 /**
  * Trait UserHasRoleTrait
  * @package App\ModelTraits
- * @property Role|null $role
- * @property string[]|array $permissionNames
  */
 trait UserHasRoleTrait
 {
     use UserHasPermissions;
 
+    protected function modelConstruct()
+    {
+        $this->fillable[] = $this->getRoleAttributeName();
+        $hasRoleAttributeNames = [
+            $this->getRoleNameAttributeName(),
+            $this->getPermissionNamesAttributeName(),
+        ];
+        array_push($this->appends, ...$hasRoleAttributeNames);
+        array_push($this->visible, ...$hasRoleAttributeNames);
+    }
+
     public function getRoleAttributeName()
     {
         return 'role_id';
+    }
+
+    public function getRoleNameAttributeName()
+    {
+        return 'role_name';
     }
 
     public function getRoleNameAttribute()

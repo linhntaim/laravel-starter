@@ -6,7 +6,6 @@
 
 namespace App\Models;
 
-use App\Configuration;
 use App\ModelResources\UserResource;
 use App\Models\Base\IModel;
 use App\Models\Base\IUser;
@@ -176,6 +175,6 @@ class User extends Authenticatable implements IModel, IUser
     public function getPasswordResetExpiredAt()
     {
         $passwordReset = $this->passwordReset;
-        return empty($passwordReset) ? null : $passwordReset->sdStExpiredAt;
+        return $passwordReset ? $passwordReset->expiredAt : null;
     }
 }

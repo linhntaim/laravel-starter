@@ -10,10 +10,9 @@ use App\Models\DatabaseNotification;
 use App\Models\User;
 use App\ModelTraits\UserTrait;
 use App\Notifications\UserResetPasswordNotification;
-use Illuminate\Auth\Passwords\CanResetPassword;
 
 /**
- * Trait UserExtendedTrait
+ * Class ExtendedUserModel
  * @package App\Models\Base
  * @property int $user_id
  * @property string $username
@@ -23,7 +22,7 @@ use Illuminate\Auth\Passwords\CanResetPassword;
  */
 abstract class ExtendedUserModel extends Model implements IUser
 {
-    use UserTrait, CanResetPassword;
+    use UserTrait;
 
     public const PROTECTED = User::PROTECTED;
 

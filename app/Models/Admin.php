@@ -9,7 +9,9 @@ namespace App\Models;
 use App\ModelResources\AdminResource;
 use App\Models\Base\ExtendedUserModel;
 use App\Models\Base\IUserHasRole;
+use App\Models\Base\IUserVerifyEmail;
 use App\ModelTraits\UserHasRoleTrait;
+use App\ModelTraits\UserVerifyEmailTrait;
 use App\Notifications\AdminResetPasswordNotification;
 
 /**
@@ -17,16 +19,17 @@ use App\Notifications\AdminResetPasswordNotification;
  * @package App\Models
  * @property int $user_id
  * @property string $display_name
- * @property string $roleName
  * @property string $avatarUrl
- * @property string[] $permissionNames
  * @property User $user
- * @property Role $role
  * @property HandledFile $avatar
  */
-class Admin extends ExtendedUserModel implements IUserHasRole
+class Admin extends ExtendedUserModel implements IUserHasRole, IUserVerifyEmail
 {
-    use UserHasRoleTrait;
+    use UserHasRoleTrait, UserVerifyEmailTrait {
+        UserHasRoleTrait::modelConstruct as userHasRoleConstruct;
+        UserHasRoleTrait::modelConstruct insteadof UserVerifyEmailTrait;
+        UserVerifyEmailTrait::modelConstruct as userVerifyEmailConstruct;
+    }
 
     public const MAX_AVATAR_SIZE = 512;
 
@@ -34,7 +37,6 @@ class Admin extends ExtendedUserModel implements IUserHasRole
 
     protected $fillable = [
         'user_id',
-        'role_id',
         'avatar_id',
         'display_name',
     ];
@@ -42,14 +44,10 @@ class Admin extends ExtendedUserModel implements IUserHasRole
     protected $visible = [
         'user_id',
         'display_name',
-        'role_name',
-        'permission_names',
         'avatar_url',
     ];
 
     protected $appends = [
-        'role_name',
-        'permission_names',
         'avatar_url',
     ];
 
@@ -58,6 +56,14 @@ class Admin extends ExtendedUserModel implements IUserHasRole
     ];
 
     protected $resourceClass = AdminResource::class;
+
+    public function __construct(array $attributes = [])
+    {
+        $this->userHasRoleConstruct();
+        $this->userVerifyEmailConstruct();
+
+        parent::__construct($attributes);
+    }
 
     #region Get Attributes
     public function getAvatarUrlAttribute()

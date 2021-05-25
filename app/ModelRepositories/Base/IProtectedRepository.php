@@ -8,6 +8,9 @@ namespace App\ModelRepositories\Base;
 
 interface IProtectedRepository
 {
+    /**
+     * @return static
+     */
     public function skipProtected();
 
     public function getProtectedValue();

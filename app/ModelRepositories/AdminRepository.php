@@ -7,6 +7,8 @@
 namespace App\ModelRepositories;
 
 use App\ModelRepositories\Base\ExtendedUserRepository;
+use App\ModelRepositories\Base\IUserVerifyEmailRepository;
+use App\ModelRepositories\Base\UserVerifyRepositoryTrait;
 use App\Models\Admin;
 use Illuminate\Http\UploadedFile;
 
@@ -17,8 +19,10 @@ use Illuminate\Http\UploadedFile;
  * @method Admin|null model($id = null)
  * @method Admin|null getById($id, callable $callback = null)
  */
-class AdminRepository extends ExtendedUserRepository
+class AdminRepository extends ExtendedUserRepository implements IUserVerifyEmailRepository
 {
+    use UserVerifyRepositoryTrait;
+
     public function modelClass()
     {
         return Admin::class;

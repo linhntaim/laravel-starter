@@ -29,10 +29,23 @@ interface IUserRepository extends IProtectedRepository
 
     /**
      * @param array $attributes
+     * @param array $userAttributes
      * @param array $userSocialAttributes
      * @return IUser|mixed
      */
-    public function createWithAttributesFromSocial(array $attributes = [], array $userSocialAttributes = []);
+    public function createWithAttributesFromSocial(array $attributes = [], array $userAttributes = [], array $userSocialAttributes = []);
+
+    /**
+     * @param string $password
+     * @return IUser|mixed
+     */
+    public function updatePassword($password);
+
+    /**
+     * @param string $password
+     * @return IUser|mixed
+     */
+    public function updatePasswordRandomly(&$password);
 
     /**
      * @return IUser|mixed

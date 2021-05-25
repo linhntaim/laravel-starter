@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Console\Commands;
+
+use App\Console\Commands\Base\Command;
+use App\Console\Commands\Base\UserCommandTrait;
+use App\ModelRepositories\Base\IUserVerifyEmailRepository;
+
+class NotifyEmailVerificationCommand extends Command
+{
+    use UserCommandTrait;
+
+    protected $signature = 'notify:email-verification {user}';
+
+    protected function go()
+    {
+        if ($this->parseUser()) {
+            if ($this->userRepository instanceof IUserVerifyEmailRepository) {
+                $this->userRepository->notifyEmailVerification();
+            }
+        }
+    }
+}
