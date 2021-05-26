@@ -101,8 +101,8 @@ abstract class PasswordController extends ModelApiController
         ]);
 
         $email = $this->modelRepository->getEmailByToken($request->input('token'));
-        if (empty($email)) {
-            $this->abort404();
+        if (is_null($email)) {
+            return $this->responseFail(trans(Password::INVALID_TOKEN));
         }
 
         $user = $this->brokerGetUser([
@@ -112,7 +112,7 @@ abstract class PasswordController extends ModelApiController
             return $this->responseFail(trans(Password::INVALID_USER));
         }
         if (!$this->brokerTokenExists($user, $request->input('token'))) {
-            $this->abort404();
+            return $this->responseFail(trans(Password::INVALID_TOKEN));
         }
 
         return $this->responseModel([
@@ -219,8 +219,19 @@ abstract class PasswordController extends ModelApiController
         return $this->responseSuccess();
     }
 
-    protected function getPasswordResetAutomaticallyEvent(User $user, $password)
+    /**
+     * @param User $user
+     * @param string $password
+     * @return PasswordResetAutomaticallyEvent
+     */
+    protected function getPasswordResetAutomaticallyEvent(User $user, string $password)
     {
-        return new PasswordResetAutomaticallyEvent($user, $password);
+        $eventClass = $this->getPasswordResetAutomaticallyEventClass();
+        return new $eventClass($user, $password);
+    }
+
+    protected function getPasswordResetAutomaticallyEventClass()
+    {
+        return PasswordResetAutomaticallyEvent::class;
     }
 }

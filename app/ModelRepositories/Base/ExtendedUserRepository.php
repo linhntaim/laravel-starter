@@ -48,8 +48,8 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
     {
         return parent::queryUniquely($query, $unique)
             ->orWhereHas('user', function ($query) use ($unique) {
-                $query->orWhere('email', $unique)
-                    ->where(DB::raw('BINARY username'), $unique);
+                $query->where('email', $unique)
+                    ->orWhere(DB::raw('BINARY username'), $unique);
             });
     }
 

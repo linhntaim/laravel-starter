@@ -130,6 +130,18 @@ trait ModelTrait
         return false;
     }
 
+    public function mergeVisible(array $visible)
+    {
+        $this->visible = array_merge($this->visible, $visible);
+        return $this;
+    }
+
+    public function mergeAppends(array $appends, $visible = true)
+    {
+        $this->appends = array_merge($this->appends, $appends);
+        return $visible ? $this->mergeVisible($appends) : $this;
+    }
+
     public function toArray()
     {
         return $this->attributesToArray();

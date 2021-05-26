@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api\Admin\Auth;
 
+use App\Events\AdminPasswordResetAutomaticallyEvent;
 use App\Http\Controllers\Api\Auth\PasswordController as BasePasswordController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\AdminRepository;
@@ -42,5 +43,10 @@ class PasswordController extends BasePasswordController
             $this->abort404();
         }
         return parent::store($request);
+    }
+
+    protected function getPasswordResetAutomaticallyEventClass()
+    {
+        return AdminPasswordResetAutomaticallyEvent::class;
     }
 }

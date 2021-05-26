@@ -3,10 +3,13 @@
 namespace App\Console\Commands;
 
 use App\ModelRepositories\AdminRepository;
+use App\Utils\ClientSettings\Traits\AdminConsoleClientTrait;
 
 class NotifyAdminEmailVerificationCommand extends NotifyEmailVerificationCommand
 {
-    protected $signature = 'notify:email-verification:admin {id}';
+    use AdminConsoleClientTrait;
+
+    protected $signature = 'notify:email-verification:admin {user} {--again}';
 
     protected function getUserRepositoryClass()
     {

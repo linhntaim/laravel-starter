@@ -15,12 +15,20 @@ class OnPasswordResetAutomatically extends NowListener
     protected function go($event)
     {
         Mail::send(
-            (new PasswordResetAutomaticallyMailable())
+            $this->getMailable()
                 ->to($event->user->preferredEmail(), $event->user->preferredName())
                 ->with([
                     'name' => $event->user->preferredName(),
                     'password' => $event->password,
                 ])
         );
+    }
+
+    /**
+     * @return PasswordResetAutomaticallyMailable
+     */
+    protected function getMailable()
+    {
+        return new PasswordResetAutomaticallyMailable();
     }
 }

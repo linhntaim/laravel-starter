@@ -20,13 +20,18 @@ use Carbon\Carbon;
  */
 class PasswordReset extends Model
 {
-    protected $table = 'user_password_resets';
-
     protected $primaryKey = null;
 
     public $incrementing = false;
 
     public $timestamps = false;
+
+    public function __construct(array $attributes = [])
+    {
+        $this->table = config('auth.passwords.users.table');
+
+        parent::__construct($attributes);
+    }
 
     public function getExpiredAtAttribute()
     {

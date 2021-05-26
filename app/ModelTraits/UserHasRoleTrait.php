@@ -14,13 +14,12 @@ trait UserHasRoleTrait
 
     protected function modelConstruct()
     {
-        $this->fillable[] = $this->getRoleAttributeName();
-        $hasRoleAttributeNames = [
+        return $this->mergeFillable([
+            $this->getRoleAttributeName(),
+        ])->mergeAppends([
             $this->getRoleNameAttributeName(),
             $this->getPermissionNamesAttributeName(),
-        ];
-        array_push($this->appends, ...$hasRoleAttributeNames);
-        array_push($this->visible, ...$hasRoleAttributeNames);
+        ]);
     }
 
     public function getRoleAttributeName()

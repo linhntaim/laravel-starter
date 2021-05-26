@@ -5,14 +5,26 @@
  */
 
 return [
+    'admin_email_verification_mailable' => [
+        'subject' => '【:app_name】Verify email',
+    ],
+    'admin_password_reset_automatically_mailable' => [
+        'subject' => '【:app_name】パスワードのリセット',
+    ],
+    'admin_password_reset_mailable' => [
+        'subject' => '【:app_name】パスワードのリセット',
+    ],
+    'email_verification_mailable' => [
+        'subject' => '【:app_name】Verify email',
+    ],
     'password_reset_automatically_mailable' => [
         'subject' => '【:app_name】パスワードのリセット',
     ],
-    'admin_reset_password_mailable' => [
+    'password_reset_mailable' => [
         'subject' => '【:app_name】パスワードのリセット',
     ],
-    'user_reset_password_mailable' => [
-        'subject' => '【:app_name】パスワードのリセット',
+    'test_mailable' => [
+        'subject' => '【:app_name】Test',
     ],
     // TODO:
 

@@ -6,14 +6,14 @@
 </head>
 <body>
 <p>
-    Dear {{ $name }},<br>
+    {{ $name }}様<br>
+    お世話になっております。<br>
     <br>
-    We've got a request to reset your password.<br>
-    <br>
-    Your password has been automatically reset to <strong>{{ $password }}</strong>.<br>
+    パスワードは自動的に「<strong>{{ $password }}</strong>」にリセットされました。<br>
     <br>
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━<br>
-    This email is for sending only. Please do not make any reply to it.<br>
+    ※このメールは送信専用メールアドレスから配信されています。<br>
+    　このままご返信いただいてもお答えできませんので予めご了承ください。<br>
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 </p>
 </body>

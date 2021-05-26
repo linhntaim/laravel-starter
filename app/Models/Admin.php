@@ -12,7 +12,8 @@ use App\Models\Base\IUserHasRole;
 use App\Models\Base\IUserVerifyEmail;
 use App\ModelTraits\UserHasRoleTrait;
 use App\ModelTraits\UserVerifyEmailTrait;
-use App\Notifications\AdminResetPasswordNotification;
+use App\Notifications\AdminEmailVerificationNotification;
+use App\Notifications\AdminPasswordResetNotification;
 
 /**
  * Class Admin
@@ -91,9 +92,14 @@ class Admin extends ExtendedUserModel implements IUserHasRole, IUserVerifyEmail
         return $this->avatarUrl;
     }
 
-    protected function getPasswordResetNotification($token)
+    protected function getPasswordResetNotificationClass()
     {
-        return new AdminResetPasswordNotification($token);
+        return AdminPasswordResetNotification::class;
+    }
+
+    protected function getEmailVerificationNotificationClass()
+    {
+        return AdminEmailVerificationNotification::class;
     }
 
     #region Functionality

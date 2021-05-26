@@ -3,7 +3,6 @@
 namespace App\ModelRepositories\Base;
 
 use App\Models\Base\IUserVerifyEmail;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Trait UserVerifyRepositoryTrait

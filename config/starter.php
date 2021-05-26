@@ -124,6 +124,10 @@ return [
                 'cookies' => [
                     'default' => env('CLIENT_ADMIN_COOKIE_DEFAULT_NAME'),
                 ],
+                'paths' => [
+                    'reset_password' => null,
+                    'verify_email' => null,
+                ],
             ],
             'home' => [
                 'app_name' => env('CLIENT_HOME_NAME'),

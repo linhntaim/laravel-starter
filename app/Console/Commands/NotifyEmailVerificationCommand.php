@@ -10,13 +10,13 @@ class NotifyEmailVerificationCommand extends Command
 {
     use UserCommandTrait;
 
-    protected $signature = 'notify:email-verification {user}';
+    protected $signature = 'notify:email-verification {user} {--again}';
 
     protected function go()
     {
         if ($this->parseUser()) {
             if ($this->userRepository instanceof IUserVerifyEmailRepository) {
-                $this->userRepository->notifyEmailVerification();
+                $this->userRepository->skipProtected()->notifyEmailVerification($this->option('again'));
             }
         }
     }

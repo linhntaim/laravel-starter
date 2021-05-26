@@ -2,9 +2,9 @@
 
 namespace App\Mail;
 
-use App\Mail\Base\NowMailable;
+use App\Mail\Base\TemplateNowMailable;
 
-class EmailVerificationMailable extends NowMailable
+class EmailVerificationMailable extends TemplateNowMailable
 {
     public $emailView = 'email_verification';
 }

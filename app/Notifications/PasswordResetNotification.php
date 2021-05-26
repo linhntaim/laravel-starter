@@ -13,19 +13,25 @@ use App\Models\Base\IUser;
 use App\Notifications\Base\NowNotification;
 use App\Utils\ClientSettings\Facade;
 
-class UserResetPasswordNotification extends NowNotification
+class PasswordResetNotification extends NowNotification
 {
+    public static $defaultAppResetPasswordPath = 'auth/reset-password';
+
     protected $token;
 
     protected $appResetPasswordPath;
 
-    public function __construct($token, INotifier $notifier = null)
+    public function __construct($code, INotifier $notifier = null)
     {
         parent::__construct($notifier);
 
-        $this->token = $token;
+        $this->token = $code;
 
-        $this->appResetPasswordPath = request()->input('app_reset_password_path');
+        $this->appResetPasswordPath =
+            request()->input(
+                'app_reset_password_path',
+                Facade::getPath('reset_password') ?: static::$defaultAppResetPasswordPath
+            );
     }
 
     public function shouldMail()
@@ -50,14 +56,20 @@ class UserResetPasswordNotification extends NowNotification
     {
         return [
             'url_reset_password' => $this->getAppResetPasswordUrl($notifiable),
-            'expired_at' => ($expiredAt = $notifiable->getPasswordResetExpiredAt()) ? Facade::dateTimer()->compound(
-                'shortDate',
-                ' ',
-                'shortTime',
-                $expiredAt
-            ) : null,
+            'expired_at' => ($expiredAt = $notifiable->getPasswordResetExpiredAt()) ?
+                $this->formatExpiredAt($expiredAt) : null,
             'name' => $notifiable->preferredName(),
         ];
+    }
+
+    protected function formatExpiredAt($expiredAt)
+    {
+        return Facade::dateTimer()->compound(
+            'shortDate',
+            ' ',
+            'shortTime',
+            $expiredAt
+        );
     }
 
     /**

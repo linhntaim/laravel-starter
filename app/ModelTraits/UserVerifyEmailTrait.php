@@ -2,9 +2,8 @@
 
 namespace App\ModelTraits;
 
-use App\Notifications\UserEmailVerificationNotification;
+use App\Notifications\EmailVerificationNotification;
 use App\Utils\ClientSettings\DateTimer;
-use Illuminate\Auth\Notifications\VerifyEmail;
 
 /**
  * Trait UserVerifyEmailTrait
@@ -16,12 +15,12 @@ trait UserVerifyEmailTrait
 {
     protected function modelConstruct()
     {
-        array_push($this->appends, ...[
+        return $this->mergeFillable([
             $this->getEmailVerifiedCodeAttributeName(),
             $this->getEmailVerifiedAtAttributeName(),
+        ])->mergeAppends([
+            $this->getEmailVerifiedAttributeName(),
         ]);
-        $this->appends[] = $this->getEmailVerifiedAttributeName();
-        $this->visible[] = $this->getEmailVerifiedAttributeName();
     }
 
     public function getEmailVerifiedCodeAttributeName()
@@ -81,6 +80,20 @@ trait UserVerifyEmailTrait
      */
     public function sendEmailVerificationNotification()
     {
-        $this->notify(new UserEmailVerificationNotification($this->email_verified_code));
+        $this->notify($this->getEmailVerificationNotification());
+    }
+
+    /**
+     * @return EmailVerificationNotification
+     */
+    protected function getEmailVerificationNotification()
+    {
+        $notificationClass = $this->getEmailVerificationNotificationClass();
+        return new $notificationClass();
+    }
+
+    protected function getEmailVerificationNotificationClass()
+    {
+        return EmailVerificationNotification::class;
     }
 }

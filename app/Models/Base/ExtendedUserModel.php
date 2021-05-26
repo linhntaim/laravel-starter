@@ -9,7 +9,7 @@ namespace App\Models\Base;
 use App\Models\DatabaseNotification;
 use App\Models\User;
 use App\ModelTraits\UserTrait;
-use App\Notifications\UserResetPasswordNotification;
+use App\Notifications\PasswordResetNotification;
 
 /**
  * Class ExtendedUserModel
@@ -77,11 +77,17 @@ abstract class ExtendedUserModel extends Model implements IUser
 
     /**
      * @param string $token
-     * @return UserResetPasswordNotification
+     * @return PasswordResetNotification
      */
     protected function getPasswordResetNotification($token)
     {
-        return new UserResetPasswordNotification($token);
+        $notificationClass = $this->getPasswordResetNotificationClass();
+        return new $notificationClass($token);
+    }
+
+    protected function getPasswordResetNotificationClass()
+    {
+        return PasswordResetNotification::class;
     }
 
     public function getUsernameAttribute()

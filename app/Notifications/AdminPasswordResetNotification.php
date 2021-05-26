@@ -9,9 +9,12 @@ namespace App\Notifications;
 use App\Mail\AdminPasswordResetMailable;
 use App\Models\Base\INotifiable;
 use App\Models\Base\IUser;
+use App\Utils\ClientSettings\Traits\AdminIndependentClientTrait;
 
-class AdminResetPasswordNotification extends UserResetPasswordNotification
+class AdminPasswordResetNotification extends PasswordResetNotification
 {
+    use AdminIndependentClientTrait;
+
     /**
      * @param INotifiable|IUser $notifiable
      * @return AdminPasswordResetMailable

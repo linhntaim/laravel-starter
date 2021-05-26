@@ -6,23 +6,20 @@
 </head>
 <body>
 <p>
-    Dear {{ $name }},<br>
+    {{ $name }}様<br>
     <br>
-    We've got a request to reset your password.<br>
-    <br>
-    Please click the link below to reset password for your account.<br>
-    If you do not make the request, please ignore this email.<br>
+    アカウントのメールアドレスを承認するには、以下のリンクをクリックしてください。<br>
     <br>
     ----------------------------------------------------------------<br>
-    URL: <a href="{{ $url_reset_password }}">{{ $url_reset_password }}</a><br>
+    URL：<a href="{{ $url_verify_email }}">{{ $url_verify_email }}</a><br>
     @if ($expired_at)
-        The link will be expired at: {{ $expired_at }}<br>
+        有効期限：{{ $expired_at }} まで<br>
     @endif
     ----------------------------------------------------------------<br>
     <br>
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━<br>
-    For security, please change the password immediately after you access the link.<br>
-    This email is for sending only. Please do not make any reply to it.<br>
+    ※このメールは送信専用メールアドレスから配信されています。<br>
+    　このままご返信いただいてもお答えできませんので予めご了承ください。<br>
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 </p>
 </body>
