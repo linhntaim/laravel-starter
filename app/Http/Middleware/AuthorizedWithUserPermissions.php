@@ -7,7 +7,7 @@
 namespace App\Http\Middleware;
 
 use App\Http\Requests\Request;
-use App\Models\Base\IUserHasPermissions;
+use App\Models\Base\IHasPermissions;
 use App\Utils\AbortTrait;
 use Closure;
 
@@ -30,7 +30,7 @@ abstract class AuthorizedWithUserPermissions
 
     /**
      * @param Request $request
-     * @return IUserHasPermissions|null
+     * @return IHasPermissions|null
      */
     protected abstract function getUser(Request $request);
 

@@ -6,12 +6,12 @@ use App\Models\Role;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Interface IUserHasRole
+ * Interface IHasRole
  * @package App\Models\Base
  * @property string $roleName
  * @property Role $role
  */
-interface IUserHasRole extends IUserHasPermissions
+interface IHasRole extends IHasPermissions
 {
     /**
      * @return string

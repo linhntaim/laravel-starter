@@ -6,7 +6,7 @@ use App\Mail\EmailVerificationMailable;
 use App\Models\Base\INotifiable;
 use App\Models\Base\INotifier;
 use App\Models\Base\IUser;
-use App\Models\Base\IUserVerifyEmail;
+use App\Models\Base\IHasEmailVerified;
 use App\Notifications\Base\NowNotification;
 use App\Utils\ClientSettings\Facade;
 
@@ -33,7 +33,7 @@ class EmailVerificationNotification extends NowNotification
     }
 
     /**
-     * @param INotifiable|IUser|IUserVerifyEmail $notifiable
+     * @param INotifiable|IUser|IHasEmailVerified $notifiable
      * @return EmailVerificationMailable
      */
     protected function getMailable($notifiable)
@@ -42,7 +42,7 @@ class EmailVerificationNotification extends NowNotification
     }
 
     /**
-     * @param INotifiable|IUser|IUserVerifyEmail $notifiable
+     * @param INotifiable|IUser|IHasEmailVerified $notifiable
      * @return array
      */
     protected function getMailParams($notifiable)
@@ -66,7 +66,7 @@ class EmailVerificationNotification extends NowNotification
     }
 
     /**
-     * @param INotifiable|IUser|IUserVerifyEmail $notifiable
+     * @param INotifiable|IUser|IHasEmailVerified $notifiable
      * @return string
      */
     public function getAppVerifyEmailUrl($notifiable)

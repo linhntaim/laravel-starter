@@ -7,12 +7,12 @@ use App\Utils\ClientSettings\DateTimer;
 use Carbon\Carbon;
 
 /**
- * Trait UserVerifyEmailTrait
+ * Trait HasEmailVerifiedTrait
  * @package App\ModelTraits
  * @property bool $email
  * @property bool $emailVerified
  */
-trait UserVerifyEmailTrait
+trait HasEmailVerifiedTrait
 {
     protected function modelConstruct()
     {

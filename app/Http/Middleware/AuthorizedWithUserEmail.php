@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Http\Requests\Request;
 use App\Models\Base\IUser;
-use App\Models\Base\IUserVerifyEmail;
+use App\Models\Base\IHasEmailVerified;
 use App\Utils\AbortTrait;
 use Closure;
 
@@ -37,7 +37,7 @@ abstract class AuthorizedWithUserEmail
         if (is_null($user)) {
             return false;
         }
-        if ($user instanceof IUserVerifyEmail) {
+        if ($user instanceof IHasEmailVerified) {
             return $user->hasVerifiedEmail();
         }
         return true;

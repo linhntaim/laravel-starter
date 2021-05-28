@@ -9,6 +9,7 @@ namespace App\Models\Base;
 use App\Models\DatabaseNotification;
 use App\Models\User;
 use App\ModelTraits\UserTrait;
+use App\ModelTraits\HasEmailVerifiedTrait;
 use App\Notifications\PasswordResetNotification;
 
 /**
@@ -22,13 +23,22 @@ use App\Notifications\PasswordResetNotification;
  */
 abstract class ExtendedUserModel extends Model implements IUser
 {
-    use UserTrait;
+    use UserTrait, HasEmailVerifiedTrait {
+        HasEmailVerifiedTrait::modelConstruct as userVerifyEmailConstruct;
+    }
 
     public const PROTECTED = User::PROTECTED;
 
     protected $primaryKey = 'user_id';
 
     public $incrementing = false;
+
+    public function __construct(array $attributes = [])
+    {
+        $this->userVerifyEmailConstruct();
+
+        parent::__construct($attributes);
+    }
 
     public static function getProtectedKey()
     {

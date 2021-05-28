@@ -7,9 +7,9 @@
 namespace App\Models;
 
 use App\ModelResources\UserResource;
+use App\Models\Base\IHasSettings;
 use App\Models\Base\IModel;
 use App\Models\Base\IUser;
-use App\Models\Base\IUserHasSettings;
 use App\ModelTraits\ModelTrait;
 use App\ModelTraits\PassportTrait;
 use App\ModelTraits\UserTrait;
@@ -164,7 +164,7 @@ class User extends Authenticatable implements IModel, IUser
 
     public function preferredSettings()
     {
-        return $this instanceof IUserHasSettings ? $this->getSettings() : Facade::capture();
+        return $this instanceof IHasSettings ? $this->getSettings() : Facade::capture();
     }
 
     public function preferredLocale()

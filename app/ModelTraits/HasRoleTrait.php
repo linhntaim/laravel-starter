@@ -5,12 +5,12 @@ namespace App\ModelTraits;
 use App\Models\Role;
 
 /**
- * Trait UserHasRoleTrait
+ * Trait HasRoleTrait
  * @package App\ModelTraits
  */
-trait UserHasRoleTrait
+trait HasRoleTrait
 {
-    use UserHasPermissions;
+    use HasPermissions;
 
     protected function modelConstruct()
     {

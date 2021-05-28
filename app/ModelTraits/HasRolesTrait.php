@@ -3,17 +3,16 @@
 namespace App\ModelTraits;
 
 use App\Models\Role;
-use Illuminate\Database\Eloquent\Collection;
 
 /**
- * Trait UserHasRoleTrait
+ * Trait HasRoleTrait
  * @package App\ModelTraits
  */
-trait UserHasRolesTrait
+trait HasRolesTrait
 {
-    use UserHasPermissions;
+    use HasPermissions;
 
-    public function getMappingRolesTable()
+    public function getBelongsToManyRolesTable()
     {
         return 'users_roles';
     }
@@ -59,7 +58,7 @@ trait UserHasRolesTrait
         return $this
             ->belongsToMany(
                 Role::class,
-                $this->getMappingRolesTable(),
+                $this->getBelongsToManyRolesTable(),
                 $this->getUserAttributeName(),
                 $this->getRoleAttributeName()
             )

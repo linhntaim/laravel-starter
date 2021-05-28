@@ -8,10 +8,8 @@ namespace App\Models;
 
 use App\ModelResources\AdminResource;
 use App\Models\Base\ExtendedUserModel;
-use App\Models\Base\IUserHasRole;
-use App\Models\Base\IUserVerifyEmail;
-use App\ModelTraits\UserHasRoleTrait;
-use App\ModelTraits\UserVerifyEmailTrait;
+use App\Models\Base\IHasRole;
+use App\ModelTraits\HasRoleTrait;
 use App\Notifications\AdminEmailVerificationNotification;
 use App\Notifications\AdminPasswordResetNotification;
 
@@ -24,12 +22,10 @@ use App\Notifications\AdminPasswordResetNotification;
  * @property User $user
  * @property HandledFile $avatar
  */
-class Admin extends ExtendedUserModel implements IUserHasRole, IUserVerifyEmail
+class Admin extends ExtendedUserModel implements IHasRole
 {
-    use UserHasRoleTrait, UserVerifyEmailTrait {
-        UserHasRoleTrait::modelConstruct as userHasRoleConstruct;
-        UserHasRoleTrait::modelConstruct insteadof UserVerifyEmailTrait;
-        UserVerifyEmailTrait::modelConstruct as userVerifyEmailConstruct;
+    use HasRoleTrait {
+        HasRoleTrait::modelConstruct as userHasRoleConstruct;
     }
 
     public const MAX_AVATAR_SIZE = 512;
@@ -61,7 +57,6 @@ class Admin extends ExtendedUserModel implements IUserHasRole, IUserVerifyEmail
     public function __construct(array $attributes = [])
     {
         $this->userHasRoleConstruct();
-        $this->userVerifyEmailConstruct();
 
         parent::__construct($attributes);
     }
@@ -69,7 +64,7 @@ class Admin extends ExtendedUserModel implements IUserHasRole, IUserVerifyEmail
     #region Get Attributes
     public function getAvatarUrlAttribute()
     {
-        return empty($this->attributes['avatar_id']) ? null : $this->avatar->url;
+        return is_null($this->attributes['avatar_id']) ? null : $this->avatar->url;
     }
 
     #endregion

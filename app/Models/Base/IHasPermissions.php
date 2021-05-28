@@ -3,11 +3,11 @@
 namespace App\Models\Base;
 
 /**
- * Interface IUserHasPermissions
+ * Interface IHasPermissions
  * @package App\Models\Base
  * @property string[]|array $permissionNames
  */
-interface IUserHasPermissions
+interface IHasPermissions
 {
     /**
      * @param string $permissionName

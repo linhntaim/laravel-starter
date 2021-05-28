@@ -2,7 +2,7 @@
 
 namespace App\ModelTraits;
 
-trait UserHasPermissions
+trait HasPermissions
 {
     public function getPermissionNamesAttributeName()
     {

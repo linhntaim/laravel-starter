@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Console\Commands\Base\Command;
 use App\Console\Commands\Base\UserCommandTrait;
-use App\ModelRepositories\Base\IUserVerifyEmailRepository;
+use App\ModelRepositories\Base\IHasEmailVerifiedRepository;
 
 class VerifyEmailCommand extends Command
 {
@@ -25,7 +25,7 @@ class VerifyEmailCommand extends Command
 
     protected function goVerifying()
     {
-        if ($this->userRepository instanceof IUserVerifyEmailRepository) {
+        if ($this->userRepository instanceof IHasEmailVerifiedRepository) {
             if ($code = $this->option('code')) {
                 if (is_null($this->userRepository->skipProtected()->verifyEmailByCode($code))) {
                     $this->error(
@@ -61,7 +61,7 @@ class VerifyEmailCommand extends Command
 
     protected function goUnverifying()
     {
-        if ($this->userRepository instanceof IUserVerifyEmailRepository) {
+        if ($this->userRepository instanceof IHasEmailVerifiedRepository) {
             if ($code = $this->option('code')) {
                 if (is_null($this->userRepository->skipProtected()->unverifyEmailByCode($code, !$this->option('no-fresh')))) {
                     $this->error(

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\Base\IUserRepository;
-use App\ModelRepositories\Base\IUserVerifyEmailRepository;
+use App\ModelRepositories\Base\IHasEmailVerifiedRepository;
 use App\ModelRepositories\UserRepository;
 
 /**
@@ -34,7 +34,7 @@ class VerificationController extends ModelApiController
             'code' => 'required|string',
         ]);
 
-        if ($this->modelRepository instanceof IUserVerifyEmailRepository) {
+        if ($this->modelRepository instanceof IHasEmailVerifiedRepository) {
             if (is_null(
                 $this->modelRepository->skipProtected()
                     ->verifyEmailByCode($request->input('code'))

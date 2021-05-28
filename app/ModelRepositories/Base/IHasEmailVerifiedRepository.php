@@ -2,7 +2,7 @@
 
 namespace App\ModelRepositories\Base;
 
-interface IUserVerifyEmailRepository
+interface IHasEmailVerifiedRepository
 {
     public function notifyEmailVerification($again = false);
 

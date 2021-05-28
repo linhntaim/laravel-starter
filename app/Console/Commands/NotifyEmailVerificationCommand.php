@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Console\Commands\Base\Command;
 use App\Console\Commands\Base\UserCommandTrait;
-use App\ModelRepositories\Base\IUserVerifyEmailRepository;
+use App\ModelRepositories\Base\IHasEmailVerifiedRepository;
 
 class NotifyEmailVerificationCommand extends Command
 {
@@ -15,7 +15,7 @@ class NotifyEmailVerificationCommand extends Command
     protected function go()
     {
         if ($this->parseUser()) {
-            if ($this->userRepository instanceof IUserVerifyEmailRepository) {
+            if ($this->userRepository instanceof IHasEmailVerifiedRepository) {
                 $this->userRepository->skipProtected()->notifyEmailVerification($this->option('again'));
             }
         }

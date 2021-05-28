@@ -3,13 +3,13 @@
 namespace App\Models\Base;
 
 /**
- * Interface IUserVerifyEmail
+ * Interface IHasEmailVerified
  * @package App\Models\Base
  * @property string $email_verified_code
  * @property string $email_verified_at
  * @property bool $emailVerified
  */
-interface IUserVerifyEmail
+interface IHasEmailVerified
 {
     /**
      * @return string

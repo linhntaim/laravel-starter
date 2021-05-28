@@ -2,23 +2,23 @@
 
 namespace App\ModelRepositories\Base;
 
-use App\Models\Base\IUserVerifyEmail;
+use App\Models\Base\IHasEmailVerified;
 use App\Utils\ClientSettings\DateTimer;
 
 /**
- * Trait UserVerifyRepositoryTrait
+ * Trait HasEmailVerifiedRepositoryTrait
  * @package App\ModelRepositories\Base
- * @property IUserVerifyEmail|null $model
+ * @property IHasEmailVerified|null $model
  */
-trait UserVerifyRepositoryTrait
+trait HasEmailVerifiedRepositoryTrait
 {
     /**
-     * @var IUserVerifyEmail
+     * @var IHasEmailVerified
      */
     protected $newVerifiedModel;
 
     /**
-     * @return IUserVerifyEmail
+     * @return IHasEmailVerified
      */
     protected function newVerifiedModel()
     {

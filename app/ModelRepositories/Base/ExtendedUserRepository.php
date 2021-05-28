@@ -9,9 +9,9 @@ namespace App\ModelRepositories\Base;
 use App\ModelRepositories\UserRepository;
 use App\ModelRepositories\UserSocialRepository;
 use App\Models\Base\ExtendedUserModel;
-use App\Models\Base\IUserHasRole;
-use App\Models\Base\IUserHasRoles;
-use App\Models\Base\IUserVerifyEmail;
+use App\Models\Base\IHasRole;
+use App\Models\Base\IHasRoles;
+use App\Models\Base\IHasEmailVerified;
 use App\Models\User;
 use App\Utils\SocialLogin;
 use Illuminate\Support\Facades\DB;
@@ -19,12 +19,12 @@ use Illuminate\Support\Facades\DB;
 /**
  * Class ExtendedUserRepository
  * @package App\ModelRepositories
- * @property ExtendedUserModel|IUserHasRole|IUserHasRoles|IUserVerifyEmail|mixed|null $model
- * @method ExtendedUserModel|IUserHasRole|IUserHasRoles|IUserVerifyEmail|mixed newModel($pinned = true)
+ * @property ExtendedUserModel|IHasRole|IHasRoles|IHasEmailVerified|mixed|null $model
+ * @method ExtendedUserModel|IHasRole|IHasRoles|IHasEmailVerified|mixed newModel($pinned = true)
  */
 abstract class ExtendedUserRepository extends DependedRepository implements IUserRepository
 {
-    use ProtectedRepositoryTrait;
+    use ProtectedRepositoryTrait, HasEmailVerifiedRepositoryTrait;
 
     public function __construct($id = null)
     {
@@ -33,7 +33,7 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
 
     /**
      * @param User|ExtendedUserModel|mixed|null $id
-     * @return ExtendedUserModel|IUserHasRole|IUserHasRoles|IUserVerifyEmail|mixed|null
+     * @return ExtendedUserModel|IHasRole|IHasRoles|IHasEmailVerified|mixed|null
      * @throws
      */
     public function model($id = null)
