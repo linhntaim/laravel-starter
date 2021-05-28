@@ -2,8 +2,15 @@
 
 namespace App\Models\Base;
 
+use App\Models\Role;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Interface IUserHasRole
+ * @package App\Models\Base
+ * @property string $roleName
+ * @property Role $role
+ */
 interface IUserHasRole extends IUserHasPermissions
 {
     /**
@@ -15,11 +22,6 @@ interface IUserHasRole extends IUserHasPermissions
      * @return string|null
      */
     public function getRoleNameAttribute();
-
-    /**
-     * @return string[]|array
-     */
-    public function getPermissionNamesAttribute();
 
     /**
      * @return BelongsTo

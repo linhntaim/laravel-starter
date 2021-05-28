@@ -4,7 +4,8 @@ namespace App\Events\Listeners;
 
 use App\Events\Listeners\Base\NowListener;
 use App\Events\PasswordResetAutomaticallyEvent;
-use App\Utils\Mail\TemplateMailable;
+use App\Mail\PasswordResetAutomaticallyMailable;
+use Illuminate\Support\Facades\Mail;
 
 class OnPasswordResetAutomatically extends NowListener
 {
@@ -13,23 +14,21 @@ class OnPasswordResetAutomatically extends NowListener
      */
     protected function go($event)
     {
-        $this->sendMail($event);
+        Mail::send(
+            $this->getMailable()
+                ->to($event->user->preferredEmail(), $event->user->preferredName())
+                ->with([
+                    'name' => $event->user->preferredName(),
+                    'password' => $event->password,
+                ])
+        );
     }
 
     /**
-     * @param PasswordResetAutomaticallyEvent $event
+     * @return PasswordResetAutomaticallyMailable
      */
-    protected function getMailParams($event)
+    protected function getMailable()
     {
-        return array_merge(parent::getMailParams($event), [
-            TemplateMailable::EMAIL_TO => $event->user->preferredEmail(),
-            TemplateMailable::EMAIL_TO_NAME => $event->user->preferredName(),
-            'password' => $event->password,
-        ]);
-    }
-
-    protected function getMailTemplate($event)
-    {
-        return 'password_reset_automatically';
+        return new PasswordResetAutomaticallyMailable();
     }
 }

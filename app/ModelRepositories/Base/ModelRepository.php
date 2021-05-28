@@ -19,6 +19,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use PDOException;
 
 abstract class ModelRepository
@@ -586,13 +587,14 @@ abstract class ModelRepository
     /**
      * @param string $uniqueKey
      * @param int|callable|null $generateCallback
+     * @param bool $binary
      * @param array|callable|null $ignores
      * @return string
      */
-    protected function generateUniqueValue(string $uniqueKey, $generateCallback = null, $ignores = null)
+    protected function generateUniqueValue(string $uniqueKey, bool $binary = false, $generateCallback = null, $ignores = null)
     {
         if (is_null($generateCallback)) {
-            if (method_exists($this, $method = 'generate' . Str::studly($uniqueKey))) {
+            if (method_exists($this, $method = 'generateUnique' . Str::studly($uniqueKey))) {
                 $generateCallback = function () use ($method) {
                     return $this->{$method}();
                 };
@@ -608,20 +610,34 @@ abstract class ModelRepository
             };
         }
 
-        while (($uniqueValue = $generateCallback()) && $this->notStrict()->getByUnique($uniqueKey, $uniqueValue, $ignores)) {
+        while (($uniqueValue = $generateCallback()) && $this->notStrict()->getByUnique($uniqueKey, $uniqueValue, $binary, $ignores)) {
         }
         return $uniqueValue;
+    }
+
+    public function updateUniqueValue(string $uniqueKey, bool $binary = false, $generateCallback = null, $ignores = null, array $attributes = [])
+    {
+        return $this->updateWithAttributes([
+                $uniqueKey => $this->generateUniqueValue($uniqueKey, $binary, $generateCallback, $ignores),
+            ] + $attributes);
     }
 
     /**
      * @param string $uniqueKey
      * @param string $uniqueValue
+     * @param bool $binary
      * @param array|callable|null $ignores
      * @return Model|null
      */
-    public function getByUnique(string $uniqueKey, string $uniqueValue, $ignores = null)
+    public function getByUnique(string $uniqueKey, string $uniqueValue, bool $binary = false, $ignores = null)
     {
-        $query = $this->query()->where($uniqueKey, $uniqueValue);
+        if (method_exists($this, $method = 'getByUnique' . Str::studly($uniqueKey))) {
+            return $this->{$method}($uniqueValue, $ignores, $binary);
+        }
+        $query = $this->query()->where(
+            $binary ? DB::raw('BINARY ' . $uniqueKey) : $uniqueKey,
+            $uniqueValue
+        );
         if (is_array($ignores)) {
             foreach ($ignores as $ignoreKey => $ignoreValue) {
                 $query->where($ignoreKey, '<>', $ignoreValue);

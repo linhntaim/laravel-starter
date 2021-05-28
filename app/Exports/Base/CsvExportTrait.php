@@ -94,7 +94,7 @@ trait CsvExportTrait
             ->csvAfterExporting();
         return tap(
             $this->handledFileRepository
-                ->usePublic() // make sure to move to public storage
+                ->useCloud() // make sure to move to cloud storage if possible, otherwise, keep it private
                 ->createWithFiler($this->csvFiler),
             function () {
                 App::bench('export::csv::' . $this->getName());

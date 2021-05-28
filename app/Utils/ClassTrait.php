@@ -119,11 +119,6 @@ trait ClassTrait
         return static::__hasTransWithModule($error, 'error', $locale, $fallback);
     }
 
-    protected static function __transMailWithModule($mail, $replace = [], $locale = null)
-    {
-        return static::__transWithModule($mail, 'mail', $replace, $locale);
-    }
-
     protected static function __transErrorWithModule($error, $replace = [], $locale = null)
     {
         return static::__transWithModule($error, 'error', $replace, $locale);

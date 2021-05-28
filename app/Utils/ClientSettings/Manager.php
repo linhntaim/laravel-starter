@@ -250,6 +250,10 @@ class Manager
      */
     public function temporary($settings, callable $callback)
     {
+        if (empty($settings)) {
+            return $callback();
+        }
+
         $original = $this->capture();
         try {
             $this->update($settings);

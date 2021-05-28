@@ -6,6 +6,6 @@
 
 namespace App\Events;
 
-class TestingEvent extends Event
+class TestEvent extends Event
 {
 }

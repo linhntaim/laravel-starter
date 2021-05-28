@@ -48,7 +48,7 @@ class ImpersonateRepository extends ModelRepository
 
     public function createWithAttributes(array $attributes = [])
     {
-        $attributes['impersonate_token'] = $this->generateUniqueValue('impersonate_token', 128);
+        $attributes['impersonate_token'] = $this->generateUniqueValue('impersonate_token', true, 128);
         return parent::createWithAttributes($attributes);
     }
 }

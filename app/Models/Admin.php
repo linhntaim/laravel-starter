@@ -9,24 +9,28 @@ namespace App\Models;
 use App\ModelResources\AdminResource;
 use App\Models\Base\ExtendedUserModel;
 use App\Models\Base\IUserHasRole;
+use App\Models\Base\IUserVerifyEmail;
 use App\ModelTraits\UserHasRoleTrait;
-use App\Notifications\AdminResetPasswordNotification;
+use App\ModelTraits\UserVerifyEmailTrait;
+use App\Notifications\AdminEmailVerificationNotification;
+use App\Notifications\AdminPasswordResetNotification;
 
 /**
  * Class Admin
  * @package App\Models
  * @property int $user_id
  * @property string $display_name
- * @property string $roleName
  * @property string $avatarUrl
- * @property string[] $permissionNames
  * @property User $user
- * @property Role $role
  * @property HandledFile $avatar
  */
-class Admin extends ExtendedUserModel implements IUserHasRole
+class Admin extends ExtendedUserModel implements IUserHasRole, IUserVerifyEmail
 {
-    use UserHasRoleTrait;
+    use UserHasRoleTrait, UserVerifyEmailTrait {
+        UserHasRoleTrait::modelConstruct as userHasRoleConstruct;
+        UserHasRoleTrait::modelConstruct insteadof UserVerifyEmailTrait;
+        UserVerifyEmailTrait::modelConstruct as userVerifyEmailConstruct;
+    }
 
     public const MAX_AVATAR_SIZE = 512;
 
@@ -34,7 +38,6 @@ class Admin extends ExtendedUserModel implements IUserHasRole
 
     protected $fillable = [
         'user_id',
-        'role_id',
         'avatar_id',
         'display_name',
     ];
@@ -42,14 +45,10 @@ class Admin extends ExtendedUserModel implements IUserHasRole
     protected $visible = [
         'user_id',
         'display_name',
-        'role_name',
-        'permission_names',
         'avatar_url',
     ];
 
     protected $appends = [
-        'role_name',
-        'permission_names',
         'avatar_url',
     ];
 
@@ -58,6 +57,14 @@ class Admin extends ExtendedUserModel implements IUserHasRole
     ];
 
     protected $resourceClass = AdminResource::class;
+
+    public function __construct(array $attributes = [])
+    {
+        $this->userHasRoleConstruct();
+        $this->userVerifyEmailConstruct();
+
+        parent::__construct($attributes);
+    }
 
     #region Get Attributes
     public function getAvatarUrlAttribute()
@@ -75,11 +82,6 @@ class Admin extends ExtendedUserModel implements IUserHasRole
 
     #endregion
 
-    public function sendPasswordResetNotification($token)
-    {
-        $this->notify(new AdminResetPasswordNotification($token));
-    }
-
     public function preferredName()
     {
         return $this->display_name;
@@ -88,6 +90,16 @@ class Admin extends ExtendedUserModel implements IUserHasRole
     public function preferredAvatarUrl()
     {
         return $this->avatarUrl;
+    }
+
+    protected function getPasswordResetNotificationClass()
+    {
+        return AdminPasswordResetNotification::class;
+    }
+
+    protected function getEmailVerificationNotificationClass()
+    {
+        return AdminEmailVerificationNotification::class;
     }
 
     #region Functionality

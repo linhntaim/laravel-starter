@@ -19,6 +19,11 @@ class DatabaseTokenRepository extends BaseDatabaseTokenRepository
                 ->count() > 0;
     }
 
+    protected function tokenExpired($createdAt)
+    {
+        return $this->expires && parent::tokenExpired($createdAt);
+    }
+
     public function createNewToken()
     {
         // Create unique token

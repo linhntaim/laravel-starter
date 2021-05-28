@@ -6,16 +6,22 @@
 
 namespace App\Events;
 
-class MailTestingEvent extends Event
+class TestMailEvent extends Event
 {
+    /**
+     * @var string
+     */
     protected $subject;
 
-    protected $templatePath;
+    /**
+     * @var string
+     */
+    protected $view;
 
-    public function __construct($subject = 'Tested', $templatePath = 'test')
+    public function __construct($subject = 'Tested', $view = 'test')
     {
         $this->subject = $subject;
-        $this->templatePath = $templatePath;
+        $this->view = $view;
     }
 
     /**
@@ -29,8 +35,8 @@ class MailTestingEvent extends Event
     /**
      * @return string
      */
-    public function getTemplatePath()
+    public function getView()
     {
-        return $this->templatePath;
+        return $this->view;
     }
 }

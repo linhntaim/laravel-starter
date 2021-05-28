@@ -8,8 +8,8 @@ namespace App\Models;
 
 use App\ModelResources\DatabaseNotificationResource;
 use App\Models\Base\IModel;
-use App\Models\Base\IUser;
-use App\Models\Base\Model;
+use App\Models\Base\INotifiable;
+use App\Models\Base\INotifier;
 use App\ModelTraits\ModelTrait;
 use App\Notifications\Base\DatabaseNotificationFactory;
 use App\Notifications\Base\NowNotification;
@@ -29,8 +29,8 @@ use Illuminate\Notifications\DatabaseNotification as BaseDatabaseNotification;
  * @property string $sdStCreatedAt
  * @property string $sdStReadAt
  * @property array|null $data
- * @property Model|IUser $notifiable
- * @property Model|IUser $notifier
+ * @property INotifiable $notifiable
+ * @property INotifier $notifier
  * @property NowNotification|mixed $notification
  */
 class DatabaseNotification extends BaseDatabaseNotification implements IModel
@@ -139,14 +139,14 @@ class DatabaseNotification extends BaseDatabaseNotification implements IModel
     public function getDataByKey($key, $default = null)
     {
         $data = $this->data;
-        return isset($data[$key]) ? $data[$key] : $default;
+        return $data[$key] ?? $default;
     }
 
     public function getDataNotifier()
     {
         $notifierType = $this->getDataByKey('notifier_type');
         $notifierId = $this->getDataByKey('notifier_id');
-        return $notifierType && $notifierId ? call_user_func($this->getDataByKey('notifier_type') . '::withTrashed')
-            ->find($this->getDataByKey('notifier_id')) : null;
+        return $notifierType && $notifierId ?
+            call_user_func($notifierType . '::findByKey', $notifierId) : null;
     }
 }

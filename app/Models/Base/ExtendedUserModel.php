@@ -6,14 +6,13 @@
 
 namespace App\Models\Base;
 
-use App\Configuration;
 use App\Models\DatabaseNotification;
 use App\Models\User;
 use App\ModelTraits\UserTrait;
-use Illuminate\Auth\Passwords\CanResetPassword;
+use App\Notifications\PasswordResetNotification;
 
 /**
- * Trait UserExtendedTrait
+ * Class ExtendedUserModel
  * @package App\Models\Base
  * @property int $user_id
  * @property string $username
@@ -23,7 +22,7 @@ use Illuminate\Auth\Passwords\CanResetPassword;
  */
 abstract class ExtendedUserModel extends Model implements IUser
 {
-    use UserTrait, CanResetPassword;
+    use UserTrait;
 
     public const PROTECTED = User::PROTECTED;
 
@@ -31,39 +30,9 @@ abstract class ExtendedUserModel extends Model implements IUser
 
     public $incrementing = false;
 
-    public function getPasswordMinLength()
-    {
-        return Configuration::PASSWORD_MIN_LENGTH;
-    }
-
     public static function getProtectedKey()
     {
         return 'user_id';
-    }
-
-    public function getUsernameAttribute()
-    {
-        return $this->user->username;
-    }
-
-    public function getEmailAttribute()
-    {
-        return $this->user->email;
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id', 'id');
-    }
-
-    public function getEmailForPasswordReset()
-    {
-        return $this->preferredEmail();
-    }
-
-    public function getId()
-    {
-        return $this->getKey();
     }
 
     public function preferredName()
@@ -81,18 +50,58 @@ abstract class ExtendedUserModel extends Model implements IUser
         return $this->user->preferredAvatarUrl();
     }
 
-    public function preferredLocale()
-    {
-        return $this->user->preferredLocale();
-    }
-
     public function preferredSettings()
     {
         return $this->user->preferredSettings();
     }
 
+    public function preferredLocale()
+    {
+        return $this->user->preferredLocale();
+    }
+
+    public function getEmailForPasswordReset()
+    {
+        return $this->email;
+    }
+
     public function getPasswordResetExpiredAt()
     {
         return $this->user->getPasswordResetExpiredAt();
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify($this->getPasswordResetNotification($token));
+    }
+
+    /**
+     * @param string $token
+     * @return PasswordResetNotification
+     */
+    protected function getPasswordResetNotification($token)
+    {
+        $notificationClass = $this->getPasswordResetNotificationClass();
+        return new $notificationClass($token);
+    }
+
+    protected function getPasswordResetNotificationClass()
+    {
+        return PasswordResetNotification::class;
+    }
+
+    public function getUsernameAttribute()
+    {
+        return $this->user->username;
+    }
+
+    public function getEmailAttribute()
+    {
+        return $this->user->email;
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

@@ -9,7 +9,9 @@ namespace App\ModelRepositories\Base;
 use App\ModelRepositories\UserRepository;
 use App\ModelRepositories\UserSocialRepository;
 use App\Models\Base\ExtendedUserModel;
-use App\Models\Base\IUser;
+use App\Models\Base\IUserHasRole;
+use App\Models\Base\IUserHasRoles;
+use App\Models\Base\IUserVerifyEmail;
 use App\Models\User;
 use App\Utils\SocialLogin;
 use Illuminate\Support\Facades\DB;
@@ -17,8 +19,8 @@ use Illuminate\Support\Facades\DB;
 /**
  * Class ExtendedUserRepository
  * @package App\ModelRepositories
- * @property ExtendedUserModel|null $model
- * @method ExtendedUserModel newModel($pinned = true)
+ * @property ExtendedUserModel|IUserHasRole|IUserHasRoles|IUserVerifyEmail|mixed|null $model
+ * @method ExtendedUserModel|IUserHasRole|IUserHasRoles|IUserVerifyEmail|mixed newModel($pinned = true)
  */
 abstract class ExtendedUserRepository extends DependedRepository implements IUserRepository
 {
@@ -30,8 +32,8 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
     }
 
     /**
-     * @param ExtendedUserModel|User|IUser|mixed|null $id
-     * @return ExtendedUserModel|IUser|mixed|null
+     * @param User|ExtendedUserModel|mixed|null $id
+     * @return ExtendedUserModel|IUserHasRole|IUserHasRoles|IUserVerifyEmail|mixed|null
      * @throws
      */
     public function model($id = null)
@@ -46,8 +48,8 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
     {
         return parent::queryUniquely($query, $unique)
             ->orWhereHas('user', function ($query) use ($unique) {
-                $query->orWhere('email', $unique)
-                    ->where(DB::raw('BINARY username'), $unique);
+                $query->where('email', $unique)
+                    ->orWhere(DB::raw('BINARY username'), $unique);
             });
     }
 
@@ -126,6 +128,16 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
         $this->getUserRepository()
             ->withModel($this->model->user)
             ->updatePassword($password);
+
+        $this->validateProtected('Cannot edit this protected user');
+        return $this->model;
+    }
+
+    public function updatePasswordRandomly(&$password)
+    {
+        $this->getUserRepository()
+            ->withModel($this->model->user)
+            ->updatePasswordRandomly($password);
 
         $this->validateProtected('Cannot edit this protected user');
         return $this->model;

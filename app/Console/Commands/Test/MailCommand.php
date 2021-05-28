@@ -7,14 +7,17 @@
 namespace App\Console\Commands\Test;
 
 use App\Console\Commands\Base\Command;
-use App\Utils\Mail\MailHelper;
+use App\Mail\TestMailable;
+use Illuminate\Support\Facades\Mail;
 
 class MailCommand extends Command
 {
-    protected $signature = 'test:mail {--subject=Tested} {--template_path=test}';
+    protected $signature = 'test:mail {--subject=Tested} {--view=test}';
 
     protected function go()
     {
-        MailHelper::sendTestMailNow($this->option('subject'), $this->option('template_path'));
+        Mail::send(
+            new TestMailable($this->option('subject'), $this->option('view'))
+        );
     }
 }

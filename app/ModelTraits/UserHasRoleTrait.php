@@ -7,16 +7,29 @@ use App\Models\Role;
 /**
  * Trait UserHasRoleTrait
  * @package App\ModelTraits
- * @property Role|null $role
- * @property string[]|array $permissionNames
  */
 trait UserHasRoleTrait
 {
     use UserHasPermissions;
 
+    protected function modelConstruct()
+    {
+        return $this->mergeFillable([
+            $this->getRoleAttributeName(),
+        ])->mergeAppends([
+            $this->getRoleNameAttributeName(),
+            $this->getPermissionNamesAttributeName(),
+        ]);
+    }
+
     public function getRoleAttributeName()
     {
         return 'role_id';
+    }
+
+    public function getRoleNameAttributeName()
+    {
+        return 'role_name';
     }
 
     public function getRoleNameAttribute()

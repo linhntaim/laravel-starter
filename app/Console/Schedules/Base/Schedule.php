@@ -9,14 +9,13 @@ namespace App\Console\Schedules\Base;
 use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\Traits\ConsoleClientTrait;
 use App\Utils\Database\Transaction\TransactionTrait;
-use App\Utils\ReportExceptionTrait;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
 abstract class Schedule
 {
-    use ClassTrait, ConsoleClientTrait, TransactionTrait, ReportExceptionTrait;
+    use ClassTrait, ConsoleClientTrait, TransactionTrait;
 
     /**
      * @var ConsoleKernel
@@ -66,7 +65,7 @@ abstract class Schedule
 
     protected function handleException(Throwable $e)
     {
-        $this->reportException($e);
+        report($e);
         $this->fails();
     }
 

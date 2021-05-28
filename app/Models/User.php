@@ -6,7 +6,6 @@
 
 namespace App\Models;
 
-use App\Configuration;
 use App\ModelResources\UserResource;
 use App\Models\Base\IModel;
 use App\Models\Base\IUser;
@@ -89,11 +88,6 @@ class User extends Authenticatable implements IModel, IUser
 
     protected $resourceClass = UserResource::class;
 
-    public function getPasswordMinLength()
-    {
-        return Configuration::PASSWORD_MIN_LENGTH;
-    }
-
     public static function getProtectedKey()
     {
         return 'id';
@@ -140,11 +134,6 @@ class User extends Authenticatable implements IModel, IUser
         );
     }
 
-    public function scopeNoneProtected($query)
-    {
-        return $query->whereNotIn('id', static::PROTECTED);
-    }
-
     #region Relationship
     public function passwordReset()
     {
@@ -155,20 +144,8 @@ class User extends Authenticatable implements IModel, IUser
     {
         return $this->hasMany(UserSocial::class, 'user_id', 'id');
     }
-    #endregion
-
-    #region HasLocalePreference
-    public function preferredLocale()
-    {
-        return $this->preferredSettings()->getLocale();
-    }
 
     #endregion
-
-    public function getId()
-    {
-        return $this->getKey();
-    }
 
     public function preferredEmail()
     {
@@ -177,9 +154,7 @@ class User extends Authenticatable implements IModel, IUser
 
     public function preferredName()
     {
-        return isset($this->attributes['username']) ?
-            $this->attributes['username']
-            : Str::before($this->preferredEmail(), '@');
+        return $this->attributes['username'] ?? Str::before($this->preferredEmail(), '@');
     }
 
     public function preferredAvatarUrl()
@@ -192,9 +167,14 @@ class User extends Authenticatable implements IModel, IUser
         return $this instanceof IUserHasSettings ? $this->getSettings() : Facade::capture();
     }
 
+    public function preferredLocale()
+    {
+        return $this->preferredSettings()->getLocale();
+    }
+
     public function getPasswordResetExpiredAt()
     {
         $passwordReset = $this->passwordReset;
-        return empty($passwordReset) ? null : $passwordReset->sdStExpiredAt;
+        return $passwordReset ? $passwordReset->expiredAt : null;
     }
 }

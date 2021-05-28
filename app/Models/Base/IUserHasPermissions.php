@@ -2,6 +2,11 @@
 
 namespace App\Models\Base;
 
+/**
+ * Interface IUserHasPermissions
+ * @package App\Models\Base
+ * @property string[]|array $permissionNames
+ */
 interface IUserHasPermissions
 {
     /**
@@ -21,4 +26,9 @@ interface IUserHasPermissions
      * @return bool
      */
     public function hasPermissionsAll(array $permissionNames);
+
+    /**
+     * @return string[]|array
+     */
+    public function getPermissionNamesAttribute();
 }

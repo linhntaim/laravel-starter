@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Collection;
 /**
  * Trait UserHasRoleTrait
  * @package App\ModelTraits
- * @property Role[]|Collection $roles
  */
 trait UserHasRolesTrait
 {
