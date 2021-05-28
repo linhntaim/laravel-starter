@@ -10,7 +10,7 @@ class NotifyEmailVerificationCommand extends Command
 {
     use UserCommandTrait;
 
-    protected $signature = 'notify:email-verification {user} {--again}';
+    protected $signature = 'notify:verification:email {user} {--again}';
 
     protected function go()
     {

@@ -18,9 +18,14 @@ abstract class AuthorizedWithUserPermissions
     public function handle(Request $request, Closure $next, $permissions = null)
     {
         if (!$this->hasPermissions($request, $permissions)) {
-            $this->abort403();
+            $this->whenError();
         }
         return $next($request);
+    }
+
+    protected function whenError()
+    {
+        $this->abort403();
     }
 
     /**

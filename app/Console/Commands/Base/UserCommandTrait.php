@@ -23,18 +23,20 @@ trait UserCommandTrait
      */
     protected function getUserRepository()
     {
-        $userRepositoryClass = $this->getUserRepositoryClass();
-        return new $userRepositoryClass;
+        if (is_null($this->userRepository)) {
+            $userRepositoryClass = $this->getUserRepositoryClass();
+            $this->userRepository = new $userRepositoryClass;
+        }
+        return $this->userRepository;
     }
 
-    protected function parseUser()
+    protected function parseUser($input = 'user', $errorShown = true)
     {
-        $this->userRepository = $this->getUserRepository();
-        $this->userRepository->pinModel()
+        $this->getUserRepository()->pinModel()
             ->notStrict()
-            ->getUniquely($this->argument('user'));
-        if ($this->userRepository->doesntHaveModel()) {
-            $this->error('Cannot find user');
+            ->getUniquely($this->argument($input) ?? $this->option($input));
+        if ($this->getUserRepository()->doesntHaveModel()) {
+            $errorShown && $this->error('Cannot find user');
             return false;
         }
         return true;

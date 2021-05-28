@@ -615,11 +615,11 @@ abstract class ModelRepository
         return $uniqueValue;
     }
 
-    public function updateUniqueValue(string $uniqueKey, bool $binary = false, $generateCallback = null, $ignores = null)
+    public function updateUniqueValue(string $uniqueKey, bool $binary = false, $generateCallback = null, $ignores = null, array $attributes = [])
     {
         return $this->updateWithAttributes([
-            $uniqueKey => $this->generateUniqueValue($uniqueKey, $binary, $generateCallback, $ignores),
-        ]);
+                $uniqueKey => $this->generateUniqueValue($uniqueKey, $binary, $generateCallback, $ignores),
+            ] + $attributes);
     }
 
     /**

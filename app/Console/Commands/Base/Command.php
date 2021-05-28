@@ -64,7 +64,12 @@ abstract class Command extends BaseCommand
 
     public function option($key = null, $default = null, $filled = true)
     {
-        return is_null($key) ? parent::option($key) : got(parent::option($key), $default, $filled);
+        return is_null($key) ? parent::option($key) : got($this->safeOption($key), $default, $filled);
+    }
+
+    public function safeOption($key)
+    {
+        return is_null($key) || $this->hasOption($key) ? parent::option($key) : null;
     }
 
     public function ifArgument($key, &$argument, $filled = false)
@@ -75,7 +80,12 @@ abstract class Command extends BaseCommand
 
     public function argument($key = null, $default = null, $filled = true)
     {
-        return is_null($key) ? parent::argument($key) : got(parent::argument($key), $default, $filled);
+        return is_null($key) ? parent::argument($key) : got($this->safeArgument($key), $default, $filled);
+    }
+
+    public function safeArgument($key)
+    {
+        return is_null($key) || $this->hasArgument($key) ? parent::argument($key) : null;
     }
 
     public function alert($string)

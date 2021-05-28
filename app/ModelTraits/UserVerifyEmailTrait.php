@@ -4,6 +4,7 @@ namespace App\ModelTraits;
 
 use App\Notifications\EmailVerificationNotification;
 use App\Utils\ClientSettings\DateTimer;
+use Carbon\Carbon;
 
 /**
  * Trait UserVerifyEmailTrait
@@ -17,7 +18,9 @@ trait UserVerifyEmailTrait
     {
         return $this->mergeFillable([
             $this->getEmailVerifiedCodeAttributeName(),
+            $this->getEmailVerifiedSentAtAttributeName(),
             $this->getEmailVerifiedAtAttributeName(),
+            $this->getEmailVerifiedAttributeName(),
         ])->mergeAppends([
             $this->getEmailVerifiedAttributeName(),
         ]);
@@ -28,6 +31,11 @@ trait UserVerifyEmailTrait
         return 'email_verified_code';
     }
 
+    public function getEmailVerifiedSentAtAttributeName()
+    {
+        return 'email_verified_sent_at';
+    }
+
     public function getEmailVerifiedAtAttributeName()
     {
         return 'email_verified_at';
@@ -36,6 +44,14 @@ trait UserVerifyEmailTrait
     public function getEmailVerifiedAttributeName()
     {
         return 'email_verified';
+    }
+
+    /**
+     * @return int
+     */
+    public function getEmailVerifiedCodeLength()
+    {
+        return 32;
     }
 
     /**
@@ -72,7 +88,21 @@ trait UserVerifyEmailTrait
      */
     public function getEmailVerificationExpiredAt()
     {
-        return null;
+        return ($expire = config('auth.verification.expire'))
+        && !is_null($emailVerifiedSentAt = $this->attributes[$this->getEmailVerifiedSentAtAttributeName()]) ?
+            Carbon::parse($emailVerifiedSentAt)
+                ->addMinutes($expire)
+                ->format(DateTimer::DATABASE_FORMAT)
+            : null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getEmailVerificationExpired()
+    {
+        return !is_null($expiredAt = $this->getEmailVerificationExpiredAt())
+            && $expiredAt <= DateTimer::syncNow();
     }
 
     /**

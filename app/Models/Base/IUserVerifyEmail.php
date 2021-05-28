@@ -19,12 +19,22 @@ interface IUserVerifyEmail
     /**
      * @return string
      */
+    public function getEmailVerifiedSentAtAttributeName();
+
+    /**
+     * @return string
+     */
     public function getEmailVerifiedAtAttributeName();
 
     /**
      * @return string
      */
     public function getEmailVerifiedAttributeName();
+
+    /**
+     * @return int
+     */
+    public function getEmailVerifiedCodeLength();
 
     /**
      * @return string
@@ -50,6 +60,11 @@ interface IUserVerifyEmail
      * @return string|null
      */
     public function getEmailVerificationExpiredAt();
+
+    /**
+     * @return bool
+     */
+    public function getEmailVerificationExpired();
 
     /**
      * @return void

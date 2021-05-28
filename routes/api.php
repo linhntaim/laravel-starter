@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\Admin\Auth\LoginController as AdminLoginController;
 use App\Http\Controllers\Api\Admin\Auth\LogoutController as AdminLogoutController;
 use App\Http\Controllers\Api\Admin\Auth\RegisterController as AdminRegisterController;
 use App\Http\Controllers\Api\Admin\Auth\PasswordController as AdminPasswordController;
+use App\Http\Controllers\Api\Admin\Auth\VerificationController as AdminVerificationController;
 
 // Admin account
 use App\Http\Controllers\Api\Admin\Account\AccountController as AdminAccountController;
@@ -189,6 +190,7 @@ Route::group([
             Route::post('register', [AdminRegisterController::class, 'store']);
             Route::post('password', [AdminPasswordController::class, 'store']);
             Route::get('password', [AdminPasswordController::class, 'index']);
+            Route::post('verify', [AdminVerificationController::class, 'store']);
 
             // TODO:
 
