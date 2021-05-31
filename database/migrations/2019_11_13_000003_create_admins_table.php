@@ -27,7 +27,7 @@ class CreateAdminsTable extends Migration
             $table->integer('role_id')->unsigned()->nullable();
             $table->integer('avatar_id')->unsigned()->nullable();
             $table->string('display_name')->nullable();
-            if (is_a(Admin::class, IHasEmailVerified::class)) {
+            if (classImplemented(Admin::class, IHasEmailVerified::class)) {
                 $table->string('email_verified_code')->nullable()->index();
                 $table->timestamp('email_verified_sent_at')->nullable();
                 $table->timestamp('email_verified_at')->nullable();
