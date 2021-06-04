@@ -7,7 +7,6 @@
 namespace App\Models;
 
 use App\ModelResources\UserResource;
-use App\Models\Base\IHasEmailVerified;
 use App\Models\Base\IHasSettings;
 use App\Models\Base\IModel;
 use App\Models\Base\IUser;
@@ -29,7 +28,7 @@ use Laravel\Passport\HasApiTokens;
  * @property bool $hasPassword
  * @property PasswordReset $passwordReset
  */
-class User extends Authenticatable implements IModel, IUser, IHasEmailVerified
+class User extends Authenticatable implements IModel, IUser
 {
     use HasApiTokens;
     use ModelTrait, PassportTrait;
