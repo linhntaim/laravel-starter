@@ -43,6 +43,6 @@ class CreateDataImportsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('data_exports');
+        Schema::dropIfExists('data_imports');
     }
 }

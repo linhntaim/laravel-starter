@@ -115,11 +115,10 @@ trait ApiResponseTrait
      */
     protected function response($payload, $status = Response::HTTP_OK, $headers = [])
     {
-        return response()->json(
+        return responseJson(
             $payload,
             ConfigHelper::getApiResponseStatus($status),
-            ConfigHelper::getApiResponseHeaders($headers),
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+            ConfigHelper::getApiResponseHeaders($headers)
         );
     }
 

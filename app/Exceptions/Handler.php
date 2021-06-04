@@ -85,11 +85,10 @@ class Handler extends ExceptionHandler
 
     protected function prepareJsonResponse($request, Throwable $e)
     {
-        return new JsonResponse(
+        return responseJson(
             $this->convertExceptionToArray($e),
             ConfigHelper::getApiResponseStatus($this->isHttpException($e) ? $e->getStatusCode() : 500),
-            array_merge($this->isHttpException($e) ? $e->getHeaders() : [], ConfigHelper::getApiResponseHeaders()),
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+            array_merge($this->isHttpException($e) ? $e->getHeaders() : [], ConfigHelper::getApiResponseHeaders())
         );
     }
 
@@ -101,22 +100,20 @@ class Handler extends ExceptionHandler
     protected function unauthenticated($request, AuthenticationException $exception)
     {
         return $request->expectsJson()
-            ? response()->json(
+            ? responseJson(
                 ApiController::failPayload(null, $exception, 401),
                 ConfigHelper::getApiResponseStatus(401),
-                ConfigHelper::getApiResponseHeaders(),
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+                ConfigHelper::getApiResponseHeaders()
             )
             : redirect()->guest($exception->redirectTo() ?? route('login'));
     }
 
     protected function invalidJson($request, ValidationException $exception)
     {
-        return response()->json(
+        return responseJson(
             ApiController::failPayload(null, $exception, $exception->status),
             ConfigHelper::getApiResponseStatus($exception->status),
-            ConfigHelper::getApiResponseHeaders(),
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+            ConfigHelper::getApiResponseHeaders()
         );
     }
 

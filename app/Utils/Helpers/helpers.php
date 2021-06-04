@@ -64,13 +64,34 @@ function classExtended($object, $classes)
 }
 
 /**
+ * @param array $data
+ * @param int $status
+ * @param array $headers
+ * @return \Illuminate\Http\JsonResponse
+ */
+function responseJson(array $data = [], int $status = 200, array $headers = [])
+{
+    return response()->json($data, $status, $headers, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+}
+
+/**
+ * @param mixed $value
+ * @param int $depth
+ * @return bool|string
+ */
+function storeJson($value, int $depth = 512)
+{
+    return json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE, $depth);
+}
+
+/**
  * @param string|null $json
  * @param bool $safe
  * @param int $depth
  * @param int $flags
  * @return array
  */
-function jsonDecodeArray($json = null, bool $safe = true, int $depth = 512, int $flags = 0)
+function jsonDecodeArray(string $json = null, bool $safe = true, int $depth = 512, int $flags = 0)
 {
     $array = json_decode($json, true, $depth, $flags);
 
