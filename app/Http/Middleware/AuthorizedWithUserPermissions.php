@@ -4,6 +4,10 @@
  * Base - Any modification needs to be approved, except the space inside the block of TODO
  */
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http\Middleware;
 
 use App\Http\Requests\Request;
@@ -11,7 +15,7 @@ use App\Models\Base\IHasPermissions;
 use App\Utils\AbortTrait;
 use Closure;
 
-abstract class AuthorizedWithUserPermissions
+class AuthorizedWithUserPermissions
 {
     use AbortTrait;
 
@@ -25,14 +29,17 @@ abstract class AuthorizedWithUserPermissions
 
     protected function whenError()
     {
-        $this->abort403();
+        $this->abort403('Not authorized: Permission is required.');
     }
 
     /**
      * @param Request $request
      * @return IHasPermissions|null
      */
-    protected abstract function getUser(Request $request);
+    protected function getUser(Request $request)
+    {
+        return $request->user();
+    }
 
     /**
      * @param Request $request
@@ -42,7 +49,7 @@ abstract class AuthorizedWithUserPermissions
     protected function hasPermissions(Request $request, $permissions = null)
     {
         $user = $this->getUser($request);
-        if (is_null($user)) {
+        if (is_null($user) || !($user instanceof IHasPermissions)) {
             return false;
         }
         if (is_null($permissions)) {

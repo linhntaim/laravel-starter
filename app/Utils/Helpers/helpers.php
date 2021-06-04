@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 function maxExecutionTime()
 {
     static $maxExecutionTime = null;
@@ -140,3 +144,7 @@ function currentUserId($default = null)
 {
     return got(auth()->id(), $default);
 }
+
+// TODO:
+
+// TODO

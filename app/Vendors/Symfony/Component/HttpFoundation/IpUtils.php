@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Vendors\Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\IpUtils as BaseUtils;

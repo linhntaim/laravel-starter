@@ -9,8 +9,6 @@ namespace App\Models\Base;
 use App\Models\DatabaseNotification;
 use App\Models\User;
 use App\ModelTraits\UserTrait;
-use App\ModelTraits\HasEmailVerifiedTrait;
-use App\Notifications\PasswordResetNotification;
 
 /**
  * Class ExtendedUserModel
@@ -23,8 +21,8 @@ use App\Notifications\PasswordResetNotification;
  */
 abstract class ExtendedUserModel extends Model implements IUser
 {
-    use UserTrait, HasEmailVerifiedTrait {
-        HasEmailVerifiedTrait::modelConstruct as userVerifyEmailConstruct;
+    use UserTrait {
+        modelConstruct as userConstruct;
     }
 
     public const PROTECTED = User::PROTECTED;
@@ -35,7 +33,7 @@ abstract class ExtendedUserModel extends Model implements IUser
 
     public function __construct(array $attributes = [])
     {
-        $this->userVerifyEmailConstruct();
+        $this->userConstruct();
 
         parent::__construct($attributes);
     }
@@ -78,26 +76,6 @@ abstract class ExtendedUserModel extends Model implements IUser
     public function getPasswordResetExpiredAt()
     {
         return $this->user->getPasswordResetExpiredAt();
-    }
-
-    public function sendPasswordResetNotification($token)
-    {
-        $this->notify($this->getPasswordResetNotification($token));
-    }
-
-    /**
-     * @param string $token
-     * @return PasswordResetNotification
-     */
-    protected function getPasswordResetNotification($token)
-    {
-        $notificationClass = $this->getPasswordResetNotificationClass();
-        return new $notificationClass($token);
-    }
-
-    protected function getPasswordResetNotificationClass()
-    {
-        return PasswordResetNotification::class;
     }
 
     public function getUsernameAttribute()

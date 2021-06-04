@@ -1,7 +1,14 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Vendors\Illuminate\Support\Facades;
 
+use App\Models\Admin;
+use App\Models\Base\IHasEmailVerified;
+use App\Models\User;
 use App\Utils\ConfigHelper;
 use App\Utils\HandledFiles\Helper;
 use Illuminate\Support\Facades\App as BaseApp;
@@ -133,5 +140,23 @@ class App extends BaseApp
                 static::benchFrom($benchFrom);
             }
         }
+    }
+
+    public static function userEmailVerifiedImplemented()
+    {
+        static $implemented = null;
+        setIfNull($implemented, function () {
+            return classImplemented(User::class, IHasEmailVerified::class);
+        });
+        return $implemented;
+    }
+
+    public static function adminEmailVerifiedImplemented()
+    {
+        static $implemented = null;
+        setIfNull($implemented, function () {
+            return classImplemented(Admin::class, IHasEmailVerified::class);
+        });
+        return $implemented;
     }
 }

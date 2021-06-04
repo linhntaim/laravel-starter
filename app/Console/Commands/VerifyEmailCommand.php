@@ -1,10 +1,14 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Console\Commands;
 
 use App\Console\Commands\Base\Command;
 use App\Console\Commands\Base\UserCommandTrait;
-use App\ModelRepositories\Base\IHasEmailVerifiedRepository;
+use App\Models\Base\IHasEmailVerified;
 
 class VerifyEmailCommand extends Command
 {
@@ -25,7 +29,7 @@ class VerifyEmailCommand extends Command
 
     protected function goVerifying()
     {
-        if ($this->userRepository instanceof IHasEmailVerifiedRepository) {
+        if (classImplemented($this->userRepository->modelClass(), IHasEmailVerified::class)) {
             if ($code = $this->option('code')) {
                 if (is_null($this->userRepository->skipProtected()->verifyEmailByCode($code))) {
                     $this->error(
@@ -61,7 +65,7 @@ class VerifyEmailCommand extends Command
 
     protected function goUnverifying()
     {
-        if ($this->userRepository instanceof IHasEmailVerifiedRepository) {
+        if (classImplemented($this->userRepository->modelClass(), IHasEmailVerified::class)) {
             if ($code = $this->option('code')) {
                 if (is_null($this->userRepository->skipProtected()->unverifyEmailByCode($code, !$this->option('no-fresh')))) {
                     $this->error(

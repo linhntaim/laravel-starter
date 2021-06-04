@@ -7,6 +7,7 @@
 namespace App\ModelRepositories;
 
 use App\Exceptions\AppException;
+use App\ModelRepositories\Base\HasEmailVerifiedRepositoryTrait;
 use App\ModelRepositories\Base\IProtectedRepository;
 use App\ModelRepositories\Base\IUserRepository;
 use App\ModelRepositories\Base\ModelRepository;
@@ -28,7 +29,7 @@ use Illuminate\Support\Facades\DB;
  */
 class UserRepository extends ModelRepository implements IUserRepository
 {
-    use ProtectedRepositoryTrait;
+    use ProtectedRepositoryTrait, HasEmailVerifiedRepositoryTrait;
 
     public function modelClass()
     {

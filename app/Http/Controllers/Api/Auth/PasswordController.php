@@ -14,6 +14,7 @@ use App\ModelRepositories\Base\IUserRepository;
 use App\ModelRepositories\PasswordResetRepository;
 use App\ModelRepositories\UserRepository;
 use App\Models\User;
+use App\Utils\ConfigHelper;
 use Closure;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Contracts\Auth\CanResetPassword;
@@ -24,7 +25,7 @@ use Illuminate\Support\Facades\Password;
  * @package App\Http\Controllers\Api\Auth
  * @property PasswordResetRepository $modelRepository
  */
-abstract class PasswordController extends ModelApiController
+class PasswordController extends ModelApiController
 {
     /**
      * @var IUserRepository
@@ -35,8 +36,10 @@ abstract class PasswordController extends ModelApiController
     {
         parent::__construct();
 
-        if ($userRepositoryClass = $this->getUserRepositoryClass()) {
-            $this->userRepository = new $userRepositoryClass;
+        $userRepositoryClass = $this->getUserRepositoryClass();
+        $this->userRepository = new $userRepositoryClass;
+        if (!$this->enabled()) {
+            $this->abort404();
         }
     }
 
@@ -48,7 +51,10 @@ abstract class PasswordController extends ModelApiController
     /**
      * @return string
      */
-    protected abstract function getUserRepositoryClass();
+    protected function getUserRepositoryClass()
+    {
+        return UserRepository::class;
+    }
 
     protected function getPasswordMinLength()
     {
@@ -83,6 +89,16 @@ abstract class PasswordController extends ModelApiController
     protected function brokerReset(array $credentials, Closure $callback)
     {
         return $this->broker()->reset($credentials, $callback);
+    }
+
+    protected function enabled()
+    {
+        return ConfigHelper::get('forgot_password_enabled.user');
+    }
+
+    protected function automated()
+    {
+        return ConfigHelper::get('forgot_password_enabled.user_auto');
     }
 
     public function index(Request $request)
@@ -120,15 +136,10 @@ abstract class PasswordController extends ModelApiController
         ]);
     }
 
-    protected function isAutomatic()
-    {
-        return false;
-    }
-
     public function store(Request $request)
     {
         if ($request->has('_forgot')) {
-            return $this->isAutomatic() ?
+            return $this->automated() ?
                 $this->resetAutomatically($request)
                 : $this->forgot($request);
         }
@@ -195,7 +206,13 @@ abstract class PasswordController extends ModelApiController
 
     protected function getPasswordResetEvent(User $user, $password)
     {
-        return new PasswordResetEvent($user, $password);
+        $eventClass = $this->getPasswordResetEventClass();
+        return new $eventClass($user, $password);
+    }
+
+    protected function getPasswordResetEventClass()
+    {
+        return PasswordResetEvent::class;
     }
 
     protected function resetAutomatically(Request $request)

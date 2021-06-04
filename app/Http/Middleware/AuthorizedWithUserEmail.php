@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http\Middleware;
 
 use App\Http\Requests\Request;
@@ -8,7 +12,7 @@ use App\Models\Base\IHasEmailVerified;
 use App\Utils\AbortTrait;
 use Closure;
 
-abstract class AuthorizedWithUserEmail
+class AuthorizedWithUserEmail
 {
     use AbortTrait;
 
@@ -22,14 +26,17 @@ abstract class AuthorizedWithUserEmail
 
     protected function whenError()
     {
-        $this->abort403();
+        $this->abort403('Not authorized: Email is not verified.');
     }
 
     /**
      * @param Request $request
      * @return IUser|null
      */
-    protected abstract function getUser(Request $request);
+    protected function getUser(Request $request)
+    {
+        return $request->user();
+    }
 
     protected function hasVerified(Request $request)
     {

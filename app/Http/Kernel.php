@@ -17,6 +17,8 @@ use App\Http\Middleware\AuthenticatedByPassportViaRequest;
 use App\Http\Middleware\AuthorizedWithAdmin;
 use App\Http\Middleware\AuthorizedWithAdminEmail;
 use App\Http\Middleware\AuthorizedWithAdminPermissions;
+use App\Http\Middleware\AuthorizedWithUserEmail;
+use App\Http\Middleware\AuthorizedWithUserPermissions;
 use App\Http\Middleware\CustomLocale;
 use App\Http\Middleware\CustomTimezone;
 use App\Http\Middleware\Impersonate;
@@ -106,6 +108,8 @@ class Kernel extends HttpKernel
         'authenticated.passport.cookie' => AuthenticatedByPassportViaCookie::class,
         'authenticated.passport.header' => AuthenticatedByPassportViaHeader::class,
         'authenticated.passport.request' => AuthenticatedByPassportViaRequest::class,
+        'authorized.user.email' => AuthorizedWithUserEmail::class,
+        'authorized.user.permissions' => AuthorizedWithUserPermissions::class,
         'authorized.admin' => AuthorizedWithAdmin::class,
         'authorized.admin.email' => AuthorizedWithAdminEmail::class,
         'authorized.admin.permissions' => AuthorizedWithAdminPermissions::class,

@@ -1,12 +1,16 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\Base\IUserRepository;
-use App\ModelRepositories\Base\IHasEmailVerifiedRepository;
 use App\ModelRepositories\UserRepository;
+use App\Models\Base\IHasEmailVerified;
 
 /**
  * Class VerificationController
@@ -15,9 +19,23 @@ use App\ModelRepositories\UserRepository;
  */
 class VerificationController extends ModelApiController
 {
+    public function __construct()
+    {
+        parent::__construct();
+
+        if (!$this->enabled()) {
+            $this->abort404();
+        }
+    }
+
     protected function modelRepositoryClass()
     {
         return UserRepository::class;
+    }
+
+    protected function enabled()
+    {
+        return classImplemented($this->modelRepository->modelClass(), IHasEmailVerified::class);
     }
 
     public function store(Request $request)
@@ -34,13 +52,11 @@ class VerificationController extends ModelApiController
             'code' => 'required|string',
         ]);
 
-        if ($this->modelRepository instanceof IHasEmailVerifiedRepository) {
-            if (is_null(
-                $this->modelRepository->skipProtected()
-                    ->verifyEmailByCode($request->input('code'))
-            )) {
-                return $this->responseFail();
-            }
+        if (is_null(
+            $this->modelRepository->skipProtected()
+                ->verifyEmailByCode($request->input('code'))
+        )) {
+            return $this->responseFail();
         }
 
         return $this->responseSuccess();

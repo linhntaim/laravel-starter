@@ -7,6 +7,7 @@
 namespace App\Models;
 
 use App\ModelResources\UserResource;
+use App\Models\Base\IHasEmailVerified;
 use App\Models\Base\IHasSettings;
 use App\Models\Base\IModel;
 use App\Models\Base\IUser;
@@ -28,10 +29,13 @@ use Laravel\Passport\HasApiTokens;
  * @property bool $hasPassword
  * @property PasswordReset $passwordReset
  */
-class User extends Authenticatable implements IModel, IUser
+class User extends Authenticatable implements IModel, IUser, IHasEmailVerified
 {
     use HasApiTokens;
-    use ModelTrait, UserTrait, PassportTrait;
+    use ModelTrait, PassportTrait;
+    use UserTrait {
+        modelConstruct as userConstruct;
+    }
 
     public const USER_SYSTEM_ID = 1;
     public const USER_SUPER_ADMINISTRATOR_ID = 2;
@@ -87,6 +91,13 @@ class User extends Authenticatable implements IModel, IUser
     ];
 
     protected $resourceClass = UserResource::class;
+
+    public function __construct(array $attributes = [])
+    {
+        $this->userConstruct();
+
+        parent::__construct($attributes);
+    }
 
     public static function getProtectedKey()
     {

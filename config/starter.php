@@ -66,6 +66,8 @@ return [
         ],
     ],
     'forgot_password_enabled' => [
+        'user' => (bool)env('USER_FORGOT_PASSWORD_ENABLED', false),
+        'user_auto' => (bool)env('USER_FORGOT_PASSWORD_AUTO', false),
         'admin' => (bool)env('ADMIN_FORGOT_PASSWORD_ENABLED', false),
         'admin_auto' => (bool)env('ADMIN_FORGOT_PASSWORD_AUTO', false),
     ],

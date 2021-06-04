@@ -24,4 +24,8 @@ class AdminEmailVerificationNotification extends EmailVerificationNotification
     {
         return new AdminEmailVerificationMailable();
     }
+
+    // TODO:
+
+    // TODO
 }

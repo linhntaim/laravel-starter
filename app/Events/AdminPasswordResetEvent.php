@@ -6,6 +6,6 @@
 
 namespace App\Events;
 
-class PasswordResetAutomaticallyEvent extends PasswordResetEvent
+class AdminPasswordResetEvent extends PasswordResetEvent
 {
 }

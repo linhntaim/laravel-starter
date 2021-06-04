@@ -20,6 +20,7 @@ use App\Utils\Framework\ServerMaintainer;
 use App\Utils\HandledFiles\Helper;
 use App\Utils\SocialLogin;
 use App\Vendors\Illuminate\Support\Arr;
+use App\Vendors\Illuminate\Support\Facades\App;
 
 abstract class PrerequisiteController extends ApiController
 {
@@ -76,12 +77,13 @@ abstract class PrerequisiteController extends ApiController
                     ],
                 ],
                 'forgot_password_enabled' => ConfigHelper::get('forgot_password_enabled'),
+                'notification_via_database' => ConfigHelper::get('notification.via.database'),
                 'verification_enabled' => [
                     'email' => [
-                        'admin' => classImplemented(Admin::class, IHasEmailVerified::class),
+                        'user' => App::userEmailVerifiedImplemented(),
+                        'admin' => App::adminEmailVerifiedImplemented(),
                     ],
                 ],
-                'notification_via_database' => ConfigHelper::get('notification.via.database'),
             ];
         }
     }

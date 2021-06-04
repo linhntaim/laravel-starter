@@ -52,8 +52,6 @@ abstract class Command extends BaseCommand
         parent::__construct();
 
         $this->friendlyName = trim(preg_replace('/command$/i', '', static::__friendlyClassBaseName()));
-
-        $this->consoleClientApply();
     }
 
     public function ifOption($key, &$option, $filled = false)
@@ -163,6 +161,7 @@ abstract class Command extends BaseCommand
 
     public function handle()
     {
+        $this->consoleClientApply();
         try {
             $this->start();
             $this->go();

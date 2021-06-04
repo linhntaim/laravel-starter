@@ -6,12 +6,7 @@
 
 namespace App\Providers;
 
-use App\Exceptions\AppException;
 use App\Http\Requests\Request;
-use App\ModelRepositories\AdminRepository;
-use App\ModelRepositories\Base\IHasEmailVerifiedRepository;
-use App\Models\Admin;
-use App\Models\Base\IHasEmailVerified;
 use App\Utils\ClientSettings\Facade;
 use App\Utils\ClientSettings\Manager as ClientSettingsManager;
 use App\Utils\ConfigHelper;
@@ -91,11 +86,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if (classImplemented(Admin::class, IHasEmailVerified::class)
-            == !classImplemented(AdminRepository::class, IHasEmailVerifiedRepository::class)) {
-            throw new AppException('Email verification has not been fully implemented for [Admin].');
-        }
-
         if (Str::startsWith(config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }

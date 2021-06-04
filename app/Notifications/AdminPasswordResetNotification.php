@@ -23,4 +23,8 @@ class AdminPasswordResetNotification extends PasswordResetNotification
     {
         return new AdminPasswordResetMailable();
     }
+
+    // TODO:
+
+    // TODO
 }

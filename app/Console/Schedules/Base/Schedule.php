@@ -22,11 +22,6 @@ abstract class Schedule
      */
     protected $kernel;
 
-    public function __construct()
-    {
-        $this->consoleClientApply();
-    }
-
     public function withKernel(ConsoleKernel $kernel)
     {
         $this->kernel = $kernel;
@@ -53,6 +48,7 @@ abstract class Schedule
 
     public function handle()
     {
+        $this->consoleClientApply();
         try {
             $this->start();
             $this->go();

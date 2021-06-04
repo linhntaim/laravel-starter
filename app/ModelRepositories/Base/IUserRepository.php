@@ -13,7 +13,7 @@ use App\Models\User;
  * Interface IUserRepository
  * @package App\ModelRepositories\Base
  */
-interface IUserRepository extends IProtectedRepository
+interface IUserRepository extends IProtectedRepository, IHasPasswordRepository, IHasEmailVerifiedRepository
 {
     /**
      * @param User|IUser|mixed|null $id
@@ -33,18 +33,6 @@ interface IUserRepository extends IProtectedRepository
      * @return IUser|mixed
      */
     public function createWithAttributesFromSocial(array $attributes = [], array $userSocialAttributes = []);
-
-    /**
-     * @param string $password
-     * @return IUser|mixed
-     */
-    public function updatePassword($password);
-
-    /**
-     * @param string $password
-     * @return IUser|mixed
-     */
-    public function updatePasswordRandomly(&$password);
 
     /**
      * @return IUser|mixed

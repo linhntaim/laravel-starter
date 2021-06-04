@@ -4,9 +4,8 @@
  * Base - Any modification needs to be approved, except the space inside the block of TODO
  */
 
-use App\Models\Admin;
-use App\Models\Base\IHasEmailVerified;
 use App\Vendors\Illuminate\Database\Schema\Blueprint;
+use App\Vendors\Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Migrations\Migration;
 
@@ -27,7 +26,7 @@ class CreateAdminsTable extends Migration
             $table->integer('role_id')->unsigned()->nullable();
             $table->integer('avatar_id')->unsigned()->nullable();
             $table->string('display_name')->nullable();
-            if (classImplemented(Admin::class, IHasEmailVerified::class)) {
+            if (App::adminEmailVerifiedImplemented()) {
                 $table->string('email_verified_code')->nullable()->index();
                 $table->timestamp('email_verified_sent_at')->nullable();
                 $table->timestamp('email_verified_at')->nullable();

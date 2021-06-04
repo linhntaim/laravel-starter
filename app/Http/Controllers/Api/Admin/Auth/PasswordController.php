@@ -7,8 +7,8 @@
 namespace App\Http\Controllers\Api\Admin\Auth;
 
 use App\Events\AdminPasswordResetAutomaticallyEvent;
+use App\Events\AdminPasswordResetEvent;
 use App\Http\Controllers\Api\Auth\PasswordController as BasePasswordController;
-use App\Http\Requests\Request;
 use App\ModelRepositories\AdminRepository;
 use App\Utils\ConfigHelper;
 
@@ -24,25 +24,19 @@ class PasswordController extends BasePasswordController
         return AdminRepository::class;
     }
 
-    public function index(Request $request)
+    protected function enabled()
     {
-        if (!ConfigHelper::get('forgot_password_enabled.admin')) {
-            $this->abort404();
-        }
-        return parent::index($request);
+        return ConfigHelper::get('forgot_password_enabled.admin');
     }
 
-    protected function isAutomatic()
+    protected function automated()
     {
         return ConfigHelper::get('forgot_password_enabled.admin_auto');
     }
 
-    public function store(Request $request)
+    protected function getPasswordResetEventClass()
     {
-        if (!ConfigHelper::get('forgot_password_enabled.admin')) {
-            $this->abort404();
-        }
-        return parent::store($request);
+        return AdminPasswordResetEvent::class;
     }
 
     protected function getPasswordResetAutomaticallyEventClass()
