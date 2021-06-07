@@ -24,7 +24,7 @@
 AddDefaultCharset utf-8
 
 ### Set default document
-DirectoryIndex index.htm index.html index.php
+DirectoryIndex index.php index.html index.htm
 
 ### Set mime for some specific file extension
 AddType application/json .json

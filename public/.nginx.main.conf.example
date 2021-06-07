@@ -1,14 +1,30 @@
+### Basic authentication
+#auth_basic "Protected Area";
+#auth_basic_user_file /path/to/.htpasswd;
+#satisfy any;
+# Ignore: IPs (GBU - Security Room)
+#allow 113.161.68.31;
+# Ignore: IPs (GBU - Office)
+#allow 113.161.68.89;
+# Ignore: IPs (JPN - Office)
+#allow 113.43.219.94;
+# Ignore: IPs (JPN - Office)
+#allow 124.36.26.238;
+# Other must fill username and password
+#deny all;
+
 ### Set default charset
 charset utf-8;
 
 ### Set default document
-index index.htm index.html index.php;
+index index.php index.html index.htm;
 
 ### Set mime for some specific file extension
 types {
     application/json json;
     font/woff woff;
     font/woff2 woff2;
+    text/html html;
     text/csv csv;
     text/plain txt;
     video/mp4 mp4;
@@ -19,33 +35,13 @@ ssi on;
 ssi_last_modified on;
 ssi_min_file_chunk 1k;
 ssi_silent_errors off;
-ssi_types text/html;
+#ssi_types text/html;
 ssi_value_length 256;
 
-include common-headers.conf
+include common-headers.conf;
 ### Cache for static files only, ignore other requests
 add_header Cache-Control "no-cache, no-store, private";
 add_header Pragma "no-cache";
-
-### Handle Front
-location / {
-    ### Basic authentication
-    #auth_basic "Protected Area";
-    #auth_basic_user_file /path/to/.htpasswd;
-    #satisfy any;
-    # Ignore: IPs (GBU - Security Room)
-    #allow 113.161.68.31;
-    # Ignore: IPs (GBU - Office)
-    #allow 113.161.68.89;
-    # Ignore: IPs (JPN - Office)
-    #allow 113.43.219.94;
-    # Ignore: IPs (JPN - Office)
-    #allow 124.36.26.238;
-    # Other must fill username and password
-    #deny all;
-
-    try_files $uri $uri/ /index.php?$query_string;
-}
 
 ### Basic authentication
 # Ignore: Images
@@ -57,6 +53,16 @@ location / {
 #    auth_basic off;
 #}
 
+### Handle Front
+location / {
+    try_files $uri $uri/ /index.php?$query_string;
+}
+
+location = /favicon.ico { access_log off; log_not_found off; }
+location = /robots.txt  { access_log off; log_not_found off; }
+
+error_page 404 /index.php;
+
 location ~* \.(html|jpg|jpeg|png|gif|svg|ico|css|js|json|woff|woff2|mp4)$ {
     include common-headers.conf;
     ### Cache for static files only, ignore other requests
@@ -65,7 +71,10 @@ location ~* \.(html|jpg|jpeg|png|gif|svg|ico|css|js|json|woff|woff2|mp4)$ {
 
 location ~* \.php$ {
     fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
-    fastcgi_index index.php;
     fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
     include fastcgi_params;
+}
+
+location ~ /\.(?!well-known).* {
+    deny all;
 }

@@ -38,9 +38,9 @@
         <!--
         <defaultDocument enabled="true">
             <files>
-                <add value="index.htm"/>
-                <add value="index.html"/>
                 <add value="index.php"/>
+                <add value="index.html"/>
+                <add value="index.htm"/>
             </files>
         </defaultDocument>
         -->
