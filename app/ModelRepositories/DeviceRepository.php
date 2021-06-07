@@ -39,7 +39,7 @@ class DeviceRepository extends ModelRepository
     /**
      * @param $provider
      * @param $secret
-     * @return boolean
+     * @return bool
      * @throws
      */
     public function hasProviderAndSecret($provider, $secret)

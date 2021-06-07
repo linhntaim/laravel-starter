@@ -28,7 +28,7 @@ Route::group([
     // TODO
 ], function () {
     if (!App::runningInProduction() && class_exists('App\Http\Controllers\Web\TestWebController')) {
-        Route::any('test', ['App\Http\Controllers\Web\TestWebController', 'test']);
+        Route::any('test', ['App\Http\Controllers\Web\TestWebController', 'test'])->name('debug.test');
     }
 
     // TODO:

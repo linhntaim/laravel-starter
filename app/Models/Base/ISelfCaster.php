@@ -18,7 +18,7 @@ interface ISelfCaster
 
     /**
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function hasCaster(string $key);
 

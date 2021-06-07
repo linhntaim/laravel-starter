@@ -12,7 +12,7 @@ use App\Models\PasswordReset;
 /**
  * Class PasswordResetRepository
  * @package App\ModelRepositories
- * @property PasswordReset $model
+ * @property PasswordReset|null $model
  */
 class PasswordResetRepository extends ModelRepository
 {

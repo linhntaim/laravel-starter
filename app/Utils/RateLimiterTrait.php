@@ -28,7 +28,7 @@ trait RateLimiterTrait
         if ($needToRefreshCacheStore) {
             $cacheManager->forgetDriver();
         }
-        if ($needToRefreshCacheStore || empty($this->limiter)) {
+        if (is_null($this->limiter) || $needToRefreshCacheStore) {
             $this->limiter = new RateLimiter($cacheManager->store());
         }
         return $this->limiter;

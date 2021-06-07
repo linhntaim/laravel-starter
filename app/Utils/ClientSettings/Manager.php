@@ -132,9 +132,9 @@ class Manager
 
     public function setClientFromRequestRoute(Request $request, $force = false)
     {
-        $routeBasesClientIds = ConfigHelper::get('client.id_maps.routes', []);
+        $routeBasedClientIds = ConfigHelper::get('client.id_maps.routes', []);
         $appliedClientId = null;
-        foreach ($routeBasesClientIds as $routeMatch => $clientId) {
+        foreach ($routeBasedClientIds as $routeMatch => $clientId) {
             if ($request->possiblyIs($routeMatch)) {
                 $appliedClientId = $clientId;
             }
@@ -250,6 +250,10 @@ class Manager
      */
     public function temporary($settings, callable $callback)
     {
+        if (empty($settings)) {
+            return $callback();
+        }
+
         $original = $this->capture();
         try {
             $this->update($settings);

@@ -21,8 +21,8 @@ use Illuminate\Http\UploadedFile;
 /**
  * Class HandledFileRepository
  * @package App\ModelRepositories
- * @property HandledFile $model
- * @method  HandledFile model($id = null)
+ * @property HandledFile|null $model
+ * @method  HandledFile|null model($id = null)
  */
 class HandledFileRepository extends ModelRepository
 {

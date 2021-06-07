@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Class DatabaseNotificationRepository
  * @package App\ModelRepositories
- * @property DatabaseNotification $model
+ * @property DatabaseNotification|null $model
  */
 class DatabaseNotificationRepository extends ModelRepository
 {

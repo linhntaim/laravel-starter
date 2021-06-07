@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Collection;
 /**
  * Trait ProtectedRepositoryTrait
  * @package App\ModelRepositories\Base
- * @property IProtected $model
+ * @property IProtected|null $model
  */
 trait ProtectedRepositoryTrait
 {

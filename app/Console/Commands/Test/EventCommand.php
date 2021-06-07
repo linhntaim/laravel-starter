@@ -7,7 +7,7 @@
 namespace App\Console\Commands\Test;
 
 use App\Console\Commands\Base\Command;
-use App\Events\TestingEvent;
+use App\Events\TestEvent;
 
 class EventCommand extends Command
 {
@@ -15,6 +15,6 @@ class EventCommand extends Command
 
     protected function go()
     {
-        event(new TestingEvent());
+        event(new TestEvent());
     }
 }

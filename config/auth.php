@@ -95,8 +95,8 @@ return [
         'users' => [
             'provider' => 'users',
             'table' => 'user_password_resets',
-            'expire' => (int)env('PASSWORD_RESET_EXPIRE', 1440), // 1 day
-            'throttle' => (int)env('PASSWORD_RESET_THROTTLE', 60), // 1 minute
+            'expire' => (int)env('PASSWORD_RESET_EXPIRE', 1440), // minutes (= 1 day), 0 = no expiration
+            'throttle' => (int)env('PASSWORD_RESET_THROTTLE', 60), // seconds (= 1 minute), 0 = no throttle
         ],
     ],
 
@@ -113,4 +113,14 @@ return [
 
     'password_timeout' => 10800,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Email verification
+    |--------------------------------------------------------------------------
+    |
+    */
+
+    'verification' => [
+        'expire' => (int)env('EMAIL_VERIFICATION_EXPIRE', 0), // minutes, 0 = no expiration
+    ],
 ];

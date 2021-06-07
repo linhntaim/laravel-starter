@@ -15,7 +15,7 @@ use App\Models\Permission;
 /**
  * Class PermissionRepository
  * @package App\ModelRepositories
- * @property Permission|IProtected $model
+ * @property Permission|IProtected|null $model
  */
 class PermissionRepository extends ModelRepository implements IProtectedRepository
 {

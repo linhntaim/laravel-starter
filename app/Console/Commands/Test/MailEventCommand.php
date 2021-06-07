@@ -7,14 +7,14 @@
 namespace App\Console\Commands\Test;
 
 use App\Console\Commands\Base\Command;
-use App\Events\MailTestingEvent;
+use App\Events\TestMailEvent;
 
 class MailEventCommand extends Command
 {
-    protected $signature = 'test:mail-event {--subject=Tested} {--template_path=test}';
+    protected $signature = 'test:mail-event {--subject=Tested} {--view=test}';
 
     protected function go()
     {
-        event(new MailTestingEvent($this->option('subject'), $this->option('template_path')));
+        event(new TestMailEvent($this->option('subject'), $this->option('view')));
     }
 }

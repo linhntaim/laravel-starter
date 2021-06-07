@@ -7,17 +7,14 @@
 namespace App\Console\Commands;
 
 use App\Console\Commands\Base\Command;
-use App\ModelRepositories\UserRepository;
+use App\Console\Commands\Base\UserCommandTrait;
 use App\Utils\PasswordGenerator;
 
 class UpdatePasswordCommand extends Command
 {
-    protected $signature = 'update:password {user} {--password=}';
+    use UserCommandTrait;
 
-    /**
-     * @var UserRepository
-     */
-    protected $userRepository;
+    protected $signature = 'update:password {user} {--password=}';
 
     protected $password;
 
@@ -30,10 +27,7 @@ class UpdatePasswordCommand extends Command
 
     protected function updatePassword()
     {
-        $this->userRepository->skipProtected()
-            ->updateWithAttributes([
-                'password' => $this->password,
-            ]);
+        $this->userRepository->skipProtected()->updatePassword($this->password);
         $this->warn(
             sprintf(
                 '[%s] was updated as password for User ID [%s] successfully!',
@@ -41,19 +35,6 @@ class UpdatePasswordCommand extends Command
                 $this->userRepository->getId(),
             )
         );
-    }
-
-    protected function parseUser()
-    {
-        $this->userRepository = new UserRepository();
-        $this->userRepository->pinModel()
-            ->notStrict()
-            ->getUniquely($this->argument('user'));
-        if ($this->userRepository->doesntHaveModel()) {
-            $this->error('Cannot find user');
-            return false;
-        }
-        return true;
     }
 
     protected function parsePassword()
@@ -89,12 +70,12 @@ class UpdatePasswordCommand extends Command
 
             $this->password = (new PasswordGenerator())
                 ->excludeSimilarCharacters($similarCharactersExcluded)
-                ->includeLowerCases($lowerCasesIncluded)
                 ->includeUpperCases($upperCasesIncluded)
+                ->includeLowerCases($lowerCasesIncluded)
                 ->includeNumbers($numbersIncluded)
                 ->includeSymbols($symbolsIncluded)
-                ->setLowerCasesLength($lowerCasesLength)
                 ->setUpperCasesLength($upperCasesLength)
+                ->setLowerCasesLength($lowerCasesLength)
                 ->setNumbersLength($numbersLength)
                 ->setSymbolsLength($symbolsLength)
                 ->generate();

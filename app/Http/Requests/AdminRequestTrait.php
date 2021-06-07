@@ -11,7 +11,7 @@ use App\Models\Admin;
 trait AdminRequestTrait
 {
     /**
-     * @var Admin
+     * @var Admin|null
      */
     protected $admin = null;
 

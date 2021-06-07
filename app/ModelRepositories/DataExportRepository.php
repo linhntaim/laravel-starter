@@ -14,7 +14,7 @@ use App\Models\DataExport;
 /**
  * Class DataExportRepository
  * @package App\ModelRepositories
- * @method DataExport model($id = null)
+ * @method DataExport|null model($id = null)
  */
 class DataExportRepository extends ModelRepository
 {

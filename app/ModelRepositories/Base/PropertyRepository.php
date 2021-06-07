@@ -49,7 +49,7 @@ abstract class PropertyRepository extends ModelRepository
      * @param array $properties
      * @param IHasProperties|Model $hasPropertyModel
      * @param array $extraAttributes
-     * @return boolean
+     * @return bool
      * @throws
      */
     public function saveMany(array $properties, $hasPropertyModel, $extraAttributes = [])

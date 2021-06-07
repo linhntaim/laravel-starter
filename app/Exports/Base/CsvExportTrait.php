@@ -6,10 +6,13 @@
 
 namespace App\Exports\Base;
 
+use App\Exceptions\AppException;
+use App\Exceptions\Exception;
 use App\ModelRepositories\HandledFileRepository;
 use App\Models\HandledFile;
 use App\Utils\HandledFiles\Filer\CsvFiler;
 use App\Vendors\Illuminate\Support\Facades\App;
+use Throwable;
 
 /**
  * Trait CsvExportTrait
@@ -22,6 +25,8 @@ trait CsvExportTrait
      * @var CsvFiler
      */
     protected $csvFiler;
+
+    protected $storeBlockOfData = true;
 
     public function csvHeaders()
     {
@@ -46,11 +51,30 @@ trait CsvExportTrait
         return $this;
     }
 
-    protected function csvStore($data)
+    /**
+     * @param array $data
+     * @return static
+     * @throws
+     */
+    protected function csvStore(array $data)
     {
-        $this->csvFiler->fStartAppending()
-            ->fWrite($data)
-            ->fEndWriting();
+        $this->csvFiler->fStartAppending();
+        if ($this->storeBlockOfData) {
+            $this->csvFiler->fWrite($data);
+        }
+        else {
+            foreach ($data as $item) {
+                try {
+                    $this->csvFiler->fWrite([$item]);
+                }
+                catch (Throwable $exception) {
+                    throw ($exception instanceof Exception ? $exception : AppException::from($exception))->setAttachedData([
+                        'export_data' => $item,
+                    ]);
+                }
+            }
+        }
+        $this->csvFiler->fEndWriting();
         return $this;
     }
 
@@ -70,7 +94,7 @@ trait CsvExportTrait
             ->csvAfterExporting();
         return tap(
             $this->handledFileRepository
-                ->usePublic() // make sure to move to public storage
+                ->useCloud() // make sure to move to cloud storage if possible, otherwise, keep it private
                 ->createWithFiler($this->csvFiler),
             function () {
                 App::bench('export::csv::' . $this->getName());

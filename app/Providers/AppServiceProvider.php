@@ -38,6 +38,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        App::benchFrom('start');
+
         $this->generateAppId();
 
         $this->app->alias('request', Request::class);
@@ -80,6 +82,7 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      *
      * @return void
+     * @throws
      */
     public function boot()
     {
@@ -107,6 +110,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $this->app->terminating(function () {
+            App::bench('start');
             App::bench('app');
         });
     }

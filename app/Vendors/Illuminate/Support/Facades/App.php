@@ -1,7 +1,14 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\Vendors\Illuminate\Support\Facades;
 
+use App\Models\Admin;
+use App\Models\Base\IHasEmailVerified;
+use App\Models\User;
 use App\Utils\ConfigHelper;
 use App\Utils\HandledFiles\Helper;
 use Illuminate\Support\Facades\App as BaseApp;
@@ -66,7 +73,10 @@ class App extends BaseApp
 
     protected static $benchAt = [];
 
-    public static function benchFrom($name)
+    /**
+     * @param string $name
+     */
+    public static function benchFrom(string $name)
     {
         if (static::runningInDebug()) {
             static::$benchAt[$name] = [
@@ -76,16 +86,26 @@ class App extends BaseApp
                 'p' => memory_get_peak_usage(),
                 'pr' => memory_get_peak_usage(true),
             ];
+            Log::info(
+                sprintf(
+                    'Bench start [%s].',
+                    $name
+                )
+            );
         }
     }
 
-    public static function bench($name)
+    /**
+     * @param string $name
+     * @param bool|string $benchFrom
+     */
+    public static function bench(string $name, $benchFrom = false)
     {
         if (static::runningInDebug()) {
             if (isset(static::$benchAt[$name])) {
                 Log::info(
                     sprintf(
-                        'Bench from [%s]: %sms + %sms, %s / %s, %s / %s (real), %s / %s (peak), %s / %s (peak real).',
+                        'Bench end [%s]: %sms + %sms, %s / %s, %s / %s (real), %s / %s (peak), %s / %s (peak real).',
                         $name,
                         number_format(round((microtime(true) - static::$benchAt[$name]['t']) * 1000, 2), 2),
                         number_format(round((static::$benchAt[$name]['t'] - LARAVEL_START) * 1000, 2), 2),
@@ -103,7 +123,7 @@ class App extends BaseApp
             else {
                 Log::info(
                     sprintf(
-                        'Bench [%s] from start: %sms, %s, %s (real), %s (peak), %s (peak real).',
+                        'Bench [%s]: %sms, %s, %s (real), %s (peak), %s (peak real).',
                         $name,
                         number_format(round((microtime(true) - LARAVEL_START) * 1000, 2), 2),
                         Helper::autoDisplaySize(memory_get_usage(), 2),
@@ -113,6 +133,30 @@ class App extends BaseApp
                     )
                 );
             }
+            if ($benchFrom === true) {
+                static::benchFrom($name);
+            }
+            elseif ($benchFrom !== false) {
+                static::benchFrom($benchFrom);
+            }
         }
+    }
+
+    public static function userEmailVerifiedImplemented()
+    {
+        static $implemented = null;
+        setIfNull($implemented, function () {
+            return classImplemented(User::class, IHasEmailVerified::class);
+        });
+        return $implemented;
+    }
+
+    public static function adminEmailVerifiedImplemented()
+    {
+        static $implemented = null;
+        setIfNull($implemented, function () {
+            return classImplemented(Admin::class, IHasEmailVerified::class);
+        });
+        return $implemented;
     }
 }

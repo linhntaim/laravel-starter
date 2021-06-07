@@ -6,14 +6,16 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
+use App\Events\PasswordResetAutomaticallyEvent;
+use App\Events\PasswordResetEvent;
 use App\Http\Controllers\ModelApiController;
 use App\Http\Requests\Request;
 use App\ModelRepositories\Base\IUserRepository;
 use App\ModelRepositories\PasswordResetRepository;
+use App\ModelRepositories\UserRepository;
 use App\Models\User;
-use App\Vendors\Illuminate\Support\Str;
+use App\Utils\ConfigHelper;
 use Closure;
-use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Support\Facades\Password;
@@ -23,7 +25,7 @@ use Illuminate\Support\Facades\Password;
  * @package App\Http\Controllers\Api\Auth
  * @property PasswordResetRepository $modelRepository
  */
-abstract class PasswordController extends ModelApiController
+class PasswordController extends ModelApiController
 {
     /**
      * @var IUserRepository
@@ -34,8 +36,10 @@ abstract class PasswordController extends ModelApiController
     {
         parent::__construct();
 
-        if ($userRepositoryClass = $this->getUserRepositoryClass()) {
-            $this->userRepository = new $userRepositoryClass;
+        $userRepositoryClass = $this->getUserRepositoryClass();
+        $this->userRepository = new $userRepositoryClass;
+        if (!$this->enabled()) {
+            $this->abort404();
         }
     }
 
@@ -47,7 +51,10 @@ abstract class PasswordController extends ModelApiController
     /**
      * @return string
      */
-    protected abstract function getUserRepositoryClass();
+    protected function getUserRepositoryClass()
+    {
+        return UserRepository::class;
+    }
 
     protected function getPasswordMinLength()
     {
@@ -84,6 +91,16 @@ abstract class PasswordController extends ModelApiController
         return $this->broker()->reset($credentials, $callback);
     }
 
+    protected function enabled()
+    {
+        return ConfigHelper::get('forgot_password_enabled.user');
+    }
+
+    protected function automated()
+    {
+        return ConfigHelper::get('forgot_password_enabled.user_auto');
+    }
+
     public function index(Request $request)
     {
         if ($request->has('_reset')) {
@@ -100,8 +117,8 @@ abstract class PasswordController extends ModelApiController
         ]);
 
         $email = $this->modelRepository->getEmailByToken($request->input('token'));
-        if (empty($email)) {
-            $this->abort404();
+        if (is_null($email)) {
+            return $this->responseFail(trans(Password::INVALID_TOKEN));
         }
 
         $user = $this->brokerGetUser([
@@ -111,7 +128,7 @@ abstract class PasswordController extends ModelApiController
             return $this->responseFail(trans(Password::INVALID_USER));
         }
         if (!$this->brokerTokenExists($user, $request->input('token'))) {
-            $this->abort404();
+            return $this->responseFail(trans(Password::INVALID_TOKEN));
         }
 
         return $this->responseModel([
@@ -122,7 +139,9 @@ abstract class PasswordController extends ModelApiController
     public function store(Request $request)
     {
         if ($request->has('_forgot')) {
-            return $this->forgot($request);
+            return $this->automated() ?
+                $this->resetAutomatically($request)
+                : $this->forgot($request);
         }
         if ($request->has('_reset')) {
             return $this->reset($request);
@@ -177,9 +196,59 @@ abstract class PasswordController extends ModelApiController
 
     protected function afterReset(User $user, $password)
     {
-        $user->password = Str::hash($password);
-        $user->save();
+        (new UserRepository())
+            ->withModel($user)
+            ->skipProtected()
+            ->updatePassword($password);
 
-        event(new PasswordReset($user));
+        event($this->getPasswordResetEvent($user, $password));
+    }
+
+    protected function getPasswordResetEvent(User $user, $password)
+    {
+        $eventClass = $this->getPasswordResetEventClass();
+        return new $eventClass($user, $password);
+    }
+
+    protected function getPasswordResetEventClass()
+    {
+        return PasswordResetEvent::class;
+    }
+
+    protected function resetAutomatically(Request $request)
+    {
+        $this->validated($request, [
+            'email' => 'required',
+        ]);
+
+        ($userRepository = new UserRepository())
+            ->notStrict()
+            ->pinModel()
+            ->getByEmail($request->input('email'));
+        if ($userRepository->doesntHaveModel()) {
+            return $this->responseFail(trans(Password::INVALID_USER));
+        }
+
+        $userRepository
+            ->skipProtected()
+            ->updatePasswordRandomly($password);
+        event($this->getPasswordResetAutomaticallyEvent($userRepository->model(), $password));
+        return $this->responseSuccess();
+    }
+
+    /**
+     * @param User $user
+     * @param string $password
+     * @return PasswordResetAutomaticallyEvent
+     */
+    protected function getPasswordResetAutomaticallyEvent(User $user, string $password)
+    {
+        $eventClass = $this->getPasswordResetAutomaticallyEventClass();
+        return new $eventClass($user, $password);
+    }
+
+    protected function getPasswordResetAutomaticallyEventClass()
+    {
+        return PasswordResetAutomaticallyEvent::class;
     }
 }

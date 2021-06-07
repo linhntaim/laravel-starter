@@ -13,7 +13,7 @@ use App\Models\User;
  * Interface IUserRepository
  * @package App\ModelRepositories\Base
  */
-interface IUserRepository
+interface IUserRepository extends IProtectedRepository, IHasPasswordRepository, IHasEmailVerifiedRepository
 {
     /**
      * @param User|IUser|mixed|null $id

@@ -6,17 +6,6 @@
 
 use App\Http\Controllers\Api\HandledFileController;
 
-// Common common
-use App\Http\Controllers\Api\Common\DeviceController as CommonDeviceController;
-use App\Http\Controllers\Api\Common\PrerequisiteController as CommonPrerequisiteController;
-
-// Common auth
-use App\Http\Controllers\Api\Common\Auth\LoginController as CommonLoginController;
-use App\Http\Controllers\Api\Common\Auth\LogoutController as CommonLogoutController;
-
-// Common account
-use App\Http\Controllers\Api\Common\Account\AccountController as CommonAccountController;
-
 // Admin common
 use App\Http\Controllers\Api\Admin\DeviceController as AdminDeviceController;
 use App\Http\Controllers\Api\Admin\HandledFileController as AdminHandledFileController;
@@ -27,6 +16,7 @@ use App\Http\Controllers\Api\Admin\Auth\LoginController as AdminLoginController;
 use App\Http\Controllers\Api\Admin\Auth\LogoutController as AdminLogoutController;
 use App\Http\Controllers\Api\Admin\Auth\RegisterController as AdminRegisterController;
 use App\Http\Controllers\Api\Admin\Auth\PasswordController as AdminPasswordController;
+use App\Http\Controllers\Api\Admin\Auth\VerificationController as AdminVerificationController;
 
 // Admin account
 use App\Http\Controllers\Api\Admin\Account\AccountController as AdminAccountController;
@@ -53,6 +43,8 @@ use App\Http\Controllers\Api\Home\PrerequisiteController as HomePrerequisiteCont
 use App\Http\Controllers\Api\Home\Auth\LoginController as HomeLoginController;
 use App\Http\Controllers\Api\Home\Auth\LogoutController as HomeLogoutController;
 use App\Http\Controllers\Api\Home\Auth\RegisterController as HomeRegisterController;
+use App\Http\Controllers\Api\Home\Auth\PasswordController as HomePasswordController;
+use App\Http\Controllers\Api\Home\Auth\VerificationController as HomeVerificationController;
 
 // Home account
 use App\Http\Controllers\Api\Home\Account\AccountController as HomeAccountController;
@@ -81,7 +73,7 @@ Route::group([
     // TODO
 ], function () {
     if (!App::runningInProduction() && class_exists('App\Http\Controllers\Api\TestApiController')) {
-        Route::any('test', ['App\Http\Controllers\Api\TestApiController', 'test']);
+        Route::any('test', ['App\Http\Controllers\Api\TestApiController', 'test'])->name('debug.test');
     }
 
     Route::get('handled-file/{id}', [HandledFileController::class, 'show'])->name('handled_file.show');
@@ -92,7 +84,11 @@ Route::group([
 
     Route::group([
         'prefix' => 'account',
-        'middleware' => ['authenticated.passport.cookie', 'authenticated.passport.request', 'auth:api'],
+        'middleware' => [
+            'authenticated.passport.cookie',
+            'authenticated.passport.request',
+            'auth:api',
+        ],
     ], function () {
         Route::get('handled-file/{id}', [HandledFileController::class, 'show'])->name('account.handled_file.show');
     });
@@ -117,6 +113,9 @@ Route::group([
         ], function () {
             Route::post('login', [HomeLoginController::class, 'issueToken']);
             Route::post('register', [HomeRegisterController::class, 'store']);
+            Route::post('password', [HomePasswordController::class, 'store']);
+            Route::get('password', [HomePasswordController::class, 'index']);
+            Route::post('verify', [HomeVerificationController::class, 'store']);
 
             // TODO:
 
@@ -126,7 +125,11 @@ Route::group([
 
         #region Authenticated
         Route::group([
-            'middleware' => ['auth:api', 'impersonate'],
+            'middleware' => [
+                'auth:api',
+                'impersonate',
+                //'authorized.user.email',
+            ],
         ], function () {
             Route::group([
                 'prefix' => 'auth',
@@ -151,17 +154,21 @@ Route::group([
             });
 
             Route::group([
-                'prefix' => 'handled-file',
+                //'authorized.user.email',
             ], function () {
-                Route::post('/', [HomeHandledFileController::class, 'store']);
+                Route::group([
+                    'prefix' => 'handled-file',
+                ], function () {
+                    Route::post('/', [HomeHandledFileController::class, 'store']);
+                    // TODO:
+
+                    // TODO
+                });
+
                 // TODO:
 
                 // TODO
             });
-
-            // TODO:
-
-            // TODO
         });
         #endregion
     });
@@ -189,6 +196,7 @@ Route::group([
             Route::post('register', [AdminRegisterController::class, 'store']);
             Route::post('password', [AdminPasswordController::class, 'store']);
             Route::get('password', [AdminPasswordController::class, 'index']);
+            Route::post('verify', [AdminVerificationController::class, 'store']);
 
             // TODO:
 
@@ -198,7 +206,12 @@ Route::group([
 
         #region Authenticated
         Route::group([
-            'middleware' => ['auth:api', 'authorized.admin', 'impersonate'],
+            'middleware' => [
+                'auth:api',
+                'authorized.admin',
+                'impersonate',
+                //'authorized.admin.email',
+            ],
         ], function () {
             Route::group([
                 'prefix' => 'auth',
@@ -226,111 +239,76 @@ Route::group([
             });
 
             Route::group([
-                'middleware' => 'authorized.admin.permissions:be-super-admin',
+                //'authorized.admin.email',
             ], function () {
                 Route::group([
-                    'prefix' => 'command',
+                    'middleware' => 'authorized.admin.permissions:be-super-admin',
                 ], function () {
-                    Route::get('/', [AdminCommandController::class, 'index']);
-                    Route::post('/', [AdminCommandController::class, 'run']);
+                    Route::group([
+                        'prefix' => 'command',
+                    ], function () {
+                        Route::get('/', [AdminCommandController::class, 'index']);
+                        Route::post('/', [AdminCommandController::class, 'run']);
+                    });
+
+                    Route::group([
+                        'prefix' => 'system-log',
+                    ], function () {
+                        Route::get('/', [AdminSystemLogController::class, 'index']);
+                        Route::get('{id}', [AdminSystemLogController::class, 'show'])
+                            ->middleware(['authenticated.passport.cookie', 'authenticated.passport.request'])
+                            ->where('id', '.+')
+                            ->name('admin.system_log.show');
+                    });
                 });
 
                 Route::group([
-                    'prefix' => 'system-log',
+                    'prefix' => 'app-option',
                 ], function () {
-                    Route::get('/', [AdminSystemLogController::class, 'index']);
-                    Route::get('{id}', [AdminSystemLogController::class, 'show'])
-                        ->middleware(['authenticated.passport.cookie', 'authenticated.passport.request'])
-                        ->where('id', '.+')
-                        ->name('admin.system_log.show');
+                    Route::post('/', [AdminAppOptionController::class, 'store']);
                 });
-            });
 
-            Route::group([
-                'prefix' => 'app-option',
-            ], function () {
-                Route::post('/', [AdminAppOptionController::class, 'store']);
-            });
+                Route::group([
+                    'prefix' => 'data-export',
+                ], function () {
+                    Route::get('/', [AdminDataExportController::class, 'index']);
+                    Route::get('{id}', [AdminDataExportController::class, 'show'])
+                        ->middleware(['authenticated.passport.cookie', 'authenticated.passport.request']);
+                });
 
-            Route::group([
-                'prefix' => 'data-export',
-            ], function () {
-                Route::get('/', [AdminDataExportController::class, 'index']);
-                Route::get('{id}', [AdminDataExportController::class, 'show'])
-                    ->middleware(['authenticated.passport.cookie', 'authenticated.passport.request']);
-            });
+                Route::group([
+                    'prefix' => 'handled-file',
+                ], function () {
+                    Route::post('/', [AdminHandledFileController::class, 'store']);
+                    Route::post('ck-editor-simple-upload', [AdminHandledFileController::class, 'storeCkEditorSimpleUpload']);
+                    Route::post('{id}', [AdminHandledFileController::class, 'update']);
+                });
 
-            Route::group([
-                'prefix' => 'handled-file',
-            ], function () {
-                Route::post('/', [AdminHandledFileController::class, 'store']);
-                Route::post('ck-editor-simple-upload', [AdminHandledFileController::class, 'storeCkEditorSimpleUpload']);
-                Route::post('{id}', [AdminHandledFileController::class, 'update']);
-            });
+                Route::group([
+                    'prefix' => 'activity-log',
+                ], function () {
+                    Route::get('/', [AdminActivityLogController::class, 'index'])
+                        ->middleware('authorized.admin.permissions:activity-log-manage');
+                    Route::get('{id}', [AdminActivityLogController::class, 'show'])
+                        ->middleware('authorized.admin.permissions:activity-log-manage');
+                });
 
-            Route::group([
-                'prefix' => 'activity-log',
-            ], function () {
-                Route::get('/', [AdminActivityLogController::class, 'index'])
-                    ->middleware('authorized.admin.permissions:activity-log-manage');
-                Route::get('{id}', [AdminActivityLogController::class, 'show'])
-                    ->middleware('authorized.admin.permissions:activity-log-manage');
-            });
+                Route::group([
+                    'prefix' => 'role',
+                ], function () {
+                    Route::get('/', [AdminRoleController::class, 'index'])
+                        ->middleware('authorized.admin.permissions:role-manage');
+                    Route::post('/', [AdminRoleController::class, 'store'])
+                        ->middleware('authorized.admin.permissions:role-manage');
+                    Route::get('{id}', [AdminRoleController::class, 'show'])
+                        ->middleware('authorized.admin.permissions:role-manage');
+                    Route::post('{id}', [AdminRoleController::class, 'update'])
+                        ->middleware('authorized.admin.permissions:role-manage');
+                });
 
-            Route::group([
-                'prefix' => 'role',
-            ], function () {
-                Route::get('/', [AdminRoleController::class, 'index'])
-                    ->middleware('authorized.admin.permissions:role-manage');
-                Route::post('/', [AdminRoleController::class, 'store'])
-                    ->middleware('authorized.admin.permissions:role-manage');
-                Route::get('{id}', [AdminRoleController::class, 'show'])
-                    ->middleware('authorized.admin.permissions:role-manage');
-                Route::post('{id}', [AdminRoleController::class, 'update'])
-                    ->middleware('authorized.admin.permissions:role-manage');
-            });
+                // TODO:
 
-            // TODO:
-
-            // TODO
-        });
-        #endregion
-    });
-    #endregion
-
-    #region Common
-    Route::group([
-        'prefix' => 'common',
-    ], function () {
-        #region Common
-        Route::get('prerequisite', [CommonPrerequisiteController::class, 'index']);
-        Route::post('device/current', [CommonDeviceController::class, 'currentStore']);
-        #endregion
-
-        #region Authentication
-        Route::group([
-            'prefix' => 'auth',
-        ], function () {
-            Route::post('login', [CommonLoginController::class, 'issueToken']);
-        });
-        #endregion
-
-        #region Authenticated
-        Route::group([
-            'middleware' => ['auth:api', 'impersonate'],
-        ], function () {
-            Route::group([
-                'prefix' => 'auth',
-            ], function () {
-                Route::post('logout', [CommonLogoutController::class, 'logout']);
-            });
-
-            // Account
-            Route::group([
-                'prefix' => 'account',
-            ], function () {
-                Route::get('/', [CommonAccountController::class, 'index']);
-                Route::post('/', [CommonAccountController::class, 'store']);
+                // TODO
             });
         });
         #endregion

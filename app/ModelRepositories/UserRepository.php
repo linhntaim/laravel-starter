@@ -7,6 +7,7 @@
 namespace App\ModelRepositories;
 
 use App\Exceptions\AppException;
+use App\ModelRepositories\Base\HasEmailVerifiedRepositoryTrait;
 use App\ModelRepositories\Base\IProtectedRepository;
 use App\ModelRepositories\Base\IUserRepository;
 use App\ModelRepositories\Base\ModelRepository;
@@ -14,6 +15,7 @@ use App\ModelRepositories\Base\ProtectedRepositoryTrait;
 use App\Models\Base\IProtected;
 use App\Models\User;
 use App\Utils\ClientSettings\DateTimer;
+use App\Utils\PasswordGenerator;
 use App\Utils\SocialLogin;
 use App\Vendors\Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -21,12 +23,13 @@ use Illuminate\Support\Facades\DB;
 /**
  * Class UserRepository
  * @package App\ModelRepositories
- * @property User|IProtected $model
+ * @property User|IProtected|null $model
+ * @method User|null model($id = null)
  * @method User|null getUniquely($unique)
  */
-class UserRepository extends ModelRepository implements IProtectedRepository, IUserRepository
+class UserRepository extends ModelRepository implements IUserRepository
 {
-    use ProtectedRepositoryTrait;
+    use ProtectedRepositoryTrait, HasEmailVerifiedRepositoryTrait;
 
     public function modelClass()
     {
@@ -163,7 +166,6 @@ class UserRepository extends ModelRepository implements IProtectedRepository, IU
             && !$socialLogin->checkEmailDomain($attributes['email'])) {
             throw new AppException(static::__transErrorWithModule('email.not_allowed'));
         }
-
         if (!empty($attributes['password'])) {
             $attributes['password'] = Str::hash($attributes['password']);
             $attributes['password_changed_at'] = DateTimer::syncNow();
@@ -182,9 +184,36 @@ class UserRepository extends ModelRepository implements IProtectedRepository, IU
         return $this->model;
     }
 
+    public function updatePassword($password)
+    {
+        return $this->updateWithAttributes([
+            'password' => $password,
+        ]);
+    }
+
+    public function updatePasswordRandomly(&$password)
+    {
+        return $this->updateWithAttributes([
+            'password' => ($password = $this->getRandomPasswordGenerator()->generate()),
+        ]);
+    }
+
+    /**
+     * @return PasswordGenerator
+     */
+    protected function getRandomPasswordGenerator()
+    {
+        return (new PasswordGenerator())
+            ->excludeSimilarCharacters()
+            ->includeUpperCases()
+            ->includeLowerCases()
+            ->includeNumbers()
+            ->includeSymbols();
+    }
+
     public function updateLastAccessedAt()
     {
-        return $this->skipProtected()->updateWithAttributes([
+        return $this->updateWithAttributes([
             'last_accessed_at' => DateTimer::syncNow(),
         ]);
     }

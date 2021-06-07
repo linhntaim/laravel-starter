@@ -6,14 +6,14 @@
 
 namespace App\Events\Listeners;
 
-use App\Events\TestingEvent;
+use App\Events\TestEvent;
 use App\Events\Listeners\Base\NowListener;
 use Illuminate\Support\Facades\Log;
 
 class OnTestingEvent extends NowListener
 {
     /**
-     * @param TestingEvent $event
+     * @param TestEvent $event
      */
     protected function go($event)
     {

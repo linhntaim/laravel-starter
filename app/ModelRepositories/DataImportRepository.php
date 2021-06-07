@@ -19,7 +19,7 @@ use Illuminate\Http\UploadedFile;
 /**
  * Class DataImportRepository
  * @package App\ModelRepositories
- * @method DataImport model($id = null)
+ * @method DataImport|null model($id = null)
  */
 class DataImportRepository extends ModelRepository
 {

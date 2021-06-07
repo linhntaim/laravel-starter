@@ -48,6 +48,10 @@ return [
             'level_failed' => 'アクセスするには認証が必要です。',
             'level' => ':message',
         ],
+        'mail_exception' => [
+            'level_failed' => 'E-mail cannot be sent.',
+            'level' => ':message',
+        ],
         'unhandled_exception' => [
             'level_failed' => '問題が発生しました。',
             'level' => ':message',

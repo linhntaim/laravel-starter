@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\ApiResponseTrait;
-use App\ModelRepositories\OAuthImpersonateRepository;
+use App\ModelRepositories\ImpersonateRepository;
 use App\Utils\ConfigHelper;
 use App\Vendors\Illuminate\Support\Str;
 use Illuminate\Http\Response;
@@ -24,6 +24,8 @@ abstract class LoginController extends AccessTokenController
 {
     use ApiResponseTrait;
 
+    protected $grantType = '';
+
     public function __construct(AuthorizationServer $server, TokenRepository $tokens, JwtParser $jwt)
     {
         parent::__construct($server, $tokens, $jwt);
@@ -39,7 +41,7 @@ abstract class LoginController extends AccessTokenController
      */
     private function impersonate($response, $impersonateToken)
     {
-        if (!is_null($impersonateToken) && ConfigHelper::get('impersonated_by_admin')) {
+        if (ConfigHelper::get('impersonated_by_admin') && !is_null($impersonateToken)) {
             $parsedToken = $this->jwt->parse(
                 json_decode($response->getContent(), true)['_data']['access_token']
             );
@@ -50,10 +52,10 @@ abstract class LoginController extends AccessTokenController
             elseif (method_exists($parsedToken, 'claims')) { // support lcobucci/jwt@4.x
                 $accessTokenId = $parsedToken->claims()->get('jti');;
             }
-            $oAuthImpersonateRepository = new OAuthImpersonateRepository();
+            $oAuthImpersonateRepository = new ImpersonateRepository();
             $oAuthImpersonateRepository->pinModel()->getByImpersonateToken($impersonateToken);
             $oAuthImpersonateRepository->updateWithAttributes([
-                'access_token_id' => $accessTokenId,
+                'auth_token' => $accessTokenId,
             ]);
         }
         return $response;
@@ -67,6 +69,9 @@ abstract class LoginController extends AccessTokenController
                 $this->throwException(LeagueException::invalidClient($request));
             }
         }
+        if (isset($parsedBody['grant_type'])) {
+            $this->grantType = $parsedBody['grant_type'];
+        }
         return $this->impersonate(
             parent::issueToken($request),
             $parsedBody['impersonate_token'] ?? null
@@ -79,22 +84,20 @@ abstract class LoginController extends AccessTokenController
             return $callback();
         }
         catch (LeagueException $e) {
-            return $this->throwException($e);
+            $this->throwException($e);
         }
     }
 
     protected function throwException(LeagueException $e)
     {
-        $e->setPayload(static::failPayload(null, $e, 401));
+        if ($this->grantType == 'password' && $e->getErrorType() == 'invalid_grant') {
+            $this->throwException(LeagueException::invalidCredentials());
+        }
+
+        $e->setPayload(static::failPayload(null, $e, $e->getHttpStatusCode()));
         throw new OAuthServerException(
             $e,
             $this->convertResponse($e->generateHttpResponse(new Psr7Response))
         );
-    }
-
-    public function convertResponse($psrResponse)
-    {
-        return parent::convertResponse($psrResponse)
-            ->setStatusCode(ConfigHelper::getApiResponseStatus($psrResponse->getStatusCode()));
     }
 }

@@ -318,7 +318,7 @@ class Filer
     }
 
     public function moveToHandledStorage(HandledStorage $toStorage,
-                                         $toDirectory = 'asda',
+                                         $toDirectory = '',
                                          $keepOriginalName = true,
                                          $markOriginal = true,
                                          $cloneOriginal = false,

@@ -9,7 +9,9 @@ namespace App\ModelRepositories\Base;
 use App\ModelRepositories\UserRepository;
 use App\ModelRepositories\UserSocialRepository;
 use App\Models\Base\ExtendedUserModel;
-use App\Models\Base\IUser;
+use App\Models\Base\IHasRole;
+use App\Models\Base\IHasRoles;
+use App\Models\Base\IHasEmailVerified;
 use App\Models\User;
 use App\Utils\SocialLogin;
 use Illuminate\Support\Facades\DB;
@@ -17,12 +19,12 @@ use Illuminate\Support\Facades\DB;
 /**
  * Class ExtendedUserRepository
  * @package App\ModelRepositories
- * @property ExtendedUserModel $model
- * @method ExtendedUserModel newModel($pinned = true)
+ * @property ExtendedUserModel|IHasRole|IHasRoles|IHasEmailVerified|mixed|null $model
+ * @method ExtendedUserModel|IHasRole|IHasRoles|IHasEmailVerified|mixed newModel($pinned = true)
  */
-abstract class ExtendedUserRepository extends DependedRepository implements IUserRepository, IProtectedRepository
+abstract class ExtendedUserRepository extends DependedRepository implements IUserRepository
 {
-    use ProtectedRepositoryTrait;
+    use ProtectedRepositoryTrait, HasEmailVerifiedRepositoryTrait;
 
     public function __construct($id = null)
     {
@@ -30,8 +32,8 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
     }
 
     /**
-     * @param ExtendedUserModel|User|IUser|mixed|null $id
-     * @return ExtendedUserModel|IUser|mixed|null
+     * @param User|ExtendedUserModel|mixed|null $id
+     * @return ExtendedUserModel|IHasRole|IHasRoles|IHasEmailVerified|mixed|null
      * @throws
      */
     public function model($id = null)
@@ -46,8 +48,8 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
     {
         return parent::queryUniquely($query, $unique)
             ->orWhereHas('user', function ($query) use ($unique) {
-                $query->orWhere('email', $unique)
-                    ->where(DB::raw('BINARY username'), $unique);
+                $query->where('email', $unique)
+                    ->orWhere(DB::raw('BINARY username'), $unique);
             });
     }
 
@@ -97,19 +99,58 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
         return $this->model;
     }
 
+    /**
+     * @return UserRepository
+     */
+    protected function getUserRepository()
+    {
+        return tap(new UserRepository(), function (UserRepository $userRepository) {
+            if (!$this->protected) {
+                $userRepository->skipProtected();
+            }
+        });
+    }
+
     public function updateWithAttributes(array $attributes = [], array $userAttributes = [], array $userSocialAttributes = [])
     {
         if (!empty($userAttributes) || !empty($userSocialAttributes)) {
-            (new UserRepository())->withModel($this->model->user)->updateWithAttributes($userAttributes, $userSocialAttributes);
+            $this->getUserRepository()
+                ->withModel($this->model->user)
+                ->updateWithAttributes($userAttributes, $userSocialAttributes);
         }
+
+        $this->validateProtected('Cannot edit this protected user');
         return parent::updateWithAttributes($attributes);
+    }
+
+    public function updatePassword($password)
+    {
+        $this->getUserRepository()
+            ->withModel($this->model->user)
+            ->updatePassword($password);
+
+        $this->validateProtected('Cannot edit this protected user');
+        return $this->model;
+    }
+
+    public function updatePasswordRandomly(&$password)
+    {
+        $this->getUserRepository()
+            ->withModel($this->model->user)
+            ->updatePasswordRandomly($password);
+
+        $this->validateProtected('Cannot edit this protected user');
+        return $this->model;
     }
 
     public function updateLastAccessedAt()
     {
-        return (new UserRepository())
+        $this->getUserRepository()
             ->withModel($this->model->user)
             ->updateLastAccessedAt();
+
+        $this->validateProtected('Cannot edit this protected user');
+        return $this->model;
     }
 
     /**
@@ -119,18 +160,17 @@ abstract class ExtendedUserRepository extends DependedRepository implements IUse
      */
     public function deleteWithIds(array $ids)
     {
-        (new UserRepository())->deleteWithIds($ids);
-        return $this->queryDelete(
-            $this->dependedWhere(function ($query) {
-                $query->noneProtected();
-            }, SocialLogin::getInstance()->enabled() ? 'user' : null)
-                ->queryByIds($ids)
-        );
+        $this->getUserRepository()->deleteWithIds($ids);
+        return $this->queryDelete($this->queryProtected($this->queryByIds($ids)));
     }
 
     public function delete()
     {
-        (new UserRepository())->withModel($this->model->user)->delete();
+        $this->getUserRepository()
+            ->withModel($this->model->user)
+            ->delete();
+
+        $this->validateProtected('Cannot delete this protected user');
         return parent::delete();
     }
 }

@@ -56,11 +56,6 @@ trait ApiResponseTrait
         $debug = null;
         if ($message instanceof Throwable) {
             $exception = $message;
-            $debug = [
-                'file' => $exception->getFile(),
-                'line' => $exception->getLine(),
-                'trace' => $exception->getTrace(),
-            ];
             if ($exception instanceof OAuthServerException) {
                 $exception = UserException::from(
                     $exception,
@@ -70,13 +65,13 @@ trait ApiResponseTrait
             if (!($exception instanceof Exception)) {
                 $exception = UnhandledException::from($exception);
             }
-
+            $debug = $exception->toArray();
             $message = $exception->getMessages();
             static::addErrorResponseMessage($exception->getLevel(), $exception->getAttachedData());
         }
 
         return [
-            '_messages' => empty($message) ? null : (array)$message,
+            '_messages' => $message ? (array)$message : null,
             '_data' => $data,
             '_extra' => static::$extraResponse,
             '_exception' => App::runningInDebug() ? $debug : null,
@@ -120,11 +115,10 @@ trait ApiResponseTrait
      */
     protected function response($payload, $status = Response::HTTP_OK, $headers = [])
     {
-        return response()->json(
+        return responseJson(
             $payload,
             ConfigHelper::getApiResponseStatus($status),
-            ConfigHelper::getApiResponseHeaders($headers),
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+            ConfigHelper::getApiResponseHeaders($headers)
         );
     }
 

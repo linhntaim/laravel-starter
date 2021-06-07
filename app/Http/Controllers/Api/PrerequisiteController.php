@@ -12,12 +12,15 @@ use App\ModelRepositories\AppOptionRepository;
 use App\ModelRepositories\PermissionRepository;
 use App\ModelRepositories\RoleRepository;
 use App\ModelResources\Base\ModelTransformTrait;
+use App\Models\Admin;
+use App\Models\Base\IHasEmailVerified;
 use App\Utils\Framework\ClientLimiter;
 use App\Utils\ConfigHelper;
 use App\Utils\Framework\ServerMaintainer;
 use App\Utils\HandledFiles\Helper;
 use App\Utils\SocialLogin;
 use App\Vendors\Illuminate\Support\Arr;
+use App\Vendors\Illuminate\Support\Facades\App;
 
 abstract class PrerequisiteController extends ApiController
 {
@@ -75,6 +78,12 @@ abstract class PrerequisiteController extends ApiController
                 ],
                 'forgot_password_enabled' => ConfigHelper::get('forgot_password_enabled'),
                 'notification_via_database' => ConfigHelper::get('notification.via.database'),
+                'verification_enabled' => [
+                    'email' => [
+                        'user' => App::userEmailVerifiedImplemented(),
+                        'admin' => App::adminEmailVerifiedImplemented(),
+                    ],
+                ],
             ];
         }
     }

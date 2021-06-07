@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Base - Any modification needs to be approved, except the space inside the block of TODO
+ */
+
 namespace App\ModelCasts;
 
 use App\Models\Base\ISafeArrayCast;
@@ -35,6 +39,6 @@ class SafeArrayCast
         if (!($model instanceof ISafeArrayCast) || $model->isSafeArrayCastEnabled($key)) {
             $value = array_merge($model->{$key}, $value);
         }
-        return json_encode($value);
+        return storeJson($value);
     }
 }

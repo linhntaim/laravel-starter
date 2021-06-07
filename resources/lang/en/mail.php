@@ -5,13 +5,26 @@
  */
 
 return [
-    'notifications' => [
-        'admin_reset_password_notification' => [
-            'mail_subject' => '[:app_name] Reset password',
-        ],
-        // TODO:
-
-        // TODO
+    'admin_email_verification_mailable' => [
+        'subject' => '[:app_name] Verify email',
+    ],
+    'admin_password_reset_automatically_mailable' => [
+        'subject' => '[:app_name] Reset password',
+    ],
+    'admin_password_reset_mailable' => [
+        'subject' => '[:app_name] Reset password',
+    ],
+    'email_verification_mailable' => [
+        'subject' => '[:app_name] Verify email',
+    ],
+    'password_reset_automatically_mailable' => [
+        'subject' => '[:app_name] Reset password',
+    ],
+    'password_reset_mailable' => [
+        'subject' => '[:app_name] Reset password',
+    ],
+    'test_mailable' => [
+        'subject' => '[:app_name] Test',
     ],
     // TODO:
 

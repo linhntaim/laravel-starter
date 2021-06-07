@@ -85,7 +85,7 @@ class Generator
      * @param int $limitQuantity
      * @param int $limitCharacters
      * @param callable|null $generatedCallback
-     * @param boolean $isRandom
+     * @param bool $isRandom
      * @return array
      */
     public function generate($limitQuantity = -1, $limitCharacters = -1, $generatedCallback = null, $isRandom = false)
@@ -135,7 +135,7 @@ class Generator
     /**
      * @param int $limitQuantity
      * @param callable|null $generatedCallback
-     * @param boolean $isRandom
+     * @param bool $isRandom
      * @return array
      */
     private function generateLimit($limitQuantity, $generatedCallback = null, $isRandom = false)

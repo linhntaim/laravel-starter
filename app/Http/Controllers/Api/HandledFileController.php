@@ -156,7 +156,7 @@ class HandledFileController extends ModelApiController
                 'public' => true,
                 'encrypt' => $request->input('encrypt') == 1,
             ]);
-        return response()->json([
+        return responseJson([
             'url' => $handledFile->url,
         ]);
     }

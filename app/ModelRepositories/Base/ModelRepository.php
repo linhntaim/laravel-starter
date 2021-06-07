@@ -14,10 +14,12 @@ use App\Models\Base\IModel;
 use App\Utils\AbortTrait;
 use App\Utils\ClassTrait;
 use App\Utils\ClientSettings\DateTimer;
+use App\Vendors\Illuminate\Support\Str;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use PDOException;
 
 abstract class ModelRepository
@@ -449,7 +451,7 @@ abstract class ModelRepository
     /**
      * @param callable $callback
      * @param callable|null $catchCallback
-     * @return Model|Collection|boolean|mixed|null|void
+     * @return Model|Collection|bool|mixed|null|void
      * @throws
      */
     protected function catch(callable $callback, callable $catchCallback = null)
@@ -562,6 +564,89 @@ abstract class ModelRepository
                 return $this->queryUniquely($query, $unique);
             })
         );
+    }
+
+    /**
+     * @return array
+     */
+    protected function getGeneratedUniqueKeys()
+    {
+        return [];
+    }
+
+    /**
+     * @param string $uniqueKey
+     * @return int|callable
+     */
+    protected function generateUniqueCallback(string $uniqueKey)
+    {
+        $generatedUniqueKeys = $this->getGeneratedUniqueKeys();
+        return $generatedUniqueKeys[$uniqueKey] ?? 32;
+    }
+
+    /**
+     * @param string $uniqueKey
+     * @param int|callable|null $generateCallback
+     * @param bool $binary
+     * @param array|callable|null $ignores
+     * @return string
+     */
+    protected function generateUniqueValue(string $uniqueKey, bool $binary = false, $generateCallback = null, $ignores = null)
+    {
+        if (is_null($generateCallback)) {
+            if (method_exists($this, $method = 'generateUnique' . Str::studly($uniqueKey))) {
+                $generateCallback = function () use ($method) {
+                    return $this->{$method}();
+                };
+            }
+            else {
+                $generateCallback = $this->generateUniqueCallback($uniqueKey);
+            }
+        }
+        if (is_int($generateCallback)) {
+            $length = $generateCallback;
+            $generateCallback = function () use ($length) {
+                return Str::random($length);
+            };
+        }
+
+        while (($uniqueValue = $generateCallback()) && $this->notStrict()->getByUnique($uniqueKey, $uniqueValue, $binary, $ignores)) {
+        }
+        return $uniqueValue;
+    }
+
+    public function updateUniqueValue(string $uniqueKey, bool $binary = false, $generateCallback = null, $ignores = null, array $attributes = [])
+    {
+        return $this->updateWithAttributes([
+                $uniqueKey => $this->generateUniqueValue($uniqueKey, $binary, $generateCallback, $ignores),
+            ] + $attributes);
+    }
+
+    /**
+     * @param string $uniqueKey
+     * @param string $uniqueValue
+     * @param bool $binary
+     * @param array|callable|null $ignores
+     * @return Model|null
+     */
+    public function getByUnique(string $uniqueKey, string $uniqueValue, bool $binary = false, $ignores = null)
+    {
+        if (method_exists($this, $method = 'getByUnique' . Str::studly($uniqueKey))) {
+            return $this->{$method}($uniqueValue, $ignores, $binary);
+        }
+        $query = $this->query()->where(
+            $binary ? DB::raw('BINARY ' . $uniqueKey) : $uniqueKey,
+            $uniqueValue
+        );
+        if (is_array($ignores)) {
+            foreach ($ignores as $ignoreKey => $ignoreValue) {
+                $query->where($ignoreKey, '<>', $ignoreValue);
+            }
+        }
+        elseif (is_callable($ignores)) {
+            $query = $ignores($query);
+        }
+        return $this->first($query);
     }
 
     /**
@@ -743,7 +828,7 @@ abstract class ModelRepository
 
     /**
      * @param array $ids
-     * @return boolean
+     * @return bool
      */
     public function deleteWithIds(array $ids)
     {
@@ -752,7 +837,7 @@ abstract class ModelRepository
 
     /**
      * @param Builder $query
-     * @return boolean
+     * @return bool
      * @throws
      */
     public function queryDelete($query)
@@ -770,7 +855,7 @@ abstract class ModelRepository
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function delete()
     {
@@ -783,7 +868,7 @@ abstract class ModelRepository
      */
     public function restore()
     {
-        if ($this->model->trashed()) {
+        if (!is_null($this->model) && $this->model->trashed()) {
             return $this->catch(function () {
                 $this->model->restore();
                 return $this->model;

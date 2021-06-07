@@ -13,9 +13,13 @@ trait AdminMiddlewareTrait
 {
     protected function getAdmin(Request $request)
     {
-        return $request->hasAdminViaMiddleware() ?
-            $request->admin()
-            : $request->setAdminViaMiddleware((new AdminRepository())->notStrict()->getById($request->user()->id))
-                ->admin();
+        return ($request->hasAdminViaMiddleware() ?
+            $request : $request->setAdminViaMiddleware((new AdminRepository())->notStrict()->getById($request->user()->id)))
+            ->admin();
+    }
+
+    protected function getUser(Request $request)
+    {
+        return $this->getAdmin($request);
     }
 }

@@ -11,11 +11,11 @@ use App\Models\Admin;
 use Illuminate\Http\UploadedFile;
 
 /**
- * Class UserRepository
+ * Class AdminRepository
  * @package App\ModelRepositories
- * @property Admin $model
- * @method Admin model($id = null)
- * @method Admin getById($id, callable $callback = null)
+ * @property Admin|null $model
+ * @method Admin|null model($id = null)
+ * @method Admin|null getById($id, callable $callback = null)
  */
 class AdminRepository extends ExtendedUserRepository
 {

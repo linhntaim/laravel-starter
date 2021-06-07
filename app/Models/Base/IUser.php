@@ -6,23 +6,20 @@
 
 namespace App\Models\Base;
 
-use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Contracts\Auth\CanResetPassword;
 
 /**
  * Interface IUser
  * @package App\Models\Base
  */
-interface IUser extends IContactable, HasLocalePreference, IProtected
+interface IUser extends IContactable, ILocalizable, IProtected, INotifiable, INotifier, CanResetPassword
 {
     public function getId();
 
-    public function preferredAvatarUrl();
-
-    public function preferredSettings();
-
-    public function getPasswordResetExpiredAt();
-
     public function getPasswordMinLength();
 
-    public function sendPasswordResetNotification($token);
+    /**
+     * @return string|null
+     */
+    public function getPasswordResetExpiredAt();
 }

@@ -33,7 +33,7 @@ class SystemLogController extends ModelApiController
                 $logRelativePath = trim(str_replace($this->logPath, '', $logRealPath), '\\/');
                 $systemLogs[] = [
                     'name' => $logRelativePath,
-                    'url' => route('admin.system_log.show', ['id' => str_replace('\\', '/', $logRelativePath)]),
+                    'url' => route('api.admin.system_log.show', ['id' => str_replace('\\', '/', $logRelativePath)]),
                 ];
             }
         }
