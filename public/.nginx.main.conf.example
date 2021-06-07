@@ -47,10 +47,12 @@ add_header Pragma "no-cache";
 # Ignore: Images
 #location ~ \.(jpg|jpeg|png|gif|svg|ico)$ {
 #    auth_basic off;
+#    allow all;
 #}
 # Ignore: Health check
 #location ~ 200\.html$ {
 #    auth_basic off;
+#    allow all;
 #}
 
 ### Handle Front
